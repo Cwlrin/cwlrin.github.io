@@ -9,13 +9,14 @@
     <meta http-equiv="Cache-Control" content="no-siteapp"/>
     <link rel="stylesheet" href="/styles/main.css">
     <link rel="stylesheet" href="//cdnjs.loli.net/ajax/libs/mdui/0.4.3/css/mdui.min.css">
+    <link rel="stylesheet" href="/media/css/post.css">
     <link rel="stylesheet" href="/media/live2d/css/live2d.css" />
     
     <script type="text/javascript" src="&lt;script type=&#34;text/javascript&#34; src=&#34;http://tajs.qq.com/stats?sId=undefined&#34; charset=&#34;UTF-8&#34;&gt;&lt;/script&gt;" charset="UTF-8"></script>
     
 </head>
 <body class=" mdui-appbar-with-toolbar  mdui-theme-primary-pink mdui-theme-accent-pink">
-        <header class="mdui-toolbar mdui-color-pink mdui-appbar-fixed mdui-appbar-scroll-toolbar-hide" style="z-index: 1000">
+<header class="mdui-toolbar mdui-color-pink mdui-appbar-fixed mdui-appbar-scroll-toolbar-hide" style="z-index: 1000">
     <a href="javascript:;" mdui-drawer="{target: '#left-drawer',overlay:true}" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
     <span class="mdui-typo-title">七叶的个人小站</span>
     <div class="mdui-toolbar-spacer"></div>
@@ -23,7 +24,7 @@
     <a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">more_vert</i></a>
 </header>
 
-        <div class="mdui-drawer mdui-color-white mdui-drawer-full-height mdui-drawer-close" id="left-drawer">
+<div class="mdui-drawer mdui-color-white mdui-drawer-full-height mdui-drawer-close" id="left-drawer">
     <ul class="mdui-list">
         <li class="mdui-subheader">菜单</li>
         
@@ -46,38 +47,47 @@
     </ul>
 </div>
 
+<div id="content" class="site-content">
+    <div id="primary" class="content-area">
+        <main id="main" class="site-main" role="main">
+            <article id="post-1270" class="post-1270 post type-post status-publish format-standard hentry category-90 category-129 tag-149">
+                <header class="entry-header">
+                    <h1 class="entry-title">About</h1>
+                    <p class="entry-census">发布于 2020-02-27</p>
+                    <hr>
+                </header>
+                <div class="neko">
+                    <p>🌸欢迎来到七叶的小站，这里是樱小路七叶，你可以叫我七叶~<br>
+🌸 这个网站主要用来储存一些我的一些学习笔记和游戏心得，大部分的学习笔记会同步于<a href="https://www.luogu.com.cn/blog/nanaha/">洛谷博客</a> 。<br>
+🌸 你可以在文章底部留下你的昵称、邮箱或者网站来进行回复，我会一一回应你的留言（通过留下的邮箱或网站进行回复）。</p>
+
+                </div>
+            </article>
+        </main>
+    </div>
+    <div class="doc-footer-nav mdui-color-theme">
         <div class="mdui-container">
-            <div class="mdui-row mdui-row-gapless">
-                <div class="k-container">
-                    <div class="head_card-offset"></div>
-                    
-    <div class="mdui-card">
-        <div class="mdui-card-media">
-            <img src="http://b266.photo.store.qq.com/psb?/V14elsmj2ZtqRO/HFy.JAQHgrWRRP.3Jkr0Pjsc2qgV5U9hJB9L*Lxe7QU!/b/dAoBAAAAAAAA&amp;bo=wAY4BAAAAAARB8o!&amp;rf=viewer_4"/>
-            <div class="mdui-card-media-covered">
-                <div class="mdui-card-primary">
-                    <div class="mdui-card-primary-title">七叶的算法笔记——排序、模拟</div>
-                    <div class="mdui-card-primary-subtitle"></div>
-                </div>
-                <div class="mdui-card-actions" style="float:right;">
-                    <a href="https://cwlrin.github.io/post/qi-xie-de-suan-fa-bi-ji-pai-xu-mo-ni/" class="mdui-btn mdui-ripple mdui-ripple-white">点击查看</a>
-                </div>
+            <div class="mdui-row">
+                
+                <div class="mdui-col-xs-2 mdui-col-sm-6 doc-footer-nav-left"></div>
+                
+                
+                <a href="https://cwlrin.github.io/post/qi-xie-de-suan-fa-bi-ji-pai-xu-mo-ni/" class="mdui-ripple mdui-color-theme mdui-col-xs-10 mdui-col-sm-6 doc-footer-nav-right">
+                    <div class="doc-footer-nav-text">
+                        <i class="mdui-icon material-icons">arrow_forward</i>
+                        <span class="doc-footer-nav-direction">下一篇文章</span>
+                        <div class="doc-footer-nav-chapter">七叶的算法笔记——排序、模拟</div>
+                    </div>
+                </a>
+                
             </div>
         </div>
     </div>
-    <div class="head_card-offset"></div>
-
-
-                </div>
-            </div>
-            <div class="mdui-row mdui-row-gapless">
-                <div class="k-container">
-                    
-
-                </div>
-            </div>
-        </div>
-        <footer class="mdui-container footer ">
+    <br>
+    
+    <div class="comment"></div>
+</div>
+<footer class="mdui-container footer ">
     <div class="head_card-offset"></div>
     <div class="mdui-row mdui-row-gapless">
         <div class="k-container">
@@ -125,6 +135,31 @@
 <script type="text/javascript" src="/media/live2d/js/live2d.js"></script>
 <script type="text/javascript" src="/media/live2d/js/message.js"></script>
 
-    </body>
+</body>
 <script src="//cdnjs.loli.net/ajax/libs/mdui/0.4.3/js/mdui.min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+    $('.comment').bind('DOMNodeInserted',()=>{
+        $('.comment').unbind()
+
+        $('.vbtn').addClass(' mdui-btn mdui-color-theme-accent mdui-ripple')
+    })
+
+    let valine = new Valine({
+        el: '.comment',
+        
+        app_id: 'miKfAllYGUAWs0flYNOazIKw-gzGzoHsz',
+        
+        
+        app_key: 'bq92hoypqYLisNGOWtqbgRF6',
+        
+        
+        placeholder: '欢迎评论w~',
+        
+        path: window.location.pathname,
+        pageSize: 30,
+        avatar:'mm',
+        notify:true
+    })
+</script>
 </html>

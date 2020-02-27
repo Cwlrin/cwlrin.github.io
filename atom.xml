@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://cwlrin.github.io/</id>
     <title>七叶的个人小站</title>
-    <updated>2020-02-27T09:37:17.651Z</updated>
+    <updated>2020-02-27T10:21:08.128Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://cwlrin.github.io/"/>
     <link rel="self" href="https://cwlrin.github.io/atom.xml"/>
@@ -11,12 +11,26 @@
     <icon>https://cwlrin.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 七叶的个人小站</rights>
     <entry>
+        <title type="html"><![CDATA[About]]></title>
+        <id>https://cwlrin.github.io/post/guan-yu-ben-zhan/</id>
+        <link href="https://cwlrin.github.io/post/guan-yu-ben-zhan/">
+        </link>
+        <updated>2020-02-27T08:41:29.000Z</updated>
+        <content type="html"><![CDATA[<p>🌸欢迎来到七叶的小站，这里是樱小路七叶，你可以叫我七叶~<br>
+🌸 这个网站主要用来储存一些我的一些学习笔记和游戏心得，大部分的学习笔记会同步于<a href="https://www.luogu.com.cn/blog/nanaha/">洛谷博客</a> 。<br>
+🌸 你可以在文章底部留下你的昵称、邮箱或者网站来进行回复，我会一一回应你的留言（通过留下的邮箱或网站进行回复）。</p>
+]]></content>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[七叶的算法笔记——排序、模拟]]></title>
         <id>https://cwlrin.github.io/post/qi-xie-de-suan-fa-bi-ji-pai-xu-mo-ni/</id>
         <link href="https://cwlrin.github.io/post/qi-xie-de-suan-fa-bi-ji-pai-xu-mo-ni/">
         </link>
         <updated>2020-02-27T07:57:40.000Z</updated>
         <content type="html"><![CDATA[<ul>
+<li>
+<p>本blog已同步到<a href="https://www.luogu.com.cn/blog/nanaha/chun-ling-ying-ji-chu-zu-day1-pai-xu-mu-ni">洛谷博客</a>中，欢迎翻阅~</p>
+</li>
 <li>
 <p>本blog为自己根据洛谷春令营的课程整理，整理结果仅供参考，如果有错误的话欢迎指正。</p>
 </li>
