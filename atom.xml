@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://cwlrin.github.io/</id>
     <title>七叶的个人小站</title>
-    <updated>2020-02-27T13:24:39.697Z</updated>
+    <updated>2020-02-27T13:25:12.070Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://cwlrin.github.io/"/>
     <link rel="self" href="https://cwlrin.github.io/atom.xml"/>
@@ -596,7 +596,7 @@ void QuickSort1(SqList &amp;L, int low, int high)
 🌸 这个网站主要用来储存一些我的一些学习笔记和游戏心得，大部分的学习笔记会同步于<a href="https://www.luogu.com.cn/blog/nanaha/">洛谷博客</a> 。<br>
 🌸 你可以在文章底部留下你的昵称、邮箱或者网站来进行回复，我会一一回应你的留言（通过留下的邮箱或网站进行回复）。<br>
 🌸底下的那个L2D是伊斯特瓦尔，来自<a href="https://github.com/eeg1412/Live2dHistoire">一个大佬的开源项目</a> 。<br>
-🌸最后，希望点进这个小站的你天天开心~</p>
+🌸最后，希望点进这个小站的你看的开心~</p>
 ]]></content>
     </entry>
 </feed>
