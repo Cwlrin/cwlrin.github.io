@@ -1929,7 +1929,7 @@ body {
     .node-title::before {
       background-color: #555;
     }.bg-color {
-      background-color: #f8f9fa;
+      background-color: #fff;
     }a {
       color: #555;
     }
@@ -2003,24 +2003,26 @@ body {
       color: #fc6423;
       border-bottom-color: #fc6423;
     }.header {
-        opacity: 0.9;
+        opacity: 0.8;
         background-color: #fff;
       }
       .muse.section-layout {
-        opacity: 0.9;
+        opacity: 0.8;
       }
       .site-meta {
-        background: #f8f9fa !important;
+        background: #000 !important;
       }
       .head-top-line {
-        background: #f8f9fa !important;
+        background: #000 !important;
       }
     .brand {
-      background: #f8f9fa;
+      background: #000;
     }
     .main-title {
       color: #FFF;
     }
     .mist .site-title i {
       background: #FFF;
+    }.box-shadow-wrapper {
+      box-shadow: none !important;
     }
