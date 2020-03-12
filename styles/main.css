@@ -1895,12 +1895,12 @@ body {
     .nav-toggle .line {
       background-color: #eee !important;
     }.header {
-        width: 700px;
+        width: 960px;
         margin: 0 auto;
       }
 
       .main-continer {
-        width: 700px;
+        width: 960px;
         margin: 0 auto;
       }
     body {
@@ -2023,6 +2023,4 @@ body {
     }
     .mist .site-title i {
       background: #FFF;
-    }.box-shadow-wrapper {
-      box-shadow: none !important;
     }
