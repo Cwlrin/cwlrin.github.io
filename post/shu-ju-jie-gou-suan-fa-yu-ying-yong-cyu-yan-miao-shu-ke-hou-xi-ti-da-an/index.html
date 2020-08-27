@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="keywords" content="Gridea静态个人博客">
+<meta name="description" content="七叶今天码代码了吗">
+<meta name="theme-color" content="#000">
+<title>数据结构、算法与应用——C++语言描述 课后习题答案 | 七叶的个人小站</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1598546589453">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="stylesheet" href="/media/css/muse.css">
+
+<link rel="stylesheet" href="/media/fonts/font-awesome.css">
+<link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Rosario:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+<link href="/media/hljs/styles/androidstudio.css" rel="stylesheet">  
+
+<script src="/media/hljs/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.0/velocity.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.0/velocity.ui.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+
+    <meta name="description" content="数据结构、算法与应用——C++语言描述 课后习题答案" />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div class="head-top-line"></div>
+    <div class="header-box">
+      
+<div class=" muse">
+  <header class="header bg-color ">
+    <div class="blog-header box-shadow-wrapper  " id="header">
+      <div class="nav-toggle" id="nav_toggle">
+        <div class="toggle-box">
+          <div class="line line-top"></div>
+          <div class="line line-center"></div>
+          <div class="line line-bottom"></div>
+        </div>
+      </div>
+      <div class="site-meta">       
+        <div class="site-title">
+          
+            <a href="/" class="brand">
+              <span>七叶的个人小站</span>
+            </a>  
+          
+        </div>
+        
+          <p class="subtitle">七叶今天码代码了吗？</p>
+        
+      </div>
+      <nav class="site-nav" id="site_nav">
+        <ul id="nav_ul">
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/" target="_self">
+                  <i class="fa fa-home"></i> 首页
+                </a>
+              
+            </li>
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/archives" target="_self">
+                  <i class="fa fa-archive"></i> 发布时间
+                </a>
+              
+            </li>
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/tags" target="_self">
+                  <i class="fa fa-tags"></i> 标签
+                </a>
+              
+            </li>
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/post/guan-yu-ben-zhan" target="_self">
+                  <i class="fa fa-globe"></i> 关于
+                </a>
+              
+            </li>
+          
+          <li class="nav-item">
+            <a>
+              <i class="fa fa-search"></i> 搜索
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+</div>
+
+<script type="text/javascript"> 
+ 
+  let showNav = true;
+
+  let navToggle = document.querySelector('#nav_toggle'),
+  siteNav = document.querySelector('#site_nav');
+  
+  function navClick() {
+    let sideBar = document.querySelector('.sidebar');
+    let navUl = document.querySelector('#nav_ul');
+    navToggle.classList.toggle('nav-toggle-active');
+    siteNav.classList.toggle('nav-menu-active');
+    if (siteNav.classList.contains('nav-menu-active')) {
+      siteNav.style = "height: " + (navUl.children.length * 42) +"px !important";
+    } else {
+      siteNav.style = "";
+    }
+  }
+
+  navToggle.addEventListener('click',navClick);  
+</script>
+    </div>
+    <div class="main-continer">
+      
+      <div class="section-layout muse bg-color">
+        <div class="section-layout-wrapper">
+          
+
+<div class="sidebar">
+  
+    <div class="sidebar-box box-shadow-wrapper  right-motion" id="sidebar">
+      
+        <div class="post-list-sidebar">
+          <div class="sidebar-title">
+            <span id="tocSideBar" class="sidebar-title-item sidebar-title-active">文章目录</span>
+            <span id="metaSideBar" class="sidebar-title-item">站点概览</span>
+          </div>
+        </div>
+      
+      <div class="sidebar-body muse" id="sidebar_body">
+        
+          
+            <div class="post-side-meta" id="post_side_meta">
+              
+<div class="sidebar-wrapper box-shadow-wrapper ">
+  <div class="sidebar-item">
+    <img class="site-author-image right-motion" src="https://cwlrin.github.io//images/avatar.png"/>
+    <p class="site-author-name">七叶的个人小站</p>
+    <p class="site-description right-motion">七叶今天码代码了吗</p>
+  </div>
+  <div class="sidebar-item side-item-stat right-motion">
+    <div class="sidebar-item-box">
+      <a href="/archives/">
+        
+        <span class="site-item-stat-count">26</span>
+        <span class="site-item-stat-name">文章</span>
+      </a>
+    </div>
+    <div class="sidebar-item-box">
+      <a href="">
+        <span class="site-item-stat-count">6</span>
+        <span class="site-item-stat-name">分类</span>
+      </a>
+    </div>
+    <div class="sidebar-item-box">
+      <a href="/tags/">
+        <span class="site-item-stat-count">6</span>
+        <span class="site-item-stat-name">标签</span>
+      </a>
+    </div>
+  </div>
+  
+  
+    <div class="sidebar-item sidebar-item-social">
+      <div class="social-item">
+        
+          
+            <a href="https://steamcommunity.com/id/20304773/">
+              <i class="fa fa-steam"></i> steam
+            </a>
+          
+            <a href="https://music.163.com/#/user/home?id=411590211">
+              <i class="fa fa-music"></i> 网易云音乐
+            </a>
+          
+            <a href="https://www.zhihu.com/people/ying-xiao-lu-qi-xie">
+              <i class="fa fa-square"></i> 知乎
+            </a>
+          
+            <a href="https://space.bilibili.com/8013992">
+              <i class="fa fa-television"></i> 哔哩哔哩
+            </a>
+          
+        
+        
+      </div>
+    </div>
+  
+
+  <div class="sidebar-item">
+    <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=300 height=460 src="//music.163.com/outchain/player?type=0&id=3147695839&auto=0&height=430"></iframe>
+  </div>
+
+
+</div>
+            </div>
+            <div class="post-toc sidebar-body-active" id="post_toc" style="opacity: 1;">
+              <div class="toc-box right-motion">
+  <div class="toc-wrapper auto-number auto" id="toc_wrapper">
+    <ul class="markdownIt-TOC">
+<li><a href="#chapter-1">Chapter 1</a>
+<ul>
+<li><a href="#exercise-1">Exercise 1</a></li>
+<li><a href="#exercise-2">Exercise 2</a></li>
+<li><a href="#exercise-3">Exercise 3</a></li>
+<li><a href="#exercise-4">Exercise 4</a></li>
+<li><a href="#exercise-5">Exercise 5</a></li>
+<li><a href="#exercise-6">Exercise 6</a></li>
+<li><a href="#exercise-7">Exercise 7</a></li>
+<li><a href="#exercise-8">Exercise 8</a></li>
+<li><a href="#exercise-5-2">Exercise 5</a></li>
+<li><a href="#exercise-10">Exercise 10</a></li>
+<li><a href="#exercise-11">Exercise 11</a></li>
+<li><a href="#exercise-12">Exercise 12</a></li>
+<li><a href="#exercise-13">Exercise 13</a></li>
+<li><a href="#exercise-14">Exercise 14</a></li>
+<li><a href="#exercise-15">Exercise 15</a></li>
+<li><a href="#exercise-16">Exercise 16</a></li>
+<li><a href="#exercise-17">Exercise 17</a></li>
+<li><a href="#exercise-18">Exercise 18</a></li>
+<li><a href="#exercise-19">Exercise 19</a></li>
+<li><a href="#exercise-20">Exercise 20</a></li>
+<li><a href="#exercise-21">Exercise 21</a></li>
+<li><a href="#exercise-22">Exercise 22</a></li>
+<li><a href="#exercise-23">Exercise 23</a></li>
+<li><a href="#exercise-24">Exercise 24</a></li>
+<li><a href="#exercise-25">Exercise 25</a></li>
+<li><a href="#exercise-26">Exercise 26</a></li>
+<li><a href="#exercise-27-~-exercise-44">Exercise 27 ~ Exercise 44</a></li>
+<li><a href="#exercise-45">Exercise 45</a></li>
+<li><a href="#exercise-46">Exercise 46</a></li>
+<li><a href="#exercise-47">Exercise 47</a></li>
+<li><a href="#exercise-48">Exercise 48</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+</div>
+
+<script>
+
+let lastTop = 0, lList = [], hList = [], postBody, lastIndex = -1; 
+let active = 'active-show', activeClass = 'active-current';
+let tocWrapper = document.querySelector('#toc_wrapper');
+let tocContent = tocWrapper.children[0];
+let autoNumber = tocWrapper&&tocWrapper.classList.contains('auto-number');
+
+function addTocNumber(elem, deep) {
+  if (!elem) {
+    return;
+  }
+  let prop = elem.__proto__;
+
+  if (prop === HTMLUListElement.prototype) {
+    for (let i = 0; i < elem.children.length; i++) {
+      addTocNumber(elem.children[i], deep + (i + 1) + '.');
+    }
+  } else if (prop === HTMLLIElement.prototype) {
+    // 保存li元素
+    if (elem.children[0].__proto__ === HTMLAnchorElement.prototype) {
+      lList.push(elem);
+    }
+    for (let i = 0; i < elem.children.length; i++) {
+      let cur = elem.children[i];
+      if (cur.__proto__ === HTMLAnchorElement.prototype) {
+        if (autoNumber) {
+          cur.text =  deep + ' ' + cur.text;
+        }
+      } else if (cur.__proto__ === HTMLUListElement.prototype) {
+        addTocNumber(cur, deep);
+      }
+    }
+  }
+}
+
+function removeParentActiveClass() {
+  let parents = tocContent.querySelectorAll('.'+active)
+  parents.forEach(function(elem) {
+    elem.classList.remove(active);
+  });
+}
+
+function addActiveClass(index) {
+  if (index >= 0 && index < hList.length) {
+    lList[index].classList.add(activeClass);
+  }
+}
+
+function removeActiveClass(index) {
+  if (index >= 0 && index < hList.length) {
+    lList[index].classList.remove(activeClass);
+  }
+}
+
+function addActiveLiElemment(elem, parent) {
+  if (!elem || elem === parent) {
+    return;
+  } else {
+    if (elem.__proto__ === HTMLLIElement.prototype) {
+      elem.classList.add(active);
+    }
+    addActiveLiElemment(elem.parentElement, parent);
+  }
+}
+
+function showToc() {
+  if (tocWrapper) {
+    postBody = document.querySelector('#post_body');
+    for (let i = 0; i < postBody.children.length; i++) {
+      if (postBody.children[i].__proto__ === HTMLHeadingElement.prototype) {
+        hList.push(postBody.children[i]);
+      }
+    }
+    if (tocWrapper.classList.contains('compress')) {
+        tocContent.classList.add('closed');
+    } else if (tocWrapper.classList.contains('no_compress')){
+      tocContent.classList.add('expanded');
+    } else {
+      if (hList.length > 10) {
+        active = 'active-hidden'
+        tocContent.classList.add('closed');
+      } else {
+        tocContent.classList.add('expanded');
+      }
+    }
+  }
+}
+
+(function() {
+  // 处理不是从#一级标题开始目录
+  if (tocContent.children.length === 1 && tocContent.children[0].__proto__ === HTMLLIElement.prototype) {
+    let con = tocContent.children[0].children[0];
+    tocContent.innerHTML = con.innerHTML;
+  }
+  addTocNumber(tocContent, '');
+})();
+
+document.addEventListener('scroll', function(e) {
+  if (lList.length <= 0) {
+    return;
+  }
+  let scrollTop = document.scrollingElement.scrollTop + 10;
+  let dir;
+
+  if (lastTop - scrollTop > 0) {
+    dir = 'up';
+  } else {
+    dir = 'down';
+  }
+
+  lastTop = scrollTop;
+  if (scrollTop <= 0) {
+    if (lastIndex >= 0 && lastIndex < hList.length) {
+      lList[lastIndex].classList.remove(activeClass);
+    }
+    return;
+  }
+
+  let current = 0, hasFind = false;
+  for (let i = 0; i < hList.length; i++) {
+    if (hList[i].offsetTop > scrollTop) {
+      current = i;
+      hasFind = true;
+      break;
+    }
+  }
+  if (!hasFind && scrollTop > lList[lList.length - 1].offsetTop) {
+    current = hList.length - 1;
+  } else {
+    current--;
+  }
+  if (dir === 'down') {
+    if (current > lastIndex) {
+      addActiveClass(current);
+      removeActiveClass(lastIndex) 
+      lastIndex = current;
+      removeParentActiveClass();
+      lList[current] && addActiveLiElemment(lList[current].parentElement,tocContent);
+    }
+  } else {
+    if (current < lastIndex) {
+      addActiveClass(current);
+      removeActiveClass(lastIndex);
+      lastIndex = current;
+      removeParentActiveClass();
+      lList[current] && addActiveLiElemment(lList[current].parentElement,tocContent);
+    }
+  }
+});
+
+window.addEventListener('load', function() {
+  showToc();
+  document.querySelector('#sidebar').style='display: block;';
+  tocWrapper.classList.add('toc-active');
+  setTimeout(function() {
+    if ("createEvent" in document) {
+      let evt = document.createEvent("HTMLEvents");
+      evt.initEvent("scroll", false, true);
+      document.dispatchEvent(evt);
+    }
+    else {
+      document.fireEvent("scroll");
+    }
+  }, 500)
+})
+
+</script>
+            </div>
+          
+        
+      </div>
+    </div>
+  
+</div>
+<script>
+  const SIDEBAR_TITLE_ACTIVE = 'sidebar-title-active';
+  const SIDEBAR_BODY_ACTIVE = 'sidebar-body-active';
+  const SLIDE_UP_IN = 'slide-up-in';
+
+  let sidebar = document.querySelector('#sidebar'),
+  tocSideBar = document.querySelector('#tocSideBar'),
+  metaSideBar = document.querySelector('#metaSideBar'),
+  postToc = document.querySelector('#post_toc'),
+  postSiteMeta = document.querySelector('#post_side_meta'),
+  sidebarTitle = document.querySelector('.sidebar-title'),
+  sidebarBody = document.querySelector('#sidebar_body');
+
+  tocSideBar && tocSideBar.addEventListener('click', (e) => {
+    toggleSidebar(e);
+  });
+
+  metaSideBar && metaSideBar.addEventListener('click', (e) => {
+    toggleSidebar(e);
+  });
+
+  function toggleSidebar(e) {
+    let currentTitle = document.querySelector("."+SIDEBAR_TITLE_ACTIVE);
+    if (currentTitle == e.srcElement) {
+      return ;
+    }
+    let current, showElement, hideElement;
+    if (e.srcElement == metaSideBar) {
+      showElement = postSiteMeta;
+      hideElement = postToc;
+    } else if (e.srcElement == tocSideBar){
+      showElement = postToc;
+      hideElement = postSiteMeta;
+    }
+    currentTitle.classList.remove(SIDEBAR_TITLE_ACTIVE);
+    e.srcElement.classList.add(SIDEBAR_TITLE_ACTIVE);
+
+    window.Velocity(hideElement, 'stop');
+    window.Velocity(hideElement, 'transition.slideUpOut', {
+      display: 'none',
+      duration: 200,
+      complete: function () {
+        window.Velocity(showElement, 'transition.slideDownIn', {
+          duration: 200
+        });
+      }
+    })
+    hideElement.classList.remove(SIDEBAR_BODY_ACTIVE);
+    showElement.classList.add(SIDEBAR_BODY_ACTIVE);
+  }
+
+  postToc && postToc.addEventListener('transitionend', function() {
+    this.classList.remove(SLIDE_UP_IN);
+  });
+
+  if (sidebarBody) {
+    if (sidebarBody.classList.contains('pisces') || sidebarBody.classList.contains('gemini')) {
+      let hasFix = false;
+      let scrollEl = document.querySelector('.main-continer');
+      let limitTop = document.querySelector('#nav_ul').children.length * 42 + 162;
+      window.addEventListener('scroll', function(e) {
+        if (document.scrollingElement.scrollTop >= limitTop) {
+          if (!hasFix) {
+            sidebar.classList.add('sidebar-fixed');
+            hasFix = true;
+          }
+        } else {
+          if (hasFix) {
+            sidebar.classList.remove('sidebar-fixed');
+            hasFix = false;
+          }
+        }
+      });
+    }
+  }
+  
+</script>
+          <div class="section-box box-shadow-wrapper">
+            <div class="section bg-color post post-page">
+              <header class="post-header">
+  <h1 class="post-title">
+    <a class="post-title-link" href="https://cwlrin.github.io/post/shu-ju-jie-gou-suan-fa-yu-ying-yong-cyu-yan-miao-shu-ke-hou-xi-ti-da-an/">
+      数据结构、算法与应用——C++语言描述 课后习题答案
+    </a>
+  </h1>
+  <div class="post-meta">
+    
+    <span class="meta-item pc-show">
+      <i class="fa fa-calendar-o"></i>
+      <span>发布于</span>
+      <span>2020-08-28</span>
+      <span class="post-meta-divider pc-show">|</span>
+    </span>
+    
+    <span class="meta-item">
+      <i class="fa fa-clock-o"></i>
+      <span>36分钟</span>
+    </span>
+    <span class="meta-item">
+      <span class="post-meta-divider">|</span>
+      <i class="fa fa-file-word-o"></i>
+      <span>6620<span class="pc-show">字数</span></span>
+    </span>
+    
+      
+      
+        
+      
+      <span id="/post/shu-ju-jie-gou-suan-fa-yu-ying-yong-cyu-yan-miao-shu-ke-hou-xi-ti-da-an/" data-flag-title="数据结构、算法与应用——C++语言描述 课后习题答案" class="meta-item pc-show leancloud_visitors">
+        <span class="post-meta-divider">|</span>
+        <i class="fa fa-eye"></i>
+        <span>浏览量：<span class="leancloud-visitors-count" ></span></span>
+      </span>
+    
+  </div>
+</header>
+              <div class="post-body next-md-body" id="post_body">
+                <figure data-type="image" tabindex="1"><img src="https://cwlrin.github.io//post-images/1598546578498.png" alt="" loading="lazy"></figure>
+<h1 id="chapter-1">Chapter 1</h1>
+<h2 id="exercise-1">Exercise 1</h2>
+<p>The function <code>swap</code> fails to swap the values of the actual parameters because <code>x</code> and <code>y</code> are value parameters. The invocation <code>swap(a, b)</code> results in the values of the actual parameters a and b being copied into the formal parameters <code>x</code> and <code>y</code>, respectively. Then, within the body of swap, the values of <code>x</code> and <code>y</code> are interchanged, and the function terminates. Upon termination, the new values of <code>x</code> and <code>y</code> are not copied back into the actual parameters. Consequently, the values of the actual parameters are unaffected by the function.<br>
+To get the function to work properly we should change the header to</p>
+<pre><code class="language-cpp">void swap(int&amp; x, int&amp; y);
+</code></pre>
+<p>函数 <code>swap</code> 无法交换实际参数的值，因为 <code>x</code> 和 <code>y</code> 是形参。调用 <code>swap(a, b)</code>导致实际参数a和b的值分别复制到形式参数 <code>x</code> 和 <code>y</code> 中。然后，在交换体内，<code>x</code> 和 <code>y</code> 的值互换，并且函数终止。 终止后，不会将 <code>x</code> 和 <code>y</code> 的新值复制回实际参数中。 因此，实际参数的值不受该功能的影响。<br>
+为了使功能正常工作，我们应该将标头更改为</p>
+<pre><code class="language-cpp">void swap(int&amp; x, int&amp; y);
+</code></pre>
+<h2 id="exercise-2">Exercise 2</h2>
+<pre><code class="language-cpp">template &lt;class T&gt;
+int count(T a[], int n, const T&amp; value)
+{// 返回数组 a[0:n-1] 中 value 出现的次数.
+   int theCount = 0;
+   for (int i = 0; i &lt; n; i++)
+      if (a[i] == value)
+         theCount++;
+   return theCount;
+}
+</code></pre>
+<h2 id="exercise-3">Exercise 3</h2>
+<pre><code class="language-cpp">template &lt;class T&gt;
+void fill(T* a, int start, int end, const T&amp; value)
+{// 建立数组 a[start:end-1].
+   for (int i = start; i &lt; end; i++)
+      a[i] = value;
+}
+</code></pre>
+<h2 id="exercise-4">Exercise 4</h2>
+<pre><code class="language-cpp">template &lt;class T&gt; 
+T inner_product(T a[], T b[], int n)
+{// 返回 sum_(0  &lt; = i  &lt;  n) a[i] * b[i].
+   T ip = 0;
+   for (int i = 0; i  &lt;  n; i++)
+      ip += a[i] * b[i];
+   return ip;
+}
+</code></pre>
+<h2 id="exercise-5">Exercise 5</h2>
+<pre><code class="language-cpp">template &lt;class T&gt;
+void iota(T* a, int n, const T&amp; value)
+{// 建立 a[i] = a[i] + value, 0 &lt;= i &lt; n.
+   for (int i = 0; i &lt; n; i++)
+      a[i] += value;
+}
+</code></pre>
+<h2 id="exercise-6">Exercise 6</h2>
+<pre><code class="language-cpp">template &lt;class T&gt;
+bool is_sorted(T a[], int n)
+{// 当且仅当 a[0:n-1] 有序时，返回 true.
+   for (int i = 0; i &lt; n - 1; i++)
+      if (a[i] &gt; a[i + 1])
+         return false;
+   return true;
+}
+</code></pre>
+<h2 id="exercise-7">Exercise 7</h2>
+<pre><code class="language-cpp">template &lt;class T&gt;
+int mismatch(T* a, T* b, int n)
+{// 返回使不等式 a[i] != b[i] 成立的最小索引 i.
+ // Return n if no such i.
+   for (int i = 0; i &lt; n; i++)
+      if (a[i] != b[i])
+         return i;
+
+   // no mismatch
+   return n;
+}
+</code></pre>
+<h2 id="exercise-8">Exercise 8</h2>
+<p>The signature of a function is given by the number and data types of its actual parameters. Both functions have the same signature <code>(int, int, int)</code>.</p>
+<p>函数的签名由其实际参数的数量和数据类型给出。 这两个函数具有相同的签名 <code>(int，int，int)</code>。</p>
+<h2 id="exercise-5-2">Exercise 5</h2>
+<ol>
+<li>
+<p>The signature of the function invocation agrees with that of the <code>abc</code> function of Program 1.1. Therefore, the <code>abc</code> function of Program 1.1 is invoked.</p>
+</li>
+<li>
+<p>The signature of the function invocation agrees with that of the <code>abc</code> function of Program 1.2. Therefore, the <code>abc</code> function of Program 1.2 is invoked.</p>
+</li>
+<li>
+<p>vThe signature of the function invocation does not agree with that of either of the <code>abc</code> functions. Since type conversions from both float to int and <code>int</code> to <code>float</code> are possible, C++ cannot resolve which function to use and gives a compile-time error.</p>
+</li>
+<li>
+<p>The actual parameters are of type <code>double</code>. C++ cannot resolve which function to use and gives a compile-time error as type conversions from <code>double</code> to both <code>int</code> and <code>float</code> are possible.</p>
+</li>
+</ol>
+<ul>
+<li>
+<p>函数调用的签名与程序 1.1 的 <code>abc</code> 函数的签名一致。 因此，将调用程序 1.1 的 <code>abc</code> 函数。</p>
+</li>
+<li>
+<p>函数调用的签名与程序 1.2 的 <code>abc</code> 函数的签名一致。 因此，将调用程序 1.2 的 <code>abc</code> 函数。</p>
+</li>
+<li>
+<p>函数调用的签名与任何一个 <code>abc</code> 函数的签名不一致。 由于可以进行从 <code>float</code> 到 <code>int</code> 以及从 <code>int</code> 到 <code>float</code> 的类型转换，因此 C++ 无法解析要使用的函数，并且会给出编译时错误。</p>
+</li>
+<li>
+<p>实参的类型为 <code>double</code>。 C ++无法解析要使用的函数，并且会给出编译时错误，因为可能会将类型从<code>double</code> 转换为 <code>int</code> 和 <code>float</code>。</p>
+</li>
+</ul>
+<hr>
+<h2 id="exercise-10">Exercise 10</h2>
+<pre><code class="language-cpp">int abc(int a, int b, int c)
+{
+   if (a &lt; 0 &amp;&amp; b &lt; 0 &amp;&amp; c &lt; 0)
+          throw 1;
+   if (a == 0 &amp;&amp; b == 0 &amp;&amp; c == 0)
+          throw 2;
+   return a + b * c;
+}
+
+int main()
+{
+  int a = -1, b = -2, c= -3;
+  cout &lt;&lt; &quot;The parameters to abc were &quot; &lt;&lt; a &lt;&lt; &quot;, &quot;
+       &lt;&lt; b &lt;&lt; &quot;, &quot; &lt;&lt; c &lt;&lt; endl;
+  try {cout &lt;&lt; abc(a,b,c) &lt;&lt; endl;}
+  catch (int e)
+      {
+         if (e == 1)
+            cout &lt;&lt; &quot;All are &lt; 0&quot; &lt;&lt; endl;
+         else
+            cout &lt;&lt; &quot;All are = 0&quot; &lt;&lt; endl;
+      }
+  a = b = c= 0;
+  cout &lt;&lt; &quot;The parameters to abc were &quot; &lt;&lt; a &lt;&lt; &quot;, &quot;
+       &lt;&lt; b &lt;&lt; &quot;, &quot; &lt;&lt; c &lt;&lt; endl;
+  try {cout &lt;&lt; abc(a,b,c) &lt;&lt; endl;}
+  catch (int e)
+      {
+         if (e == 1)
+            cout &lt;&lt; &quot;All are &lt; 0&quot; &lt;&lt; endl;
+         else
+            cout &lt;&lt; &quot;All are = 0&quot; &lt;&lt; endl;
+      }
+  a = 1; b = 2; c= 0;
+  cout &lt;&lt; &quot;The parameters to abc were &quot; &lt;&lt; a &lt;&lt; &quot;, &quot;
+       &lt;&lt; b &lt;&lt; &quot;, &quot; &lt;&lt; c &lt;&lt; endl;
+  try {cout &lt;&lt; abc(a,b,c) &lt;&lt; endl;}
+  catch (int e)
+      {
+         if (e == 1)
+            cout &lt;&lt; &quot;All are &lt; 0&quot; &lt;&lt; endl;
+         else
+            cout &lt;&lt; &quot;All are = 0&quot; &lt;&lt; endl;
+         return 1;
+      }
+   cout &lt;&lt; &quot;No Exception&quot; &lt;&lt; endl;
+   return 0;
+}
+</code></pre>
+<h2 id="exercise-11">Exercise 11</h2>
+<pre><code class="language-cpp">template &lt;class T&gt;
+int count(T a[], int n, const T&amp; value)
+{// 返回数组 a[0:n-1] 中 value 出现的次数.
+   if (n &lt; 1)
+      throw &quot;n must be &gt;= 1&quot;;
+
+   int theCount = 0;
+   for (int i = 0; i &lt; n; i++)
+      if (a[i] == value)
+         theCount++;
+   return theCount;
+}
+</code></pre>
+<hr>
+<h2 id="exercise-12">Exercise 12</h2>
+<pre><code class="language-cpp">template &lt;class T&gt;
+void make2dArray(T ** &amp;x, int numberOfRows, int* rowSize)
+{// 创建一个二维数组
+
+   // 创建行指针
+   x = new T * [numberOfRows];
+      
+   // 为每一行分配空间
+   for (int i = 0; i &lt; numberOfRows; i++)
+      x[i] = new T [rowSize[i]];
+}
+</code></pre>
+<h2 id="exercise-13">Exercise 13</h2>
+<pre><code class="language-cpp">template&lt;class T&gt;
+void changeLength1D(T*&amp; a, int oldLength, int newLength)
+{
+   if (newLength &lt; 0)
+      throw illegalParameterValue(&quot;new length must be &gt;= 0&quot;);
+
+   T* temp = new T[newLength];              // 分配新数组
+   int number = min(oldLength, newLength);  // 复制 number
+   copy(a, a + number, temp);
+   delete [] a;                             // 释放旧空间
+   a = temp;
+}
+</code></pre>
+<h2 id="exercise-14">Exercise 14</h2>
+<pre><code class="language-cpp">template&lt;class T&gt;
+void changeLength2D(T**&amp; a, int oldRows, int oldColumns, int newRows, int newColumns)
+{
+   if (newRows &lt; 0 || newColumns &lt; 0)
+      throw illegalParameterValue(&quot;# of rows and columns must be &gt;= 0&quot;);
+
+   T** temp;
+   make2dArray(temp, newRows, newColumns);
+   int rowsToCopy = min(oldRows, newRows);
+   int columnsToCopy = min(oldColumns, newColumns);
+   for (int i = 0; i &lt; rowsToCopy; i++)
+      copy(a[i], a[i] + columnsToCopy, temp[i]);
+   delete2dArray(a, oldRows);    // 释放旧空间
+   a = temp;
+}
+</code></pre>
+<hr>
+<h2 id="exercise-15">Exercise 15</h2>
+<ul>
+<li>
+<p>The data member <code>dollar</code> is of type <code>long</code>. The maximum value assignable to a variable of type <code>unsigned long</code> is <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>32</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^{32}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>. The maximum allowable value for <code>cents</code> is 99. Therefore, when the representation of Program 1.13 is used, the maximum permissible currency value is <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>32</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^{32} - 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span> dollars and 99 cents.<br>
+Since we store the sign seprately, the minimum currency value is just the negative of the maximum value.</p>
+</li>
+<li>
+<p>The maximum value assignable to a variable of type <code>int</code> is <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>31</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^{31} - 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>. The maximum allowable value for cents is 99. When the data type of <code>dollars</code> and <code>cents</code> is changed to <code>int</code>, the maximum permissible currency value is <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>31</mn></msup></mrow><annotation encoding="application/x-tex">2^{31}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span> - 1 dollars and 99 cents.<br>
+Since we store the sign seprately, the minimum currency value is just the negative of the maximum value.</p>
+</li>
+<li>
+<p>To avoid an error in the conversion, the result (<code>a1</code> and <code>a2</code>) should not exceed <code>MAX_VALUE = 2^{32}-1</code>. Therefore, the dollar amount should not exceed <code>MAX_VALUE / 100</code>. Even though the dollar amount may not exceed MAX_VALUE / 100, the method may not give the correct result. To assure a correct result, the sum of the dollar amounts should not exceed <code>MAX_VALUE / 100</code>.</p>
+</li>
+<li>
+<p>数据成员 <code>dollar</code> 的类型为 <code>long</code> 。可分配给 <code>unsigned long</code> 类型的变量的最大值为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>32</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2 ^ {32}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>。<code>cent</code> 的最大允许值为 99。因此，当使用程序   1.13 的表示形式时，允许的最大货币值为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>32</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2 ^ {32 }-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span> <code>dollar</code> 和99 <code>cent</code>。<br>
+由于我们将符号分开存储，因此最小货币值就是最大值的负数。</p>
+</li>
+<li>
+<p>可分配给 <code>int</code> 类型的变量的最大值为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>31</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2 ^ {31}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>。 <code>cent</code> 的最大允许值为 99。当 <code>dollar</code> 和 <code>cent</code> 的数据类型更改为 <code>int</code> 时，最大允许的货币值为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>31</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2 ^ { 31}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span> <code>dollar</code> 和 99 <code>cent</code>。<br>
+由于我们分开存储符号，因此最小货币价值就是最大值的负数。</p>
+</li>
+<li>
+<p>为避免转换错误，结果（<code>a1</code> 和 <code>a2</code>）不应超过 <code>MAX_VALUE = 2 ^ {32} -1</code>。因此，<code>dollar</code>金额不应超过 <code>MAX_VALUE /100</code>。即使 <code>dollar</code> 金额可能不超过 <code>MAX_VALUE / 100</code>，该方法也可能无法给出正确的结果。为了确保结果正确，<code>dollar</code> 的总和不应超过 <code>MAX_VALUE / 100</code>。</p>
+</li>
+</ul>
+<h2 id="exercise-16">Exercise 16</h2>
+<p>We have at least two options on how to proceed. The new functions can be placed directly into the class <code>currency</code> or we can place the new functions in a class <code>enhancedCurrency</code> which is derived from <code>currency</code>. We shall take the latter approach. Even here, we have the option of either changing the visibility modifer for the data members of <code>currency</code> from <code>private</code> to <code>protected</code> so that our new class can directly access these data members, or we can leave things the way they are and use the <code>get</code> and <code>set</code> functions of <code>currency</code>. We shall take the latter option. Our choices leave the original class <code>currency</code> unmodified.</p>
+<p>关于如何进行，我们至少有两个选择。 可以将新功能直接放置在 <code>currency</code> 类中，也可以将新功能放置在从 <code>currency</code> 派生的类 <code>EnhancedCurrency</code> 中。 我们将采用后一种方法。 即使在这里，我们也可以选择将 <code>currency</code> 数据成员的可见性修改器从 <code>private</code> 更改为 <code>protected</code> ，以便我们的新类可以直接访问这些数据成员，或者可以按原样保留一切并使用 <code>get</code> 和 <code>set</code> <code>currency</code>功能。 我们将采用后一种选择。 我们的选择使原始类别的 <code>currency</code> 保持不变。</p>
+<pre><code class="language-cpp">class enhancedCurrency : public currency
+{
+   public:
+      // 与super class相同的构造函数
+      enhancedCurrency(signType theSign = plus,
+                       unsigned long theDollars = 0,
+                       unsigned int theCents = 0) :
+         currency(theSign, theDollars, theCents) {}
+   
+      // new instance methods
+      void input()
+      {
+         // 输入 double 类型的金额
+         cout &lt;&lt; &quot;Enter the currency amount as a real number&quot; &lt;&lt; endl;
+         double theValue;
+         cin &gt;&gt; theValue;
+   
+         // 设定 value
+         setValue(theValue);
+      }
+   
+      enhancedCurrency subtract(const enhancedCurrency&amp; x)
+      {// 返回 *this - x.
+         // 将* this转换为 a long
+         long a1 = getDollars() * 100 + getCents();
+         if (getSign() == minus) a1 = -a1;
+         
+         // 将 x 转换为a long
+         long a2 = x.getDollars() * 100 + x.getCents();
+         if (x.getSign() == minus) a2 = -a2;
+         
+         long a3 = a1 - a2;
+          
+         // 将结果转换为 EnhancedCurrency 对象
+         enhancedCurrency result;
+         signType theSign = plus;
+         if (a3 &lt; 0)
+         {
+            theSign = minus;
+            a3 = -a3;
+         }
+         result.setValue(theSign, a3 / 100, a3 - a3 / 100 * 100);
+         
+         return result;
+      }
+   
+      enhancedCurrency percent(float x)
+      {// 返回 * this的 x 百分比。
+         long a1, a2;
+         // convert this to a long
+         a1 = getDollars() * 100 + getCents();
+         if (getSign() == minus) a1 = -a1;
+         
+         a2 = (long) (a1 * x / 100);
+          
+         // 将结果转换为 EnhancedCurrency 对象
+         enhancedCurrency result;
+         signType theSign = plus;
+         if (a2 &lt; 0)
+         {
+            theSign = minus;
+            a2 = -a2;
+         }
+         result.setValue(theSign, a2 / 100, a2 - a2 / 100 * 100);
+         
+         return result;
+      }
+   
+      enhancedCurrency multiply(float x)
+      {// 返回 this * x.
+         long a1, a2;
+         // convert this to a long
+         a1 = getDollars() * 100 + getCents();
+         if (getSign() == minus) a1 = -a1;
+         
+         a2 = (long) (a1 * x);
+          
+         // 将结果转换为 EnhancedCurrency 对象
+         enhancedCurrency result;
+         signType theSign = plus;
+         if (a2 &lt; 0)
+         {
+            theSign = minus;
+            a2 = -a2;
+         }
+         result.setValue(theSign, a2 / 100, a2 - a2 / 100 * 100);
+         
+         return result;
+      }
+   
+      enhancedCurrency divide(float x)
+      {// 返回 this / x.
+         long a1, a2;
+         // 将 x 转换为 a long
+         a1 = getDollars() * 100 + getCents();
+         if (getSign() == minus) a1 = -a1;
+         
+         a2 = (long) (a1 / x);
+          
+         // 将结果转换为 EnhancedCurrency 对象
+         enhancedCurrency result;
+         signType theSign = plus;
+         if (a2 &lt; 0)
+         {
+            theSign = minus;
+            a2 = -a2;
+         }
+         result.setValue(theSign, a2 / 100, a2 - a2 / 100 * 100);
+         
+         return result;
+      }
+};
+</code></pre>
+<h2 id="exercise-17">Exercise 17</h2>
+<p>We have at least two options on how to proceed. The new functions can be placed directly into the class <code>currency</code> or we can place the new functions in a class <code>enhancedCurrency</code> which is derived from <code>currency</code>. We shall take the former approach.</p>
+<p>关于如何进行，我们至少有两个选择。 可以将新功能直接放置在 <code>currency</code> 类中，也可以将新功能放置在从 <code>currency</code> 派生的类 <code>EnhancedCurrency</code> 中。 我们将采用前一种方法。</p>
+<pre><code class="language-cpp">void input()
+{
+   //  //输入金额为 double
+   cout &lt;&lt; &quot;Enter the currency amount as a real number&quot; &lt;&lt; endl;
+   double theValue;
+   cin &gt;&gt; theValue;
+   
+   // set the value
+   setValue(theValue);
+}
+   
+currency subtract(const currency&amp; x)
+{// 返回 *this - x.
+   currency result;
+   result.amount = amount - x.amount;
+   return result;
+}
+   
+currency percent(float x)
+{// 返回 *this 的 x 百分比.
+   currency result;
+   result.amount = (long) (amount * x / 100);
+   return result;
+}
+   
+currency multiply(float x)
+{// 返回 this * x.
+   currency result;
+   result.amount = (long) (amount * x);
+   return result;
+}
+   
+currency divide(float x)
+{// 返回 this / x.
+   currency result;
+   result.amount = (long) (amount / x);
+   return result;
+}
+</code></pre>
+<h2 id="exercise-18">Exercise 18</h2>
+<p>We have at least two options on how to proceed. The new functions can be placed directly into the class <code>currency</code> or we can place the new functions in a class <code>enhancedCurrency</code> which is derived from <code>currency</code>. We shall take the former approach.</p>
+<p>关于如何进行，我们至少有两个选择。 可以将新函数直接放置在 <code>currency</code>类中，也可以将新函数放置在 <code>currency</code> 类的 <code>enhancedCurrency</code> 类中。 我们将采用前一种方法。</p>
+<pre><code class="language-cpp">class currency 
+{
+   friend istream&amp; operator&gt;&gt;(istream&amp;, currency&amp;);
+   public:
+      // 构造函数
+      currency(signType theSign = plus,
+               unsigned long theDollars = 0,
+               unsigned int theCents = 0);
+      // 析构函数
+      ~currency() {}
+      currency operator=(int theAmount)
+      {
+         amount = theAmount;
+         return *this;
+      }
+      currency operator=(float theAmount)
+      {
+         if (theAmount &lt; 0)
+            amount = (long) ((theAmount - 0.001) * 100);
+         else
+            amount = (long) ((theAmount + 0.001) * 100);
+         return *this;
+      }
+      signType getSign() const
+        {if (amount &lt; 0) return minus;
+         else return plus;}
+      unsigned long getDollars() const
+        {if (amount &lt; 0) return (-amount) / 100;
+         else return amount / 100;}
+      unsigned int getCents() const
+        {if (amount &lt; 0) return -amount - getDollars() * 100;
+         else return amount - getDollars() * 100;}
+      currency operator+(const currency&amp;) const;
+      currency operator-(const currency&amp;) const;
+      currency operator%(float) const;
+      currency operator*(float) const;
+      currency operator/(float) const;
+      currency&amp; operator+=(const currency&amp; x)
+        {amount += x.amount; return *this;}
+      void output(ostream&amp;) const;
+   private:
+      long amount;
+};
+
+currency::currency(signType theSign, unsigned long theDollars,
+                                     unsigned int theCents)
+{// 创建对象 currency.
+   if (theCents &gt; 99)
+      // 美分太多
+      throw illegalParameterValue(&quot;Cents should be &lt; 100&quot;);
+   
+   amount = theDollars * 100 + theCents;
+   if (theSign == minus) amount = -amount;
+}
+
+currency currency::operator+(const currency&amp; x) const
+{// 加 x 和 *this.
+   currency result;
+   result.amount = amount + x.amount;
+   return result;
+}
+
+currency currency::operator-(const currency&amp; x) const
+{// 从 *this 添加 x.
+   currency y;
+   y.amount = amount - x.amount;
+   return y;
+}
+
+currency currency::operator%(float x) const
+{// 返回 *this 的 x %.
+   currency y;
+   y.amount = (long) (amount * x) / 100;
+   return y;
+}
+
+currency currency::operator*(float x) const
+{// 返回 x * (*this).
+   currency y;
+   y.amount = (long) (amount * x);
+   return y;
+}
+
+currency currency::operator/(float x) const
+{// 返回 (*this) / x.
+   currency y;
+   y.amount = (long) (amount / x);
+   return y;
+}
+
+void currency::output(ostream&amp; out) const
+{// 将 value 值插入流中.
+   long theAmount = amount;
+   if (theAmount &lt; 0) {out &lt;&lt; '-';
+                       theAmount = -theAmount;}
+   long dollars = theAmount / 100; // dollars
+   out &lt;&lt; '$' &lt;&lt; dollars &lt;&lt; '.';
+   int cents = theAmount - dollars * 100; // cents
+   if (cents &lt; 10) out &lt;&lt; '0';
+   out &lt;&lt; cents;
+}
+
+// 重载 &lt;&lt;
+ostream&amp; operator&lt;&lt;(ostream&amp; out, const currency&amp; x)
+   {x.output(out); return out;}
+
+// 重载 &gt;&gt;
+istream&amp; operator&gt;&gt;(istream&amp; in, currency&amp; x)
+{// 输入货币金额
+
+   float y;
+   cout &lt;&lt; &quot;Enter the currency amount as &quot;
+        &lt;&lt; &quot;a floating point number as in dd.cc or -dd.cc&quot;
+        &lt;&lt; endl;
+
+   in &gt;&gt; y;
+   x = y;
+   return in;
+}
+</code></pre>
+<hr>
+<h2 id="exercise-19">Exercise 19</h2>
+<pre><code class="language-cpp">int factorial (int n)
+{// 返回 n!.
+   if (n &lt;= 1)
+      return 1;
+   int fact = 2;
+   for (int i = 3; i &lt;= n; i++)
+      fact *= i;
+   return fact;
+}
+</code></pre>
+<h2 id="exercise-20">Exercise 20</h2>
+<ol>
+<li>
+<pre><code class="language-cpp">public static int recursiveFibonacci(int n)
+{
+   if (n == 0)
+      return 0;
+   if (n == 1)
+      return 1;
+      return recursiveFibonacci(n - 1) + recursiveFibonacci(n - 2);
+}
+</code></pre>
+</li>
+<li>
+<p>When computing <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>F</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">F_3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>, for example, <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>F</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">F_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> is computed twice. Notice that <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>F</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">F_3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> is computed as $F<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2</mn><mo>+</mo><msub><mi>F</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">2 + F_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>.</p>
+<p>例如，在计算<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>F</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">F_3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>时，两次计算<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>F</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">F_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>。 请注意，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>F</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">F_3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>计算为$F $ 2 + F_1$。</p>
+</li>
+<li>
+<p>To compute the <code>n</code>th Fibonacci number nonrecursively, we compute the numbers in the order <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>F</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>F</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>F</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>F</mi><mn>3</mn></msub><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">F_0, F_1, F_2, F_3, ...</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">.</span><span class="mord">.</span><span class="mord">.</span></span></span></span>; <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>F</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>F</mi><mn>3</mn></msub><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">F_2, F_3, ...</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">.</span><span class="mord">.</span><span class="mord">.</span></span></span></span> may each be computed by summing the two preceding numbers in the sequence.</p>
+<p>为了非递归地计算第n个斐波那契数，我们按 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>F</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>F</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>F</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>F</mi><mn>3</mn></msub><mi mathvariant="normal">，</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">F_0,F_1,F_2,F_3，...</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord cjk_fallback">，</span><span class="mord">.</span><span class="mord">.</span><span class="mord">.</span></span></span></span> 的顺序计算数字; <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>F</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>F</mi><mn>3</mn></msub><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">F_2,F_3,...</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">.</span><span class="mord">.</span><span class="mord">.</span></span></span></span>可以通过将序列中的两个前面的数字相加来计算。</p>
+<pre><code class="language-cpp">public static int fibonacci(int n)
+{
+   if (n == 0)
+      return 0;
+   if (n == 1)
+      return 1;
+   int secondLast = 0;  // 倒数第二个斐波那契数
+                        // 到目前为止计算
+   int last = 1;        // 最后的斐波那契数
+                        // 到目前为止计算
+   // 计算新数字
+   for (int i = 2; i &lt;= n; i++)
+   {
+      // 计算第 i 个斐波那契数
+      int next = last + secondLast;
+      // 更新 last 和 secondLast
+      secondLast = last;
+      last = next;
+   }
+
+   return last;
+}
+</code></pre>
+</li>
+</ol>
+<h2 id="exercise-21">Exercise 21</h2>
+<ol>
+<li>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>f</mi><mo>(</mo><mn>5</mn><mo>)</mo><mo>=</mo><mi>f</mi><mo>(</mo><mn>3</mn><mo>×</mo><mn>5</mn><mo>+</mo><mn>1</mn><mo>)</mo><mo>=</mo><mi>f</mi><mo>(</mo><mn>16</mn><mo>)</mo><mo>=</mo><mn>16</mn><mi mathvariant="normal">/</mi><mn>2</mn><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">f(5) = f(3 \times 5 + 1) = f(16) = 16 / 2 = 8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">5</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">1</span><span class="mord">6</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord">6</span><span class="mord">/</span><span class="mord">2</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">8</span></span></span></span>.</p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>f</mi><mo>(</mo><mn>7</mn><mo>)</mo><mo>=</mo><mi>f</mi><mo>(</mo><mn>3</mn><mo>×</mo><mn>7</mn><mo>+</mo><mn>1</mn><mo>)</mo><mo>=</mo><mi>f</mi><mo>(</mo><mn>22</mn><mo>)</mo><mo>=</mo><mn>22</mn><mi mathvariant="normal">/</mi><mn>2</mn><mo>=</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">f(7) = f(3 \times 7 + 1) = f(22) = 22 / 2 = 11</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">7</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">7</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">2</span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord">2</span><span class="mord">/</span><span class="mord">2</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">1</span></span></span></span>.</p>
+</li>
+<li>
+<p>The base component is <code>f(n) = n/2, n is even</code> and the recursive component is <code>f(n) = f(3n + 1), n is odd</code>.</p>
+<p>When <code>n</code> is odd, one application of the recursive component transforms the occurrence of <code>n</code> on the right hand side to the base component because <code>3n + 1</code> is even whenever <code>n</code> is odd.</p>
+<p>基础部分为<code>f（n）= n / 2，n为偶数</code>，递归成分为<code>f（n）= f（3n + 1），n为奇数</code>。</p>
+<p>当 <code>n</code>为奇数时，递归组件的一个应用程序会将右侧的 <code>n</code> 的出现转换为基本组件，因为 <code>3n + 1</code> 在 任意 <code>n</code> 时都为奇数。</p>
+</li>
+<li>
+<pre><code class="language-cpp">public static int recursiveF(int n)
+{
+   return (n % 2 == 0) ? n / 2 : recursiveF(3 * n + 1);
+}
+</code></pre>
+</li>
+<li>
+<pre><code class="language-cpp">public static int iterativeF(int n)
+{
+   return (n % 2 == 0) ? n / 2 : (3 * n + 1) / 2;
+}
+</code></pre>
+</li>
+</ol>
+<h2 id="exercise-22">Exercise 22</h2>
+<ol>
+<li>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>A</mi><mo>(</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo>)</mo><mo>=</mo><msup><mn>2</mn><mn>2</mn></msup><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">A(1,2) = 2^2 = 4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">A</span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">4</span></span></span></span>.</p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>A</mi><mo>(</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo>)</mo><mo>=</mo><mi>A</mi><mo>(</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo>)</mo><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">A(2,1) = A(1,2) = 4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">A</span><span class="mopen">(</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">A</span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">4</span></span></span></span>.</p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>A</mi><mo>(</mo><mn>2</mn><mo separator="true">,</mo><mn>2</mn><mo>)</mo><mo>=</mo><mi>A</mi><mo>(</mo><mn>1</mn><mo separator="true">,</mo><mi>A</mi><mo>(</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo>)</mo><mo>)</mo><mo>=</mo><mi>A</mi><mo>(</mo><mn>1</mn><mo separator="true">,</mo><mn>4</mn><mo>)</mo><mo>=</mo><msup><mn>2</mn><mn>4</mn></msup><mo>=</mo><mn>16</mn></mrow><annotation encoding="application/x-tex">A(2,2) = A(1, A(2,1)) = A(1, 4) = 2^4 = 16</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">A</span><span class="mopen">(</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">A</span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">A</span><span class="mopen">(</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">A</span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">4</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">6</span></span></span></span>.</p>
+</li>
+<li>
+<p>The base component is <code>A(i,j) = 2j for i = 1 and j = 1</code> and the recursive components are <code>A(i,j) = A(i-1,2)</code> for <code>i &gt;= 2 and j = 1</code> and <code>A(i,j) = A(i-1,A(i, j-1)) for i,j&gt;= 2</code>.</p>
+<p>对于 <code>i = 1</code> 和 <code>j = 1</code>，基本分量为 <code>A（i，j）= 2j</code>；对于 <code>i&gt; = 2 且 j = 1</code>，递归分量为 <code>A（i，j）= A（i-1,2）</code>。 对于 <code>i，j&gt; = 2，A（i，j）= A（i-1，A（i，j-1））</code></p>
+</li>
+<li>
+<pre><code class="language-cpp">/** 计算阿克曼函数
+* @当 i 或 j &lt;1时抛出 IllegalArgumentException */
+public static int ackermann(int i, int j)
+{
+   if (i &lt; 1 || j &lt; 1)
+      throw new IllegalArgumentException(&quot;i and j must be &gt;= 1, they are &quot;+ &quot;i = &quot; + i + &quot;  j = &quot; + j);
+
+   return a(i, j);
+}
+
+/** 计算阿克曼函数
+*假设 i，j&gt; = 1 */
+private static int a(int i, int j)
+{
+   if (i == 1)
+   {// 计算 2^j
+      int ans = 2;
+      for (int k = 1; k &lt; j; k++)
+         ans *= 2;
+      return ans;
+   }
+
+   if (j == 1)
+      return a(i - 1, 2);
+
+   // i 和 j &gt;= 2
+   return a(i - 1, a(i, j - 1));
+}
+</code></pre>
+</li>
+</ol>
+<h2 id="exercise-23">Exercise 23</h2>
+<ol>
+<li>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>gcd</mi><mo>⁡</mo><mo>(</mo><mn>20</mn><mo separator="true">,</mo><mn>30</mn><mo>)</mo><mo>=</mo><mi>gcd</mi><mo>⁡</mo><mo>(</mo><mn>30</mn><mo separator="true">,</mo><mn>20</mn><mspace></mspace><mspace width="0.6666666666666666em"/><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow><mtext> </mtext><mtext> </mtext><mn>30</mn><mo>)</mo><mo>=</mo><mi>gcd</mi><mo>⁡</mo><mo>(</mo><mn>30</mn><mo separator="true">,</mo><mn>20</mn><mo>)</mo><mo>=</mo><mi>gcd</mi><mo>⁡</mo><mo>(</mo><mn>20</mn><mo separator="true">,</mo><mn>30</mn><mspace></mspace><mspace width="0.6666666666666666em"/><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow><mtext> </mtext><mtext> </mtext><mn>20</mn><mo>)</mo><mo>=</mo><mi>gcd</mi><mo>⁡</mo><mo>(</mo><mn>20</mn><mo separator="true">,</mo><mn>10</mn><mo>)</mo><mo>=</mo><mi>gcd</mi><mo>⁡</mo><mo>(</mo><mn>10</mn><mo separator="true">,</mo><mn>20</mn><mspace></mspace><mspace width="0.6666666666666666em"/><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow><mtext> </mtext><mtext> </mtext><mn>10</mn><mo>)</mo><mo>=</mo><mi>gcd</mi><mo>⁡</mo><mo>(</mo><mn>10</mn><mo separator="true">,</mo><mn>0</mn><mo>)</mo><mo>=</mo><mn>10</mn></mrow><annotation encoding="application/x-tex">\gcd(20, 30) = \gcd(30, 20 \mod 30) = \gcd(30, 20) = \gcd(20, 30 \mod 20) = \gcd(20, 10) = \gcd(10, 20 \mod 10) = \gcd(10, 0) = 10</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span style="margin-right:0.01389em;">g</span>cd</span><span class="mopen">(</span><span class="mord">2</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">3</span><span class="mord">0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span style="margin-right:0.01389em;">g</span>cd</span><span class="mopen">(</span><span class="mord">3</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mord">0</span><span class="mspace allowbreak"></span><span class="mspace" style="margin-right:0.6666666666666666em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">m</span><span class="mord mathrm">o</span><span class="mord mathrm">d</span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">3</span><span class="mord">0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span style="margin-right:0.01389em;">g</span>cd</span><span class="mopen">(</span><span class="mord">3</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mord">0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span style="margin-right:0.01389em;">g</span>cd</span><span class="mopen">(</span><span class="mord">2</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">3</span><span class="mord">0</span><span class="mspace allowbreak"></span><span class="mspace" style="margin-right:0.6666666666666666em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">m</span><span class="mord mathrm">o</span><span class="mord mathrm">d</span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mord">0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span style="margin-right:0.01389em;">g</span>cd</span><span class="mopen">(</span><span class="mord">2</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span style="margin-right:0.01389em;">g</span>cd</span><span class="mopen">(</span><span class="mord">1</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mord">0</span><span class="mspace allowbreak"></span><span class="mspace" style="margin-right:0.6666666666666666em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">m</span><span class="mord mathrm">o</span><span class="mord mathrm">d</span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span style="margin-right:0.01389em;">g</span>cd</span><span class="mopen">(</span><span class="mord">1</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">0</span></span></span></span>.</p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>gcd</mi><mo>⁡</mo><mo>(</mo><mn>112</mn><mo separator="true">,</mo><mn>42</mn><mo>)</mo><mo>=</mo><mi>g</mi><mi>c</mi><mi>d</mi><mo>(</mo><mn>42</mn><mo separator="true">,</mo><mn>112</mn><mspace></mspace><mspace width="0.6666666666666666em"/><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow><mtext> </mtext><mtext> </mtext><mn>42</mn><mo>)</mo><mo>=</mo><mi>gcd</mi><mo>⁡</mo><mo>(</mo><mn>42</mn><mo separator="true">,</mo><mn>28</mn><mo>)</mo><mo>=</mo><mi>gcd</mi><mo>⁡</mo><mo>(</mo><mn>28</mn><mo separator="true">,</mo><mn>42</mn><mspace></mspace><mspace width="0.6666666666666666em"/><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow><mtext> </mtext><mtext> </mtext><mn>28</mn><mo>)</mo><mo>=</mo><mi>g</mi><mi>c</mi><mi>d</mi><mo>(</mo><mn>28</mn><mo separator="true">,</mo><mn>14</mn><mo>)</mo><mo>=</mo><mi>gcd</mi><mo>⁡</mo><mo>(</mo><mn>14</mn><mo separator="true">,</mo><mn>28</mn><mspace></mspace><mspace width="0.6666666666666666em"/><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow><mtext> </mtext><mtext> </mtext><mn>14</mn><mo>)</mo><mo>=</mo><mi>gcd</mi><mo>⁡</mo><mo>(</mo><mn>14</mn><mo separator="true">,</mo><mn>0</mn><mo>)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\gcd(112, 42) = gcd(42, 112 \mod 42) = \gcd(42, 28) = \gcd(28, 42 \mod 28) = gcd(28, 14) = \gcd(14, 28\mod 14) = \gcd(14,0) = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span style="margin-right:0.01389em;">g</span>cd</span><span class="mopen">(</span><span class="mord">1</span><span class="mord">1</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">4</span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord mathdefault">c</span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord">4</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">1</span><span class="mord">2</span><span class="mspace allowbreak"></span><span class="mspace" style="margin-right:0.6666666666666666em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">m</span><span class="mord mathrm">o</span><span class="mord mathrm">d</span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">4</span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span style="margin-right:0.01389em;">g</span>cd</span><span class="mopen">(</span><span class="mord">4</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mord">8</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span style="margin-right:0.01389em;">g</span>cd</span><span class="mopen">(</span><span class="mord">2</span><span class="mord">8</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">4</span><span class="mord">2</span><span class="mspace allowbreak"></span><span class="mspace" style="margin-right:0.6666666666666666em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">m</span><span class="mord mathrm">o</span><span class="mord mathrm">d</span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mord">8</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord mathdefault">c</span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord">2</span><span class="mord">8</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">4</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span style="margin-right:0.01389em;">g</span>cd</span><span class="mopen">(</span><span class="mord">1</span><span class="mord">4</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mord">8</span><span class="mspace allowbreak"></span><span class="mspace" style="margin-right:0.6666666666666666em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">m</span><span class="mord mathrm">o</span><span class="mord mathrm">d</span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">4</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span style="margin-right:0.01389em;">g</span>cd</span><span class="mopen">(</span><span class="mord">1</span><span class="mord">4</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span></span></span></span>.</p>
+</li>
+<li>
+<p>The base component is <code>gcd(x, y) = x when y = 0</code> and the recursive component is <code>gcd(x, y) = gcd(y, x mod y), y &gt; 0</code>.</p>
+<p>A formal proof can be provided using induction. We provide an informal proof. When x &lt; y, the first application of the definition gives us <code>gcd(x, y) = gcd(y, x mod y) = gcd(y, x)</code>. Following this, the first parameter is <code>&gt;</code> the second. So, we may consider only the case when <code>x &gt;= y</code>.</p>
+<p>When <code>x = y</code>, an application of the definition results in <code>gcd(x,y) = gcd(y, x mod y) = gcd(y,0)</code> which is an occurrence of <code>gcd</code> in the base component.</p>
+<p>When <code>x &gt; y</code>, an application of the definition results in <code>gcd(x,y) = gcd(y, x mod y) = gcd(y,z)</code>, where <code>0 &lt;= z &lt; y</code>. Each application of the recursive component decreases the second parameter. Therefore, after a sufficient number of applications (at most <code>y</code>), the second parameter will become <code>0</code> and we will have an occurrence of <code>gcd</code> which is in the base component.</p>
+<p>基础部分是<code>当y = 0时，gcd(x，y) = x</code>，递归部分是<code>gcd(x，y)= gcd(y，x mod y)，y&gt; 0</code>。</p>
+<p>可以使用归纳法提供正式证明。 我们提供非正式证明。 当 <code>x &lt; y</code> 时，定义的第一个应用为我们提供 <code>gcd(x, y)= gcd(y, x mod y)= gcd(y, x)</code>。在此之后，第一个参数 <code>&gt;</code> 第二个参数。 因此，我们可能只考虑 <code>x &gt;= y</code> 的情况。</p>
+<p>当 <code>x = y</code> 时，定义的应用导致 <code>gcd(x，y)= gcd(y，x mod y)= gcd(y，0)</code> 。这是在基础组件中出现的 <code>gcd</code>。</p>
+<p>当<code>x &gt; y</code>时，定义的应用将导致<code>gcd(x，y)= gcd(y，x mod y)= gcd(y，z)</code>，其中<code>0 &lt;= z &lt; y</code> 递归组件的每次应用都会减少第二个参数。 因此，在足够数量的应用程序之后（最多为 <code>y</code>），第二个参数将变为 <code>0</code> ，并且在基本组件中将出现 <code>gcd</code>。</p>
+</li>
+<li>
+<pre><code class="language-cpp">/** @返回 x 和 y 的 gcd
+  * @当 x 或 y &lt; 0 时抛出 IllegalArgumentException
+public static int gcd(int x, int y)
+{
+   if (x &lt; 0 || y &lt; 0)
+    throw new IllegalArgumentException(&quot;x and y must be &gt;= 0, &quot; + &quot;x = &quot; + x + &quot;  y = &quot; + y);
+
+   return rgcd(x, y);
+}
+
+/** @return the gcd of x and y
+ * assumes x,y &gt;= 0 */
+private static int rgcd(int x, int y)
+{
+   return (y == 0) ? x : rgcd(y, x % y);
+}
+</code></pre>
+</li>
+</ol>
+<h2 id="exercise-24">Exercise 24</h2>
+<p>The code is given below. This code first compares <code>a[n-1]</code> and <code>x</code>. If they are equal, we are done. If they are not equal, the problem becomes one of determining whether <code>x</code> is one of <code>a[0:n-2]</code>. The recursion terminates when <code>n</code> is smaller than 1.</p>
+<p>代码如下。 该代码首先比较 <code>a [n-1]</code> 和 <code>x</code>。 如果它们相等，我们就完成了。 如果它们不相等，则问题成为确定 <code>x</code> 是否为 <code>a[0：n-2]</code> 之一。 当 <code>n</code> 小于 1 时，递归终止。</p>
+<pre><code class="language-cpp">package applications;
+
+import wrappers.*;
+import utilities.*;
+
+public class Exists
+{
+   /** @ 如果 x 属于 a[0:n-1] ，返回 true */
+   public static boolean exists(Comparable [] a, Comparable x, int n)
+   {
+      if (n &lt; 1)
+         return false;
+      if (a[n - 1].equals(x))
+         return true;
+      return exists(a, x, n - 1);
+   }
+}
+</code></pre>
+<h2 id="exercise-25">Exercise 25</h2>
+<p>We may represent a subset of <code>n</code> elements by the one-dimensional array <code>x[1:n]</code>, where <code>x[j]</code> is one if element <code>j</code> is included in the subset and <code>x[j]</code> is zero if element <code>j</code> is not included in the subset.</p>
+<p>To output the subsets recursively, we define a method <code>subsets(int i)</code> which outputs all <code>x[1:n]</code> with preset values for <code>x[1:i-1]</code> and <code>x[i:n]</code> taking on all possible 0 and 1 values. The invocation <code>subsets(1)</code> will output all subsets.</p>
+<p>我们可以用一维数组 <code>x [1：n]</code> 表示n个元素的子集，其中如果元素 <code>j</code> 被包含在子集中，则<code>x[j]</code> 为1，如果元素 <code>j</code> 不包含在子集中，则 <code>x[j]</code> 为零。</p>
+<p>为了递归地输出子集，我们定义了一个方法 <code>subsets(int i)</code>，该方法输出所有带有预定值 <code>x [1：i-1]</code> 和 <code>x[i：n]</code> 的 <code>x[1：n]</code>，并取所有可能的 0 和 1 的值。 调用 <code>subsets(1)</code> 将输出所有子集。</p>
+<pre><code class="language-cpp">/** 生成n个元素的所有子集 */
+
+package applications;
+
+public class AllSubsets
+{
+   // 类数据成员
+   static int [] x;  // subset vector
+   
+   /** 定义数组 x 并调用私有方法子集*/
+   public static void allSubsets(int n)
+   {
+      x = new int [n + 1];
+      // output all subsets of x[1:n]
+      subsets(1);
+   }
+
+   /** 输出 x[1：i-1]，后跟 x[i：x.length-1] 的所有子集 */
+   private static void subsets(int i)
+   {
+      if (i == x.length - 1)
+      {// x[x.length-1]可以为 0 或 1
+         // 输出没有最后一个元素的子集
+         x[x.length - 1] = 0;
+         for (int j = 1; j &lt;= x.length - 1; j++)
+            System.out.print(x[j] + &quot; &quot;);
+         System.out.println();
+         
+         // 输出带有最后一个元素的子集
+         x[x.length - 1] = 1;
+         for (int j = 1; j &lt;= x.length - 1; j++)
+            System.out.print(x[j] + &quot; &quot;);
+         System.out.println();
+         return;
+      }
+                   
+      // 忽略元素 i
+      x[i] = 0;
+      // 生成所有排除 i 的子集
+      subsets(i + 1);
+                   
+       // 生成包含 i 的所有子集
+       x[i] = 1;
+       // generate all subsets with i included
+       subsets(i + 1);
+   }
+    
+   /** 测试程序 */
+   public static void main(String [] args)
+   {
+      allSubsets(4);
+   }
+}
+</code></pre>
+<h2 id="exercise-26">Exercise 26</h2>
+<ol>
+<li>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>g</mi><mo>(</mo><mn>4</mn><mo>)</mo><mo>=</mo><mi>g</mi><mo>(</mo><mn>3</mn><mo>)</mo><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mi>g</mi><mo>(</mo><mn>3</mn><mo>)</mo><mo>=</mo><mi>g</mi><mo>(</mo><mn>2</mn><mo>)</mo><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mi>g</mi><mo>(</mo><mn>2</mn><mo>)</mo><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mi>g</mi><mo>(</mo><mn>2</mn><mo>)</mo><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mi>g</mi><mo>(</mo><mn>2</mn><mo>)</mo><mo>=</mo><mi>g</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mi>g</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mi>g</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mi>g</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mi>g</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mi>g</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mi>g</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mi>g</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>1.</mn></mrow><annotation encoding="application/x-tex">g(4) = g(3), 4, g(3) = g(2), 3, g(2), 4, g(2), 3, g(2)
+= g(1), 2, g(1), 3, g(1), 2, g(1), 4, g(1), 2, g(1), 3, g(1), 2, g(1)
+= 1, 2, 1, 3, 1, 2, 1, 4, 1, 2, 1, 3, 1, 2, 1.</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">4</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">3</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">4</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">3</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">2</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">2</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">4</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">2</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">4</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">4</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">.</span></span></span></span></p>
+</li>
+<li>
+<p>The base component is <code>g(n) = 1</code>, for <code>n = 1</code> and the recursive component is <code>g(n) = g(n-1), n, g(n-1) for n &gt;= 1</code>.</p>
+<p>A formal proof can be provided using induction. We provide an informal proof. When <code>n = 1</code>, we have an occurrence of the base component. When <code>n &gt; 1</code>, one application of the recursive component yields two occurrences of <code>g(n-1)</code>. Two additional applications of the recursive component will replace the two occurrences of <code>g(n-1)</code> by four occurrences of <code>g(n-2)</code>, and so on. So, after <code>1 + 2 + 4 + 8 + ... +</code> <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mi>n</mi></msup><mo>−</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">2^n-2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.747722em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">2</span></span></span></span> applications of the recursive component, all remaining occurrences of <code>g</code> are base component occurrences.</p>
+<p>基础部分是<code>g（n）= 1</code>，对于<code>n = 1</code>，递归分量是```g（n）= g（n-1），n，g （n-1）对于n&gt; = 1`''。</p>
+<p>可以使用归纳法提供正式证明。 我们提供非正式证明。 当<code>n = 1</code>时，我们有一个基本成分出现。 当<code>n &gt; 1</code>时，递归组件的一种应用将产生两次<code>g(n-1)</code>。 递归组件的另外两个应用程序将用四个出现的 <code>g(n-2)</code> 替换两个出现的 <code>g(n-1)</code>，依此类推。 因此，在递归组件的 <code>1 + 2 + 4 + 8 + ... +</code> <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mi>n</mi></msup><mo>−</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">2 ^ n-2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.747722em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">2</span></span></span></span>应用之后，所有剩余的 <code>g</code> 的出现都是基本分量的出现。</p>
+</li>
+<li>
+<pre><code class="language-cpp">/** @返回 n 位格雷码的位转换顺序
+  * @ n &lt; 1 时抛出IllegalArgumentException */
+private static String grayCode(int n)
+{
+   if (n &lt; 1)
+      throw new IllegalArgumentException(&quot; n must be &gt;= 1, it is &quot;+ n);
+   return g(n);
+}
+
+/** @返回 n 位格雷码的位转换顺序 */
+private static String g(int n)
+{
+   if (n == 1)
+      return &quot;1&quot;;
+   
+   String left = g(n - 1);
+   return left + &quot;, &quot; + n + &quot;, &quot; + left;
+}
+</code></pre>
+</li>
+</ol>
+<hr>
+<h2 id="exercise-27-~-exercise-44">Exercise 27 ~ Exercise 44</h2>
+<p>404 Not Found.</p>
+<h2 id="exercise-45">Exercise 45</h2>
+<p>The program has 4 execution paths and each execution path has at least one statement that is not on any other execution path. Therefore, any test set that provides statement coverage must follow all execution paths, and hence must provide execution path coverage coverage.</p>
+<p>The program has 3 decisions. By examining the decisions needed to execute each of the 4 execution paths, we see that over these 4 execution paths, each of the 3 decisions takes on the truth values true and false. Hence execution path coverage implies decision coverage. Since we have already shown that statement coverage implies execution path coverage, it follows that any test set that provides statement coverage must also provide decision coverage.</p>
+<p>该程序有 4 个执行路径，每个执行路径都有至少一个不在任何其他执行路径上的语句。 因此，任何提供语句覆盖范围的测试集都必须遵循所有执行路径，因此必须提供执行路径覆盖范围。</p>
+<p>该程序有 3 个分支。 通过检查执行 4 条执行路径中的每条所需的分支，我们看到在这4条执行路径中，这3条决策中的每条都采用真值true和false。 因此，执行路径覆盖意味着决策分支。 由于我们已经表明语句覆盖率意味着执行路径覆盖率，因此，提供语句覆盖率的任何测试集也必须提供分支覆盖率。</p>
+<h2 id="exercise-46">Exercise 46</h2>
+<p>When <code>n = 3</code>, the <code>for</code> loop is entered three times and there can be <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>3</mn></msup></mrow><annotation encoding="application/x-tex">2^3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span> <code>= 8</code>sequences of outcomes for the decision <code>(a[pos].lessThan(a[i]))</code>. So there are 8 execution paths and 8 data sets are required for execution path coverage. Each execution path can be described by the truth value sequence for the decision. For example, FFF describes the path when <code>(a[pos].lessThan(a[i]))</code> is false on all three iterations of the <code>for</code> loop, and TFF describes the execution path when <code>(a[pos].lessThan(a[i]))</code> is true on the first iteration and false on the remaining two iterations of the <code>for</code> loop.</p>
+<p>A sample array <code>a[0:3]</code> for each execution path is given below.</p>
+<p>当<code>n = 3</code>时，<code>for</code>循环被输入 3 次，并且可能有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>3</mn></msup></mrow><annotation encoding="application/x-tex">2 ^ 3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span><code>= 8</code> 决策的结果序列<code>(a[pos].lessThan(a[i]))</code>。 因此，执行路径覆盖需要 8 条执行路径和 8 个数据集。 每个执行路径都可以由决策的真值序列描述。 例如，当 <code>a[pos].lessThan(a[i]))</code> 在 <code>for</code> 循环的所有三个迭代中为 false 时，FFF 描述路径，而 TFF 描述执行 当 <code>(a[pos].lessThan(a[i]))</code> 在 for 循环的第一次迭代中为 true 且在其余两次迭代中为 false 时的路径。</p>
+<p>下面给出了每个执行路径的示例数组 <code>a[0：3]</code>。</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Test set</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FFF</td>
+<td>[6, 2, 3, 1]</td>
+</tr>
+<tr>
+<td>TFF</td>
+<td>[2, 6, 3, 1]</td>
+</tr>
+<tr>
+<td>FTF</td>
+<td>[6, 2, 8, 1]</td>
+</tr>
+<tr>
+<td>TTF</td>
+<td>[2, 6, 8, 1]</td>
+</tr>
+<tr>
+<td>FFT</td>
+<td>[6, 2, 3, 8]</td>
+</tr>
+<tr>
+<td>TFT</td>
+<td>[2, 6, 3, 8]</td>
+</tr>
+<tr>
+<td>FTT</td>
+<td>[6, 2, 8, 9]</td>
+</tr>
+<tr>
+<td>TTT</td>
+<td>[2, 6, 8, 9]</td>
+</tr>
+</tbody>
+</table>
+<h2 id="exercise-47">Exercise 47</h2>
+<p>For each value of <code>n</code>, Program 1.30 has exactly one execution path.</p>
+<p>对于每个 <code>n</code> 值，程序 1.30 仅有一个执行路径。</p>
+<h2 id="exercise-48">Exercise 48</h2>
+<p>For each value of <code>n</code>, method <code>rSum</code> of Program 1.31 has exactly one execution path.</p>
+<p>对于每个 <code>n</code> 值，程序 1.31 的 <code>rSum</code> 函数具有一个执行路径。</p>
+
+              </div>
+              <div class="post-footer">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+      <strong>本文作者：</strong>
+      七叶的个人小站
+    </li>
+    <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://cwlrin.github.io/post/shu-ju-jie-gou-suan-fa-yu-ying-yong-cyu-yan-miao-shu-ke-hou-xi-ti-da-an/" title="数据结构、算法与应用——C++语言描述 课后习题答案">数据结构、算法与应用——C++语言描述 课后习题答案</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong>
+      本博客所有文章除特别声明外，转载请注明出处！
+    </li>
+  </ul>
+  <div class="tags">
+    
+  </div>
+  <div class="nav">
+    <div class="nav-prev">
+      
+    </div>
+    <div class="nav-next">
+      
+        <a class="nav-pc-next" title="离散数学——谓词逻辑" href="https://cwlrin.github.io/post/chi-san-shu-xue-wei-ci-luo-ji/">离散数学——谓词逻辑</a>
+        <a class="nav-mobile-next" title="离散数学——谓词逻辑" href="https://cwlrin.github.io/post/chi-san-shu-xue-wei-ci-luo-ji/">下一篇</a>
+        <i class="fa fa-chevron-right"></i>
+      
+    </div>
+  </div>
+</div>
+              
+                
+<script src="https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js"></script>
+<div id="vcomments" style="padding: 10px 0px 0px 0px"></div>
+<script>
+new Valine({
+    el: '#vcomments' ,
+    appId: 'miKfAllYGUAWs0flYNOazIKw-gzGzoHsz',
+    appKey: 'bq92hoypqYLisNGOWtqbgRF6',
+    notify: 'true' === 'true', 
+    avatar:'', 
+    placeholder: '',
+    pageSize: '',
+    lang: 'zh-cn',
+    visitor: 'true' === 'true',
+    highlight: 'true' === 'true',
+    avatarForce: 'true' === 'false',
+});
+</script>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-box">
+  <footer class="footer">
+    <div class="copyright">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | © 2019-2020 Theme By HsxyHao
+    </div>
+    <div class="poweredby">
+      
+    </div>
+  </footer>
+  
+  
+    <div class="drawer-box left" id="drawer_box">
+      <span class="muse-line muse-line-first"></span>
+      <span class="muse-line muse-line-middle"></span>
+      <span class="muse-line muse-line-last"></span>
+    </div>
+  
+  <div class="muse back-to-top" id="back_to_top">
+    <i class="fa fa-arrow-up"></i>
+    
+  </div>
+  
+    <div class="bg-img">
+      <img src="\media\images\custom-bgImg.jpg" />
+    </div>
+  
+  
+    <link rel="stylesheet" href="/media/live2d/histoire/css/live2d.css" />
+<div class="box-scale">
+  <div id="landlord" style="left:5px;bottom:0px;" data-key="">
+    <div class="message" style="opacity:0"></div>
+    <canvas id="live2d" width="500" height="560" class="live2d"></canvas>
+    <div class="live_talk_input_body">
+      <div class="live_talk_input_name_body">
+        <input name="name" type="text" class="live_talk_name white_input" id="AIuserName" autocomplete="off" placeholder="你的名字" />
+      </div>
+      <div class="live_talk_input_text_body">
+        <input name="talk" type="text" class="live_talk_talk white_input" id="AIuserText" autocomplete="off" placeholder="要和我聊什么呀？"/>
+        <button type="button" class="live_talk_send_btn" id="talk_send">发送</button>
+      </div>
+    </div>
+    <input name="live_talk" id="live_talk" value="1" type="hidden" />
+    <div class="live_ico_box">
+      <div class="live_ico_item type_info" id="showInfoBtn"></div>
+      <div class="live_ico_item type_talk" id="showTalkBtn"></div>
+      
+      <div class="live_ico_item type_youdu" id="youduButton"></div>
+      <div class="live_ico_item type_quit" id="hideButton"></div>
+      <input name="live_statu_val" id="live_statu_val" value="0" type="hidden" />
+      <audio src="" style="display:none;" id="live2d_bgm" data-bgm="0" preload="none"></audio>
+      <input id="duType" value="douqilai" type="hidden">
+      
+    </div>
+  </div>
+</div>
+<div id="open_live2d">召唤伊斯特瓦尔</div>
+<script src="https://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script>
+var message_Path = '/media/live2d/histoire/';
+let landlord = document.querySelector('#landlord');
+var apiKey = landlord.dataset.key;
+</script>
+<script type="text/javascript" src="/media/live2d/histoire/js/live2d.js"></script>
+<script type="text/javascript" src="/media/live2d/histoire/js/message.js"></script>
+  
+  
+    
+
+  
+</div>
+<script>
+
+  let sideBarOpen = 'sidebar-open';
+  let body = document.body;
+  let back2Top = document.querySelector('#back_to_top'),
+  back2TopText = document.querySelector('#back_to_top_text'),
+  drawerBox = document.querySelector('#drawer_box'),
+  rightSideBar = document.querySelector('.sidebar'),
+  viewport = document.querySelector('body');
+
+  function scrollAnimation(currentY, targetY) {
+   
+    let needScrollTop = targetY - currentY
+    let _currentY = currentY
+    setTimeout(() => {
+      const dist = Math.ceil(needScrollTop / 10)
+      _currentY += dist
+      window.scrollTo(_currentY, currentY)
+      if (needScrollTop > 10 || needScrollTop < -10) {
+        scrollAnimation(_currentY, targetY)
+      } else {
+        window.scrollTo(_currentY, targetY)
+      }
+    }, 1)
+  }
+
+  back2Top.addEventListener("click", function(e) {
+    scrollAnimation(document.scrollingElement.scrollTop, 0);
+    e.stopPropagation();
+    return false;
+  });
+  
+  window.addEventListener('scroll', function(e) {
+    let percent = document.scrollingElement.scrollTop / (document.scrollingElement.scrollHeight - document.scrollingElement.clientHeight) * 100;
+    if (percent > 1 && !back2Top.classList.contains('back-top-active')) {
+      back2Top.classList.add('back-top-active');
+    }
+    if (percent == 0) {
+      back2Top.classList.remove('back-top-active');
+    }
+    if (back2TopText) {
+      back2TopText.textContent = Math.floor(percent);
+    }
+  });
+
+  
+  let hasCacu = false;
+  window.onresize = function() {
+    if (window.width > 991) {
+      calcuHeight();
+    } else {
+      hasCacu = false;
+    }
+  }
+
+  function calcuHeight() {
+    // 动态调整站点概览高度
+    if (!hasCacu && back2Top.classList.contains('pisces') || back2Top.classList.contains('gemini')) {
+      let sideBar = document.querySelector('.sidebar');
+      let navUl = document.querySelector('#site_nav');
+      sideBar.style = 'margin-top:' + (navUl.offsetHeight + navUl.offsetTop + 15) + 'px;';
+      hasCacu = true;
+    }
+  }
+  calcuHeight();
+  
+  let open = false, MOTION_TIME = 300, RIGHT_MOVE_DIS = '320px';
+
+  if (drawerBox) {
+    let rightMotions = document.querySelectorAll('.right-motion');
+    let right = drawerBox.classList.contains('right');
+
+    let transitionDir = right ? "transition.slideRightIn" : "transition.slideLeftIn";
+
+    let openProp, closeProp;
+    if (right) {
+      openProp = {
+        paddingRight: RIGHT_MOVE_DIS 
+      };
+      closeProp = {
+        paddingRight: '0px'
+      };
+    } else {
+      openProp = {
+        paddingLeft: RIGHT_MOVE_DIS 
+      };
+      closeProp = {
+        paddingLeft: '0px'
+      };
+    }
+
+    drawerBox.onclick = function() {
+      open = !open;
+      window.Velocity(rightSideBar, 'stop');
+      window.Velocity(viewport, 'stop');
+      window.Velocity(rightMotions, 'stop');
+      if (open) {
+        window.Velocity(rightSideBar, {
+          width: RIGHT_MOVE_DIS
+        }, {
+          duration: MOTION_TIME,
+          begin: function() {
+            window.Velocity(rightMotions, transitionDir,{ });
+          }
+        })
+        window.Velocity(viewport, openProp,{
+          duration: MOTION_TIME
+        });
+      } else {
+        window.Velocity(rightSideBar, {
+          width: '0px'
+        }, {
+          duration: MOTION_TIME,
+          begin: function() {
+            window.Velocity(rightMotions, {
+              opacity: 0
+            });
+          }
+        })
+        window.Velocity(viewport, closeProp ,{
+          duration: MOTION_TIME
+        });
+      }
+      for (let i = 0; i < drawerBox.children.length; i++) {
+        drawerBox.children[i].classList.toggle('muse-line');
+      }
+      drawerBox.classList.toggle(sideBarOpen);
+    }
+  }
+
+  // 代码高亮
+  hljs.initHighlightingOnLoad();
+
+</script>
+    </div>
+  </body>
+  <script src="/media/js/motion.js"></script>
+</html>
