@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="keywords" content="Gridea静态个人博客">
+<meta name="description" content="七叶今天码代码了吗">
+<meta name="theme-color" content="#000">
+<title>七叶自用的Wiki模板 | 七叶的个人小站</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1599284408338">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="stylesheet" href="/media/css/muse.css">
+
+<link rel="stylesheet" href="/media/fonts/font-awesome.css">
+<link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Rosario:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+<link href="/media/hljs/styles/androidstudio.css" rel="stylesheet">  
+
+<script src="/media/hljs/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.0/velocity.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.0/velocity.ui.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+
+    <meta name="description" content="七叶自用的Wiki模板" />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div class="head-top-line"></div>
+    <div class="header-box">
+      
+<div class=" muse">
+  <header class="header bg-color ">
+    <div class="blog-header box-shadow-wrapper  " id="header">
+      <div class="nav-toggle" id="nav_toggle">
+        <div class="toggle-box">
+          <div class="line line-top"></div>
+          <div class="line line-center"></div>
+          <div class="line line-bottom"></div>
+        </div>
+      </div>
+      <div class="site-meta">       
+        <div class="site-title">
+          
+            <a href="/" class="brand">
+              <span>七叶的个人小站</span>
+            </a>  
+          
+        </div>
+        
+          <p class="subtitle">七叶今天码代码了吗？</p>
+        
+      </div>
+      <nav class="site-nav" id="site_nav">
+        <ul id="nav_ul">
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/" target="_self">
+                  <i class="fa fa-home"></i> 首页
+                </a>
+              
+            </li>
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/archives" target="_self">
+                  <i class="fa fa-archive"></i> 发布时间
+                </a>
+              
+            </li>
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/tags" target="_self">
+                  <i class="fa fa-tags"></i> 标签
+                </a>
+              
+            </li>
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/post/guan-yu-ben-zhan" target="_self">
+                  <i class="fa fa-globe"></i> 关于
+                </a>
+              
+            </li>
+          
+          <li class="nav-item">
+            <a>
+              <i class="fa fa-search"></i> 搜索
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+</div>
+
+<script type="text/javascript"> 
+ 
+  let showNav = true;
+
+  let navToggle = document.querySelector('#nav_toggle'),
+  siteNav = document.querySelector('#site_nav');
+  
+  function navClick() {
+    let sideBar = document.querySelector('.sidebar');
+    let navUl = document.querySelector('#nav_ul');
+    navToggle.classList.toggle('nav-toggle-active');
+    siteNav.classList.toggle('nav-menu-active');
+    if (siteNav.classList.contains('nav-menu-active')) {
+      siteNav.style = "height: " + (navUl.children.length * 42) +"px !important";
+    } else {
+      siteNav.style = "";
+    }
+  }
+
+  navToggle.addEventListener('click',navClick);  
+</script>
+    </div>
+    <div class="main-continer">
+      
+      <div class="section-layout muse bg-color">
+        <div class="section-layout-wrapper">
+          
+
+<div class="sidebar">
+  
+    <div class="sidebar-box box-shadow-wrapper  right-motion" id="sidebar">
+      
+        <div class="post-list-sidebar">
+          <div class="sidebar-title">
+            <span id="tocSideBar" class="sidebar-title-item sidebar-title-active">文章目录</span>
+            <span id="metaSideBar" class="sidebar-title-item">站点概览</span>
+          </div>
+        </div>
+      
+      <div class="sidebar-body muse" id="sidebar_body">
+        
+          
+            <div class="post-side-meta" id="post_side_meta">
+              
+<div class="sidebar-wrapper box-shadow-wrapper ">
+  <div class="sidebar-item">
+    <img class="site-author-image right-motion" src="https://cwlrin.wiki//images/avatar.png"/>
+    <p class="site-author-name">七叶的个人小站</p>
+    <p class="site-description right-motion">七叶今天码代码了吗</p>
+  </div>
+  <div class="sidebar-item side-item-stat right-motion">
+    <div class="sidebar-item-box">
+      <a href="/archives/">
+        
+        <span class="site-item-stat-count">27</span>
+        <span class="site-item-stat-name">文章</span>
+      </a>
+    </div>
+    <div class="sidebar-item-box">
+      <a href="">
+        <span class="site-item-stat-count">6</span>
+        <span class="site-item-stat-name">分类</span>
+      </a>
+    </div>
+    <div class="sidebar-item-box">
+      <a href="/tags/">
+        <span class="site-item-stat-count">6</span>
+        <span class="site-item-stat-name">标签</span>
+      </a>
+    </div>
+  </div>
+  
+  
+    <div class="sidebar-item sidebar-item-social">
+      <div class="social-item">
+        
+          
+            <a href="https://steamcommunity.com/id/20304773/">
+              <i class="fa fa-steam"></i> steam
+            </a>
+          
+            <a href="https://music.163.com/#/user/home?id=411590211">
+              <i class="fa fa-music"></i> 网易云音乐
+            </a>
+          
+            <a href="https://www.zhihu.com/people/ying-xiao-lu-qi-xie">
+              <i class="fa fa-square"></i> 知乎
+            </a>
+          
+            <a href="https://space.bilibili.com/8013992">
+              <i class="fa fa-television"></i> 哔哩哔哩
+            </a>
+          
+        
+        
+      </div>
+    </div>
+  
+
+  <div class="sidebar-item">
+    <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=300 height=460 src="//music.163.com/outchain/player?type=0&id=3147695839&auto=0&height=430"></iframe>
+  </div>
+
+
+</div>
+            </div>
+            <div class="post-toc sidebar-body-active" id="post_toc" style="opacity: 1;">
+              <div class="toc-box right-motion">
+  <div class="toc-wrapper auto-number auto" id="toc_wrapper">
+    <ul class="markdownIt-TOC">
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#galgame%E7%9B%B8%E5%85%B3">Galgame相关</a>
+<ul>
+<li><a href="#%E6%B8%B8%E6%88%8F%E4%BF%A1%E6%81%AF%E6%A8%A1%E6%9D%BF">游戏信息模板</a></li>
+<li><a href="#hidebox">HideBox</a></li>
+<li><a href="#%E8%A7%92%E8%89%B2%E6%A8%A1%E6%9D%BF">角色模板</a></li>
+<li><a href="#%E6%B8%B8%E6%88%8F%E6%94%BB%E7%95%A5%E6%A8%A1%E6%9D%BF">游戏攻略模板</a></li>
+<li><a href="#%E7%9B%B8%E5%85%B3%E9%9F%B3%E4%B9%90%E6%A8%A1%E6%9D%BF">相关音乐模板</a></li>
+</ul>
+</li>
+<li><a href="#%E8%99%9A%E6%8B%9F%E4%B8%BB%E6%92%AD%E7%9B%B8%E5%85%B3%E4%BB%A5%E6%B0%B8%E8%BF%9C%E9%85%B1%E4%B8%BA%E4%BE%8B">虚拟主播相关（以永远酱为例）</a>
+<ul>
+<li><a href="#%E4%BA%BA%E7%89%A9%E4%BF%A1%E6%81%AF%E6%A8%A1%E6%9D%BF">人物信息模板</a></li>
+<li><a href="#tioggle%E6%A8%A1%E6%9D%BF-bilibilivideo%E6%A8%A1%E6%9D%BF">Tioggle模板、bilibiliVideo模板</a></li>
+</ul>
+</li>
+<li><a href="#%E6%AD%8C%E6%9B%B2%E7%9B%B8%E5%85%B3%E4%BB%A5%E4%BB%A5%E6%81%8B%E7%BB%93%E7%BC%98%E4%B8%BA%E4%BE%8B">歌曲相关（以以恋结缘为例）</a>
+<ul>
+<li><a href="#%E6%AD%8C%E6%9B%B2%E4%BF%A1%E6%81%AF">歌曲信息</a></li>
+<li><a href="#%E6%AD%8C%E8%AF%8D">歌词</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9D%82%E9%A1%B9">杂项</a>
+<ul>
+<li><a href="#latex-%E6%A0%BC%E5%BC%8F%E4%BB%A3%E7%A0%81"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext>LaTeX</mtext></mrow><annotation encoding="application/x-tex">\LaTeX</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.89883em;vertical-align:-0.2155em;"></span><span class="mord text"><span class="mord textrm">L</span><span class="mspace" style="margin-right:-0.36em;"></span><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.68333em;"><span style="top:-2.904999em;"><span class="pstrut" style="height:2.7em;"></span><span class="mord text"><span class="mord textrm sizing reset-size6 size3">A</span></span></span></span></span></span><span class="mspace" style="margin-right:-0.15em;"></span><span class="mord text"><span class="mord textrm">T</span><span class="mspace" style="margin-right:-0.1667em;"></span><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.46782999999999997em;"><span style="top:-2.7845em;"><span class="pstrut" style="height:3em;"></span><span class="mord text"><span class="mord textrm">E</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2155em;"><span></span></span></span></span><span class="mspace" style="margin-right:-0.125em;"></span><span class="mord textrm">X</span></span></span></span></span></span> 格式代码</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+</div>
+
+<script>
+
+let lastTop = 0, lList = [], hList = [], postBody, lastIndex = -1; 
+let active = 'active-show', activeClass = 'active-current';
+let tocWrapper = document.querySelector('#toc_wrapper');
+let tocContent = tocWrapper.children[0];
+let autoNumber = tocWrapper&&tocWrapper.classList.contains('auto-number');
+
+function addTocNumber(elem, deep) {
+  if (!elem) {
+    return;
+  }
+  let prop = elem.__proto__;
+
+  if (prop === HTMLUListElement.prototype) {
+    for (let i = 0; i < elem.children.length; i++) {
+      addTocNumber(elem.children[i], deep + (i + 1) + '.');
+    }
+  } else if (prop === HTMLLIElement.prototype) {
+    // 保存li元素
+    if (elem.children[0].__proto__ === HTMLAnchorElement.prototype) {
+      lList.push(elem);
+    }
+    for (let i = 0; i < elem.children.length; i++) {
+      let cur = elem.children[i];
+      if (cur.__proto__ === HTMLAnchorElement.prototype) {
+        if (autoNumber) {
+          cur.text =  deep + ' ' + cur.text;
+        }
+      } else if (cur.__proto__ === HTMLUListElement.prototype) {
+        addTocNumber(cur, deep);
+      }
+    }
+  }
+}
+
+function removeParentActiveClass() {
+  let parents = tocContent.querySelectorAll('.'+active)
+  parents.forEach(function(elem) {
+    elem.classList.remove(active);
+  });
+}
+
+function addActiveClass(index) {
+  if (index >= 0 && index < hList.length) {
+    lList[index].classList.add(activeClass);
+  }
+}
+
+function removeActiveClass(index) {
+  if (index >= 0 && index < hList.length) {
+    lList[index].classList.remove(activeClass);
+  }
+}
+
+function addActiveLiElemment(elem, parent) {
+  if (!elem || elem === parent) {
+    return;
+  } else {
+    if (elem.__proto__ === HTMLLIElement.prototype) {
+      elem.classList.add(active);
+    }
+    addActiveLiElemment(elem.parentElement, parent);
+  }
+}
+
+function showToc() {
+  if (tocWrapper) {
+    postBody = document.querySelector('#post_body');
+    for (let i = 0; i < postBody.children.length; i++) {
+      if (postBody.children[i].__proto__ === HTMLHeadingElement.prototype) {
+        hList.push(postBody.children[i]);
+      }
+    }
+    if (tocWrapper.classList.contains('compress')) {
+        tocContent.classList.add('closed');
+    } else if (tocWrapper.classList.contains('no_compress')){
+      tocContent.classList.add('expanded');
+    } else {
+      if (hList.length > 10) {
+        active = 'active-hidden'
+        tocContent.classList.add('closed');
+      } else {
+        tocContent.classList.add('expanded');
+      }
+    }
+  }
+}
+
+(function() {
+  // 处理不是从#一级标题开始目录
+  if (tocContent.children.length === 1 && tocContent.children[0].__proto__ === HTMLLIElement.prototype) {
+    let con = tocContent.children[0].children[0];
+    tocContent.innerHTML = con.innerHTML;
+  }
+  addTocNumber(tocContent, '');
+})();
+
+document.addEventListener('scroll', function(e) {
+  if (lList.length <= 0) {
+    return;
+  }
+  let scrollTop = document.scrollingElement.scrollTop + 10;
+  let dir;
+
+  if (lastTop - scrollTop > 0) {
+    dir = 'up';
+  } else {
+    dir = 'down';
+  }
+
+  lastTop = scrollTop;
+  if (scrollTop <= 0) {
+    if (lastIndex >= 0 && lastIndex < hList.length) {
+      lList[lastIndex].classList.remove(activeClass);
+    }
+    return;
+  }
+
+  let current = 0, hasFind = false;
+  for (let i = 0; i < hList.length; i++) {
+    if (hList[i].offsetTop > scrollTop) {
+      current = i;
+      hasFind = true;
+      break;
+    }
+  }
+  if (!hasFind && scrollTop > lList[lList.length - 1].offsetTop) {
+    current = hList.length - 1;
+  } else {
+    current--;
+  }
+  if (dir === 'down') {
+    if (current > lastIndex) {
+      addActiveClass(current);
+      removeActiveClass(lastIndex) 
+      lastIndex = current;
+      removeParentActiveClass();
+      lList[current] && addActiveLiElemment(lList[current].parentElement,tocContent);
+    }
+  } else {
+    if (current < lastIndex) {
+      addActiveClass(current);
+      removeActiveClass(lastIndex);
+      lastIndex = current;
+      removeParentActiveClass();
+      lList[current] && addActiveLiElemment(lList[current].parentElement,tocContent);
+    }
+  }
+});
+
+window.addEventListener('load', function() {
+  showToc();
+  document.querySelector('#sidebar').style='display: block;';
+  tocWrapper.classList.add('toc-active');
+  setTimeout(function() {
+    if ("createEvent" in document) {
+      let evt = document.createEvent("HTMLEvents");
+      evt.initEvent("scroll", false, true);
+      document.dispatchEvent(evt);
+    }
+    else {
+      document.fireEvent("scroll");
+    }
+  }, 500)
+})
+
+</script>
+            </div>
+          
+        
+      </div>
+    </div>
+  
+</div>
+<script>
+  const SIDEBAR_TITLE_ACTIVE = 'sidebar-title-active';
+  const SIDEBAR_BODY_ACTIVE = 'sidebar-body-active';
+  const SLIDE_UP_IN = 'slide-up-in';
+
+  let sidebar = document.querySelector('#sidebar'),
+  tocSideBar = document.querySelector('#tocSideBar'),
+  metaSideBar = document.querySelector('#metaSideBar'),
+  postToc = document.querySelector('#post_toc'),
+  postSiteMeta = document.querySelector('#post_side_meta'),
+  sidebarTitle = document.querySelector('.sidebar-title'),
+  sidebarBody = document.querySelector('#sidebar_body');
+
+  tocSideBar && tocSideBar.addEventListener('click', (e) => {
+    toggleSidebar(e);
+  });
+
+  metaSideBar && metaSideBar.addEventListener('click', (e) => {
+    toggleSidebar(e);
+  });
+
+  function toggleSidebar(e) {
+    let currentTitle = document.querySelector("."+SIDEBAR_TITLE_ACTIVE);
+    if (currentTitle == e.srcElement) {
+      return ;
+    }
+    let current, showElement, hideElement;
+    if (e.srcElement == metaSideBar) {
+      showElement = postSiteMeta;
+      hideElement = postToc;
+    } else if (e.srcElement == tocSideBar){
+      showElement = postToc;
+      hideElement = postSiteMeta;
+    }
+    currentTitle.classList.remove(SIDEBAR_TITLE_ACTIVE);
+    e.srcElement.classList.add(SIDEBAR_TITLE_ACTIVE);
+
+    window.Velocity(hideElement, 'stop');
+    window.Velocity(hideElement, 'transition.slideUpOut', {
+      display: 'none',
+      duration: 200,
+      complete: function () {
+        window.Velocity(showElement, 'transition.slideDownIn', {
+          duration: 200
+        });
+      }
+    })
+    hideElement.classList.remove(SIDEBAR_BODY_ACTIVE);
+    showElement.classList.add(SIDEBAR_BODY_ACTIVE);
+  }
+
+  postToc && postToc.addEventListener('transitionend', function() {
+    this.classList.remove(SLIDE_UP_IN);
+  });
+
+  if (sidebarBody) {
+    if (sidebarBody.classList.contains('pisces') || sidebarBody.classList.contains('gemini')) {
+      let hasFix = false;
+      let scrollEl = document.querySelector('.main-continer');
+      let limitTop = document.querySelector('#nav_ul').children.length * 42 + 162;
+      window.addEventListener('scroll', function(e) {
+        if (document.scrollingElement.scrollTop >= limitTop) {
+          if (!hasFix) {
+            sidebar.classList.add('sidebar-fixed');
+            hasFix = true;
+          }
+        } else {
+          if (hasFix) {
+            sidebar.classList.remove('sidebar-fixed');
+            hasFix = false;
+          }
+        }
+      });
+    }
+  }
+  
+</script>
+          <div class="section-box box-shadow-wrapper">
+            <div class="section bg-color post post-page">
+              <header class="post-header">
+  <h1 class="post-title">
+    <a class="post-title-link" href="https://cwlrin.wiki/post/qi-xie-zi-yong-de-wiki-mo-ban/">
+      七叶自用的Wiki模板
+    </a>
+  </h1>
+  <div class="post-meta">
+    
+    <span class="meta-item pc-show">
+      <i class="fa fa-calendar-o"></i>
+      <span>发布于</span>
+      <span>2020-09-05</span>
+      <span class="post-meta-divider pc-show">|</span>
+    </span>
+    
+    <span class="meta-item">
+      <i class="fa fa-clock-o"></i>
+      <span>6分钟</span>
+    </span>
+    <span class="meta-item">
+      <span class="post-meta-divider">|</span>
+      <i class="fa fa-file-word-o"></i>
+      <span>1422<span class="pc-show">字数</span></span>
+    </span>
+    
+      
+      
+        
+      
+      <span id="/post/qi-xie-zi-yong-de-wiki-mo-ban/" data-flag-title="七叶自用的Wiki模板" class="meta-item pc-show leancloud_visitors">
+        <span class="post-meta-divider">|</span>
+        <i class="fa fa-eye"></i>
+        <span>浏览量：<span class="leancloud-visitors-count" ></span></span>
+      </span>
+    
+  </div>
+</header>
+              <div class="post-body next-md-body" id="post_body">
+                <h1 id="概述">概述</h1>
+<p>这里整理出个人常用的萌娘百科编辑模板，如果你也是萌娘百科的编辑者或者是使用 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">M</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">w</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">k</mi><mi mathvariant="normal">i</mi></mrow><annotation encoding="application/x-tex">\mathrm{Mediawiki}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord"><span class="mord mathrm">M</span><span class="mord mathrm">e</span><span class="mord mathrm">d</span><span class="mord mathrm">i</span><span class="mord mathrm">a</span><span class="mord mathrm" style="margin-right:0.01389em;">w</span><span class="mord mathrm">i</span><span class="mord mathrm">k</span><span class="mord mathrm">i</span></span></span></span></span> 语法进行编辑的维基人，可以随意使用和转载该模板。</p>
+<p><a href="https://zh.moegirl.org.cn/User:%E6%A8%B1%E5%B0%8F%E8%B7%AF%E4%B8%83%E5%8F%B6">七叶的萌娘百科主页</a></p>
+<h1 id="galgame相关">Galgame相关</h1>
+<p>以恋花绽放樱飞时为例，套用其他游戏时请自觉填充。</p>
+<h2 id="游戏信息模板">游戏信息模板</h2>
+<p>代码</p>
+<pre><code class="language-wikitext">{{Video Game Infobox
+|标题         = '''恋花绽放樱飞时'''
+|image        = 恋花绽放樱飞时.jpg
+|图片大小     = 250px
+|图片信息     = 
+|tabs         = 
+|原名         = {{lj|恋がさくころ桜どき}}
+|假名         = {{lj|こいがさくころさくらどき}}
+|罗马字       = Koi ga Sakukoro Sakuradoki 
+|常用译名     = 恋花绽放樱飞时
+|类型         = ADV
+|平台         = Windows Vista / 7 / 8 / 10&lt;br&gt;PlayStation 4
+|分级         = R-18(PC)&lt;br&gt;全年龄(Steam)
+|发行         = [[Palette]]
+|开发         = [[Palette]]
+|总监         = 
+|制作人       = 
+|设计师       = 
+|编剧         = [[みなせ未来]]
+|程序         = 
+|美工         = [[和泉つばす]]、[[eco*]]
+|音乐         = [[BURTON]]
+|引擎         = 
+|模式         = 
+|发行时间     = 2014年6月27日（日文版）&lt;br&gt;2017年10月2日（英文版）&lt;br&gt;2019年2月28日（PS4）
+|标题颜色     = #CCCCFF
+|左栏颜色     = #E6E9FF
+}}
+</code></pre>
+<p>效果图</p>
+<figure data-type="image" tabindex="1"><img src="https://cwlrin.wiki//post-images/1599282502129.png" alt="" loading="lazy"></figure>
+<h2 id="hidebox">HideBox</h2>
+<p>代码</p>
+<pre><code>{{Hide
+|日语原文
+|正文
+}}
+</code></pre>
+<p>效果图</p>
+<figure data-type="image" tabindex="2"><img src="https://cwlrin.wiki//post-images/1599282805686.png" alt="" loading="lazy"></figure>
+<h2 id="角色模板">角色模板</h2>
+<p>代码</p>
+<pre><code>{{Main Characters Infolist
+|bg-color=#A2A9B1
+|th-color=#CCCCFF
+|td-color=#F8F9FA
+|cv-color=#E6E9FF
+|Name1       = '''[[神凤杏]]''' ({{ruby|神凤|じんぽう}} {{ruby|杏|あん}})
+|image1      = 神凤杏.jpg
+|info1       = 
+```血型```：O型
+
+'''生日'''：4月2日（白羊座）
+
+'''身高'''：162cm
+
+'''三围'''：B89 / W59/ H87
+
+美飒学园三年级学生，现役学生会长。
+
+拥有着连同性都憧憬的美貌，不过说起话来稍微有点让人残念。
+
+亲切待人的性格，宛若蝴蝶般的女孩子。
+
+对年下的悠真有些兴趣，想要把他拉进学生会。
+
+似乎从前就和恋爱妖精蒂娜认识……
+
+'''「从今天起，你就是我的仆人了♪」'''
+&lt;!-- 原文：
+
+美颯学園3年生。 現生徒会長。
+
+同性でも見惚れるほどの美貌を持つが、口を開くと少し残念。
+
+親しく接してきたかと思えば、はらりと手から逃れていく胡蝶のような女の子。
+
+ふとしたことから年下の悠真に興味を持ち、生徒会に引き込もうとする。
+
+恋の妖精・ティナとは以前から面識があるようだが……。
+
+「今日からキミ、あたしの下僕ね♪」 
+ --&gt;
+|CV1         = [[井之上奈奈|夏峰いろは]]
+</code></pre>
+<p>效果图</p>
+<figure data-type="image" tabindex="3"><img src="https://cwlrin.wiki//post-images/1599282978974.png" alt="" loading="lazy"></figure>
+<h2 id="游戏攻略模板">游戏攻略模板</h2>
+<p>代码</p>
+<pre><code>{{剧透提醒}}
+
+{{Hide
+|杏线
+|
+帮忙
+
+邀她去食堂
+
+岔开话题
+
+接受邀请
+
+◆SAVE
+
+听听学姐的请求
+
+杏 END
+}}
+</code></pre>
+<p>效果图<br>
+<img src="https://cwlrin.wiki//post-images/1599283871636.png" alt="" loading="lazy"></p>
+<h2 id="相关音乐模板">相关音乐模板</h2>
+<p>代码</p>
+<pre><code>{{color|red|片头曲1(OP1)}}
+*曲名：'''[[恋爱绽放的未来|恋さくミライ]]'''（恋花绽放的未来）
+**歌：[[佐咲纱花]]
+**作词：[[rino]]，作、编曲：[[大久保薰]]
+
+{{BilibiliVideo|title=OP1|id=1rs41117zK}}
+</code></pre>
+<p>效果图</p>
+<figure data-type="image" tabindex="4"><img src="https://cwlrin.wiki//post-images/1599283912489.png" alt="" loading="lazy"></figure>
+<h1 id="虚拟主播相关以永远酱为例">虚拟主播相关（以永远酱为例）</h1>
+<h2 id="人物信息模板">人物信息模板</h2>
+<p>代码</p>
+<pre><code>{{人物信息
+|image=
+|tabs={{tabs|TextPadding=0px
+ |color=white
+ |TextBackgroundColor=white
+ |LabelColor=#99ccff
+ |bt1=星月银河
+ |bt2=星辰万物
+ |bt3=星空
+ |bt4=(名字待定)
+ |tab1=[[File:永远酱 星月银河.jpg|250px|画师：瓦瓦子]]
+ |tab2=[[File:eienchan.jpg|250px|画师：瓦瓦子]]
+ |tab3=[[File:C29f2a3e690185903c4f2d9c40afbc5155ece630 raw.jpg|250px|画师：永远酱]]
+ |tab4=[[File:永远酱夏装.jpg|250px|画师：瓦瓦子]]
+ |DefaultTab=2
+}}
+|本名=永远酱
+|别号=永远星{{黑幕|&lt;del&gt;永远猩&lt;/del&gt;}}
+|出生地=永远星
+|发色=淡紫
+|瞳色=绿
+|身高=155
+|体重=42kg {{黑幕|47万吨}}
+|三围=&lt;del&gt;直径32米&lt;/del&gt;
+|年龄=未知
+|生日=10月10日
+|星座=
+|血型=
+|声优=
+|萌点={{萌点|万年萝莉|傲娇|天然呆|冒失|元气|萝莉控|齐刘海|呆毛|大眼睛|虎牙|贫乳|兽耳，悬浮兽耳|背带裙|白色过膝袜，白丝|创可贴，头顶创可贴&lt;del&gt;煎蛋&lt;/del&gt;|露肩装|外星人|头槌|特殊第一人称，吾辈&lt;del&gt;焐被&lt;/del&gt;|翻译腔，日式翻译腔|熬夜|起床气|音痴|猫奴，铲屎官|片言，散装日语}}、自搜
+|出身地区=中国
+|活动范围=[[File:Bilibili Logo Blue.svg|40px|link=bilibili]]
+|粉丝勋章={{粉丝勋章|永远喵|40}}
+|目前B站粉丝数={{BilibiliUP|id=135980509|type=follower}}
+|所属团体=
+|个人状态=活动中
+|相关人士={{heimu|前世：[[新科娘]]（二代目） }}
+}}
+</code></pre>
+<p>效果图</p>
+<figure data-type="image" tabindex="5"><img src="https://cwlrin.wiki//post-images/1599283387877.png" alt="" loading="lazy"></figure>
+<h2 id="tioggle模板-bilibilivideo模板">Tioggle模板、bilibiliVideo模板</h2>
+<p>代码</p>
+<pre><code>{{Toggle
+|button={{color|#99CCFF|'''永远酱的音乐作品'''}}
+|content=
+{{bilibiliVideo|title=【翻唱】爱杀宝贝ed|id=BV15J41127VG|page=0|width=600|height=421|autoplay=false}}
+}}
+</code></pre>
+<p>效果图<br>
+<img src="https://cwlrin.wiki//post-images/1599283974521.png" alt="" loading="lazy"></p>
+<h1 id="歌曲相关以以恋结缘为例">歌曲相关（以以恋结缘为例）</h1>
+<h2 id="歌曲信息">歌曲信息</h2>
+<p>代码</p>
+<pre><code>{{Infobox Song
+|歌曲名= 恋ひ恋ふ縁
+|image= 千恋万花OST封面.jpg
+|图片信息= OST封面
+|图片大小= 250px 
+|演唱= [[KOTOKO]]
+|编曲= 井ノ原智
+|作曲= Famishin
+|填词= [[KOTOKO]]
+|吉他= Asai Yasuo 
+|三味线= 尾上秀樹
+|MV编导= 
+|收录专辑= 《千恋＊万花 オリジナル・サウンドトラック》
+}}
+</code></pre>
+<p>效果图<br>
+<img src="https://cwlrin.wiki//post-images/1599284404586.png" alt="" loading="lazy"></p>
+<h2 id="歌词">歌词</h2>
+<p>代码</p>
+<pre><code>{{Photrans/button}}
+{{LyricsKai
+|lstyle=color:#704A83|rstyle=color:#EE6174|reserveWidth=260px
+|original=
+{{Photrans|誠|まこと}}、{{Photrans|意地|いじ}}の{{Photrans|悪|わる}}い{{Photrans|神|かみ}}の{{Photrans|所業|しょぎょう}}か？
+{{Photrans|奇跡|きせき}}？{{Photrans|縁|えにし}}？ {{Photrans|袂|たもと}}{{Photrans|触合|ふれあ}}う{{Photrans|不思議|ふしぎ}}
+{{Photrans|花|はな}}ひとひら{{Photrans|揺|ゆ}}れて
+{{Photrans|不意|ふい}}に{{Photrans|宿|やど}}ってた
+うなじ{{Photrans|解|ほど}}いてく{{Photrans|春風|はるかぜ}}
+
+{{Photrans|戯|たわむ}}れはそこそこに
+{{Photrans|恋手|こいて}}ほどきしてくだしゃんせ
+{{Photrans|湯気|ゆげ}}にほんのり{{Photrans|頬染|ほほそめ}}て
+{{Photrans|夜風|よかぜ}}に{{Photrans|願ふ|ねがう}}
+
+|translated=
+是天意不善 在戏谑人间？&lt;ref&gt;翻译：七海芽生 已取得授权| 假名标注：[[User:MCPE White|MCPE White]]&lt;/ref&gt;
+玄妙的邂逅 奇迹还是缘？
+哪曾想
+摇曳花儿丛中掩
+春风吹人暖
+
+莫要再拿人调笑
+恋爱妙诀要请教
+水暖熏得双颊俏
+心愿随着夜风飘
+}}
+</code></pre>
+<p>效果图</p>
+<figure data-type="image" tabindex="6"><img src="https://cwlrin.wiki//post-images/1599284307681.png" alt="" loading="lazy"></figure>
+<h1 id="杂项">杂项</h1>
+<h2 id="latex-格式代码"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext>LaTeX</mtext></mrow><annotation encoding="application/x-tex">\LaTeX</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.89883em;vertical-align:-0.2155em;"></span><span class="mord text"><span class="mord textrm">L</span><span class="mspace" style="margin-right:-0.36em;"></span><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.68333em;"><span style="top:-2.904999em;"><span class="pstrut" style="height:2.7em;"></span><span class="mord text"><span class="mord textrm sizing reset-size6 size3">A</span></span></span></span></span></span><span class="mspace" style="margin-right:-0.15em;"></span><span class="mord text"><span class="mord textrm">T</span><span class="mspace" style="margin-right:-0.1667em;"></span><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.46782999999999997em;"><span style="top:-2.7845em;"><span class="pstrut" style="height:3em;"></span><span class="mord text"><span class="mord textrm">E</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2155em;"><span></span></span></span></span><span class="mspace" style="margin-right:-0.125em;"></span><span class="mord textrm">X</span></span></span></span></span></span> 格式代码</h2>
+<pre><code class="language-html">&lt;span class=&quot;texhtml&quot; style=&quot;font-family: 'CMU Serif', cmr10, LMRoman10-Regular, 'Latin Modern Math', 'Nimbus Roman No9 L', 'Times New Roman', Times, serif;&quot;&gt;L&lt;span style=&quot;text-transform: uppercase; font-size: 57.851%; vertical-align: 0.205em; margin-left: -0.36em; margin-right: -0.15em; line-height: 0&quot;&gt;a&lt;/span&gt;T&lt;span style=&quot;text-transform: uppercase; vertical-align: -0.2155em; margin-left: -0.125em; margin-right: -0.1667em; line-height: 0&quot;&gt;e&lt;/span&gt;X&lt;/span&gt;
+</code></pre>
+
+              </div>
+              <div class="post-footer">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+      <strong>本文作者：</strong>
+      七叶的个人小站
+    </li>
+    <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://cwlrin.wiki/post/qi-xie-zi-yong-de-wiki-mo-ban/" title="七叶自用的Wiki模板">七叶自用的Wiki模板</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong>
+      本博客所有文章除特别声明外，转载请注明出处！
+    </li>
+  </ul>
+  <div class="tags">
+    
+  </div>
+  <div class="nav">
+    <div class="nav-prev">
+      
+    </div>
+    <div class="nav-next">
+      
+        <a class="nav-pc-next" title="数据结构、算法与应用——C++语言描述 课后习题答案" href="https://cwlrin.wiki/post/shu-ju-jie-gou-suan-fa-yu-ying-yong-cyu-yan-miao-shu-ke-hou-xi-ti-da-an/">数据结构、算法与应用——C++语言描述 课后习题答案</a>
+        <a class="nav-mobile-next" title="数据结构、算法与应用——C++语言描述 课后习题答案" href="https://cwlrin.wiki/post/shu-ju-jie-gou-suan-fa-yu-ying-yong-cyu-yan-miao-shu-ke-hou-xi-ti-da-an/">下一篇</a>
+        <i class="fa fa-chevron-right"></i>
+      
+    </div>
+  </div>
+</div>
+              
+                
+<script src="https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js"></script>
+<div id="vcomments" style="padding: 10px 0px 0px 0px"></div>
+<script>
+new Valine({
+    el: '#vcomments' ,
+    appId: 'miKfAllYGUAWs0flYNOazIKw-gzGzoHsz',
+    appKey: 'bq92hoypqYLisNGOWtqbgRF6',
+    notify: 'true' === 'true', 
+    avatar:'', 
+    placeholder: '',
+    pageSize: '',
+    lang: 'zh-cn',
+    visitor: 'true' === 'true',
+    highlight: 'true' === 'true',
+    avatarForce: 'true' === 'false',
+});
+</script>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-box">
+  <footer class="footer">
+    <div class="copyright">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | © 2019-2020 Theme By HsxyHao
+    </div>
+    <div class="poweredby">
+      
+    </div>
+  </footer>
+  
+  
+    <div class="drawer-box left" id="drawer_box">
+      <span class="muse-line muse-line-first"></span>
+      <span class="muse-line muse-line-middle"></span>
+      <span class="muse-line muse-line-last"></span>
+    </div>
+  
+  <div class="muse back-to-top" id="back_to_top">
+    <i class="fa fa-arrow-up"></i>
+    
+  </div>
+  
+    <div class="bg-img">
+      <img src="\media\images\custom-bgImg.jpg" />
+    </div>
+  
+  
+    <link rel="stylesheet" href="/media/live2d/histoire/css/live2d.css" />
+<div class="box-scale">
+  <div id="landlord" style="left:5px;bottom:0px;" data-key="">
+    <div class="message" style="opacity:0"></div>
+    <canvas id="live2d" width="500" height="560" class="live2d"></canvas>
+    <div class="live_talk_input_body">
+      <div class="live_talk_input_name_body">
+        <input name="name" type="text" class="live_talk_name white_input" id="AIuserName" autocomplete="off" placeholder="你的名字" />
+      </div>
+      <div class="live_talk_input_text_body">
+        <input name="talk" type="text" class="live_talk_talk white_input" id="AIuserText" autocomplete="off" placeholder="要和我聊什么呀？"/>
+        <button type="button" class="live_talk_send_btn" id="talk_send">发送</button>
+      </div>
+    </div>
+    <input name="live_talk" id="live_talk" value="1" type="hidden" />
+    <div class="live_ico_box">
+      <div class="live_ico_item type_info" id="showInfoBtn"></div>
+      <div class="live_ico_item type_talk" id="showTalkBtn"></div>
+      
+      <div class="live_ico_item type_youdu" id="youduButton"></div>
+      <div class="live_ico_item type_quit" id="hideButton"></div>
+      <input name="live_statu_val" id="live_statu_val" value="0" type="hidden" />
+      <audio src="" style="display:none;" id="live2d_bgm" data-bgm="0" preload="none"></audio>
+      <input id="duType" value="douqilai" type="hidden">
+      
+    </div>
+  </div>
+</div>
+<div id="open_live2d">召唤伊斯特瓦尔</div>
+<script src="https://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script>
+var message_Path = '/media/live2d/histoire/';
+let landlord = document.querySelector('#landlord');
+var apiKey = landlord.dataset.key;
+</script>
+<script type="text/javascript" src="/media/live2d/histoire/js/live2d.js"></script>
+<script type="text/javascript" src="/media/live2d/histoire/js/message.js"></script>
+  
+  
+    
+
+  
+</div>
+<script>
+
+  let sideBarOpen = 'sidebar-open';
+  let body = document.body;
+  let back2Top = document.querySelector('#back_to_top'),
+  back2TopText = document.querySelector('#back_to_top_text'),
+  drawerBox = document.querySelector('#drawer_box'),
+  rightSideBar = document.querySelector('.sidebar'),
+  viewport = document.querySelector('body');
+
+  function scrollAnimation(currentY, targetY) {
+   
+    let needScrollTop = targetY - currentY
+    let _currentY = currentY
+    setTimeout(() => {
+      const dist = Math.ceil(needScrollTop / 10)
+      _currentY += dist
+      window.scrollTo(_currentY, currentY)
+      if (needScrollTop > 10 || needScrollTop < -10) {
+        scrollAnimation(_currentY, targetY)
+      } else {
+        window.scrollTo(_currentY, targetY)
+      }
+    }, 1)
+  }
+
+  back2Top.addEventListener("click", function(e) {
+    scrollAnimation(document.scrollingElement.scrollTop, 0);
+    e.stopPropagation();
+    return false;
+  });
+  
+  window.addEventListener('scroll', function(e) {
+    let percent = document.scrollingElement.scrollTop / (document.scrollingElement.scrollHeight - document.scrollingElement.clientHeight) * 100;
+    if (percent > 1 && !back2Top.classList.contains('back-top-active')) {
+      back2Top.classList.add('back-top-active');
+    }
+    if (percent == 0) {
+      back2Top.classList.remove('back-top-active');
+    }
+    if (back2TopText) {
+      back2TopText.textContent = Math.floor(percent);
+    }
+  });
+
+  
+  let hasCacu = false;
+  window.onresize = function() {
+    if (window.width > 991) {
+      calcuHeight();
+    } else {
+      hasCacu = false;
+    }
+  }
+
+  function calcuHeight() {
+    // 动态调整站点概览高度
+    if (!hasCacu && back2Top.classList.contains('pisces') || back2Top.classList.contains('gemini')) {
+      let sideBar = document.querySelector('.sidebar');
+      let navUl = document.querySelector('#site_nav');
+      sideBar.style = 'margin-top:' + (navUl.offsetHeight + navUl.offsetTop + 15) + 'px;';
+      hasCacu = true;
+    }
+  }
+  calcuHeight();
+  
+  let open = false, MOTION_TIME = 300, RIGHT_MOVE_DIS = '320px';
+
+  if (drawerBox) {
+    let rightMotions = document.querySelectorAll('.right-motion');
+    let right = drawerBox.classList.contains('right');
+
+    let transitionDir = right ? "transition.slideRightIn" : "transition.slideLeftIn";
+
+    let openProp, closeProp;
+    if (right) {
+      openProp = {
+        paddingRight: RIGHT_MOVE_DIS 
+      };
+      closeProp = {
+        paddingRight: '0px'
+      };
+    } else {
+      openProp = {
+        paddingLeft: RIGHT_MOVE_DIS 
+      };
+      closeProp = {
+        paddingLeft: '0px'
+      };
+    }
+
+    drawerBox.onclick = function() {
+      open = !open;
+      window.Velocity(rightSideBar, 'stop');
+      window.Velocity(viewport, 'stop');
+      window.Velocity(rightMotions, 'stop');
+      if (open) {
+        window.Velocity(rightSideBar, {
+          width: RIGHT_MOVE_DIS
+        }, {
+          duration: MOTION_TIME,
+          begin: function() {
+            window.Velocity(rightMotions, transitionDir,{ });
+          }
+        })
+        window.Velocity(viewport, openProp,{
+          duration: MOTION_TIME
+        });
+      } else {
+        window.Velocity(rightSideBar, {
+          width: '0px'
+        }, {
+          duration: MOTION_TIME,
+          begin: function() {
+            window.Velocity(rightMotions, {
+              opacity: 0
+            });
+          }
+        })
+        window.Velocity(viewport, closeProp ,{
+          duration: MOTION_TIME
+        });
+      }
+      for (let i = 0; i < drawerBox.children.length; i++) {
+        drawerBox.children[i].classList.toggle('muse-line');
+      }
+      drawerBox.classList.toggle(sideBarOpen);
+    }
+  }
+
+  // 代码高亮
+  hljs.initHighlightingOnLoad();
+
+</script>
+    </div>
+  </body>
+  <script src="/media/js/motion.js"></script>
+</html>
