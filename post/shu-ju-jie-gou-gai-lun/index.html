@@ -8,7 +8,7 @@
 <meta name="description" content="七叶今天码代码了吗">
 <meta name="theme-color" content="#000">
 <title>数据结构——概论 | 七叶的个人小站</title>
-<link rel="shortcut icon" href="/favicon.ico?v=1599572745494">
+<link rel="shortcut icon" href="/favicon.ico?v=1599661035517">
 <link rel="stylesheet" href="/styles/main.css">
 <link rel="stylesheet" href="/media/css/muse.css">
 
@@ -238,6 +238,20 @@
 </ul>
 </li>
 <li><a href="#%E6%8A%BD%E8%B1%A1%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E8%A1%A8%E7%A4%BA%E5%92%8C%E5%AE%9E%E7%8E%B0">抽象数据类型的表示和实现</a></li>
+<li><a href="#%E7%AE%97%E6%B3%95%E5%92%8C%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90">算法和算法分析</a>
+<ul>
+<li><a href="#%E7%AE%97%E6%B3%95%E5%AE%9A%E4%B9%89">算法定义</a></li>
+<li><a href="#%E7%AE%97%E6%B3%95%E5%BA%94%E5%85%B7%E6%9C%89%E7%9A%84%E6%80%A7%E8%B4%A8">算法应具有的性质</a></li>
+<li><a href="#%E7%AE%97%E6%B3%95%E6%8F%8F%E8%BF%B0%E6%96%B9%E6%B3%95">算法描述方法</a></li>
+<li><a href="#%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%85%B3%E7%B3%BB">算法和程序的关系</a></li>
+</ul>
+</li>
+<li><a href="#%E7%AE%97%E6%B3%95%E8%AF%84%E4%BB%B7%E6%A0%87%E5%87%86">算法评价标准</a>
+<ul>
+<li><a href="#%E7%AE%97%E6%B3%95%E7%9A%84%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6">算法的时间复杂度</a></li>
+<li><a href="#%E7%AE%97%E6%B3%95%E7%9A%84%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6">算法的空间复杂度</a></li>
+</ul>
+</li>
 </ul>
 
   </div>
@@ -514,12 +528,12 @@ window.addEventListener('load', function() {
     
     <span class="meta-item">
       <i class="fa fa-clock-o"></i>
-      <span>4分钟</span>
+      <span>9分钟</span>
     </span>
     <span class="meta-item">
       <span class="post-meta-divider">|</span>
       <i class="fa fa-file-word-o"></i>
-      <span>974<span class="pc-show">字数</span></span>
+      <span>2299<span class="pc-show">字数</span></span>
     </span>
     
       
@@ -620,6 +634,111 @@ window.addEventListener('load', function() {
 </ul>
 <h1 id="抽象数据类型的表示和实现">抽象数据类型的表示和实现</h1>
 <p>抽象数据类型需要通过固有数据类型（高级编程语言中已实现的数据类型）来实现。</p>
+<h1 id="算法和算法分析">算法和算法分析</h1>
+<h2 id="算法定义">算法定义</h2>
+<p>算法是为了解决某类问题而规定的一个有限长的操作序列。</p>
+<h2 id="算法应具有的性质">算法应具有的性质</h2>
+<ol>
+<li>
+<p>正确性</p>
+<p>正确性指必须完成所期望的功能，对算法是否“<strong>正确</strong>”的理解可以有如下<strong>四个层次</strong>：</p>
+<ul>
+<li>程序中不含任何语法错误。</li>
+<li>程序对于几组输入数据能够得出满足要求的结果。</li>
+<li>程序对于精心选择的、典型的、苛刻的并带有刁难性的几组输入数据能够得出满足要求的结果。</li>
+<li>程序对于一切输入数据都能得出满足要求的结果。</li>
+</ul>
+</li>
+<li>
+<p>具体性</p>
+<p>一个算法必须由一系列<strong>具体操作</strong>组成，这时的“<strong>具体</strong>”指的所有操作都必须经过<strong>已实现</strong>的基本操作有限次来实现，并且所有操作都是可读的、可执行的，<strong>每一操作</strong>必须在<strong>有限时间</strong>内完成。</p>
+</li>
+<li>
+<p>确定性</p>
+<p><strong>算法中</strong>的所有操作都必须有<strong>确切的含义</strong>，不能产生歧义，算法的执行者或阅读者都能明确其<strong>含义</strong>及<strong>如何执行</strong>。</p>
+</li>
+<li>
+<p>有限性</p>
+<p>对于任意一组合法输入值，在执行<strong>有限步骤</strong>之后一定能结束，即：算法中的每个步骤都能在<strong>有限时间</strong>内完成</p>
+</li>
+<li>
+<p>可读性</p>
+<p><strong>算法</strong>应具备良好的<strong>可读性</strong>，这样的算法有利于算法的查错及对算法的理解，一般算法的<strong>逻辑必须清楚、结构简单</strong>，所有标识符必须具有<strong>实际含义</strong>，能<strong>见名知义</strong>。</p>
+</li>
+<li>
+<p>健壮性</p>
+<p>健壮性指当<strong>输入数据非法</strong>时，算法能作<strong>适当的处理</strong>并作出反应，而不应死机或输出异常结果</p>
+</li>
+</ol>
+<h2 id="算法描述方法">算法描述方法</h2>
+<ol>
+<li>
+<p>用自然语言描述算法</p>
+<p>用我们日常生活中的自然语言（可以是中文形式，也可以是英文形式）也可以描述算法</p>
+</li>
+<li>
+<p>用流程图描述算法</p>
+<p>一个算法可以用流程图的方式来描述，输入输出、判断、处理分别用不同的框图表示，用箭头表示流程的流向。这是一种描述算法的较好方法，目前在一些高级语言程序设计中仍然采用。也有其他的图形辅助工具</p>
+</li>
+<li>
+<p>用其它方式描述算法</p>
+<p>我们还可以用数学语言或约定的符号语言来描述算法。</p>
+</li>
+<li>
+<p>用C++描述算法</p>
+</li>
+</ol>
+<p>为表示各种状态信息，定义枚举类型StatusCode供使用，具体声明如下：</p>
+<pre><code class="language-cpp">// 自定义类型
+enum StatusCode {
+SUCCESS, FAIL, UNDER_FLOW, OVER_FLOW,RANGE_ERROR, DUPLICATE_ERROR, NOT_PRESENT, ENTRY_INSERTED, ENTRY_FOUND, VISITED, UNVISITED
+};
+</code></pre>
+<h2 id="算法和程序的关系">算法和程序的关系</h2>
+<p>算法着重体现思路和方法，程序着重体现计算机的实现。</p>
+<p>程序不一定满足有穷性（死循环），另外，程序中的指令必须是机器可执行的，算法中的指令无此限制。</p>
+<p>一个算法若用计算机语言来书写，它就是一个程序。</p>
+<h1 id="算法评价标准">算法评价标准</h1>
+<p>时间特性(时间复杂度<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>T</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">T(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span> ):度量算法执行的时间长短</p>
+<p>空间特性(空间复杂度<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">S(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span> )：度量算法所需存储空间的大小</p>
+<h2 id="算法的时间复杂度">算法的时间复杂度</h2>
+<p>一个特定<strong>算法的“运行工作量”<strong>的大小，只依赖于</strong>问题的规模</strong>（通常用整数量 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 表示），或者说，<strong>它是问题规模的函数</strong>。</p>
+<p><strong>算法的运行时间与运行工作量的增长率相同。算法花费的时间与算法中语句的执行次数成正比例。一个算法中语句执行次数称为语句频度或时间频度。记为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>T</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">T(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span>。</strong></p>
+<p>假如，随着问题规模 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 的增长，算法执行时间的增长率和 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>f</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span> 的增长率相同，则可记作：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>T</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>=</mo><mi>O</mi><mo>(</mo><mi>f</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">T (n) = O(f(n))
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span></p>
+<p>称 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>T</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">T (n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span> 为算法的<strong>渐近时间复杂度</strong>。</p>
+<p>算法的时间复杂度越低，算法的效率越高。</p>
+<p>将基本语句执行次数的数量级放入大 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi></mrow><annotation encoding="application/x-tex">O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span></span></span></span> 记号中，用大 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi></mrow><annotation encoding="application/x-tex">O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span></span></span></span> 记号表示算法的时间性能，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi></mrow><annotation encoding="application/x-tex">O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span></span></span></span> 表示量级。</p>
+<p>常见的时间复杂度有：<br>
+<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo>(</mo><mn>1</mn><mo>)</mo><mi mathvariant="normal">，</mi><mi>O</mi><mo>(</mo><mi>n</mi><mo>)</mo><mi mathvariant="normal">，</mi><mi>O</mi><mo>(</mo><msup><mi>n</mi><mn>2</mn></msup><mo>)</mo><mi mathvariant="normal">，</mi><mi>O</mi><mo>(</mo><msup><mi>n</mi><mn>3</mn></msup><mo>)</mo><mi mathvariant="normal">，</mi><mi>O</mi><mo>(</mo><mi>l</mi><mi>o</mi><msub><mi>g</mi><mn>2</mn></msub><mi>n</mi><mo>)</mo><mo>…</mo></mrow><annotation encoding="application/x-tex">O(1)，O(n)，O(n^2)，O(n^3)，O(log_2n) …</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mord cjk_fallback">，</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mord cjk_fallback">，</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord cjk_fallback">，</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord cjk_fallback">，</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span></span></span></span><br>
+例：</p>
+<pre><code class="language-cpp">x = x + 1;
+for(i = 1;i &lt;= n;i++)
+    x = x + 1;
+for(i = 1;i &lt;= n;i++)
+    for(j = 1;j &lt;= n;j++)
+        x = x + 1;
+</code></pre>
+<p>例：矩阵元素之和</p>
+<pre><code class="language-cpp">template &lt;class ElemType&gt;
+ElemType Sum( ElemType a[][MAX_SIZE], int n)
+// 操作结果: 返回矩阵a中元素之和
+{
+	ElemType s = 0;		// 暂存和
+	for (int row = 0; row &lt; n; row++)
+		for (int col = 0; col &lt; n; col++)
+			s = s + a[row][col];	// 遍历求和
+	return s;			// 返回元素之和
+}
+</code></pre>
+<p>基本操作: 加法“<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>+</mo></mrow><annotation encoding="application/x-tex">+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord">+</span></span></span></span>”</p>
+<p>时间复杂度: <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo>(</mo><msup><mi>n</mi><mn>2</mn></msup><mo>)</mo></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></p>
+<h2 id="算法的空间复杂度">算法的空间复杂度</h2>
+<p>算法的空间复杂度定义为:</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>=</mo><mi>O</mi><mo>(</mo><mi>g</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">S(n) = O(g(n))
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span></p>
+<p>表示随着问题规模 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 的增大，算法运行所需存储量S(n)的增长率与 g(n) 的增长率相同，称S(n)(渐近)空间复杂度。</p>
 
               </div>
               <div class="post-footer">
