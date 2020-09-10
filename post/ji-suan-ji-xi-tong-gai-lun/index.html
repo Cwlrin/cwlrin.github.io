@@ -8,7 +8,7 @@
 <meta name="description" content="七叶今天码代码了吗">
 <meta name="theme-color" content="#000">
 <title>计算机系统——概论 | 七叶的个人小站</title>
-<link rel="shortcut icon" href="/favicon.ico?v=1599663096103">
+<link rel="shortcut icon" href="/favicon.ico?v=1599748388856">
 <link rel="stylesheet" href="/styles/main.css">
 <link rel="stylesheet" href="/media/css/muse.css">
 
@@ -236,6 +236,23 @@
 <ul>
 <li><a href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E7%BB%84%E6%88%90">计算机系统组成</a></li>
 <li><a href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A1%AC%E4%BB%B6%E7%B3%BB%E7%BB%9F">计算机硬件系统</a></li>
+<li><a href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%BD%AF%E4%BB%B6%E7%B3%BB%E7%BB%9F">计算机软件系统</a>
+<ul>
+<li><a href="#%E7%B3%BB%E7%BB%9F%E8%BD%AF%E4%BB%B6">系统软件</a>
+<ul>
+<li><a href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F">操作系统</a></li>
+<li><a href="#%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%A8%8B%E5%BA%8F">语言处理程序</a></li>
+<li><a href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%AF%AD%E8%A8%80">计算机语言</a></li>
+</ul>
+</li>
+<li><a href="#%E5%BA%94%E7%94%A8%E8%BD%AF%E4%BB%B6">应用软件</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84">计算机系统的层次结构</a>
+<ul>
+<li><a href="#%E4%BD%BF%E7%94%A8%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%A3%E9%A2%98%E7%9A%84%E8%BF%87%E7%A8%8B">使用计算机解题的过程</a></li>
 </ul>
 </li>
 </ul>
@@ -514,12 +531,12 @@ window.addEventListener('load', function() {
     
     <span class="meta-item">
       <i class="fa fa-clock-o"></i>
-      <span>11分钟</span>
+      <span>14分钟</span>
     </span>
     <span class="meta-item">
       <span class="post-meta-divider">|</span>
       <i class="fa fa-file-word-o"></i>
-      <span>2984<span class="pc-show">字数</span></span>
+      <span>4032<span class="pc-show">字数</span></span>
     </span>
     
       
@@ -794,7 +811,122 @@ window.addEventListener('load', function() {
 </ol>
 </li>
 </ol>
+<ul>
+<li>运算器</li>
+</ul>
+<ol>
+<li>功能：在控制器控制下，进行算术运算和逻辑运算。</li>
+<li>运算器的技术性能高低直接影响着计算机的运算速度和整机性能。</li>
+</ol>
+<ul>
+<li>控制器</li>
+</ul>
+<ol>
+<li>功能：对当前指令进行译码分析其所需要完成的操作，产生并发送各部件所需要的控制信号，从而使整个计算机自动、协调地工作。</li>
+<li>控制器是计算机的控制指挥部件，也是整个计算机的控制中心。</li>
+</ol>
+<ul>
+<li>计算机硬件系统五大部件</li>
+</ul>
+<ol>
+<li>
+<p>输入设备</p>
+<p>功能：将外界的信息转换为计算机能识别的二进制代码。输入设备是给计算机输入信息的设备。</p>
 </li>
+<li>
+<p>输出设备</p>
+<p>功能：将计算机处理结果转换成人们或其他设备所能接收的形式。</p>
+</li>
+</ol>
+</li>
+</ol>
+<figure data-type="image" tabindex="5"><img src="https://cwlrin.wiki//post-images/1599723400098.png" alt="" loading="lazy"></figure>
+<h2 id="计算机软件系统">计算机软件系统</h2>
+<h3 id="系统软件">系统软件</h3>
+<p>系统软件是指管理、调度、监视和维护计算机系统软硬件资源的程序集合，使系统资源得到合理调度，确保高效率运行。</p>
+<h4 id="操作系统">操作系统</h4>
+<ol>
+<li>操作系统（Operating System）的功能：</li>
+</ol>
+<ul>
+<li>管理计算机系统的各种软、硬件资源，使其被高效使用。</li>
+<li>为计算机系统和用户之间提供接口，为用户提供方便。</li>
+</ul>
+<ol start="2">
+<li>
+<p>操作系统是<strong>直接运行在裸机上的最基本的系统软件</strong>，是系统软件的核心，任何其他软件必须在操作系统的支持下才能运行。</p>
+<p>功能：将高级语言编写的程序翻译成计算机能识别和执行的二进制机器指令，然后供计算机执行。又称为翻译程序。</p>
+</li>
+</ol>
+<h4 id="语言处理程序">语言处理程序</h4>
+<p>语言处理程序分为两种：</p>
+<ol>
+<li>
+<p>编译程序：将用户编写的高级语言程序（源程序）的全部语句全部翻译成机器语言程序，然后再执行机器语言程序</p>
+</li>
+<li>
+<p>解释程序：将源程序的一条语句翻译成机器语言程序，并立即执行，接着再翻译源程序的下一条语句并执行，如此重复直至完成源程序的全部翻译任务。它的特点是翻译一次执行一次</p>
+</li>
+</ol>
+<h4 id="计算机语言">计算机语言</h4>
+<p>程序是用某种计算机程序设计语言按问题的要求编写而成的。是指令的有序集合。</p>
+<p>机器语言：由 0 和 1 按一定规则排列组成的一个指令集；它是计算机唯一能识别和执行的语言。优点是执行效率高、速度快。主要缺点是直观性差，可读性不强。</p>
+<p>汇编语言：用助记符来表示机器指令中的操作码和操作数的指令系统 。可读性增强，执行速度快，但仍是一种面向机器的语言，编制程序的效率不高，难度较大，维护较困难，属低级语言</p>
+<p>高级语言：一种更接近于人类自然语言和数学语言的语言，用高级语言编写程序可以大大减少编程人员的劳动，因此它也具有较好的可移植性</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">机器语言</th>
+<th style="text-align:center">汇编语言</th>
+<th style="text-align:center">高级语言</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">语言的构成</td>
+<td style="text-align:center">代码语言</td>
+<td style="text-align:center">符号语言</td>
+<td style="text-align:center">符号语言</td>
+</tr>
+<tr>
+<td style="text-align:center">与硬件的关联</td>
+<td style="text-align:center">面向机器</td>
+<td style="text-align:center">面向机器</td>
+<td style="text-align:center">面向用户</td>
+</tr>
+<tr>
+<td style="text-align:center">可在硬件上直接执行</td>
+<td style="text-align:center">可以</td>
+<td style="text-align:center">不可以（需要编译）</td>
+<td style="text-align:center">不可以（需要编译）</td>
+</tr>
+<tr>
+<td style="text-align:center">运行效率</td>
+<td style="text-align:center">高</td>
+<td style="text-align:center">高</td>
+<td style="text-align:center">低</td>
+</tr>
+<tr>
+<td style="text-align:center">程序可读性</td>
+<td style="text-align:center">低</td>
+<td style="text-align:center">较低</td>
+<td style="text-align:center">高</td>
+</tr>
+</tbody>
+</table>
+<h3 id="应用软件">应用软件</h3>
+<p>又称为应用程序，它是用户在各自不同的应用领域根据具体的任务需要所开发编制的各种程序。</p>
+<p>如工程设计程序、数据处理程序、自动控制程序、企业管理程序、科学计算程序等等。</p>
+<h1 id="计算机系统的层次结构">计算机系统的层次结构</h1>
+<figure data-type="image" tabindex="6"><img src="https://cwlrin.wiki//post-images/1599727322833.png" alt="" loading="lazy"></figure>
+<h2 id="使用计算机解题的过程">使用计算机解题的过程</h2>
+<ol>
+<li>提出问题和任务</li>
+<li>建立模型，用适合于程序设计的方式描述算法过程</li>
+<li>用某种语言编制程序</li>
+<li>编译为机器语言程序</li>
+<li>在硬件上执行程序，实现任务</li>
 </ol>
 
               </div>
