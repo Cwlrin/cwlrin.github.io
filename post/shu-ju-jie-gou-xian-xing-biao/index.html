@@ -7,7 +7,7 @@
 <meta name="keywords" content="Gridea静态个人博客">
 <meta name="description" content="七叶今天码代码了吗">
 <meta name="theme-color" content="#000">
-<title>七叶自用的Wiki模板 | 七叶的个人小站</title>
+<title>数据结构——线性表 | 七叶的个人小站</title>
 <link rel="shortcut icon" href="/favicon.ico?v=1599914423459">
 <link rel="stylesheet" href="/styles/main.css">
 <link rel="stylesheet" href="/media/css/muse.css">
@@ -27,7 +27,7 @@
 
 
 
-    <meta name="description" content="七叶自用的Wiki模板" />
+    <meta name="description" content="数据结构——线性表" />
     <meta name="keywords" content="" />
   </head>
   <body>
@@ -216,31 +216,10 @@
               <div class="toc-box right-motion">
   <div class="toc-wrapper auto-number auto" id="toc_wrapper">
     <ul class="markdownIt-TOC">
-<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
-<li><a href="#galgame%E7%9B%B8%E5%85%B3%E4%BB%A5%E6%81%8B%E8%8A%B1%E7%BB%BD%E6%94%BE%E6%A8%B1%E9%A3%9E%E6%97%B6%E4%B8%BA%E4%BE%8B">Galgame相关（以恋花绽放樱飞时为例）</a>
+<li><a href="#%E7%BA%BF%E6%80%A7%E8%A1%A8%E7%9A%84%E9%80%BB%E8%BE%91%E7%BB%93%E6%9E%84">线性表的逻辑结构</a>
 <ul>
-<li><a href="#%E6%B8%B8%E6%88%8F%E4%BF%A1%E6%81%AF%E6%A8%A1%E6%9D%BF">游戏信息模板</a></li>
-<li><a href="#hidebox">HideBox</a></li>
-<li><a href="#%E8%A7%92%E8%89%B2%E6%A8%A1%E6%9D%BF">角色模板</a></li>
-<li><a href="#%E6%B8%B8%E6%88%8F%E6%94%BB%E7%95%A5%E6%A8%A1%E6%9D%BF">游戏攻略模板</a></li>
-<li><a href="#%E7%9B%B8%E5%85%B3%E9%9F%B3%E4%B9%90%E6%A8%A1%E6%9D%BF">相关音乐模板</a></li>
-</ul>
-</li>
-<li><a href="#%E8%99%9A%E6%8B%9F%E4%B8%BB%E6%92%AD%E7%9B%B8%E5%85%B3%E4%BB%A5%E6%B0%B8%E8%BF%9C%E9%85%B1%E4%B8%BA%E4%BE%8B">虚拟主播相关（以永远酱为例）</a>
-<ul>
-<li><a href="#%E4%BA%BA%E7%89%A9%E4%BF%A1%E6%81%AF%E6%A8%A1%E6%9D%BF">人物信息模板</a></li>
-<li><a href="#tioggle%E6%A8%A1%E6%9D%BF-bilibilivideo%E6%A8%A1%E6%9D%BF">Tioggle模板、bilibiliVideo模板</a></li>
-</ul>
-</li>
-<li><a href="#%E6%AD%8C%E6%9B%B2%E7%9B%B8%E5%85%B3%E4%BB%A5%E4%BB%A5%E6%81%8B%E7%BB%93%E7%BC%98%E4%B8%BA%E4%BE%8B">歌曲相关（以以恋结缘为例）</a>
-<ul>
-<li><a href="#%E6%AD%8C%E6%9B%B2%E4%BF%A1%E6%81%AF">歌曲信息</a></li>
-<li><a href="#%E6%AD%8C%E8%AF%8D">歌词</a></li>
-</ul>
-</li>
-<li><a href="#%E6%9D%82%E9%A1%B9">杂项</a>
-<ul>
-<li><a href="#latex-%E6%A0%BC%E5%BC%8F%E4%BB%A3%E7%A0%81"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext>LaTeX</mtext></mrow><annotation encoding="application/x-tex">\LaTeX</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.89883em;vertical-align:-0.2155em;"></span><span class="mord text"><span class="mord textrm">L</span><span class="mspace" style="margin-right:-0.36em;"></span><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.68333em;"><span style="top:-2.904999em;"><span class="pstrut" style="height:2.7em;"></span><span class="mord text"><span class="mord textrm sizing reset-size6 size3">A</span></span></span></span></span></span><span class="mspace" style="margin-right:-0.15em;"></span><span class="mord text"><span class="mord textrm">T</span><span class="mspace" style="margin-right:-0.1667em;"></span><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.46782999999999997em;"><span style="top:-2.7845em;"><span class="pstrut" style="height:3em;"></span><span class="mord text"><span class="mord textrm">E</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2155em;"><span></span></span></span></span><span class="mspace" style="margin-right:-0.125em;"></span><span class="mord textrm">X</span></span></span></span></span></span> 格式代码</a></li>
+<li><a href="#%E7%BA%BF%E6%80%A7%E8%A1%A8%E7%9A%84%E5%AE%9A%E4%B9%89%E5%92%8C%E7%89%B9%E7%82%B9">线性表的定义和特点</a></li>
+<li><a href="#%E7%BA%BF%E6%80%A7%E8%A1%A8%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C">线性表基本操作</a></li>
 </ul>
 </li>
 </ul>
@@ -504,8 +483,8 @@ window.addEventListener('load', function() {
             <div class="section bg-color post post-page">
               <header class="post-header">
   <h1 class="post-title">
-    <a class="post-title-link" href="https://cwlrin.wiki/post/qi-xie-zi-yong-de-wiki-mo-ban/">
-      七叶自用的Wiki模板
+    <a class="post-title-link" href="https://cwlrin.wiki/post/shu-ju-jie-gou-xian-xing-biao/">
+      数据结构——线性表
     </a>
   </h1>
   <div class="post-meta">
@@ -513,25 +492,25 @@ window.addEventListener('load', function() {
     <span class="meta-item pc-show">
       <i class="fa fa-calendar-o"></i>
       <span>发布于</span>
-      <span>2020-09-05</span>
+      <span>2020-09-12</span>
       <span class="post-meta-divider pc-show">|</span>
     </span>
     
     <span class="meta-item">
       <i class="fa fa-clock-o"></i>
-      <span>6分钟</span>
+      <span>2分钟</span>
     </span>
     <span class="meta-item">
       <span class="post-meta-divider">|</span>
       <i class="fa fa-file-word-o"></i>
-      <span>1410<span class="pc-show">字数</span></span>
+      <span>482<span class="pc-show">字数</span></span>
     </span>
     
       
       
         
       
-      <span id="/post/qi-xie-zi-yong-de-wiki-mo-ban/" data-flag-title="七叶自用的Wiki模板" class="meta-item pc-show leancloud_visitors">
+      <span id="/post/shu-ju-jie-gou-xian-xing-biao/" data-flag-title="数据结构——线性表" class="meta-item pc-show leancloud_visitors">
         <span class="post-meta-divider">|</span>
         <i class="fa fa-eye"></i>
         <span>浏览量：<span class="leancloud-visitors-count" ></span></span>
@@ -540,244 +519,81 @@ window.addEventListener('load', function() {
   </div>
 </header>
               <div class="post-body next-md-body" id="post_body">
-                <h1 id="概述">概述</h1>
-<p>这里整理出个人常用的萌娘百科编辑模板，如果你也是萌娘百科的编辑者或者是使用 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">M</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">w</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">k</mi><mi mathvariant="normal">i</mi></mrow><annotation encoding="application/x-tex">\mathrm{Mediawiki}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord"><span class="mord mathrm">M</span><span class="mord mathrm">e</span><span class="mord mathrm">d</span><span class="mord mathrm">i</span><span class="mord mathrm">a</span><span class="mord mathrm" style="margin-right:0.01389em;">w</span><span class="mord mathrm">i</span><span class="mord mathrm">k</span><span class="mord mathrm">i</span></span></span></span></span> 语法进行编辑的维基人，可以随意使用和转载该模板。</p>
-<p><a href="https://zh.moegirl.org.cn/User:%E6%A8%B1%E5%B0%8F%E8%B7%AF%E4%B8%83%E5%8F%B6">七叶的萌娘百科主页</a></p>
-<h1 id="galgame相关以恋花绽放樱飞时为例">Galgame相关（以恋花绽放樱飞时为例）</h1>
-<h2 id="游戏信息模板">游戏信息模板</h2>
-<p>代码</p>
-<pre><code class="language-wikitext">{{Video Game Infobox
-|标题         = '''恋花绽放樱飞时'''
-|image        = 恋花绽放樱飞时.jpg
-|图片大小     = 250px
-|图片信息     = 
-|tabs         = 
-|原名         = {{lj|恋がさくころ桜どき}}
-|假名         = {{lj|こいがさくころさくらどき}}
-|罗马字       = Koi ga Sakukoro Sakuradoki 
-|常用译名     = 恋花绽放樱飞时
-|类型         = ADV
-|平台         = Windows Vista / 7 / 8 / 10&lt;br&gt;PlayStation 4
-|分级         = R-18(PC)&lt;br&gt;全年龄(Steam)
-|发行         = [[Palette]]
-|开发         = [[Palette]]
-|总监         = 
-|制作人       = 
-|设计师       = 
-|编剧         = [[みなせ未来]]
-|程序         = 
-|美工         = [[和泉つばす]]、[[eco*]]
-|音乐         = [[BURTON]]
-|引擎         = 
-|模式         = 
-|发行时间     = 2014年6月27日（日文版）&lt;br&gt;2017年10月2日（英文版）&lt;br&gt;2019年2月28日（PS4）
-|标题颜色     = #CCCCFF
-|左栏颜色     = #E6E9FF
-}}
+                <h1 id="线性表的逻辑结构">线性表的逻辑结构</h1>
+<h2 id="线性表的定义和特点">线性表的定义和特点</h2>
+<ol>
+<li>
+<p>线性表的定义</p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi><mtext> </mtext><mo>(</mo><mi>n</mi><mo>≥</mo><mn>0</mn><mo>)</mo></mrow><annotation encoding="application/x-tex">n\ (n\ge 0)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">n</span><span class="mspace"> </span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0</span><span class="mclose">)</span></span></span></span>个数据元素的有限序列，记作:</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">（</mi><msub><mi>a</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>a</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>a</mi><mi>n</mi></msub><mi mathvariant="normal">）</mi></mrow><annotation encoding="application/x-tex">（a_1, a_2, …, a_n）
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord cjk_fallback">（</span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord cjk_fallback">）</span></span></span></span></span></p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">a_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 是线性表中数据元素，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 是线性表长度， 其中 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">a_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 称为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>a</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">a_{i+1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.638891em;vertical-align:-0.208331em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.208331em;"><span></span></span></span></span></span></span></span></span></span> 的直接前驱，简称为前驱，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>a</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">a_{i+1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.638891em;vertical-align:-0.208331em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.208331em;"><span></span></span></span></span></span></span></span></span></span> 称为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">a_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 的直接后继，简称为后继。</p>
+</li>
+<li>
+<p>线性表的特点</p>
+<ul>
+<li>
+<p>除第一个元素外，其他每一个元素有一个且仅有一个直接前驱。</p>
+</li>
+<li>
+<p>除最后一个元素外，其他每一个元素有一个且仅有一个直接后继。</p>
+</li>
+</ul>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>a</mi><mn>1</mn></msub><mo>→</mo><msub><mi>a</mi><mn>2</mn></msub><mo>→</mo><msub><mi>a</mi><mn>3</mn></msub><mo>→</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo>→</mo><msub><mi>a</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">a_1\rightarrow a_2\rightarrow a_3\rightarrow... \rightarrow a_n 
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mord">.</span><span class="mord">.</span><span class="mord">.</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+</li>
+</ol>
+<h2 id="线性表基本操作">线性表基本操作</h2>
+<ol>
+<li>
+<pre><code class="language-cpp">int Length() const
 </code></pre>
-<p>效果图</p>
-<figure data-type="image" tabindex="1"><img src="https://cwlrin.wiki//post-images/1599282502129.png" alt="" loading="lazy"></figure>
-<h2 id="hidebox">HideBox</h2>
-<p>代码</p>
-<pre><code>{{Hide
-|日语原文
-|正文
-}}
+<p>初始条件：线性表已存在。</p>
+<p>操作结果：返回线性表元素个数。</p>
+</li>
+<li>
+<pre><code class="language-cpp">bool Empty() const
 </code></pre>
-<p>效果图</p>
-<figure data-type="image" tabindex="2"><img src="https://cwlrin.wiki//post-images/1599282805686.png" alt="" loading="lazy"></figure>
-<h2 id="角色模板">角色模板</h2>
-<p>代码</p>
-<pre><code>{{Main Characters Infolist
-|bg-color=#A2A9B1
-|th-color=#CCCCFF
-|td-color=#F8F9FA
-|cv-color=#E6E9FF
-|Name1       = '''[[神凤杏]]''' ({{ruby|神凤|じんぽう}} {{ruby|杏|あん}})
-|image1      = 神凤杏.jpg
-|info1       = 
-'''血型'''：O型
-
-'''生日'''：4月2日（白羊座）
-
-'''身高'''：162cm
-
-'''三围'''：B89 / W59/ H87
-
-美飒学园三年级学生，现役学生会长。
-
-拥有着连同性都憧憬的美貌，不过说起话来稍微有点让人残念。
-
-亲切待人的性格，宛若蝴蝶般的女孩子。
-
-对年下的悠真有些兴趣，想要把他拉进学生会。
-
-似乎从前就和恋爱妖精蒂娜认识……
-
-'''「从今天起，你就是我的仆人了♪」'''
-&lt;!-- 原文：
-
-美颯学園3年生。 現生徒会長。
-
-同性でも見惚れるほどの美貌を持つが、口を開くと少し残念。
-
-親しく接してきたかと思えば、はらりと手から逃れていく胡蝶のような女の子。
-
-ふとしたことから年下の悠真に興味を持ち、生徒会に引き込もうとする。
-
-恋の妖精・ティナとは以前から面識があるようだが……。
-
-「今日からキミ、あたしの下僕ね♪」 
- --&gt;
-|CV1         = [[井之上奈奈|夏峰いろは]]
+<p>初始条件：线性表已存在。</p>
+<p>操作结果：如线性表为空，则返回<code>true</code>，否则返回<code>false</code>。</p>
+</li>
+<li>
+<pre><code class="language-cpp">void Clear()
 </code></pre>
-<p>效果图</p>
-<figure data-type="image" tabindex="3"><img src="https://cwlrin.wiki//post-images/1599282978974.png" alt="" loading="lazy"></figure>
-<h2 id="游戏攻略模板">游戏攻略模板</h2>
-<p>代码</p>
-<pre><code>{{剧透提醒}}
-
-{{Hide
-|杏线
-|
-帮忙
-
-邀她去食堂
-
-岔开话题
-
-接受邀请
-
-◆SAVE
-
-听听学姐的请求
-
-杏 END
-}}
+<p>初始条件：线性表已存在。</p>
+<p>操作结果：清空线性表。</p>
+</li>
+<li>
+<pre><code class="language-cpp">void Traverse (void (*visit)(const ElemType &amp;)) const
 </code></pre>
-<p>效果图<br>
-<img src="https://cwlrin.wiki//post-images/1599283871636.png" alt="" loading="lazy"></p>
-<h2 id="相关音乐模板">相关音乐模板</h2>
-<p>代码</p>
-<pre><code>{{color|red|片头曲1(OP1)}}
-*曲名：'''[[恋爱绽放的未来|恋さくミライ]]'''（恋花绽放的未来）
-**歌：[[佐咲纱花]]
-**作词：[[rino]]，作、编曲：[[大久保薰]]
-
-{{BilibiliVideo|title=OP1|id=1rs41117zK}}
+<p>初始条件：线性表已存在。</p>
+<p>操作结果：依次对线性表的每个元素调用函数 <code>(*visit)</code>。</p>
+</li>
+<li>
+<pre><code class="language-cpp">StatusCode GetElem (int position, ElemType &amp;e) const
 </code></pre>
-<p>效果图</p>
-<figure data-type="image" tabindex="4"><img src="https://cwlrin.wiki//post-images/1599283912489.png" alt="" loading="lazy"></figure>
-<h1 id="虚拟主播相关以永远酱为例">虚拟主播相关（以永远酱为例）</h1>
-<h2 id="人物信息模板">人物信息模板</h2>
-<p>代码</p>
-<pre><code>{{人物信息
-|image=
-|tabs={{tabs|TextPadding=0px
- |color=white
- |TextBackgroundColor=white
- |LabelColor=#99ccff
- |bt1=星月银河
- |bt2=星辰万物
- |bt3=星空
- |bt4=(名字待定)
- |tab1=[[File:永远酱 星月银河.jpg|250px|画师：瓦瓦子]]
- |tab2=[[File:eienchan.jpg|250px|画师：瓦瓦子]]
- |tab3=[[File:C29f2a3e690185903c4f2d9c40afbc5155ece630 raw.jpg|250px|画师：永远酱]]
- |tab4=[[File:永远酱夏装.jpg|250px|画师：瓦瓦子]]
- |DefaultTab=2
-}}
-|本名=永远酱
-|别号=永远星{{黑幕|&lt;del&gt;永远猩&lt;/del&gt;}}
-|出生地=永远星
-|发色=淡紫
-|瞳色=绿
-|身高=155
-|体重=42kg {{黑幕|47万吨}}
-|三围=&lt;del&gt;直径32米&lt;/del&gt;
-|年龄=未知
-|生日=10月10日
-|星座=
-|血型=
-|声优=
-|萌点={{萌点|万年萝莉|傲娇|天然呆|冒失|元气|萝莉控|齐刘海|呆毛|大眼睛|虎牙|贫乳|兽耳，悬浮兽耳|背带裙|白色过膝袜，白丝|创可贴，头顶创可贴&lt;del&gt;煎蛋&lt;/del&gt;|露肩装|外星人|头槌|特殊第一人称，吾辈&lt;del&gt;焐被&lt;/del&gt;|翻译腔，日式翻译腔|熬夜|起床气|音痴|猫奴，铲屎官|片言，散装日语}}、自搜
-|出身地区=中国
-|活动范围=[[File:Bilibili Logo Blue.svg|40px|link=bilibili]]
-|粉丝勋章={{粉丝勋章|永远喵|40}}
-|目前B站粉丝数={{BilibiliUP|id=135980509|type=follower}}
-|所属团体=
-|个人状态=活动中
-|相关人士={{heimu|前世：[[新科娘]]（二代目） }}
-}}
+<p>初始条件：线性表已存在，<code>1≤position≤Length()</code>。</p>
+<p>操作结果：用 <code>e</code> 返回第 <code>position</code> 个元素的值。</p>
+</li>
+<li>
+<pre><code class="language-cpp">StatusCode SetElem(int position, const ElemType &amp;e)
 </code></pre>
-<p>效果图</p>
-<figure data-type="image" tabindex="5"><img src="https://cwlrin.wiki//post-images/1599283387877.png" alt="" loading="lazy"></figure>
-<h2 id="tioggle模板-bilibilivideo模板">Tioggle模板、bilibiliVideo模板</h2>
-<p>代码</p>
-<pre><code>{{Toggle
-|button={{color|#99CCFF|'''永远酱的音乐作品'''}}
-|content=
-{{bilibiliVideo|title=【翻唱】爱杀宝贝ed|id=BV15J41127VG|page=0|width=600|height=421|autoplay=false}}
-}}
+<p>初始条件：线性表已存在，<code>1≤position≤Length()</code>。</p>
+<p>操作结果：将线性表的第 <code>position</code>个位置的元素赋值为 <code>e</code>。</p>
+</li>
+<li>
+<pre><code>StatusCode Delete(int position, 	ElemType &amp;e)
 </code></pre>
-<p>效果图<br>
-<img src="https://cwlrin.wiki//post-images/1599283974521.png" alt="" loading="lazy"></p>
-<h1 id="歌曲相关以以恋结缘为例">歌曲相关（以以恋结缘为例）</h1>
-<h2 id="歌曲信息">歌曲信息</h2>
-<p>代码</p>
-<pre><code>{{Infobox Song
-|歌曲名= 恋ひ恋ふ縁
-|image= 千恋万花OST封面.jpg
-|图片信息= OST封面
-|图片大小= 250px 
-|演唱= [[KOTOKO]]
-|编曲= 井ノ原智
-|作曲= Famishin
-|填词= [[KOTOKO]]
-|吉他= Asai Yasuo 
-|三味线= 尾上秀樹
-|MV编导= 
-|收录专辑= 《千恋＊万花 オリジナル・サウンドトラック》
-}}
+<p>初始条件：线性表已存在，<code>1≤position≤Length()</code>。</p>
+<p>操作结果：删除线性表的第 <code>position</code> 个位置的元素, 并用 <code>e</code> 返回其值，长度减 <code>1</code> 。</p>
+</li>
+<li>
+<pre><code>StatusCode Insert(int position, 	const ElemType &amp;e)
 </code></pre>
-<p>效果图<br>
-<img src="https://cwlrin.wiki//post-images/1599284404586.png" alt="" loading="lazy"></p>
-<h2 id="歌词">歌词</h2>
-<p>代码</p>
-<pre><code>{{Photrans/button}}
-{{LyricsKai
-|lstyle=color:#704A83|rstyle=color:#EE6174|reserveWidth=260px
-|original=
-{{Photrans|誠|まこと}}、{{Photrans|意地|いじ}}の{{Photrans|悪|わる}}い{{Photrans|神|かみ}}の{{Photrans|所業|しょぎょう}}か？
-{{Photrans|奇跡|きせき}}？{{Photrans|縁|えにし}}？ {{Photrans|袂|たもと}}{{Photrans|触合|ふれあ}}う{{Photrans|不思議|ふしぎ}}
-{{Photrans|花|はな}}ひとひら{{Photrans|揺|ゆ}}れて
-{{Photrans|不意|ふい}}に{{Photrans|宿|やど}}ってた
-うなじ{{Photrans|解|ほど}}いてく{{Photrans|春風|はるかぜ}}
-
-{{Photrans|戯|たわむ}}れはそこそこに
-{{Photrans|恋手|こいて}}ほどきしてくだしゃんせ
-{{Photrans|湯気|ゆげ}}にほんのり{{Photrans|頬染|ほほそめ}}て
-{{Photrans|夜風|よかぜ}}に{{Photrans|願ふ|ねがう}}
-
-|translated=
-是天意不善 在戏谑人间？&lt;ref&gt;翻译：七海芽生 已取得授权| 假名标注：[[User:MCPE White|MCPE White]]&lt;/ref&gt;
-玄妙的邂逅 奇迹还是缘？
-哪曾想
-摇曳花儿丛中掩
-春风吹人暖
-
-莫要再拿人调笑
-恋爱妙诀要请教
-水暖熏得双颊俏
-心愿随着夜风飘
-}}
-</code></pre>
-<p>效果图</p>
-<figure data-type="image" tabindex="6"><img src="https://cwlrin.wiki//post-images/1599284307681.png" alt="" loading="lazy"></figure>
-<h1 id="杂项">杂项</h1>
-<h2 id="latex-格式代码"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext>LaTeX</mtext></mrow><annotation encoding="application/x-tex">\LaTeX</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.89883em;vertical-align:-0.2155em;"></span><span class="mord text"><span class="mord textrm">L</span><span class="mspace" style="margin-right:-0.36em;"></span><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.68333em;"><span style="top:-2.904999em;"><span class="pstrut" style="height:2.7em;"></span><span class="mord text"><span class="mord textrm sizing reset-size6 size3">A</span></span></span></span></span></span><span class="mspace" style="margin-right:-0.15em;"></span><span class="mord text"><span class="mord textrm">T</span><span class="mspace" style="margin-right:-0.1667em;"></span><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.46782999999999997em;"><span style="top:-2.7845em;"><span class="pstrut" style="height:3em;"></span><span class="mord text"><span class="mord textrm">E</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2155em;"><span></span></span></span></span><span class="mspace" style="margin-right:-0.125em;"></span><span class="mord textrm">X</span></span></span></span></span></span> 格式代码</h2>
-<pre><code class="language-html">&lt;span class=&quot;texhtml&quot; style=&quot;font-family: 'CMU Serif', cmr10, LMRoman10-Regular, 'Latin Modern Math', 'Nimbus Roman No9 L', 'Times New Roman', Times, serif;&quot;&gt;L&lt;span style=&quot;text-transform: uppercase; font-size: 57.851%; vertical-align: 0.205em; margin-left: -0.36em; margin-right: -0.15em; line-height: 0&quot;&gt;a&lt;/span&gt;T&lt;span style=&quot;text-transform: uppercase; vertical-align: -0.2155em; margin-left: -0.125em; margin-right: -0.1667em; line-height: 0&quot;&gt;e&lt;/span&gt;X&lt;/span&gt;
-</code></pre>
+<p>初始条件：线性表已存在，<code>1≤position≤Length()+1</code> 。</p>
+<p>操作结果：在线性表的第 <code>position</code> 个位置前插入元素 <code>e</code> ，长度加 <code>1</code>。</p>
+</li>
+</ol>
 
               </div>
               <div class="post-footer">
@@ -788,7 +604,7 @@ window.addEventListener('load', function() {
     </li>
     <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="https://cwlrin.wiki/post/qi-xie-zi-yong-de-wiki-mo-ban/" title="七叶自用的Wiki模板">七叶自用的Wiki模板</a>
+      <a href="https://cwlrin.wiki/post/shu-ju-jie-gou-xian-xing-biao/" title="数据结构——线性表">数据结构——线性表</a>
     </li>
     <li class="post-copyright-license">
       <strong>版权声明： </strong>
@@ -801,15 +617,11 @@ window.addEventListener('load', function() {
   <div class="nav">
     <div class="nav-prev">
       
-        <i class="fa fa-chevron-left"></i>
-        <a class="nav-pc-next" title="数据结构——概论" href="https://cwlrin.wiki/post/shu-ju-jie-gou-gai-lun/">数据结构——概论</a class="nav-pc-next">
-        <a class="nav-mobile-prev" title="数据结构——概论" href="https://cwlrin.wiki/post/shu-ju-jie-gou-gai-lun/">上一篇</a>
-      
     </div>
     <div class="nav-next">
       
-        <a class="nav-pc-next" title="数据结构、算法与应用——C++语言描述 课后习题答案" href="https://cwlrin.wiki/post/shu-ju-jie-gou-suan-fa-yu-ying-yong-cyu-yan-miao-shu-ke-hou-xi-ti-da-an/">数据结构、算法与应用——C++语言描述 课后习题答案</a>
-        <a class="nav-mobile-next" title="数据结构、算法与应用——C++语言描述 课后习题答案" href="https://cwlrin.wiki/post/shu-ju-jie-gou-suan-fa-yu-ying-yong-cyu-yan-miao-shu-ke-hou-xi-ti-da-an/">下一篇</a>
+        <a class="nav-pc-next" title="数据库——概论" href="https://cwlrin.wiki/post/shu-ju-ku-gai-lun/">数据库——概论</a>
+        <a class="nav-mobile-next" title="数据库——概论" href="https://cwlrin.wiki/post/shu-ju-ku-gai-lun/">下一篇</a>
         <i class="fa fa-chevron-right"></i>
       
     </div>
