@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://cwlrin.wiki/</id>
     <title>七叶的个人小站</title>
-    <updated>2020-09-12T12:40:30.427Z</updated>
+    <updated>2020-09-27T11:45:55.644Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://cwlrin.wiki/"/>
     <link rel="self" href="https://cwlrin.wiki/atom.xml"/>
@@ -91,6 +91,580 @@
 <p>操作结果：在线性表的第 <code>position</code> 个位置前插入元素 <code>e</code> ，长度加 <code>1</code>。</p>
 </li>
 </ol>
+<h2 id="线性表的顺序存储结构">线性表的顺序存储结构</h2>
+<ol>
+<li>顺序表的定义和特点</li>
+</ol>
+<ul>
+<li>定义 ：将线性表中的元素相继存放在一个连续的存储空间中。</li>
+<li>特点：可利用一维数组描述存储结构，采用线性表的顺序存储方式</li>
+</ul>
+<ol start="2">
+<li>顺序表(SeqList)类模板的定义</li>
+</ol>
+<pre><code class="language-cpp">// 顺序表类模板
+template &lt;class ElemType&gt;
+class SqList 
+{
+protected:
+// 顺序表实现的数据成员:
+	int count;			// 元素个数
+	int maxSize;		// 顺序表最大元素个数
+	ElemType *elems;	// 元素存储空间
+// 辅助函数模板
+	bool Full() const;	// 判断线性表是否已满
+	void Init(int size);	// 初始化线性表
+
+public:
+// 抽象数据类型方法声明及重载编译系统默认方法声明:
+	SqList(int size = DEFAULT_SIZE);// 构造函数模板
+	virtual ~SqList();	// 析构函数模板
+	int Length() const;	// 求线性表长度			 
+	bool Empty() const;	// 判断线性表是否为空
+	void Clear();		// 将线性表清空
+	void Traverse(void (*visit)(const ElemType &amp;)) 
+		const;			// 遍历线性表
+	StatusCode GetElem(int position, ElemType &amp;e) 	const;			// 求指定位置的元素	
+	StatusCode SetElem(int position, const ElemType &amp;e); 	// 设置指定位置的元素值
+	StatusCode Delete(int position, ElemType &amp;e);		// 删除元素		
+	StatusCode Insert(int position, const ElemType &amp;e);
+		// 插入元素
+	SqList(const SqList&lt;elemType&gt; &amp;copy); 
+		// 复制构造函数模板
+	SqList&lt;elemType&gt; &amp;operator =(const
+	 	SqList&lt;elemType&gt; &amp;copy); 	// 重载赋值运算符
+};
+</code></pre>
+<ol start="3">
+<li>顺序表辅助函数模板的实现</li>
+</ol>
+<pre><code class="language-cpp">template &lt;class ElemType&gt;
+bool SqList&lt;ElemType&gt;::Full() const
+// 操作结果：如线性表已满，则返回true，否则返回false
+{
+	return count == maxSize;
+}
+template &lt;class ElemType&gt;
+void SqList&lt;ElemType&gt;::Init(int size)
+// 操作结果：初始化线性表为最大元素个数为size的空线
+//	性表
+{
+	maxSize = size;			      // 最大元素个数
+	if (elems != NULL) delete []elems;// 释放存储空间
+	elems = new ElemType[maxSize];// 分配存储空间
+	count = 0;			// 空线性表元素个数为0
+}
+</code></pre>
+<ol start="4">
+<li>顺序表部分操作的实现</li>
+</ol>
+<pre><code class="language-cpp">template &lt;class ElemType&gt;
+SqList&lt;ElemType&gt;::SqList(int size)
+// 操作结果：构造一个最大元素个数为size的空顺序表
+{
+	elems = NULL;		// 未分配存储空间前,elems为空
+	Init(size);			// 初始化线性表
+}
+
+template &lt;class ElemType&gt;
+SqList&lt;ElemType&gt;::~SqList()
+// 操作结果：销毁线性表
+{
+	delete []elems;		// 释放存储空间
+}
+</code></pre>
+<h3 id="表项的插入">表项的插入</h3>
+<figure data-type="image" tabindex="1"><img src="https://cwlrin.wiki//post-images/1601122016003.png" alt="" loading="lazy"></figure>
+<pre><code class="language-cpp">template &lt;class ElemType&gt;
+StatusCode SqList&lt;ElemType&gt;::Insert(int position,
+ 	const ElemType &amp;e)
+// 操作结果：在线性表的第position个位置前插入元素e,
+//	position的的取值范围为1≤position≤Length()+1
+//	如线性表已满,则返回OVER_FLOW,
+//	如position合法, 则返回SUCCESS, 否则返回
+//	RANGE_ERROR
+{
+	int len = Length();
+	ElemType tmp;
+	if (Full())
+	{	// 线性表已满返回OVER_FLOW
+		return OVER_FLOW;	
+	}
+	else if (position &lt; 1 || position &gt; len + 1)
+	{	// position范围错
+		return RANGE_ERROR;
+	}
+	else
+	{	// 成功
+		count++;		// 插入后元素个数将自增1
+		for (int curPosition = len; 
+			curPosition &gt;= position;  curPosition--)
+		{	// 插入位置之后的元素右移
+			GetElem(curPosition, tmp);
+ 			SetElem(curPosition + 1, tmp); 
+		}
+		SetElem(position, e);//将e赋值到position位置处
+		return SUCCESS;    // 插入成功
+	}
+}
+</code></pre>
+<h3 id="表项的删除">表项的删除</h3>
+<figure data-type="image" tabindex="2"><img src="https://cwlrin.wiki//post-images/1601122096270.png" alt="" loading="lazy"></figure>
+<pre><code class="language-cpp">template &lt;class ElemType&gt;
+StatusCode SqList&lt;ElemType&gt;::Delete(int position, 
+	ElemType &amp;e)
+// 操作结果：删除线性表的第position个位置的元素, 并前//	用e返回其值, position的的取值范围为
+//	1≤position≤Length(), position合法时返回
+//	SUCCESS,否则返回RANGE_ERROR
+{
+	int len = Length();
+	ElemType tmp;
+	if (position &lt; 1 || position &gt; len)
+	{	// position范围错
+		return RANGE_ERROR;
+	}
+	else
+	{	// position合法
+		GetElem(position, e);
+			// 用e返回被删除元素的值
+		for (int curPosition = position + 1; 
+			curPosition &lt;= len; curPosition++)
+		{	 // 被删除元素之后的元素依次左移
+			GetElem(curPosition, tmp);
+ 			SetElem(curPosition - 1, tmp); 
+		}
+		count--;	// 删除后元素个数将自减1
+		return SUCCESS;
+	}
+}
+</code></pre>
+<h2 id="顺序表的应用集合的差运算">顺序表的应用：集合的“差”运算</h2>
+<pre><code class="language-cpp">// 文件路径名:s2_1\alg.h 
+template &lt;class ElemType&gt;
+void Difference(const SqList&lt;ElemType&gt; &amp;la, const SqList&lt;ElemType&gt; &amp;lb, SqList&lt;ElemType&gt; &amp;lc)
+// 操作结果: 用lc返回la和lb表示的集合的差集
+// 方    法: 在la中取出元素,在lb中进行查找,如果未在lb中
+//	出现了,将其插入到lc
+{
+	ElemType aItem, bItem;
+	lc.Clear();				// 清空lc
+	for (int aPosition = 1; aPosition &lt;= la.Length();
+ 		aPosition++)
+	{
+		la.GetElem(aPosition, aItem);		
+			// 取出la的一个元素aItem
+		bool isExist = false;
+			// 表示aItem是否在lb中出现
+		for (int bPosition = 1; bPosition &lt;= lb.Length();
+	 		bPosition++)
+		{
+			lb.GetElem(bPosition, bItem);	
+				// 取出lb的一个元素bItem
+			if (aItem == bItem)
+			{
+				isExist = true;			
+					// aItem同时在la和lb中
+					// 出现,置isExist为true
+				break;	// 退出内层循环
+			}
+		}
+		if (!isExist)
+		{	// aItem在la中出现,而未在lb中未出现,
+			//	将其插入到lc中
+			lc.Insert(lc.Length() + 1, aItem); 
+		}
+	}
+}
+</code></pre>
+<h1 id="线性表的链式存储结构">线性表的链式存储结构</h1>
+<h2 id="单链表singly-linked-list">单链表(Singly Linked List)</h2>
+<ol>
+<li>
+<p>单链表的概念</p>
+<p>用一组地址任意的存储单元存放线性表中的数据元素。</p>
+<p>以 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mi>a</mi><mi>t</mi><mi>a</mi></mrow><annotation encoding="application/x-tex">data</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span><span class="mord mathdefault">a</span><span class="mord mathdefault">t</span><span class="mord mathdefault">a</span></span></span></span>(元素的值) + <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi><mi>e</mi><mi>x</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">next</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.61508em;vertical-align:0em;"></span><span class="mord mathdefault">n</span><span class="mord mathdefault">e</span><span class="mord mathdefault">x</span><span class="mord mathdefault">t</span></span></span></span>(后继)= 结点(表示数据元素)</p>
+<p>以“结点的序列”表示线性表称作单链表</p>
+</li>
+</ol>
+<figure data-type="image" tabindex="3"><img src="https://cwlrin.wiki//post-images/1601122437946.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="4"><img src="https://cwlrin.wiki//post-images/1601122750698.png" alt="" loading="lazy"></figure>
+<pre><code>以线性表中第一个数据元素 $a_1$ 的存储地址作为线性表的地址，称作线性表的头指针。
+
+有时为了操作方便，在第一个结点之前虚加一个“头结点”，这时指向头结点的指针称为链表的头指针。
+</code></pre>
+<ol start="2">
+<li>单链表的相关类模板</li>
+</ol>
+<pre><code class="language-cpp">// 结点类模板
+template &lt;class ElemType&gt;
+struct Node 
+{
+// 数据成员:
+	ElemType data;			// 数据域
+	Node&lt;ElemType&gt; *next;	// 指针域
+
+// 构造函数模板:
+	Node();			// 无参数的构造函数模板
+	Node(ElemType item, Node&lt;ElemType&gt; *link = 
+		NULL);// 已知数据域和指针域建立结构
+};
+// 简单线性链表类模板
+template &lt;class ElemType&gt;
+class SimpleLinkList 
+{
+protected:
+//  链表实现的数据成员:
+	Node&lt;ElemType&gt; *head;	// 头结点指针
+
+// 辅助函数模板:
+	Node&lt;ElemType&gt; *GetElemPtr(int position) const;		// 返回指向第position个结点的指针
+	void Init();				// 初始化线性表
+public:
+//  抽象数据类型方法声明及重载编译系统默认方法声明:
+	SimpleLinkList();		// 无参数构造函数模板
+	virtual ~SimpleLinkList();	// 析构函数模板
+	int Length() const;		// 求线性表长度	 
+	bool Empty() const;	// 判断线性表是否为空
+	void Clear();			// 将线性表清空
+	void Traverse(void (*visit)(const ElemType &amp;))
+ 		const;				// 遍历线性表
+	StatusCode GetElem(int position, ElemType &amp;e)
+ 		const;				// 求指定位置的元素
+	StatusCode SetElem(int position, const ElemType
+ 		&amp;e);			// 设置指定位置的元素值
+	StatusCode Delete(int position, ElemType &amp;e);
+		// 删除元素		
+	StatusCode Insert(int position, const ElemType &amp;e);
+		// 插入元素
+	SimpleLinkList(const SimpleLinkList&lt;ElemType&gt;
+ 		&amp;copy); 			// 复制构造函数模板
+	SimpleLinkList&lt;ElemType&gt; &amp;operator =(const
+ 		SimpleLinkList&lt;ElemType&gt; &amp;copy); 
+		// 重载赋值运算符
+};
+</code></pre>
+<ol start="3">
+<li>单链表中的插入与删除</li>
+</ol>
+<ul>
+<li>
+<p>插入</p>
+<pre><code class="language-cpp">newPtr = new Node&lt;ElemType&gt;(e, tmpPtr-&gt;next); 
+tmpPtr-&gt;next = newPtr;
+</code></pre>
+<figure data-type="image" tabindex="5"><img src="https://cwlrin.wiki//post-images/1601123039311.png" alt="" loading="lazy"></figure>
+<pre><code class="language-cpp">template &lt;class ElemType&gt;
+StatusCode SimpleLinkList&lt;ElemType&gt;::Insert(
+int position, const ElemType &amp;e)
+// 操作结果：在线性表的第position个位置前插入元素e
+//	position的取值范围为1≤position≤Length()+1
+//	position合法时返回SUCCESS, 否则返回
+//	RANGE_ERROR
+{
+    if (position &lt; 1 || position &gt; Length() + 1)
+    {	// position范围错
+        return RANGE_ERROR; 	// 位置不合法
+    }
+    else
+    {	// position合法
+        Node&lt;ElemType&gt; *tmpPtr;
+        tmpPtr = GetElemPtr(position - 1);		
+            // 取出指向第position-1个结点的指针
+        Node&lt;ElemType&gt; *newPtr;
+        newPtr = new Node&lt;ElemType&gt;(e, 
+            tmpPtr-&gt;next);		// 生成新结点
+        tmpPtr-&gt;next = newPtr;			
+            // 将tmpPtr插入到链表中
+        return SUCCESS;
+    }
+}
+</code></pre>
+</li>
+<li>
+<p>删除</p>
+<pre><code class="language-cpp">nextPtr = tmpPtr-&gt;next;	// nextPtr为tmpPtr的后继
+tmpPtr-&gt;next = nextPtr-&gt;next;// 删除结点
+delete nextPtr;			// 释放被删结点
+</code></pre>
+<figure data-type="image" tabindex="6"><img src="https://cwlrin.wiki//post-images/1601123198863.png" alt="" loading="lazy"></figure>
+<pre><code>  ```cpp
+</code></pre>
+<p>nextPtr = tmpPtr-&gt;next;	// nextPtr为tmpPtr的后继<br>
+tmpPtr-&gt;next = nextPtr-&gt;next;// 删除结点<br>
+delete nextPtr;			// 释放被删结点</p>
+<pre><code>
+```cpp
+template &lt;class ElemType&gt;
+StatusCode SimpleLinkList&lt;ElemType&gt;::Delete(int position, ElemType &amp;e)
+// 操作结果：删除线性表的第position个位置的元素, 并用
+//	e返回其值, position的取值范围为
+//	1≤position≤Length(), position合法时返回
+//	SUCCESS,否则返回RANGE_ERROR
+{
+    if (position &lt; 1 || position &gt; Length())
+    {	// position范围错
+        return RANGE_ERROR;
+    }
+    else
+    {	// position合法
+        Node&lt;ElemType&gt; *tmpPtr;
+        tmpPtr = GetElemPtr(position - 1);
+            // 取出指向第position-1个结点的指针
+        Node&lt;ElemType&gt; *nextPtr = tmpPtr-&gt;next;
+            // nextPtr为tmpPtr的后继
+        tmpPtr-&gt;next = nextPtr-&gt;next;// 删除结点
+        e = nextPtr-&gt;data;// 用e返回被删结点元素值		delete nextPtr;	// 释放被删结点
+        return SUCCESS;
+    }
+}
+</code></pre>
+</li>
+</ul>
+<h2 id="循环链表-circular-list">循环链表 (Circular List)</h2>
+<ol>
+<li>循环链表的概念</li>
+</ol>
+<ul>
+<li>
+<p>循环链表是单链表的变形。</p>
+</li>
+<li>
+<p>循环链表最后一个结点的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi><mi>e</mi><mi>x</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">next</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.61508em;vertical-align:0em;"></span><span class="mord mathdefault">n</span><span class="mord mathdefault">e</span><span class="mord mathdefault">x</span><span class="mord mathdefault">t</span></span></span></span> 指针不为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>U</mi><mi>L</mi><mi>L</mi></mrow><annotation encoding="application/x-tex">NULL</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.10903em;">U</span><span class="mord mathdefault">L</span><span class="mord mathdefault">L</span></span></span></span>，而是指向了表的前端。</p>
+</li>
+<li>
+<p>为简化操作，在循环链表中往往加入表头结点。</p>
+</li>
+<li>
+<p>循环链表的特点是：只要知道表中某一结点的地址，就可搜寻到所有其他结点的地址。</p>
+</li>
+</ul>
+<ol start="2">
+<li>
+<p>循环链表示例</p>
+<figure data-type="image" tabindex="7"><img src="https://cwlrin.wiki//post-images/1601125758064.png" alt="" loading="lazy"></figure>
+</li>
+<li>
+<p>循环链表的相关类模板</p>
+</li>
+</ol>
+<pre><code class="language-cpp">// 简单循环链表类模板
+template &lt;class ElemType&gt;
+class SimpleCircLinkList 
+{
+protected:
+//  循环链表实现的数据成员:
+	Node&lt;ElemType&gt; *head;		// 头结点指针
+
+// 辅助函数模板:
+	Node&lt;ElemType&gt; *GetElemPtr(int position) const;
+		// 返回指向第position个结点的指针
+	void Init();					// 初始化线性表
+public:
+//  抽象数据类型方法声明及重载编译系统默认方法声明:
+	SimpleCircLinkList();	// 无参数的构造函数模板
+	virtual ~SimpleCircLinkList();	// 析构函数模板
+	int Length() const;			// 求线性表长度
+	bool Empty() const;	// 判断线性表是否为空
+	void Clear();				// 将线性表清空
+	void Traverse(void (*visit)(const ElemType &amp;))
+ 		const;					// 遍历线性表
+	StatusCode GetElem(int position, ElemType &amp;e)
+ 		const;				// 求指定位置的元素
+	StatusCode SetElem(int position, const ElemType
+ 		&amp;e);			// 设置指定位置的元素值
+	StatusCode Delete(int position, ElemType &amp;e);
+		// 删除元素		
+	StatusCode Insert(int position, const ElemType &amp;e);
+		// 插入元素
+	SimpleCircLinkList(const 		SimpleCircLinkList&lt;ElemType&gt; &amp;copy); 
+		// 复制构造函数模板
+	SimpleCircLinkList&lt;ElemType&gt; &amp;operator =(const
+ 		SimpleCircLinkList&lt;ElemType&gt; &amp;copy);
+		// 重载赋值运算符
+};
+</code></pre>
+<ol start="4">
+<li>循环链表的应用——用循环链表求解约瑟夫问题</li>
+</ol>
+<ul>
+<li>
+<p>约瑟夫问题的提法</p>
+<p>n 个人围成一个圆圈，首先第1个人从1开始一个人一个人顺时针报数,  报到第m个人，令其出列。然后再从下一个人开始，从1顺时针报数，报到第m个人，再令其出列，…，如此下去,  直到圆圈中只剩一个人为止。此人即为优胜者。</p>
+</li>
+<li>
+<p>例如  <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi><mo>=</mo><mn>8</mn><mspace width="1em"/><mi>m</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">n = 8\quad m = 3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathdefault">m</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">3</span></span></span></span></p>
+</li>
+</ul>
+<figure data-type="image" tabindex="8"><img src="https://cwlrin.wiki//post-images/1601125884388.png" alt="" loading="lazy"></figure>
+<pre><code class="language-cpp">// 文件路径名:s2_5\alg.h 
+void Josephus(int n, int m)
+// 操作结果:n个人围成一个圆圈，首先第1个人从1开始一
+// 	个人一个人顺时针报数,报到第m个人，令其出列。
+//	然后再从下一个人开始，从1顺时针报数报到第m
+//	个人，再令其出列，…，如此下去, 直到圆圈中只
+//	剩一个人为止。此人即为优胜者
+{
+    	SimpleCircLinkList&lt;int&gt; la;	// 定义空循环链表
+	int position = 0;		// 报数到的人在链表中序号
+	int out, winer;
+	for (int k = 1; k &lt;= n; k++) la.Insert(k, k);
+		// 建立数据域为1,2,..,n的循环链表
+	cout &lt;&lt; &quot;出列者:&quot;; 
+	for (int i = 1; i &lt; n; i++)
+	{	// 循环n-1次，让n-1个个出列
+		for (int j = 1; j &lt;= m; j++)	
+		{	 // 从1报数到m
+			position++;
+			if (position &gt; la.Length())
+				position = 1;
+		}
+		la.Delete(position--, out);// 报数到m的人出列
+		cout &lt;&lt; out &lt;&lt; &quot; &quot;;
+	}
+	la.GetElem(1, winer);	// 剩下的一个人为优胜者
+	cout &lt;&lt; endl &lt;&lt; &quot;优胜者:&quot; &lt;&lt; winer &lt;&lt; endl;
+}
+</code></pre>
+<h2 id="双向链表-doubly-linked-list">双向链表 (Doubly Linked List)</h2>
+<ol>
+<li>双向链表的概念</li>
+</ol>
+<ul>
+<li>双向链表是指在前驱和后继方向都能游历(遍历)的线性链表。</li>
+<li>双向链表每个结点结构：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>b</mi><mi>a</mi><mi>c</mi><mi>k</mi><mo>(</mo><mi mathvariant="normal">左</mi><mi mathvariant="normal">链</mi><mi mathvariant="normal">指</mi><mi mathvariant="normal">针</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">back(左链指针)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">b</span><span class="mord mathdefault">a</span><span class="mord mathdefault">c</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord cjk_fallback">左</span><span class="mord cjk_fallback">链</span><span class="mord cjk_fallback">指</span><span class="mord cjk_fallback">针</span><span class="mclose">)</span></span></span></span></th>
+<th><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mi>a</mi><mi>t</mi><mi>a</mi><mo>(</mo><mi mathvariant="normal">数</mi><mi mathvariant="normal">据</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">data(数据)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mord mathdefault">a</span><span class="mord mathdefault">t</span><span class="mord mathdefault">a</span><span class="mopen">(</span><span class="mord cjk_fallback">数</span><span class="mord cjk_fallback">据</span><span class="mclose">)</span></span></span></span></th>
+<th><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi><mi>e</mi><mi>x</mi><mi>t</mi><mo>(</mo><mi mathvariant="normal">右</mi><mi mathvariant="normal">链</mi><mi mathvariant="normal">指</mi><mi mathvariant="normal">针</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">next(右链指针)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">n</span><span class="mord mathdefault">e</span><span class="mord mathdefault">x</span><span class="mord mathdefault">t</span><span class="mopen">(</span><span class="mord cjk_fallback">右</span><span class="mord cjk_fallback">链</span><span class="mord cjk_fallback">指</span><span class="mord cjk_fallback">针</span><span class="mclose">)</span></span></span></span></th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+<ul>
+<li>前驱方向 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>←</mo><mspace width="2em"/><mo>→</mo></mrow><annotation encoding="application/x-tex">\leftarrow\qquad\rightarrow</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:2em;"></span></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">→</span></span></span></span> 后继方向</li>
+<li>双向链表通常采用带表头结点的循环链表形式。</li>
+</ul>
+<ol start="2">
+<li>双向循环链表示例</li>
+</ol>
+<figure data-type="image" tabindex="9"><img src="https://cwlrin.wiki//post-images/1601126403179.png" alt="" loading="lazy"></figure>
+<h2 id="在链表结构中保存当前位置和元素个数">在链表结构中保存当前位置和元素个数</h2>
+<ul>
+<li>前面讲解了线性表的链式存储结构的实现处理简单</li>
+<li>但许多应用程序可能要几次引用同一个数据元素，对于这类应用程序，前面的链表实现效率低下</li>
+<li>最好在链表结构中保存当前位置和元素个数。</li>
+</ul>
+<pre><code class="language-cpp">// 线性链表类模板
+template &lt;class ElemType&gt;
+class LinkList 
+{
+protected:
+//  链表实现的数据成员:
+	Node&lt;ElemType&gt; *head;	// 头结点指针
+	mutable int curPosition;	// 当前位置的序号
+	mutable Node&lt;ElemType&gt; * curPtr;		
+		// 指向当前位置的指针
+	int count;				// 元素个数
+// 辅助函数模板:
+	Node&lt;ElemType&gt; *GetElemPtr(int position) const;		// 返回指向第position个结点的指针
+	void Init();				// 初始化线性表
+
+public:
+//  抽象数据类型方法声明及重载编译系统默认方法声明:
+	LinkList();			// 无参数的构造函数模板
+	virtual ~LinkList();	// 析构函数模板
+	int Length() const;	// 求线性表长度
+	bool Empty() const;	// 判断线性表是否为空
+	void Clear();		// 将线性表清空
+	void Traverse(void (*visit)( const ElemType &amp;)) 
+		const;			// 遍历线性表
+	StatusCode GetElem(int position, ElemType &amp;e)
+ 		const;				// 求指定位置的元素	StatusCode SetElem(int position, const ElemType
+ 		&amp;e);			// 设置指定位置的元素值
+	StatusCode Delete(int position, ElemType &amp;e);			// 删除元素		
+	StatusCode Insert(int position, const ElemType &amp;e); 		// 插入元素
+	LinkList(const LinkList&lt;ElemType&gt; &amp;copy); 			// 复制构造函数模板
+	LinkList&lt;ElemType&gt; &amp;operator =(const
+ 		LinkList&lt;ElemType&gt; &amp;copy); 
+		// 重载赋值运算符
+};
+</code></pre>
+<h1 id="实例研究一元多项式的表示">实例研究——一元多项式的表示</h1>
+<p>一元多项式</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>p</mi><mi>n</mi></msub><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><msub><mi>p</mi><mn>0</mn></msub><mo>+</mo><msub><mi>p</mi><mn>1</mn></msub><mi>x</mi><mo>+</mo><msub><mi>p</mi><mn>2</mn></msub><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo>+</mo><msub><mi>p</mi><mi>n</mi></msub><msup><mi>x</mi><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">p_n(x)=p_0+p_1x+p_2x^2+...+p_nx^n
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.7777700000000001em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.7777700000000001em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.0585479999999998em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord">.</span><span class="mord">.</span><span class="mord">.</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.9088319999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7143919999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>在计算机中，可以用一个线性表来表示:</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mo>=</mo><mo>(</mo><msub><mi>p</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>p</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mi mathvariant="normal">，</mi><msub><mi>p</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">P = (p_0, p_1, …，p_n)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord cjk_fallback">，</span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>但是对于形如</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mn>1</mn><mo>+</mo><mn>3</mn><msup><mi>x</mi><mn>10000</mn></msup><mi mathvariant="normal">–</mi><mn>2</mn><msup><mi>x</mi><mn>20000</mn></msup></mrow><annotation encoding="application/x-tex">S(x) = 1 + 3x^{10000} – 2x^{20000}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8641079999999999em;vertical-align:0em;"></span><span class="mord">3</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight">0</span><span class="mord mtight">0</span><span class="mord mtight">0</span><span class="mord mtight">0</span></span></span></span></span></span></span></span></span><span class="mord" style="margin-right:0.02778em;">–</span><span class="mord">2</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mtight">0</span><span class="mord mtight">0</span><span class="mord mtight">0</span><span class="mord mtight">0</span></span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>的多项式，上述表示方法是否合适？</p>
+<p>一般情况下的一元稀疏多项式可写成</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>P</mi><mi>n</mi></msub><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><msub><mi>p</mi><mn>1</mn></msub><msup><mi>x</mi><mrow><mi>e</mi><mn>1</mn></mrow></msup><mo>+</mo><msub><mi>p</mi><mn>2</mn></msub><msup><mi>x</mi><mrow><mi>e</mi><mn>2</mn></mrow></msup><mo>+</mo><mi mathvariant="normal">┄</mi><mo>+</mo><msub><mi>p</mi><mi>m</mi></msub><msup><mi>x</mi><mrow><mi>e</mi><mi>m</mi></mrow></msup></mrow><annotation encoding="application/x-tex">P_n(x) = p_1x^{e1} + p_2x^{e2} + ┄ + p_mx^{em}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.0585479999999998em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">e</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.0585479999999998em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">e</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord">┄</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.9088319999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7143919999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight">m</span></span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>其中：<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>p</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">p_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 是指数为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>e</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">e_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 的项的非零系数，</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>0</mn><mo>≤</mo><msub><mi>e</mi><mn>1</mn></msub><mo>&lt;</mo><msub><mi>e</mi><mn>2</mn></msub><mo>&lt;</mo><mi mathvariant="normal">┄</mi><mo>&lt;</mo><msub><mi>e</mi><mi>m</mi></msub><mo>=</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">0≤ e_1 &lt; e_2 &lt; ┄ &lt; e_m = n
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.78041em;vertical-align:-0.13597em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.6891em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.6891em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord">┄</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span></span></p>
+<p>可以下列线性表表示：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><mo>(</mo><msub><mi>p</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>e</mi><mn>1</mn></msub><mo>)</mo><mo separator="true">,</mo><mo>(</mo><msub><mi>p</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>e</mi><mn>2</mn></msub><mo>)</mo><mo separator="true">,</mo><mi mathvariant="normal">┄</mi><mo separator="true">,</mo><mo>(</mo><msub><mi>p</mi><mi>m</mi></msub><mo separator="true">,</mo><msub><mi>e</mi><mi>m</mi></msub><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">((p_1, e_1), (p_2, e_2), ┄, (p_m,e_m))
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">┄</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span></p>
+<p>例如:</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mi>P</mi><mn>999</mn></msup><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mn>7</mn><msup><mi>x</mi><mn>3</mn></msup><mo>−</mo><mn>2</mn><msup><mi>x</mi><mn>12</mn></msup><mo>−</mo><mn>8</mn><msup><mi>x</mi><mn>999</mn></msup></mrow><annotation encoding="application/x-tex">P^{999}(x) = 7x^3 - 2x^{12} - 8x^{999}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1141079999999999em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">9</span><span class="mord mtight">9</span><span class="mord mtight">9</span></span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.9474379999999999em;vertical-align:-0.08333em;"></span><span class="mord">7</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.9474379999999999em;vertical-align:-0.08333em;"></span><span class="mord">2</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8641079999999999em;vertical-align:0em;"></span><span class="mord">8</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">9</span><span class="mord mtight">9</span><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>可用线性表</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><mo>(</mo><mn>7</mn><mo separator="true">,</mo><mn>3</mn><mo>)</mo><mo separator="true">,</mo><mo>(</mo><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mn>12</mn><mo>)</mo><mo separator="true">,</mo><mo>(</mo><mo>−</mo><mn>8</mn><mo separator="true">,</mo><mn>999</mn><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">( (7, 3), (-2, 12), (-8, 999) )
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mopen">(</span><span class="mord">7</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">3</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mopen">(</span><span class="mord">−</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mopen">(</span><span class="mord">−</span><span class="mord">8</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">9</span><span class="mord">9</span><span class="mord">9</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span></p>
+<p>表示</p>
+<pre><code class="language-cpp">// 多项式项类
+struct PolyItem
+{
+// 数据成员:
+	double coef;	// 系数
+	int expn;		// 指数	
+
+// 构造函数:
+    	PolyItem() ;	// 无数据的构造函数
+    	PolyItem(double cf, int en);	
+		// 已知系数域和指数域建立结构
+};
+// 多项式类
+class Polynomial
+{
+protected:
+// 多项式实现的数据成员:
+	LinkList&lt;PolyItem&gt; polyList;	
+		// 多项式组成的线性表
+
+public:
+	//  抽象数据类型方法声明:
+	Polynomial(){};		// 无参构造函数
+	~Polynomial(){};		// 析构函数
+	int Length() const;	// 求多项式的项数
+	bool IsZero() const;	// 判断多项式是否为0
+	void SetZero();		// 将多项式置为0
+	void Display();		// 显示多项式
+	void InsItem( const PolyItem &amp;item);// 插入一项
+	Polynomial operator +(const Polynomial &amp;p) const;
+ 		// 加法运算符重载
+	Polynomial operator -(const Polynomial &amp;p) const;
+ 		// 减法运算符重载
+	Polynomial operator *(const Polynomial &amp;p) const;
+ 		// 乘法运算符重载
+	Polynomial(const Polynomial &amp;copy);
+		// 复制构造函数
+	Polynomial(const LinkList&lt;PolyItem&gt;
+ 		&amp;copyLinkList);				
+		// 由多项式组成的线性表构造多项式
+	Polynomial &amp;operator =(const Polynomial &amp;copy);
+		// 重载赋值运算符
+	Polynomial &amp;operator =(const LinkList&lt;PolyItem&gt;
+ 		&amp;copyLinkList);		// 重载赋值运算符
+};
+</code></pre>
 ]]></content>
     </entry>
     <entry>
