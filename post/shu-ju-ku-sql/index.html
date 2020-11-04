@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="keywords" content="Gridea静态个人博客">
+<meta name="description" content="七叶今天码代码了吗">
+<meta name="theme-color" content="#000">
+<title>数据库——SQL | 七叶的个人小站</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1604505772775">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="stylesheet" href="/media/css/muse.css">
+
+<link rel="stylesheet" href="/media/fonts/font-awesome.css">
+<link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Rosario:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+<link href="/media/hljs/styles/androidstudio.css" rel="stylesheet">  
+
+<script src="/media/hljs/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.0/velocity.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.0/velocity.ui.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+
+    <meta name="description" content="数据库——SQL" />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div class="head-top-line"></div>
+    <div class="header-box">
+      
+<div class=" muse">
+  <header class="header bg-color ">
+    <div class="blog-header box-shadow-wrapper  " id="header">
+      <div class="nav-toggle" id="nav_toggle">
+        <div class="toggle-box">
+          <div class="line line-top"></div>
+          <div class="line line-center"></div>
+          <div class="line line-bottom"></div>
+        </div>
+      </div>
+      <div class="site-meta">       
+        <div class="site-title">
+          
+            <a href="/" class="brand">
+              <span>七叶的个人小站</span>
+            </a>  
+          
+        </div>
+        
+          <p class="subtitle">七叶今天码代码了吗？</p>
+        
+      </div>
+      <nav class="site-nav" id="site_nav">
+        <ul id="nav_ul">
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/" target="_self">
+                  <i class="fa fa-home"></i> 首页
+                </a>
+              
+            </li>
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/archives" target="_self">
+                  <i class="fa fa-archive"></i> 发布时间
+                </a>
+              
+            </li>
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/tags" target="_self">
+                  <i class="fa fa-tags"></i> 标签
+                </a>
+              
+            </li>
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/post/guan-yu-ben-zhan" target="_self">
+                  <i class="fa fa-globe"></i> 关于
+                </a>
+              
+            </li>
+          
+          <li class="nav-item">
+            <a>
+              <i class="fa fa-search"></i> 搜索
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+</div>
+
+<script type="text/javascript"> 
+ 
+  let showNav = true;
+
+  let navToggle = document.querySelector('#nav_toggle'),
+  siteNav = document.querySelector('#site_nav');
+  
+  function navClick() {
+    let sideBar = document.querySelector('.sidebar');
+    let navUl = document.querySelector('#nav_ul');
+    navToggle.classList.toggle('nav-toggle-active');
+    siteNav.classList.toggle('nav-menu-active');
+    if (siteNav.classList.contains('nav-menu-active')) {
+      siteNav.style = "height: " + (navUl.children.length * 42) +"px !important";
+    } else {
+      siteNav.style = "";
+    }
+  }
+
+  navToggle.addEventListener('click',navClick);  
+</script>
+    </div>
+    <div class="main-continer">
+      
+      <div class="section-layout muse bg-color">
+        <div class="section-layout-wrapper">
+          
+
+<div class="sidebar">
+  
+    <div class="sidebar-box box-shadow-wrapper  right-motion" id="sidebar">
+      
+        <div class="post-list-sidebar">
+          <div class="sidebar-title">
+            <span id="tocSideBar" class="sidebar-title-item sidebar-title-active">文章目录</span>
+            <span id="metaSideBar" class="sidebar-title-item">站点概览</span>
+          </div>
+        </div>
+      
+      <div class="sidebar-body muse" id="sidebar_body">
+        
+          
+            <div class="post-side-meta" id="post_side_meta">
+              
+<div class="sidebar-wrapper box-shadow-wrapper ">
+  <div class="sidebar-item">
+    <img class="site-author-image right-motion" src="https://cwlrin.wiki//images/avatar.png"/>
+    <p class="site-author-name">七叶的个人小站</p>
+    <p class="site-description right-motion">七叶今天码代码了吗</p>
+  </div>
+  <div class="sidebar-item side-item-stat right-motion">
+    <div class="sidebar-item-box">
+      <a href="/archives/">
+        
+        <span class="site-item-stat-count">37</span>
+        <span class="site-item-stat-name">文章</span>
+      </a>
+    </div>
+    <div class="sidebar-item-box">
+      <a href="">
+        <span class="site-item-stat-count">6</span>
+        <span class="site-item-stat-name">分类</span>
+      </a>
+    </div>
+    <div class="sidebar-item-box">
+      <a href="/tags/">
+        <span class="site-item-stat-count">6</span>
+        <span class="site-item-stat-name">标签</span>
+      </a>
+    </div>
+  </div>
+  
+  
+    <div class="sidebar-item sidebar-item-social">
+      <div class="social-item">
+        
+          
+            <a href="https://steamcommunity.com/id/20304773/">
+              <i class="fa fa-steam"></i> steam
+            </a>
+          
+            <a href="https://music.163.com/#/user/home?id=411590211">
+              <i class="fa fa-music"></i> 网易云音乐
+            </a>
+          
+            <a href="https://www.zhihu.com/people/ying-xiao-lu-qi-xie">
+              <i class="fa fa-square"></i> 知乎
+            </a>
+          
+            <a href="https://space.bilibili.com/8013992">
+              <i class="fa fa-television"></i> 哔哩哔哩
+            </a>
+          
+        
+        
+      </div>
+    </div>
+  
+
+  <div class="sidebar-item">
+    <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=300 height=460 src="//music.163.com/outchain/player?type=0&id=3147695839&auto=0&height=430"></iframe>
+  </div>
+
+
+</div>
+            </div>
+            <div class="post-toc sidebar-body-active" id="post_toc" style="opacity: 1;">
+              <div class="toc-box right-motion">
+  <div class="toc-wrapper auto-number auto" id="toc_wrapper">
+    <ul class="markdownIt-TOC">
+<li><a href="#sql%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80%E6%A6%82%E8%A7%88">SQL查询语言概览</a>
+<ul>
+<li><a href="#sql%E8%AF%AD%E8%A8%80%E7%9A%84%E7%BB%84%E6%88%90">SQL语言的组成</a></li>
+</ul>
+</li>
+<li><a href="#sql%E6%95%B0%E6%8D%AE%E5%AE%9A%E4%B9%89">SQL数据定义</a></li>
+<li><a href="#sql%E6%9F%A5%E8%AF%A2%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84">SQL查询的基本结构</a>
+<ul>
+<li><a href="#%E5%8D%95%E5%85%B3%E7%B3%BB%E6%9F%A5%E8%AF%A2">单关系查询</a></li>
+<li><a href="#where%E5%AD%90%E5%8F%A5">where子句</a></li>
+<li><a href="#from%E5%AD%90%E5%8F%A5">from子句</a></li>
+<li><a href="#%E8%87%AA%E7%84%B6%E8%BF%9E%E6%8E%A5">自然连接</a></li>
+</ul>
+</li>
+<li><a href="#%E9%99%84%E5%8A%A0%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%BF%90%E7%AE%97">附加的基本运算</a>
+<ul>
+<li><a href="#%E6%9B%B4%E5%90%8D%E8%BF%90%E7%AE%97">更名运算</a></li>
+<li><a href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BF%90%E7%AE%97">字符串运算</a></li>
+<li><a href="#%E6%8E%92%E5%88%97%E5%85%83%E7%BB%84%E7%9A%84%E6%98%BE%E7%A4%BA%E6%AC%A1%E5%BA%8F">排列元组的显示次序</a></li>
+<li><a href="#where%E5%AD%90%E5%8F%A5%E8%B0%93%E8%AF%8D">where子句谓词</a></li>
+</ul>
+</li>
+<li><a href="#%E9%9B%86%E5%90%88%E8%BF%90%E7%AE%97">集合运算</a>
+<ul>
+<li><a href="#%E5%B9%B6%E8%BF%90%E7%AE%97">并运算</a></li>
+<li><a href="#%E4%BA%A4%E8%BF%90%E7%AE%97">交运算</a></li>
+</ul>
+</li>
+<li><a href="#%E7%A9%BA%E5%80%BC">空值</a></li>
+<li><a href="#%E8%81%9A%E9%9B%86%E5%87%BD%E6%95%B0">聚集函数</a>
+<ul>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E8%81%9A%E9%9B%86">基本聚集</a></li>
+<li><a href="#%E5%88%86%E7%BB%84%E8%81%9A%E9%9B%86">分组聚集</a></li>
+<li><a href="#having%E5%AD%90%E5%8F%A5">having子句</a></li>
+<li><a href="#%E5%AF%B9%E7%A9%BA%E5%80%BC%E5%92%8C%E5%B8%83%E5%B0%94%E5%80%BC%E7%9A%84%E8%81%9A%E9%9B%86">对空值和布尔值的聚集</a></li>
+</ul>
+</li>
+<li><a href="#%E5%B5%8C%E5%A5%97%E5%AD%90%E6%9F%A5%E8%AF%A2">嵌套子查询</a>
+<ul>
+<li><a href="#%E9%9B%86%E5%90%88%E6%88%90%E5%91%98%E8%B5%84%E6%A0%BC">集合成员资格</a></li>
+<li><a href="#%E9%9B%86%E5%90%88%E7%9A%84%E6%AF%94%E8%BE%83">集合的比较</a></li>
+<li><a href="#%E7%A9%BA%E5%85%B3%E7%B3%BB%E6%B5%8B%E8%AF%95">空关系测试</a></li>
+<li><a href="#%E9%87%8D%E5%A4%8D%E5%85%83%E7%BB%84%E5%AD%98%E5%9C%A8%E6%80%A7%E6%B5%8B%E8%AF%95">重复元组存在性测试</a></li>
+<li><a href="#from%E5%AD%90%E5%8F%A5%E4%B8%AD%E7%9A%84%E5%AD%90%E6%9F%A5%E8%AF%A2">from子句中的子查询</a></li>
+<li><a href="#with%E5%AD%90%E5%8F%A5">with子句</a></li>
+<li><a href="#%E6%A0%87%E9%87%8F%E5%AD%90%E6%9F%A5%E8%AF%A2_select%E5%B5%8C%E5%A5%97">标量子查询_select嵌套</a></li>
+</ul>
+</li>
+<li><a href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E4%BF%AE%E6%94%B9">数据库的修改</a>
+<ul>
+<li><a href="#%E5%88%A0%E9%99%A4">删除</a></li>
+<li><a href="#%E6%8F%92%E5%85%A5">插入</a></li>
+<li><a href="#%E6%9B%B4%E6%96%B0-update">更新 update</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+</div>
+
+<script>
+
+let lastTop = 0, lList = [], hList = [], postBody, lastIndex = -1; 
+let active = 'active-show', activeClass = 'active-current';
+let tocWrapper = document.querySelector('#toc_wrapper');
+let tocContent = tocWrapper.children[0];
+let autoNumber = tocWrapper&&tocWrapper.classList.contains('auto-number');
+
+function addTocNumber(elem, deep) {
+  if (!elem) {
+    return;
+  }
+  let prop = elem.__proto__;
+
+  if (prop === HTMLUListElement.prototype) {
+    for (let i = 0; i < elem.children.length; i++) {
+      addTocNumber(elem.children[i], deep + (i + 1) + '.');
+    }
+  } else if (prop === HTMLLIElement.prototype) {
+    // 保存li元素
+    if (elem.children[0].__proto__ === HTMLAnchorElement.prototype) {
+      lList.push(elem);
+    }
+    for (let i = 0; i < elem.children.length; i++) {
+      let cur = elem.children[i];
+      if (cur.__proto__ === HTMLAnchorElement.prototype) {
+        if (autoNumber) {
+          cur.text =  deep + ' ' + cur.text;
+        }
+      } else if (cur.__proto__ === HTMLUListElement.prototype) {
+        addTocNumber(cur, deep);
+      }
+    }
+  }
+}
+
+function removeParentActiveClass() {
+  let parents = tocContent.querySelectorAll('.'+active)
+  parents.forEach(function(elem) {
+    elem.classList.remove(active);
+  });
+}
+
+function addActiveClass(index) {
+  if (index >= 0 && index < hList.length) {
+    lList[index].classList.add(activeClass);
+  }
+}
+
+function removeActiveClass(index) {
+  if (index >= 0 && index < hList.length) {
+    lList[index].classList.remove(activeClass);
+  }
+}
+
+function addActiveLiElemment(elem, parent) {
+  if (!elem || elem === parent) {
+    return;
+  } else {
+    if (elem.__proto__ === HTMLLIElement.prototype) {
+      elem.classList.add(active);
+    }
+    addActiveLiElemment(elem.parentElement, parent);
+  }
+}
+
+function showToc() {
+  if (tocWrapper) {
+    postBody = document.querySelector('#post_body');
+    for (let i = 0; i < postBody.children.length; i++) {
+      if (postBody.children[i].__proto__ === HTMLHeadingElement.prototype) {
+        hList.push(postBody.children[i]);
+      }
+    }
+    if (tocWrapper.classList.contains('compress')) {
+        tocContent.classList.add('closed');
+    } else if (tocWrapper.classList.contains('no_compress')){
+      tocContent.classList.add('expanded');
+    } else {
+      if (hList.length > 10) {
+        active = 'active-hidden'
+        tocContent.classList.add('closed');
+      } else {
+        tocContent.classList.add('expanded');
+      }
+    }
+  }
+}
+
+(function() {
+  // 处理不是从#一级标题开始目录
+  if (tocContent.children.length === 1 && tocContent.children[0].__proto__ === HTMLLIElement.prototype) {
+    let con = tocContent.children[0].children[0];
+    tocContent.innerHTML = con.innerHTML;
+  }
+  addTocNumber(tocContent, '');
+})();
+
+document.addEventListener('scroll', function(e) {
+  if (lList.length <= 0) {
+    return;
+  }
+  let scrollTop = document.scrollingElement.scrollTop + 10;
+  let dir;
+
+  if (lastTop - scrollTop > 0) {
+    dir = 'up';
+  } else {
+    dir = 'down';
+  }
+
+  lastTop = scrollTop;
+  if (scrollTop <= 0) {
+    if (lastIndex >= 0 && lastIndex < hList.length) {
+      lList[lastIndex].classList.remove(activeClass);
+    }
+    return;
+  }
+
+  let current = 0, hasFind = false;
+  for (let i = 0; i < hList.length; i++) {
+    if (hList[i].offsetTop > scrollTop) {
+      current = i;
+      hasFind = true;
+      break;
+    }
+  }
+  if (!hasFind && scrollTop > lList[lList.length - 1].offsetTop) {
+    current = hList.length - 1;
+  } else {
+    current--;
+  }
+  if (dir === 'down') {
+    if (current > lastIndex) {
+      addActiveClass(current);
+      removeActiveClass(lastIndex) 
+      lastIndex = current;
+      removeParentActiveClass();
+      lList[current] && addActiveLiElemment(lList[current].parentElement,tocContent);
+    }
+  } else {
+    if (current < lastIndex) {
+      addActiveClass(current);
+      removeActiveClass(lastIndex);
+      lastIndex = current;
+      removeParentActiveClass();
+      lList[current] && addActiveLiElemment(lList[current].parentElement,tocContent);
+    }
+  }
+});
+
+window.addEventListener('load', function() {
+  showToc();
+  document.querySelector('#sidebar').style='display: block;';
+  tocWrapper.classList.add('toc-active');
+  setTimeout(function() {
+    if ("createEvent" in document) {
+      let evt = document.createEvent("HTMLEvents");
+      evt.initEvent("scroll", false, true);
+      document.dispatchEvent(evt);
+    }
+    else {
+      document.fireEvent("scroll");
+    }
+  }, 500)
+})
+
+</script>
+            </div>
+          
+        
+      </div>
+    </div>
+  
+</div>
+<script>
+  const SIDEBAR_TITLE_ACTIVE = 'sidebar-title-active';
+  const SIDEBAR_BODY_ACTIVE = 'sidebar-body-active';
+  const SLIDE_UP_IN = 'slide-up-in';
+
+  let sidebar = document.querySelector('#sidebar'),
+  tocSideBar = document.querySelector('#tocSideBar'),
+  metaSideBar = document.querySelector('#metaSideBar'),
+  postToc = document.querySelector('#post_toc'),
+  postSiteMeta = document.querySelector('#post_side_meta'),
+  sidebarTitle = document.querySelector('.sidebar-title'),
+  sidebarBody = document.querySelector('#sidebar_body');
+
+  tocSideBar && tocSideBar.addEventListener('click', (e) => {
+    toggleSidebar(e);
+  });
+
+  metaSideBar && metaSideBar.addEventListener('click', (e) => {
+    toggleSidebar(e);
+  });
+
+  function toggleSidebar(e) {
+    let currentTitle = document.querySelector("."+SIDEBAR_TITLE_ACTIVE);
+    if (currentTitle == e.srcElement) {
+      return ;
+    }
+    let current, showElement, hideElement;
+    if (e.srcElement == metaSideBar) {
+      showElement = postSiteMeta;
+      hideElement = postToc;
+    } else if (e.srcElement == tocSideBar){
+      showElement = postToc;
+      hideElement = postSiteMeta;
+    }
+    currentTitle.classList.remove(SIDEBAR_TITLE_ACTIVE);
+    e.srcElement.classList.add(SIDEBAR_TITLE_ACTIVE);
+
+    window.Velocity(hideElement, 'stop');
+    window.Velocity(hideElement, 'transition.slideUpOut', {
+      display: 'none',
+      duration: 200,
+      complete: function () {
+        window.Velocity(showElement, 'transition.slideDownIn', {
+          duration: 200
+        });
+      }
+    })
+    hideElement.classList.remove(SIDEBAR_BODY_ACTIVE);
+    showElement.classList.add(SIDEBAR_BODY_ACTIVE);
+  }
+
+  postToc && postToc.addEventListener('transitionend', function() {
+    this.classList.remove(SLIDE_UP_IN);
+  });
+
+  if (sidebarBody) {
+    if (sidebarBody.classList.contains('pisces') || sidebarBody.classList.contains('gemini')) {
+      let hasFix = false;
+      let scrollEl = document.querySelector('.main-continer');
+      let limitTop = document.querySelector('#nav_ul').children.length * 42 + 162;
+      window.addEventListener('scroll', function(e) {
+        if (document.scrollingElement.scrollTop >= limitTop) {
+          if (!hasFix) {
+            sidebar.classList.add('sidebar-fixed');
+            hasFix = true;
+          }
+        } else {
+          if (hasFix) {
+            sidebar.classList.remove('sidebar-fixed');
+            hasFix = false;
+          }
+        }
+      });
+    }
+  }
+  
+</script>
+          <div class="section-box box-shadow-wrapper">
+            <div class="section bg-color post post-page">
+              <header class="post-header">
+  <h1 class="post-title">
+    <a class="post-title-link" href="https://cwlrin.wiki/post/shu-ju-ku-sql/">
+      数据库——SQL
+    </a>
+  </h1>
+  <div class="post-meta">
+    
+    <span class="meta-item pc-show">
+      <i class="fa fa-calendar-o"></i>
+      <span>发布于</span>
+      <span>2020-11-04</span>
+      <span class="post-meta-divider pc-show">|</span>
+    </span>
+    
+    <span class="meta-item">
+      <i class="fa fa-clock-o"></i>
+      <span>26分钟</span>
+    </span>
+    <span class="meta-item">
+      <span class="post-meta-divider">|</span>
+      <i class="fa fa-file-word-o"></i>
+      <span>5993<span class="pc-show">字数</span></span>
+    </span>
+    
+      
+      
+        
+      
+      <span id="/post/shu-ju-ku-sql/" data-flag-title="数据库——SQL" class="meta-item pc-show leancloud_visitors">
+        <span class="post-meta-divider">|</span>
+        <i class="fa fa-eye"></i>
+        <span>浏览量：<span class="leancloud-visitors-count" ></span></span>
+      </span>
+    
+  </div>
+</header>
+              <div class="post-body next-md-body" id="post_body">
+                <h1 id="sql查询语言概览">SQL查询语言概览</h1>
+<ul>
+<li>SQL<strong>最早</strong>版本是 IBM 开发的 <strong>Sequel</strong>，20 世纪 70 年代早期作为 System R 项目的一部分</li>
+<li>Sequel语言发展至今，名称已变为SQL （Structured Query Language，结构化查询语言）</li>
+<li>ANSI（美国国家标准化组织） and ISO（国际标准化组织） 颁布了 SQL标准:
+<ul>
+<li>SQL-86, SQL-89, SQL-92</li>
+<li>SQL:1999, SQL:2003, SQL:2008</li>
+</ul>
+</li>
+</ul>
+<h2 id="sql语言的组成">SQL语言的组成</h2>
+<ol>
+<li>数据定义语言（Data-Definition Language，DDL）：SQL DDL 提供定义关系模式、删除关系以及修改关系模式的命令</li>
+<li>数据操纵语言（ Data-Manipulation Language，DML ）：SQL DML 提供从数据库中查询信息，以及在数据库中插入元组、删除元组、修改元组的能力</li>
+<li>完整性（integrity）：SQL DDL包括定义完整性约束的命令，保存在数据库中的数据必须满足所定义的完整性约束。破坏完整性约束的更新是不允许的</li>
+<li>视图定义（view definition）：SQL DDL 包括定义视图的命令</li>
+<li>事务控制（transaction control）：SQL 包括定义事务的开始和结束的命令</li>
+<li>嵌入式SQL和动态SQL（embedded SQL and dynamic SQL）：嵌入式和动态 SQL 定义 SQL 语句如何嵌入到通用编程语言，如 C、C++、Java</li>
+<li>授权（authorization）：SQL DDL 包括定义对关系和视图的访问权限的命令</li>
+</ol>
+<h1 id="sql数据定义">SQL数据定义</h1>
+<ul>
+<li>char(n) ：固定长度的字符串，用户可指定长度 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span>。</li>
+<li>varchar(n). ：可变长度的字符串，用户可指定最大长度 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span>。</li>
+<li>int. : 整数（整数的有限子集，与机器有关）。</li>
+<li>smallint : 小整数（整数域类型的机器依赖性子集）。</li>
+<li>numeric(p,d) : 定点数字，用户指定精度为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span></span></span></span> 位，小数点右边有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 位</li>
+<li>real, double precision. : 浮点和双精度浮点数，精度随机器而定。</li>
+<li>float(n). 浮点数，用户指定的精度至少为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 位。</li>
+</ul>
+<figure data-type="image" tabindex="1"><img src="https://cwlrin.wiki//post-images/1604505744419.png" alt="" loading="lazy"></figure>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">e</mi><mtext> </mtext><mi mathvariant="normal">t</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">b</mi><mi mathvariant="normal">l</mi><mi mathvariant="normal">e</mi></mrow><annotation encoding="application/x-tex">\mathrm{create\ table}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord"><span class="mord mathrm">c</span><span class="mord mathrm">r</span><span class="mord mathrm">e</span><span class="mord mathrm">a</span><span class="mord mathrm">t</span><span class="mord mathrm">e</span><span class="mspace"> </span><span class="mord mathrm">t</span><span class="mord mathrm">a</span><span class="mord mathrm">b</span><span class="mord mathrm">l</span><span class="mord mathrm">e</span></span></span></span></span> 命令定义 SQL 关系:</p>
+<pre><code class="language-sql">create table r (A_1 D_1, A_2 D2_, ..., A_n D_n,
+			(完整性约束_1),
+			...,
+			(完整性约束_k))
+</code></pre>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span></span></span></span> ：关系名</p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>A</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">A_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 是关系 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span></span></span></span> 模式中的一个属性名</p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>D</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">D_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 是属性 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>A</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">A_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 的域</p>
+<p>例如:</p>
+<pre><code class="language-sql">create table instructor (
+	ID	char(5),
+	name	varchar(20) not null,
+	dept_name	varchar(20),
+	salary	numeric(8,2))
+insert into instructor values (‘10211’, ’Smith’, ’Biology’, 66000);
+insert into instructor values (‘10211’, null, ’Biology’, 66000);
+</code></pre>
+<ul>
+<li>not null</li>
+<li>primary key <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">(A_1, ..., A_n )</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">.</span><span class="mord">.</span><span class="mord">.</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></li>
+<li>foreign key <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><msub><mi>A</mi><mi>m</mi></msub><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">(A_m, ..., A_n )</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">.</span><span class="mord">.</span><span class="mord">.</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> references <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span></span></span></span></li>
+</ul>
+<p>例如:  声明 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mi>e</mi><mi>p</mi><mi>t</mi><mi mathvariant="normal">_</mi><mi>n</mi><mi>a</mi><mi>m</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">dept\_name</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.00444em;vertical-align:-0.31em;"></span><span class="mord mathdefault">d</span><span class="mord mathdefault">e</span><span class="mord mathdefault">p</span><span class="mord mathdefault">t</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathdefault">n</span><span class="mord mathdefault">a</span><span class="mord mathdefault">m</span><span class="mord mathdefault">e</span></span></span></span> 作为表 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mi>e</mi><mi>p</mi><mi>a</mi><mi>r</mi><mi>t</mi><mi>m</mi><mi>e</mi><mi>n</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">department</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">d</span><span class="mord mathdefault">e</span><span class="mord mathdefault">p</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">t</span><span class="mord mathdefault">m</span><span class="mord mathdefault">e</span><span class="mord mathdefault">n</span><span class="mord mathdefault">t</span></span></span></span> 的 primary key</p>
+<pre><code class="language-sql">create table instructor (
+	ID	char(5),
+	name	varchar(20) not null,
+	dept_name	varchar(20),
+	salary	numeric(8,2),
+	primary key (ID),
+	foreign key (dept_name) references department)
+</code></pre>
+<p>primary key 在声明的过程中自动设置为 not null</p>
+<pre><code class="language-sql">create table student (
+	ID	varchar(5),
+	name	varchar(20) not null,
+	dept_name	varchar(20),
+	tot_cred	numeric(3,0),
+	primary key (ID),
+	foreign key (dept_name) references department) ;
+create table takes (
+	ID	varchar(5),
+	course_id	varchar(8),
+	sec_id	varchar(8),
+	semester	varchar(6),
+	year	numeric(4,0),
+	grade	varchar(2),
+	primary key (ID, course_id, sec_id, semester, year),
+	foreign key (ID) references	student,
+	foreign key (course_id, sec_id, semester, year) references section );
+</code></pre>
+<p>注意: 可以从以上表的主码中删除 sec_id , 以保证一个学生无法在同一学期注册一门课的两个部分</p>
+<pre><code class="language-sql">create table course (
+	course_id	varchar(8) primary key,
+	title	varchar(50),
+	dept_name	varchar(20),
+	credits	numeric(2,0),
+	foreign key (dept_name) references department);
+</code></pre>
+<p>主码可以在声明属性时一起声明</p>
+<pre><code class="language-sql">drop table student
+</code></pre>
+<p>删除表和表的所有内容</p>
+<pre><code class="language-sql">delete from student
+</code></pre>
+<p>删除表的所有内容，但不删除表</p>
+<pre><code class="language-sql">alter table
+</code></pre>
+<ol>
+<li>
+<pre><code class="language-sql">alter table r add A D
+</code></pre>
+<ul>
+<li>A 为要加入到关系 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span></span></span></span> 中的一个属性，D 为属性 A 的域</li>
+<li>关系中的所有元组在新属性上的取值将被设置为null</li>
+</ul>
+</li>
+<li>
+<pre><code class="language-sql">alter table r drop A  
+</code></pre>
+<ul>
+<li>A 为关系 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span></span></span></span> 的一个属性</li>
+<li>许多数据库并不支持去掉属性</li>
+</ul>
+</li>
+</ol>
+<h1 id="sql查询的基本结构">SQL查询的基本结构</h1>
+<p>SQL DML语言 支持查询、插入、删除、更新元组的操作</p>
+<h2 id="单关系查询">单关系查询</h2>
+<ol>
+<li>
+<p>通过select 子句能够得到目标属性上的查询结果</p>
+<p>对应于关系代数中的投影映射</p>
+<p>例如: find the names of all instructors（找出所有教师名字）</p>
+<pre><code class="language-sql">select name from instructor
+</code></pre>
+</li>
+</ol>
+<p>NOTE: SQL 的名称是不分大小写的</p>
+<p>E.g. Name ≡ NAME ≡ name</p>
+<p>有的人在我们使用粗体字的地方都是用大写。</p>
+<p>SQL 的查询结果中可能出现重复.</p>
+<pre><code class="language-sql">select dept_name from instructor
+</code></pre>
+<p>在 select 后使用关键词 distinct 可以强制消除重复查询结果.</p>
+<p>Eg：查询所有教师所在的系名，并去掉重复记录</p>
+<pre><code class="language-sql">select distinct dept_name
+from instructor
+</code></pre>
+<p>关键词 all 可以显式指明不去掉重复,</p>
+<pre><code class="language-sql">select all dept_name
+from instructor
+</code></pre>
+<p>select 子句中的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>∗</mo></mrow><annotation encoding="application/x-tex">*</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord">∗</span></span></span></span> 代表“所有属性”</p>
+<pre><code class="language-sql">select *
+from instructor
+</code></pre>
+<p>select 子句还可以包含 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>+</mo><mo separator="true">,</mo><mi mathvariant="normal">–</mi><mo separator="true">,</mo><mo>∗</mo><mo separator="true">,</mo><mi mathvariant="normal">/</mi></mrow><annotation encoding="application/x-tex">+, –, *, /</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">+</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord" style="margin-right:0.02778em;">–</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">∗</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">/</span></span></span></span> 运算符的算术表达式，运算对象可以是常数或元组的属性</p>
+<pre><code class="language-sql">select ID, name, salary*1.1
+from instructor
+</code></pre>
+<p>返回一个与 instructor 一样的关系, 只是属性 salary 的值是原来的1.1倍.</p>
+<p>这并不导致对 instructor 关系的任何改变</p>
+<h2 id="where子句">where子句</h2>
+<p>where 子句允许只选出那些在 from 子句的结果关系中满足特定谓词的元组</p>
+<p>Eg：找出所有在Comp. Sci. 系且 salary &gt; 80000	的教师姓名</p>
+<pre><code class="language-sql">select name from instructor
+where dept_name = 'Comp. Sci.' and salary &gt; 80000
+</code></pre>
+<p>SQL允许在 where子句中使用逻辑连接词 and, or, not.</p>
+<p>逻辑连接词可以是包含比较运算符 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>&gt;</mo><mo separator="true">,</mo><mo>&gt;</mo><mo>=</mo><mo separator="true">,</mo><mo>&lt;</mo><mo separator="true">,</mo><mo>&lt;</mo><mo>=</mo><mo separator="true">,</mo><mo>=</mo><mo separator="true">,</mo><mo>&lt;</mo><mo>&gt;</mo></mrow><annotation encoding="application/x-tex">&gt; , &gt;= , &lt; ,&lt;= ,= , &lt;&gt;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&gt;</span></span><span class="base"><span class="strut" style="height:0.7335400000000001em;vertical-align:-0.19444em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&gt;</span></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span></span><span class="base"><span class="strut" style="height:0.7335400000000001em;vertical-align:-0.19444em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span></span><span class="base"><span class="strut" style="height:0.7335400000000001em;vertical-align:-0.19444em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span></span><span class="base"><span class="strut" style="height:0.56131em;vertical-align:-0.19444em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span></span><span class="base"><span class="strut" style="height:0.7335400000000001em;vertical-align:-0.19444em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&gt;</span></span></span></span> 的表达式</p>
+<p>where 子句中的谓词可以限制笛卡尔积所建立的组合，只留下那些对所需答案有意义的组合</p>
+<p>查询讲授课程的教师，不输出没讲授课程的教师</p>
+<pre><code class="language-sql">select name，course_id
+from instructor，teaches
+where instructor.ID=teaches.ID
+</code></pre>
+<p>找出 Comp.Sci 系的教师名和课程标识</p>
+<pre><code class="language-sql">select name，course_id
+from instructor，teaches
+where instructor.ID=teaches.ID  and 
+instructor.dept_name=‘Comp.Sci’;
+</code></pre>
+<p>SQL查询的含义可理解为：</p>
+<ol>
+<li>为 from 子句中列出的关系产生笛卡尔积</li>
+<li>在步骤 1 的结果上应用 where 子句中指定的谓词</li>
+<li>对步骤 2 结果中的每个元组，输出 select 子句中指定的属性</li>
+</ol>
+<h2 id="from子句">from子句</h2>
+<p>多关系查询</p>
+<p>eg：找出所有教师的姓名，以及他们所在系的名称和系所在建筑的名称</p>
+<ul>
+<li>instructor：dept_name 系名</li>
+<li>department：building  建筑名称</li>
+</ul>
+<p>需要访问的关系列在 from 子句中，并且在 where 子句中指定匹配条件</p>
+<pre><code class="language-sql">select name，instructor. dept_name ，building
+from instructor，department
+where instructor. dept_name = department . dept_name 
+</code></pre>
+<p>关系名可被用作前缀来说明使用的是哪个属性</p>
+<p>当需要把同一个关系的两个不同元组信息组合时，可以使用更名运算</p>
+<p>SQL查询的基本结构:</p>
+<pre><code class="language-sql">select A1, A2, ..., An
+from r1, r2, ..., rm
+where P
+</code></pre>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>A</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">A_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>代表一个属性</p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>R</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">R_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.00773em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>代表一种关系</p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 是一个谓词</p>
+<p>SQL 查询的结果也是关系.</p>
+<p>以运算顺序理解 select 子句：from，where，select</p>
+<p>from 子句定义了一个在该子句中所列出关系的笛卡尔积，可用集合理论来形式化定义</p>
+<pre><code>for each 元组 t1 in 关系 r1
+	for each 元组 t2 in 关系 r2
+		……
+    	for each 元组 tm in 关系 rm
+    	把t1，t2，……，tm连接成单个元组t
+    	把t加入到结果关系中
+</code></pre>
+<p>此结果关系具有来自 from 子句中所有关系的所有属性</p>
+<p>eg：关系instructor和teaches的笛卡尔积关系模式：</p>
+<pre><code>（instructor.ID, name, dept_name, salary, teacher.ID, course_ID, sec_ID, semester, year）
+</code></pre>
+<h2 id="自然连接">自然连接</h2>
+<p>自然连接作用于两个关系，并产生一个关系作为结果。仅考虑在两个关系模式中都出现的属性上取值相同的元组对</p>
+<pre><code class="language-sql">select * from instructor natural join teaches;
+</code></pre>
+<p>共同属性：course_id</p>
+<p>查询：对于大学中所有授课的教师，找到他们的姓名以及所讲述的所有课程</p>
+<pre><code class="language-sql">select name, course_id
+from instructor, teaches
+where instructor.ID = teaches.ID;
+
+select name, course_id
+from instructor natural join teaches;
+</code></pre>
+<p>自然连接需要注意: 两个关系中代表不同含义的属性具有相同的名称，按照该属性产生错误的自然连接<br>
+对于大学中所有授课的教师，找到他们的姓名以及所讲述的所有课程<br>
+错误的版本(使<code>course.dept_name = instructor.dept_name</code>)</p>
+<pre><code class="language-sql">select name, title
+from instructor natural join teaches natural join course;
+</code></pre>
+<p>正确的版本</p>
+<pre><code class="language-sql">select name, title
+from instructor natural join teaches, course
+where teaches.course_id = course.course_id;
+</code></pre>
+<p>另一个正确的版本</p>
+<pre><code class="language-sql">select name, title
+from (instructor natural join teaches)
+join course using(course_id);
+</code></pre>
+<h1 id="附加的基本运算">附加的基本运算</h1>
+<h2 id="更名运算">更名运算</h2>
+<p>SQL 提供了重命名关系和属性的方法： as 子句 : <code>old-name as new-name</code></p>
+<pre><code class="language-sql">select ID, name, salary/12 as monthly_salary
+from instructor
+</code></pre>
+<p>eg：查询工资比‘Comp. Sci’系中某一个老师工资高的所有老师名称</p>
+<pre><code class="language-sql">select distinct T. name
+from instructor as T, instructor as S
+where T.salary &gt; S.salary and S.dept_name = ‘Comp. Sci.’
+</code></pre>
+<p>关键词 as 可以省略</p>
+<pre><code class="language-sql">instructor as T ≡ instructor T 
+</code></pre>
+<p>Oracle 中 Keyword as 必须省略！</p>
+<h2 id="字符串运算">字符串运算</h2>
+<p>SQL使用单引号来表示字符串，例如‘computer’，用两个单引号字符表示字符串中的单引号，例如‘it”s right’</p>
+<p>SQL标准中，字符串上的“=”操作大小写敏感</p>
+<ul>
+<li>
+<p>‘comp.sci’=‘Comp.sci’    false</p>
+</li>
+<li>
+<p>但 SQL Sever 和 MySQL 匹配字符串时不分大小写</p>
+</li>
+</ul>
+<p>字符串使用 “like” 操作符实现模式匹配（大小写敏感）:</p>
+<ul>
+<li>percent (%).  匹配任意字符串.</li>
+<li>underscore (_).  匹配某一个字符.</li>
+</ul>
+<p>查询姓名中含有“dar”的教师的姓名.</p>
+<pre><code class="language-sql">select name
+from instructor
+where name like '%dar%' 
+</code></pre>
+<p>转义字符escape ：Match the string “100 %”</p>
+<pre><code class="language-sql">like ‘100 \%'  escape  '\' 
+</code></pre>
+<p>SQL 支持字符串上有多种函数</p>
+<ul>
+<li>串联(using “||”)</li>
+<li>大小写转换(upper(s)，lower(s))</li>
+<li>计算字符串长度</li>
+<li>去掉字符串后面空格（trim(s)）</li>
+</ul>
+<p>not like：比较运算符搜寻不匹配项</p>
+<h2 id="排列元组的显示次序">排列元组的显示次序</h2>
+<p>按字母表中顺序排列 instructors 关系中的 name 属性</p>
+<pre><code class="language-sql">select distinct name
+from instructor
+order by name
+</code></pre>
+<p>desc ：降序    asc ：升序（默认）</p>
+<ul>
+<li>Example:  <code>order by name desc</code></li>
+<li>多个属性值的排序</li>
+<li>Example: <code>order by dept_name, name</code></li>
+</ul>
+<pre><code class="language-sql">select  * from instructot
+order by salary desc，name asc；
+</code></pre>
+<h2 id="where子句谓词">where子句谓词</h2>
+<p>SQL 提供 between 运算符来简化 where 子句<br>
+Example:  找出所有薪金在9万元至10万元之间（即 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>≥</mo></mrow><annotation encoding="application/x-tex">\ge</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719400000000001em;vertical-align:-0.13597em;"></span><span class="mrel">≥</span></span></span></span> 9万元至 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>≤</mo></mrow><annotation encoding="application/x-tex">\le</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719400000000001em;vertical-align:-0.13597em;"></span><span class="mrel">≤</span></span></span></span> 10万元）的教员的姓名。</p>
+<pre><code class="language-sql">select name from instructor
+where salary between 90000 and 100000
+</code></pre>
+<p>元组比较</p>
+<pre><code class="language-sql">select name, course_id
+from instructor, teaches
+where (instructor.ID, dept_name) = (teaches.ID, ’Biology’);
+</code></pre>
+<h1 id="集合运算">集合运算</h1>
+<p>在有重复的关系中，SQL可以定义结果中出现多少个元组的副本。</p>
+<p>一些关系代数运算符的多集版本--给定多集关系 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>r</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">r_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>r</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">r_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>。</p>
+<ol>
+<li><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>σ</mi><mi>θ</mi></msub></mrow><annotation encoding="application/x-tex">\sigma_\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.02778em;">θ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>(<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>r</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">r_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>): 如果 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>r</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">r_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 中的元组 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">t_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76508em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>c</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">c_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 个副本，且 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">t_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76508em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 满足选择 ，那么 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>σ</mi><mi>θ</mi></msub></mrow><annotation encoding="application/x-tex">\sigma_\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.02778em;">θ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>(<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>r</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">r_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>) 中就有<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">t_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76508em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>c</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">c_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 个副本。</li>
+<li><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mo>∏</mo><mi>A</mi></msub></mrow><annotation encoding="application/x-tex">\prod_A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0497100000000001em;vertical-align:-0.29971000000000003em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:-0.0000050000000000050004em;">∏</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.17862099999999992em;"><span style="top:-2.40029em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.29971000000000003em;"><span></span></span></span></span></span></span></span></span></span>（<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span></span></span></span>）中。对于 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>r</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">r_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 中每一个元组 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">t_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76508em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 的副本，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mo>∏</mo><mi>A</mi></msub></mrow><annotation encoding="application/x-tex">\prod_A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0497100000000001em;vertical-align:-0.29971000000000003em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:-0.0000050000000000050004em;">∏</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.17862099999999992em;"><span style="top:-2.40029em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.29971000000000003em;"><span></span></span></span></span></span></span></span></span></span>(<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>r</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">r_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>)中都有一个元组 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mo>∏</mo><mi>A</mi></msub></mrow><annotation encoding="application/x-tex">\prod_A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0497100000000001em;vertical-align:-0.29971000000000003em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:-0.0000050000000000050004em;">∏</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.17862099999999992em;"><span style="top:-2.40029em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.29971000000000003em;"><span></span></span></span></span></span></span></span></span></span>(<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">t_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76508em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>)的副本，其中 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mo>∏</mo><mi>A</mi></msub></mrow><annotation encoding="application/x-tex">\prod_A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0497100000000001em;vertical-align:-0.29971000000000003em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:-0.0000050000000000050004em;">∏</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.17862099999999992em;"><span style="top:-2.40029em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.29971000000000003em;"><span></span></span></span></span></span></span></span></span></span>(<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">t_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76508em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>)表示单元组 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">t_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76508em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 的投影。</li>
+<li><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>r</mi><mn>1</mn></msub><mo>×</mo><msub><mi>r</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">r_1×r_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.73333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>：如果 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>r</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">r_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 中的元组 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">t_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76508em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>c</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">c_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 个副本， <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>r</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">r_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>中的元组 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">t_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76508em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>c</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">c_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 个副本，则元组 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">t_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76508em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>c</mi><mn>1</mn></msub><mo>×</mo><msub><mi>c</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">c_1×c_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.73333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 个副本</li>
+</ol>
+<p>SQL作用在关系上的union、intersect、except运算对应于集合论中的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>∪</mo><mo separator="true">,</mo><mo>∩</mo><mo separator="true">,</mo><mo>−</mo></mrow><annotation encoding="application/x-tex">∪,∩,-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7777700000000001em;vertical-align:-0.19444em;"></span><span class="mord">∪</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">∩</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">−</span></span></span></span> 运算</p>
+<h2 id="并运算">并运算</h2>
+<p>2009年秋季学期  和  2010年春季学期 开设所有课程集合</p>
+<pre><code class="language-SQL">(select course_id from section where sem = ‘Fall’ and year = 2009)
+union
+(select course_id from section where sem = ‘Spring’ and year = 2010)
+</code></pre>
+<p>union运算自动去除重复，union all保留所有重复</p>
+<h2 id="交运算">交运算</h2>
+<p>2009年秋季和2010年春季同时开课的所有课程集合</p>
+<pre><code class="language-SQL">(select course_id from section where sem = ‘Fall’ and year = 2009)
+intersect
+(select course_id from section where sem = ‘Spring’ and year = 2010)
+</code></pre>
+<p>intersect运算自动去除重复，intersect all保留所有重复</p>
+<p>2009年秋季学期 开课但 2010年春季学期 不开课 的所有课程</p>
+<pre><code class="language-SQL">(select course_id from section where sem = ‘Fall’ and year = 2009)
+except
+(select course_id from section where sem = ‘Spring’ and year = 2010)
+</code></pre>
+<p>except运算自动去除重复， except all保留所有重复</p>
+<p>集合运算 union, intersect, except</p>
+<ul>
+<li>全部自动去掉重复</li>
+<li>union all, intersect all ， except all保留所有重复</li>
+<li>假设一个课程在关系 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span></span></span></span> 中出现 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">m</span></span></span></span> 次，在关系 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>s</mi></mrow><annotation encoding="application/x-tex">s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">s</span></span></span></span> 中出现 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 次<pre><code>m + n times in r union all s
+min(m,n) times in r intersect all s
+max(0, m – n) times in r except all s
+</code></pre>
+</li>
+</ul>
+<h1 id="空值">空值</h1>
+<p>元组的某些属性可以有一个空值，用null表示</p>
+<p>null 代表值未知或者值不存在.</p>
+<p>如果算术表达式的任一输入为 null 则该表达式的结果为 null</p>
+<p>Example:  <code>5 + null returns null</code></p>
+<p>谓词 is null 可以用来测试一个属性值是否为空</p>
+<p>Example: 查找所有薪水为 null 的讲师。</p>
+<pre><code class="language-sql">select name
+from instructor
+where salary is null
+</code></pre>
+<p>SQL 将涉及空值的任何比较运算的结果视为 unknown</p>
+<p>Example: <code>5 &lt; null or null &lt;&gt; null or null = null</code></p>
+<p>where 子句的谓词中可以对比较结果使用 and、or、not 的布尔运算，这些布尔运算的定义也被扩展到可以处理unknown值<br>
+OR:</p>
+<ol>
+<li>(unknown or true)   = true,</li>
+<li>(unknown or false)  = unknown</li>
+<li>(unknown or unknown) = unknown<br>
+AND:</li>
+<li>(true and unknown)  = unknown,</li>
+<li>(false and unknown) = false,</li>
+<li>(unknown and unknown) = unknown<br>
+NOT:</li>
+<li>(not unknown) = unknown</li>
+</ol>
+<p>“P is unknown” ：如果 P 为 unknown ，值为true</p>
+<p>如果 where 子句谓词对一个元组计算结果为 false 或 unknown，则该元组不能加入到结果集中</p>
+<h1 id="聚集函数">聚集函数</h1>
+<p>聚集函数是以值的一个集合（集或多重集）为输入，返回单个值的函数</p>
+<ul>
+<li>avg: average value</li>
+<li>min:  minimum value</li>
+<li>max:  maximum value</li>
+<li>sum:  sum of values</li>
+<li>count:  number of values</li>
+</ul>
+<p>sum 和 avg 的输入必须是数字集</p>
+<p>其他运算符可作用在非数字数据类型的集合上，如字符串</p>
+<h2 id="基本聚集">基本聚集</h2>
+<p>查询 Computer Science 系教师的平均工资(保留重复元组)</p>
+<pre><code class="language-sql">select avg (salary) (as avg_salary)
+from instructor
+where dept_name= ’Comp. Sci.’;
+</code></pre>
+<p>查询2010年春季学期讲授一门课程的教师总数（多个课程段仅算做一门课）</p>
+<pre><code class="language-sql">select count (distinct ID)
+from teaches
+where semester = ’Spring’ and year = 2010
+</code></pre>
+<p>查询关系 course 中的所有元组数</p>
+<pre><code>select count (*)
+from course;
+</code></pre>
+<p>SQL不允许count(*)和distinct同时使用</p>
+<h2 id="分组聚集">分组聚集</h2>
+<p>查询每个系的平均工资</p>
+<pre><code class="language-sql">select dept_name, avg (salary)
+from instructor
+group by dept_name;
+</code></pre>
+<p>Note: 没有教师的院系不会出现在查询结果中</p>
+<p>出现在 select 语句中单没有被聚集的属性只能是出现在 group by 子句中的属性，即任何没有出现在 group by子句中的属性如果出现在select子句中，它只能出现在聚集函数内部，否则查询结果出错</p>
+<pre><code class="language-sql">/* erroneous query */
+select dept_name, ID, avg (salary)
+from instructor
+group by dept_name;
+</code></pre>
+<h2 id="having子句">having子句</h2>
+<p>查询所有院系中平均工资超过42000的院系名称和平均工资</p>
+<p>查询条件并不针对单个元组，而是针对 group by 子句构成的分组</p>
+<p>having 子句中的谓词在形成分组后才起作用</p>
+<pre><code class="language-sql">select dept_name, avg (salary)
+from instructor
+group by dept_name
+having avg (salary) &gt; 42000;
+</code></pre>
+<p>Note : 任何出现在having子句中，但没有被聚集的属性必须出现在 group by 子句中</p>
+<p>包含聚集、group by、having子句的查询的含义可通过以下操作序列定义：</p>
+<ul>
+<li>与不带聚集的查询类似，最先根据 from 子句来计算出一个关系</li>
+<li>如果出现了 where 子句，where 子句中的谓词将应用到 from 子句的结果关系上</li>
+<li>如果出现了 group by 子句，满足 where 谓词的元组通过 group by 子句形成分组。如果没有 group by 子句，满足 where 谓词的整个元组集被当成一个分组</li>
+<li>如果出现了 having 子句，它将应用到每个分组上；不满足 having 子句谓词的分组将抛弃</li>
+<li>select 子句利用剩下的分组产生出查询结果中的元组，即在每个分组上应用聚集函数来得到单个结果元组</li>
+</ul>
+<h2 id="对空值和布尔值的聚集">对空值和布尔值的聚集</h2>
+<p>求工资总和（Total all salaries）</p>
+<pre><code class="language-sql">select sum (salary )	from instructor
+</code></pre>
+<ul>
+<li>
+<p>sum 运算符忽略输入中的 null 值</p>
+</li>
+<li>
+<p>如果不存在非空输入值，则返回 null</p>
+</li>
+</ul>
+<p><strong>除 count(*) 外所有的聚集函数都忽略输入集合中的空值</strong></p>
+<p>当参加函数运算的输入值集合为空集：</p>
+<ul>
+<li>count 运算值为 0</li>
+<li>其他所有运算返回 null</li>
+</ul>
+<h1 id="嵌套子查询">嵌套子查询</h1>
+<p>SQL提供嵌套子查询机制</p>
+<p>子查询：子查询是嵌套在另一个查询中的 select-from-where 表达式</p>
+<p>子查询嵌套在where子句中，通常用于对集合的成员资格、集合的比较以及集合的基数进行检查</p>
+<h2 id="集合成员资格">集合成员资格</h2>
+<p>查询Fall 2009 and in Spring 2010同时开课的所有课程</p>
+<pre><code class="language-sql">select distinct course_id
+from section
+where semester = ’Fall’ and year= 2009 and 
+	course_id in (select course_id
+		from section
+		where semester = ’Spring’ and year= 2010);
+</code></pre>
+<p>查询Fall 2009开课， Spring 2010不开课的课程</p>
+<pre><code class="language-sql">select distinct course_id
+from section
+where semester = ’Fall’ and year= 2009 and
+	course_id  not in (select course_id
+    	from section
+        where semester = ’Spring’ and year= 2010);
+</code></pre>
+<p>in 和 not in 操作符也可用于枚举集合</p>
+<pre><code class="language-sql">select distinct name
+from instructor
+where name not in (‘Mozart’ , ‘Einstein’);
+</code></pre>
+<p>查询（不同的）学生数，他们选修了ID 10101的教师所讲授的课程段</p>
+<pre><code class="language-sql">select count (distinct ID)
+from takes
+where (course_id, sec_id, semester, year) in
+	select course_id, sec_id, semester, year
+    from teaches
+    where teaches.ID= 10101);
+</code></pre>
+<h2 id="集合的比较">集合的比较</h2>
+<p>eg：查询工资至少比 Biology 系某一个教师工资高的所有教师的姓名</p>
+<pre><code class="language-sql">select distinct T.name
+from instructor as T, instructor as S
+where T.salary &gt; S.salary and S.dept_name = ’Biology’;
+</code></pre>
+<p>“至少大于某一个”在SQL中可以用 &gt; some 子句表示</p>
+<pre><code class="language-sql">select name
+from instructor
+where salary &gt; some (select salary
+    from instructor
+    where dept_name = ’Biology’);
+</code></pre>
+<p>eg：查询工资比 Biology 系每个教师工资都高的所有教师姓名.</p>
+<pre><code class="language-sql">select name
+from instructor
+where salary &gt; all (select salary
+    from instructor
+    where dept_name = ’Biology’);
+</code></pre>
+<p>类似some，SQL允许 &lt;all  &lt;=all  &gt;=all  =all  &lt;&gt;all</p>
+<h2 id="空关系测试">空关系测试</h2>
+<p>exists ：测试子查询的结果中是否存在元组，作为参数的子查询非空时返回true</p>
+<p>exists  <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi><mo>⇔</mo><mi>r</mi><mpadded width="0px"><mo></mo></mpadded><mo>=</mo><mi mathvariant="normal">Ø</mi></mrow><annotation encoding="application/x-tex">r \Leftrightarrow r \not =Ø</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">⇔</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel"><span class="mord"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.69444em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="rlap"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="inner"><span class="mrel"></span></span><span class="fix"></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span></span></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.7805500000000001em;vertical-align:-0.04861em;"></span><span class="mord">Ø</span></span></span></span></p>
+<p>not exists<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi><mo>⇔</mo><mi>r</mi><mo>=</mo><mi mathvariant="normal">Ø</mi></mrow><annotation encoding="application/x-tex">r \Leftrightarrow r =Ø</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">⇔</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.7805500000000001em;vertical-align:-0.04861em;"></span><span class="mord">Ø</span></span></span></span></p>
+<p>eg：查询2009年秋季学期和2010年春季学期同时开课的所有课程</p>
+<pre><code class="language-sql">select course_id
+from section as S
+where semester = ’Fall’ and year= 2009 and
+	exists (select * from section as T
+	where semester = ’Spring’ and year= 2010 and  S.course_id= T.course_id);
+</code></pre>
+<p>相关子查询（correlated subquery）：来自外层查询的一个相关名称可以用在where子句的子查询中，使用了来自外层查询相关名词的子查询被称为相关子查询</p>
+<p>包含了子查询的查询中，在相关名称上可以应用作用域规则</p>
+<p>作用域规则：在一个子查询中只能使用此子查询本身定义的，或者在包含此子查询的任何查询中唯一的相关名词。如果一个相关名称既在子查询中定义，又在包含该子查询的查询中定义，则子查询中的定义有效</p>
+<p>eg：选修了 Biology 系开设的所有课程的学生.</p>
+<pre><code class="language-sql">select distinct S.ID, S.name
+from student as S
+where not exists ( (select course_id
+    from course	
+    where dept_name = ’Biology’)
+    except
+    (select T.course_id
+    from takes as T
+    where S.ID = T.ID));
+</code></pre>
+<p>请注意，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>X</mi><mo>−</mo><mi>Y</mi><mo>=</mo><mi mathvariant="normal">Ø</mi><mo>⇔</mo><mi>X</mi><mo>⊆</mo><mi>Y</mi></mrow><annotation encoding="application/x-tex">X - Y = Ø\Leftrightarrow X\subseteq Y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">Y</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.7805500000000001em;vertical-align:-0.04861em;"></span><span class="mord">Ø</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">⇔</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8193em;vertical-align:-0.13597em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">⊆</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">Y</span></span></span></span></p>
+<p>注意：不能使用 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>=</mo></mrow><annotation encoding="application/x-tex">=</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span></span></span></span> all 和它的变体来写这个查询。</p>
+<h2 id="重复元组存在性测试">重复元组存在性测试</h2>
+<p>unique：测试在一个子查询的结果中是否存在重复元组</p>
+<p>如果作为参数的子查询结果中没有重复的元组，unique 结构返回 true 值</p>
+<p>eg：查询在2009年最多开设一次的课程</p>
+<pre><code class="language-sql">select T.course_id
+from course as T
+where unique (select R.course_id
+	from section as R
+	where T.course_id= R.course_id
+	and R.year = 2009);
+select T.course_id
+from course as T
+where 1&gt;= (select count (R.course_id)
+	from section as R
+	where T.course_id= R.course_id
+	and R.year = 2009);
+</code></pre>
+<p>not unique<br>
+eg: 查询所有在2009年最少开设两次课的课程</p>
+<pre><code class="language-sql">select T.course_id
+from course as T
+where not unique (select R.course_id
+	from section as R
+	where T.course_id= R.course_id and R.year = 2009);
+</code></pre>
+<h2 id="from子句中的子查询">from子句中的子查询</h2>
+<p>SQL 允许 from 子句中使用子查询表达式<br>
+eg：查询系平均工资超过$42,000的那些系中教师的平均工资.</p>
+<pre><code class="language-sql">select dept_name, avg_salary
+from (select dept_name, avg (salary) as avg_salary
+	from instructor
+	group by dept_name)
+where avg_salary &gt; 42000;
+</code></pre>
+<p>方法2：as子句为子查询结果关系起名，并对属性进行重命名</p>
+<pre><code class="language-sql">select dept_name, avg_salary
+from (select dept_name, avg (salary)
+	from instructor
+	group by dept_name)
+	as dept_avg (dept_name,  avg_salary)
+where avg_salary &gt; 42000;  
+</code></pre>
+<p>from子句嵌套的子查询中不能使用来自from子句其他关系的相关变量</p>
+<p>SQL：2003   lateral 子句作为前缀，访问from子句中在它前面的表或子查询中的属性</p>
+<pre><code class="language-sql">select name, salary, avg_salary
+from instructor I1, 
+	lateral (select avg(salary) as avg_salary
+	from instructor I2
+	where I2.dept_name= I1.dept_name);
+</code></pre>
+<p>Note: 只有少数SQL实现支持 lateral 子句，如IBM DB2</p>
+<h2 id="with子句">with子句</h2>
+<p>with 子句提供定义临时关系的方法，这个定义只对包含with子句的查询有效.</p>
+<p>eg：查询具有最大预算值的系</p>
+<pre><code class="language-sql">with max_budget (value) a
+	(select max(budget)
+	from department)
+select budget
+from department, max_budget
+where department.budget = max_budget.value;
+</code></pre>
+<p>with子句实在SQL：1999 中引入的，目前有许多数据库系统都提供了支持</p>
+<p>With 子句使查询在逻辑上更加清晰，允许在一个查询内的多个地方使用视图的定义</p>
+<p>eg：查询所有工资总额大于所有系平均工资总额的系</p>
+<pre><code class="language-sql">with dept _total (dept_name, value) as
+        (select dept_name, sum(salary)
+         from instructor
+         group by dept_name),
+dept_total_avg(value) as
+       (select avg(value)
+       from dept_total)
+select dept_name
+from dept_total, dept_total_avg
+where dept_total.value &gt;= dept_total_avg.value;
+</code></pre>
+<h2 id="标量子查询_select嵌套">标量子查询_select嵌套</h2>
+<p>标量子查询（Scalar subquery）：SQL允许子查询出现在返回单个值的表达式能够出现的任何地方，只要该子查询只返回包含单个属性的单个元组，这样的子查询称为标量子查询<br>
+Eg：查询所有的系以及他们拥有的教师数</p>
+<pre><code class="language-sql">select dept_name,
+	(select count(*) from instructor 
+	where department.dept_name = instructor.dept_name)
+	as num_instructors
+from department;
+</code></pre>
+<h1 id="数据库的修改">数据库的修改</h1>
+<p>从给定关系中删除元组。</p>
+<p>将新的元组插入给定关系中。</p>
+<p>在给定关系中更新一些图元组的值。</p>
+<p>利用SQL来增加、删除、修改信息。</p>
+<h2 id="删除">删除</h2>
+<pre><code class="language-sql">delete from r where P；
+</code></pre>
+<p>delete命令只能作用于一个关系<br>
+eg：删除instructors关系中的所有元组</p>
+<pre><code class="language-sql">delete from instructor
+</code></pre>
+<p>eg：在instructors关系中删除与Finance系教师相关的所有元组</p>
+<pre><code class="language-sql">delete from instructor where dept_name= ’Finance’;
+</code></pre>
+<p>eg：在instructors关系中删除位于Watson building工作的所有教师元组</p>
+<pre><code class="language-sql">delete from instructor where dept_name in 
+	(select dept_name from department 
+	where building = ’Watson’);
+</code></pre>
+<p>eg：删除工资低于大学平均工资的教师记录</p>
+<pre><code class="language-sql">delete from instructor
+where salary&lt; (select avg (salary) from instructor);
+</code></pre>
+<p>Problem:  删除元组的同时，平均工资也在变化</p>
+<p>SQL中使用的解决方案:</p>
+<ol>
+<li>计算 avg salary 找到需要被删除的所有元组</li>
+<li>删除所有元组，而无需重新计算 avg 或重新测试元组。</li>
+</ol>
+<h2 id="插入">插入</h2>
+<ol>
+<li>指定待插入元组</li>
+<li>用查询语句生成带插入元组集合<br>
+eg：在课程中添加一个新元组</li>
+</ol>
+<pre><code class="language-sql">insert into course
+values (’CS-437’, ’Database Systems’, ’Comp. Sci.’, 4);
+</code></pre>
+<p>或者</p>
+<pre><code class="language-sql">insert into course (course_id, title, dept_name, credits)
+values (’CS-437’, ’Database Systems’, ’Comp. Sci.’, 4);
+</code></pre>
+<p>在 student 中添加一个新元组，total_creds设置为null。</p>
+<pre><code class="language-sql">insert into student
+values (’3003’, ’Green’, ’Finance’, null);
+</code></pre>
+<p>eg：Music系每个修满144学分的学生成为Misic系的教师，工资为$18000</p>
+<pre><code class="language-sql">insert into instructor
+select ID, name, dept_name, 18000  from  student
+where dept_name=‘music’ and tot_cred&gt;144
+</code></pre>
+<p>先执行 select 语句，再执行 insert 操作</p>
+<p>如果在执行 select from where 语句的同时执行插入操作，如果 student 上没有主码约束，例如</p>
+<pre><code class="language-sql">insert into student select * from student #会产生错误
+</code></pre>
+<h2 id="更新-update">更新 update</h2>
+<p>eg：年度教师工资增长，收入高于$100,000 的教师工资增长 3%, 其余的教师工资增长 5%</p>
+<p>写两个更新语句：</p>
+<pre><code class="language-sql">update instructor
+	set salary = salary * 1.03
+	where salary &gt; 100000;
+update instructor
+	set salary = salary * 1.05
+	where salary &lt;= 100000;
+</code></pre>
+<p>注意update语句的顺序</p>
+<p>case语句：在一条update语句中实现多种更新</p>
+<pre><code class="language-sql">update instructor
+	set salary = case
+		when salary &lt;= 100000 then salary * 1.05
+		else salary * 1.03
+		end
+</code></pre>
+<p>case语句的一般格式：</p>
+<pre><code class="language-sql">case
+    when pred1 then result1
+    when pred2 then result2
+        ......
+    when predn then resultn
+    else result0
+end
+</code></pre>
+<p>eg：把每个student元组的tot_cred属性值设为该生成功完成的课程学分总和</p>
+<pre><code class="language-sql">update student S
+	set tot_cred = ( select sum(credits) from takes natural join course
+		where S.ID= takes.ID and 
+			takes.grade &lt;&gt; ’F’ and
+			takes.grade is not null);
+</code></pre>
+<p>将没有上过任何课程的学生的total_creds设置为null。</p>
+<p>不使用sum(credits)，而使用：</p>
+<pre><code class="language-sql">case
+	when sum(credits) is not null then sum(credits)
+	else 0
+end
+</code></pre>
+
+              </div>
+              <div class="post-footer">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+      <strong>本文作者：</strong>
+      七叶的个人小站
+    </li>
+    <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://cwlrin.wiki/post/shu-ju-ku-sql/" title="数据库——SQL">数据库——SQL</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong>
+      本博客所有文章除特别声明外，转载请注明出处！
+    </li>
+  </ul>
+  <div class="tags">
+    
+  </div>
+  <div class="nav">
+    <div class="nav-prev">
+      
+    </div>
+    <div class="nav-next">
+      
+        <a class="nav-pc-next" title="数据库——关系运算" href="https://cwlrin.wiki/post/shu-ju-ku-guan-xi-yun-suan/">数据库——关系运算</a>
+        <a class="nav-mobile-next" title="数据库——关系运算" href="https://cwlrin.wiki/post/shu-ju-ku-guan-xi-yun-suan/">下一篇</a>
+        <i class="fa fa-chevron-right"></i>
+      
+    </div>
+  </div>
+</div>
+              
+                
+<script src="https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js"></script>
+<div id="vcomments" style="padding: 10px 0px 0px 0px"></div>
+<script>
+new Valine({
+    el: '#vcomments' ,
+    appId: 'miKfAllYGUAWs0flYNOazIKw-gzGzoHsz',
+    appKey: 'bq92hoypqYLisNGOWtqbgRF6',
+    notify: 'true' === 'true', 
+    avatar:'', 
+    placeholder: '',
+    pageSize: '',
+    lang: 'zh-cn',
+    visitor: 'true' === 'true',
+    highlight: 'true' === 'true',
+    avatarForce: 'true' === 'false',
+});
+</script>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-box">
+  <footer class="footer">
+    <div class="copyright">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | © 2019-2020 Theme By HsxyHao
+    </div>
+    <div class="poweredby">
+      
+    </div>
+  </footer>
+  
+  
+    <div class="drawer-box left" id="drawer_box">
+      <span class="muse-line muse-line-first"></span>
+      <span class="muse-line muse-line-middle"></span>
+      <span class="muse-line muse-line-last"></span>
+    </div>
+  
+  <div class="muse back-to-top" id="back_to_top">
+    <i class="fa fa-arrow-up"></i>
+    
+  </div>
+  
+    <div class="bg-img">
+      <img src="\media\images\custom-bgImg.jpg" />
+    </div>
+  
+  
+    <link rel="stylesheet" href="/media/live2d/histoire/css/live2d.css" />
+<div class="box-scale">
+  <div id="landlord" style="left:5px;bottom:0px;" data-key="">
+    <div class="message" style="opacity:0"></div>
+    <canvas id="live2d" width="500" height="560" class="live2d"></canvas>
+    <div class="live_talk_input_body">
+      <div class="live_talk_input_name_body">
+        <input name="name" type="text" class="live_talk_name white_input" id="AIuserName" autocomplete="off" placeholder="你的名字" />
+      </div>
+      <div class="live_talk_input_text_body">
+        <input name="talk" type="text" class="live_talk_talk white_input" id="AIuserText" autocomplete="off" placeholder="要和我聊什么呀？"/>
+        <button type="button" class="live_talk_send_btn" id="talk_send">发送</button>
+      </div>
+    </div>
+    <input name="live_talk" id="live_talk" value="1" type="hidden" />
+    <div class="live_ico_box">
+      <div class="live_ico_item type_info" id="showInfoBtn"></div>
+      <div class="live_ico_item type_talk" id="showTalkBtn"></div>
+      
+      <div class="live_ico_item type_youdu" id="youduButton"></div>
+      <div class="live_ico_item type_quit" id="hideButton"></div>
+      <input name="live_statu_val" id="live_statu_val" value="0" type="hidden" />
+      <audio src="" style="display:none;" id="live2d_bgm" data-bgm="0" preload="none"></audio>
+      <input id="duType" value="douqilai" type="hidden">
+      
+    </div>
+  </div>
+</div>
+<div id="open_live2d">召唤伊斯特瓦尔</div>
+<script src="https://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script>
+var message_Path = '/media/live2d/histoire/';
+let landlord = document.querySelector('#landlord');
+var apiKey = landlord.dataset.key;
+</script>
+<script type="text/javascript" src="/media/live2d/histoire/js/live2d.js"></script>
+<script type="text/javascript" src="/media/live2d/histoire/js/message.js"></script>
+  
+  
+    
+
+  
+</div>
+<script>
+
+  let sideBarOpen = 'sidebar-open';
+  let body = document.body;
+  let back2Top = document.querySelector('#back_to_top'),
+  back2TopText = document.querySelector('#back_to_top_text'),
+  drawerBox = document.querySelector('#drawer_box'),
+  rightSideBar = document.querySelector('.sidebar'),
+  viewport = document.querySelector('body');
+
+  function scrollAnimation(currentY, targetY) {
+   
+    let needScrollTop = targetY - currentY
+    let _currentY = currentY
+    setTimeout(() => {
+      const dist = Math.ceil(needScrollTop / 10)
+      _currentY += dist
+      window.scrollTo(_currentY, currentY)
+      if (needScrollTop > 10 || needScrollTop < -10) {
+        scrollAnimation(_currentY, targetY)
+      } else {
+        window.scrollTo(_currentY, targetY)
+      }
+    }, 1)
+  }
+
+  back2Top.addEventListener("click", function(e) {
+    scrollAnimation(document.scrollingElement.scrollTop, 0);
+    e.stopPropagation();
+    return false;
+  });
+  
+  window.addEventListener('scroll', function(e) {
+    let percent = document.scrollingElement.scrollTop / (document.scrollingElement.scrollHeight - document.scrollingElement.clientHeight) * 100;
+    if (percent > 1 && !back2Top.classList.contains('back-top-active')) {
+      back2Top.classList.add('back-top-active');
+    }
+    if (percent == 0) {
+      back2Top.classList.remove('back-top-active');
+    }
+    if (back2TopText) {
+      back2TopText.textContent = Math.floor(percent);
+    }
+  });
+
+  
+  let hasCacu = false;
+  window.onresize = function() {
+    if (window.width > 991) {
+      calcuHeight();
+    } else {
+      hasCacu = false;
+    }
+  }
+
+  function calcuHeight() {
+    // 动态调整站点概览高度
+    if (!hasCacu && back2Top.classList.contains('pisces') || back2Top.classList.contains('gemini')) {
+      let sideBar = document.querySelector('.sidebar');
+      let navUl = document.querySelector('#site_nav');
+      sideBar.style = 'margin-top:' + (navUl.offsetHeight + navUl.offsetTop + 15) + 'px;';
+      hasCacu = true;
+    }
+  }
+  calcuHeight();
+  
+  let open = false, MOTION_TIME = 300, RIGHT_MOVE_DIS = '320px';
+
+  if (drawerBox) {
+    let rightMotions = document.querySelectorAll('.right-motion');
+    let right = drawerBox.classList.contains('right');
+
+    let transitionDir = right ? "transition.slideRightIn" : "transition.slideLeftIn";
+
+    let openProp, closeProp;
+    if (right) {
+      openProp = {
+        paddingRight: RIGHT_MOVE_DIS 
+      };
+      closeProp = {
+        paddingRight: '0px'
+      };
+    } else {
+      openProp = {
+        paddingLeft: RIGHT_MOVE_DIS 
+      };
+      closeProp = {
+        paddingLeft: '0px'
+      };
+    }
+
+    drawerBox.onclick = function() {
+      open = !open;
+      window.Velocity(rightSideBar, 'stop');
+      window.Velocity(viewport, 'stop');
+      window.Velocity(rightMotions, 'stop');
+      if (open) {
+        window.Velocity(rightSideBar, {
+          width: RIGHT_MOVE_DIS
+        }, {
+          duration: MOTION_TIME,
+          begin: function() {
+            window.Velocity(rightMotions, transitionDir,{ });
+          }
+        })
+        window.Velocity(viewport, openProp,{
+          duration: MOTION_TIME
+        });
+      } else {
+        window.Velocity(rightSideBar, {
+          width: '0px'
+        }, {
+          duration: MOTION_TIME,
+          begin: function() {
+            window.Velocity(rightMotions, {
+              opacity: 0
+            });
+          }
+        })
+        window.Velocity(viewport, closeProp ,{
+          duration: MOTION_TIME
+        });
+      }
+      for (let i = 0; i < drawerBox.children.length; i++) {
+        drawerBox.children[i].classList.toggle('muse-line');
+      }
+      drawerBox.classList.toggle(sideBarOpen);
+    }
+  }
+
+  // 代码高亮
+  hljs.initHighlightingOnLoad();
+
+</script>
+    </div>
+  </body>
+  <script src="/media/js/motion.js"></script>
+</html>
