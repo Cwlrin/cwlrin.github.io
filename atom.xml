@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://cwlrin.wiki/</id>
     <title>七叶的个人小站</title>
-    <updated>2020-11-04T16:03:04.537Z</updated>
+    <updated>2020-11-04T16:04:40.558Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://cwlrin.wiki/"/>
     <link rel="self" href="https://cwlrin.wiki/atom.xml"/>
@@ -741,111 +741,6 @@ end
 	else 0
 end
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[数据库——关系运算]]></title>
-        <id>https://cwlrin.wiki/post/shu-ju-ku-guan-xi-yun-suan/</id>
-        <link href="https://cwlrin.wiki/post/shu-ju-ku-guan-xi-yun-suan/">
-        </link>
-        <updated>2020-11-04T12:08:46.000Z</updated>
-        <content type="html"><![CDATA[<h1 id="关系数据库的结构">关系数据库的结构</h1>
-<p>单一的数据结构----<strong>关系</strong></p>
-<p>现实世界的实体以及实体间的各种联系均用关系来表示</p>
-<p>数据的逻辑结构----<strong>二维表</strong></p>
-<p>从用户角度，关系模型中数据的逻辑结构是一张二维表</p>
-<h1 id="数据库模式">数据库模式</h1>
-<p>属性：<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">A_1, A_2, …, A_n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><br>
-关系模式：<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>R</mi><mo>=</mo><mo>(</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">R = (A_1, A_2, …, A_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></p>
-<p>Example:</p>
-<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mrow><mi mathvariant="normal">i</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">s</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">u</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">r</mi></mrow><mo>=</mo><mo>(</mo><mi>I</mi><mi>D</mi><mo separator="true">,</mo><mi>n</mi><mi>a</mi><mi>m</mi><mi>e</mi><mo separator="true">,</mo><mi>d</mi><mi>e</mi><mi>p</mi><mi>t</mi><mi mathvariant="normal">_</mi><mi>n</mi><mi>a</mi><mi>m</mi><mi>e</mi><mo separator="true">,</mo><mi>s</mi><mi>a</mi><mi>l</mi><mi>a</mi><mi>r</mi><mi>y</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">\mathrm{instructor}  = (ID, name, dept\_name, salary)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66786em;vertical-align:0em;"></span><span class="mord"><span class="mord mathrm">i</span><span class="mord mathrm">n</span><span class="mord mathrm">s</span><span class="mord mathrm">t</span><span class="mord mathrm">r</span><span class="mord mathrm">u</span><span class="mord mathrm">c</span><span class="mord mathrm">t</span><span class="mord mathrm">o</span><span class="mord mathrm">r</span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.06em;vertical-align:-0.31em;"></span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">n</span><span class="mord mathdefault">a</span><span class="mord mathdefault">m</span><span class="mord mathdefault">e</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">d</span><span class="mord mathdefault">e</span><span class="mord mathdefault">p</span><span class="mord mathdefault">t</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathdefault">n</span><span class="mord mathdefault">a</span><span class="mord mathdefault">m</span><span class="mord mathdefault">e</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">s</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span></span></p>
-<p>Formally, given sets <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>D</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>D</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mi mathvariant="normal">.</mi><msub><mi>D</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">D_1, D_2, …. D_n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">.</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> a <strong>relation r</strong> is a subset of <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>D</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">D1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord">1</span></span></span></span> x  <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>D</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">D2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord">2</span></span></span></span>  x … x <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>D</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">D_n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></p>
-<p>Thus, a relation is a set of <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi><mo>−</mo><mrow><mi mathvariant="normal">t</mi><mi mathvariant="normal">u</mi><mi mathvariant="normal">p</mi><mi mathvariant="normal">l</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">s</mi></mrow><mo>(</mo><msub><mi>a</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>a</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>a</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">n-\mathrm{tuples} (a_1, a_2, …, a_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathrm">t</span><span class="mord mathrm">u</span><span class="mord mathrm">p</span><span class="mord mathrm">l</span><span class="mord mathrm">e</span><span class="mord mathrm">s</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> where each <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub><mo>∈</mo><msub><mi>D</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">a_i  \in D_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6891em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></p>
-<p><strong>关系模式</strong>表现了型的概念，它代表着表的<strong>框架</strong>；关系表现为<strong>值</strong>的概念,成为<strong>关系实例</strong>(<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="monospace">r</mi><mi mathvariant="monospace">e</mi><mi mathvariant="monospace">l</mi><mi mathvariant="monospace">a</mi><mi mathvariant="monospace">t</mi><mi mathvariant="monospace">i</mi><mi mathvariant="monospace">o</mi><mi mathvariant="monospace">n</mi><mtext> </mtext><mi mathvariant="monospace">i</mi><mi mathvariant="monospace">n</mi><mi mathvariant="monospace">s</mi><mi mathvariant="monospace">t</mi><mi mathvariant="monospace">a</mi><mi mathvariant="monospace">n</mi><mi mathvariant="monospace">c</mi><mi mathvariant="monospace">e</mi></mrow><annotation encoding="application/x-tex">\mathtt{relation\ instance}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.61111em;vertical-align:0em;"></span><span class="mord"><span class="mord mathtt">r</span><span class="mord mathtt">e</span><span class="mord mathtt">l</span><span class="mord mathtt">a</span><span class="mord mathtt">t</span><span class="mord mathtt">i</span><span class="mord mathtt">o</span><span class="mord mathtt">n</span><span class="mspace"> </span><span class="mord mathtt">i</span><span class="mord mathtt">n</span><span class="mord mathtt">s</span><span class="mord mathtt">t</span><span class="mord mathtt">a</span><span class="mord mathtt">n</span><span class="mord mathtt">c</span><span class="mord mathtt">e</span></span></span></span></span>)</p>
-<p>一个关系模式下可以建立多个关系，例如在学生关系的关系模式下，可以为全校所有班级各建一个学生表</p>
-<p><strong>表是动态的</strong>，是数据库中数据的快照</p>
-<p>关系数据库是关系的集合，其中每个关系都有自己的关系模式</p>
-<p>元组在关系中出现的<strong>顺序</strong>是无关紧要的(元组可以按任意顺序存储)</p>
-<p>Example: <strong>instructor</strong> relation with unordered tuples.</p>
-<p>关系模式：<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mrow><mi mathvariant="normal">I</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">s</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">u</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">r</mi></mrow><mo>(</mo><mi>I</mi><mi>D</mi><mi mathvariant="normal">，</mi><mi>n</mi><mi>a</mi><mi>m</mi><mi>e</mi><mi mathvariant="normal">，</mi><mi>d</mi><mi>e</mi><mi>p</mi><mi>t</mi><mi mathvariant="normal">_</mi><mi>n</mi><mi>a</mi><mi>m</mi><mi>e</mi><mo separator="true">,</mo><mi>s</mi><mi>a</mi><mi>l</mi><mi>a</mi><mi>r</mi><mi>y</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">\mathrm{Instructor}(ID，name，dept\_name,salary)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.06em;vertical-align:-0.31em;"></span><span class="mord"><span class="mord mathrm">I</span><span class="mord mathrm">n</span><span class="mord mathrm">s</span><span class="mord mathrm">t</span><span class="mord mathrm">r</span><span class="mord mathrm">u</span><span class="mord mathrm">c</span><span class="mord mathrm">t</span><span class="mord mathrm">o</span><span class="mord mathrm">r</span></span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord cjk_fallback">，</span><span class="mord mathdefault">n</span><span class="mord mathdefault">a</span><span class="mord mathdefault">m</span><span class="mord mathdefault">e</span><span class="mord cjk_fallback">，</span><span class="mord mathdefault">d</span><span class="mord mathdefault">e</span><span class="mord mathdefault">p</span><span class="mord mathdefault">t</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathdefault">n</span><span class="mord mathdefault">a</span><span class="mord mathdefault">m</span><span class="mord mathdefault">e</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">s</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span></span></p>
-<h1 id="码">码</h1>
-<ol>
-<li>
-<p>超码(superkey)</p>
-<p>一个或多个属性的集合，这些属性的集合可以使我们在一个关系中唯一地标识一个元组。</p>
-</li>
-<li>
-<p>候选码（Candidate Key）</p>
-<p>关系中的一个属性组，其值能唯一标识一个元组。若从属性组中去掉任何一个属性，它就不具有这一性质了，这样的属性组称作候选码。</p>
-<p>任何一个候选码中的属性称作主属性。</p>
-<p><strong>最小的超码</strong>。</p>
-</li>
-<li>
-<p>主码（Primary Key）</p>
-<p>进行数据库设计时，从一个关系的多个候选码中选定一个作为主码，如可选定 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>D</mi><mi mathvariant="normal">#</mi></mrow><annotation encoding="application/x-tex">D\#</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord">#</span></span></span></span> 作为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>D</mi><mi>E</mi><mi>P</mi><mi>T</mi></mrow><annotation encoding="application/x-tex">DEPT</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span></span></span></span> 的主码</p>
-</li>
-<li>
-<p>外码（Foreign Key）</p>
-<p>关系 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>R</mi></mrow><annotation encoding="application/x-tex">R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span></span></span></span> 中的一个属性组，它不是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>R</mi></mrow><annotation encoding="application/x-tex">R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span></span></span></span> 的码，但它与另一个关系S的码相对应，则称这个属性组为R的外部码，如 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span></span></span></span> 关系中的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>D</mi><mi mathvariant="normal">#</mi></mrow><annotation encoding="application/x-tex">D\#</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord">#</span></span></span></span> 属性</p>
-<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>R</mi></mrow><annotation encoding="application/x-tex">R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span></span></span></span> 是参照关系(Referencing Relation)</p>
-<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span></span></span></span> 是被参照关系(Referenced Relation)</p>
-<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>R</mi></mrow><annotation encoding="application/x-tex">R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span></span></span></span> 通过外码 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>F</mi></mrow><annotation encoding="application/x-tex">F</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span></span></span></span> 参照关系 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span></span></span></span></p>
-</li>
-<li>
-<p>参照完整性约束（referential integrity constraint）</p>
-<p>在参照关系中任意元组在特定属性上的取值必然等于被参照关系中某个元组在特定属性上的取值</p>
-</li>
-</ol>
-<h1 id="模式图">模式图</h1>
-<ol>
-<li>
-<p>含有主码和外码依赖的数据库模式可以用模式图（schema diagram）来表示</p>
-<p>关系：矩形</p>
-<p>关系名称：列在矩形上方</p>
-<p>属性：列在矩形内</p>
-<p>主码属性：下划线标注</p>
-<p>外码依赖：从参照关系的外码属性到被参照关系的主码属性之间的箭头表示</p>
-</li>
-</ol>
-<h1 id="关系查询语言">关系查询语言</h1>
-<ol>
-<li>
-<p>查询语言：用户用来从数据库中请求获取信息的语言</p>
-</li>
-<li>
-<p>分类：过程化语言（procedural language）、非过程化语言（nonprocedural language）</p>
-<p>过程化语言：用户指导系统对数据库执行一系列操作以计算出所需结果</p>
-<p>非过程化语言：用户描述所需信息，不用给出获取该信息的具体过程</p>
-</li>
-<li>
-<p>实际使用的查询语言既包含过程化方法，又包含非过程化方法，例如SQL（Chapter 3~Chapter 5）</p>
-</li>
-<li>
-<p>“纯”查询语言（Chapter 6）</p>
-<p>过程化：关系代数</p>
-<p>非过程化：关系演算、域关系演算</p>
-</li>
-</ol>
-<h1 id="关系运算">关系运算</h1>
-<p>自然连接：两个关系上的自然连接运算所匹配的元组在两个关系共有的所有属性上取值相同</p>
-<p>Let r and s be relations on schemas <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>R</mi></mrow><annotation encoding="application/x-tex">R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span></span></span></span> and <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span></span></span></span> respectively.</p>
-<p>Then,  the “natural join”  of relations <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>R</mi></mrow><annotation encoding="application/x-tex">R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span></span></span></span> and <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span></span></span></span> is a relation on schema <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>R</mi><mo>∪</mo><mi>S</mi></mrow><annotation encoding="application/x-tex">R \cup S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∪</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span></span></span></span> obtained as follows:</p>
-<ul>
-<li>
-<p>Consider each pair of tuples tr from r and ts from s.</p>
-</li>
-<li>
-<p>If tr and ts have the same value on each of the attributes in <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>R</mi><mo>∪</mo><mi>S</mi></mrow><annotation encoding="application/x-tex">R \cup S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∪</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span></span></span></span>, add a tuple t  to the result, where</p>
-<ul>
-<li>
-<p>t has the same value as <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mi>r</mi></msub></mrow><annotation encoding="application/x-tex">t_r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76508em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> on r</p>
-</li>
-<li>
-<p>t has the same value as <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mi>s</mi></msub></mrow><annotation encoding="application/x-tex">t_s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76508em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> on s</p>
-</li>
-</ul>
-</li>
-</ul>
 ]]></content>
     </entry>
     <entry>
@@ -3977,6 +3872,252 @@ ElemType Sum( ElemType a[][MAX_SIZE], int n)
 <p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>=</mo><mi>O</mi><mo>(</mo><mi>g</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">S(n) = O(g(n))
 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span></p>
 <p>表示随着问题规模 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 的增大，算法运行所需存储量S(n)的增长率与 g(n) 的增长率相同，称S(n)(渐近)空间复杂度。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[七叶自用的Wiki模板]]></title>
+        <id>https://cwlrin.wiki/post/qi-xie-zi-yong-de-wiki-mo-ban/</id>
+        <link href="https://cwlrin.wiki/post/qi-xie-zi-yong-de-wiki-mo-ban/">
+        </link>
+        <updated>2020-09-05T05:02:56.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="概述">概述</h1>
+<p>这里整理出个人常用的萌娘百科编辑模板，如果你也是萌娘百科的编辑者或者是使用 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">M</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">w</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">k</mi><mi mathvariant="normal">i</mi></mrow><annotation encoding="application/x-tex">\mathrm{Mediawiki}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord"><span class="mord mathrm">M</span><span class="mord mathrm">e</span><span class="mord mathrm">d</span><span class="mord mathrm">i</span><span class="mord mathrm">a</span><span class="mord mathrm" style="margin-right:0.01389em;">w</span><span class="mord mathrm">i</span><span class="mord mathrm">k</span><span class="mord mathrm">i</span></span></span></span></span> 语法进行编辑的维基人，可以随意使用和转载该模板。</p>
+<p><a href="https://zh.moegirl.org.cn/User:%E6%A8%B1%E5%B0%8F%E8%B7%AF%E4%B8%83%E5%8F%B6">七叶的萌娘百科主页</a></p>
+<h1 id="galgame相关以恋花绽放樱飞时为例">Galgame相关（以恋花绽放樱飞时为例）</h1>
+<h2 id="游戏信息模板">游戏信息模板</h2>
+<p>代码</p>
+<pre><code class="language-wikitext">{{Video Game Infobox
+|标题         = '''恋花绽放樱飞时'''
+|image        = 恋花绽放樱飞时.jpg
+|图片大小     = 250px
+|图片信息     = 
+|tabs         = 
+|原名         = {{lj|恋がさくころ桜どき}}
+|假名         = {{lj|こいがさくころさくらどき}}
+|罗马字       = Koi ga Sakukoro Sakuradoki 
+|常用译名     = 恋花绽放樱飞时
+|类型         = ADV
+|平台         = Windows Vista / 7 / 8 / 10&lt;br&gt;PlayStation 4
+|分级         = R-18(PC)&lt;br&gt;全年龄(Steam)
+|发行         = [[Palette]]
+|开发         = [[Palette]]
+|总监         = 
+|制作人       = 
+|设计师       = 
+|编剧         = [[みなせ未来]]
+|程序         = 
+|美工         = [[和泉つばす]]、[[eco*]]
+|音乐         = [[BURTON]]
+|引擎         = 
+|模式         = 
+|发行时间     = 2014年6月27日（日文版）&lt;br&gt;2017年10月2日（英文版）&lt;br&gt;2019年2月28日（PS4）
+|标题颜色     = #CCCCFF
+|左栏颜色     = #E6E9FF
+}}
+</code></pre>
+<p>效果图</p>
+<figure data-type="image" tabindex="1"><img src="https://cwlrin.wiki//post-images/1599282502129.png" alt="" loading="lazy"></figure>
+<h2 id="hidebox">HideBox</h2>
+<p>代码</p>
+<pre><code>{{Hide
+|日语原文
+|正文
+}}
+</code></pre>
+<p>效果图</p>
+<figure data-type="image" tabindex="2"><img src="https://cwlrin.wiki//post-images/1599282805686.png" alt="" loading="lazy"></figure>
+<h2 id="角色模板">角色模板</h2>
+<p>代码</p>
+<pre><code>{{Main Characters Infolist
+|bg-color=#A2A9B1
+|th-color=#CCCCFF
+|td-color=#F8F9FA
+|cv-color=#E6E9FF
+|Name1       = '''[[神凤杏]]''' ({{ruby|神凤|じんぽう}} {{ruby|杏|あん}})
+|image1      = 神凤杏.jpg
+|info1       = 
+'''血型'''：O型
+
+'''生日'''：4月2日（白羊座）
+
+'''身高'''：162cm
+
+'''三围'''：B89 / W59/ H87
+
+美飒学园三年级学生，现役学生会长。
+
+拥有着连同性都憧憬的美貌，不过说起话来稍微有点让人残念。
+
+亲切待人的性格，宛若蝴蝶般的女孩子。
+
+对年下的悠真有些兴趣，想要把他拉进学生会。
+
+似乎从前就和恋爱妖精蒂娜认识……
+
+'''「从今天起，你就是我的仆人了♪」'''
+&lt;!-- 原文：
+
+美颯学園3年生。 現生徒会長。
+
+同性でも見惚れるほどの美貌を持つが、口を開くと少し残念。
+
+親しく接してきたかと思えば、はらりと手から逃れていく胡蝶のような女の子。
+
+ふとしたことから年下の悠真に興味を持ち、生徒会に引き込もうとする。
+
+恋の妖精・ティナとは以前から面識があるようだが……。
+
+「今日からキミ、あたしの下僕ね♪」 
+ --&gt;
+|CV1         = [[井之上奈奈|夏峰いろは]]
+</code></pre>
+<p>效果图</p>
+<figure data-type="image" tabindex="3"><img src="https://cwlrin.wiki//post-images/1599282978974.png" alt="" loading="lazy"></figure>
+<h2 id="游戏攻略模板">游戏攻略模板</h2>
+<p>代码</p>
+<pre><code>{{剧透提醒}}
+
+{{Hide
+|杏线
+|
+帮忙
+
+邀她去食堂
+
+岔开话题
+
+接受邀请
+
+◆SAVE
+
+听听学姐的请求
+
+杏 END
+}}
+</code></pre>
+<p>效果图<br>
+<img src="https://cwlrin.wiki//post-images/1599283871636.png" alt="" loading="lazy"></p>
+<h2 id="相关音乐模板">相关音乐模板</h2>
+<p>代码</p>
+<pre><code>{{color|red|片头曲1(OP1)}}
+*曲名：'''[[恋爱绽放的未来|恋さくミライ]]'''（恋花绽放的未来）
+**歌：[[佐咲纱花]]
+**作词：[[rino]]，作、编曲：[[大久保薰]]
+
+{{BilibiliVideo|title=OP1|id=1rs41117zK}}
+</code></pre>
+<p>效果图</p>
+<figure data-type="image" tabindex="4"><img src="https://cwlrin.wiki//post-images/1599283912489.png" alt="" loading="lazy"></figure>
+<h1 id="虚拟主播相关以永远酱为例">虚拟主播相关（以永远酱为例）</h1>
+<h2 id="人物信息模板">人物信息模板</h2>
+<p>代码</p>
+<pre><code>{{人物信息
+|image=
+|tabs={{tabs|TextPadding=0px
+ |color=white
+ |TextBackgroundColor=white
+ |LabelColor=#99ccff
+ |bt1=星月银河
+ |bt2=星辰万物
+ |bt3=星空
+ |bt4=(名字待定)
+ |tab1=[[File:永远酱 星月银河.jpg|250px|画师：瓦瓦子]]
+ |tab2=[[File:eienchan.jpg|250px|画师：瓦瓦子]]
+ |tab3=[[File:C29f2a3e690185903c4f2d9c40afbc5155ece630 raw.jpg|250px|画师：永远酱]]
+ |tab4=[[File:永远酱夏装.jpg|250px|画师：瓦瓦子]]
+ |DefaultTab=2
+}}
+|本名=永远酱
+|别号=永远星{{黑幕|&lt;del&gt;永远猩&lt;/del&gt;}}
+|出生地=永远星
+|发色=淡紫
+|瞳色=绿
+|身高=155
+|体重=42kg {{黑幕|47万吨}}
+|三围=&lt;del&gt;直径32米&lt;/del&gt;
+|年龄=未知
+|生日=10月10日
+|星座=
+|血型=
+|声优=
+|萌点={{萌点|万年萝莉|傲娇|天然呆|冒失|元气|萝莉控|齐刘海|呆毛|大眼睛|虎牙|贫乳|兽耳，悬浮兽耳|背带裙|白色过膝袜，白丝|创可贴，头顶创可贴&lt;del&gt;煎蛋&lt;/del&gt;|露肩装|外星人|头槌|特殊第一人称，吾辈&lt;del&gt;焐被&lt;/del&gt;|翻译腔，日式翻译腔|熬夜|起床气|音痴|猫奴，铲屎官|片言，散装日语}}、自搜
+|出身地区=中国
+|活动范围=[[File:Bilibili Logo Blue.svg|40px|link=bilibili]]
+|粉丝勋章={{粉丝勋章|永远喵|40}}
+|目前B站粉丝数={{BilibiliUP|id=135980509|type=follower}}
+|所属团体=
+|个人状态=活动中
+|相关人士={{heimu|前世：[[新科娘]]（二代目） }}
+}}
+</code></pre>
+<p>效果图</p>
+<figure data-type="image" tabindex="5"><img src="https://cwlrin.wiki//post-images/1599283387877.png" alt="" loading="lazy"></figure>
+<h2 id="tioggle模板-bilibilivideo模板">Tioggle模板、bilibiliVideo模板</h2>
+<p>代码</p>
+<pre><code>{{Toggle
+|button={{color|#99CCFF|'''永远酱的音乐作品'''}}
+|content=
+{{bilibiliVideo|title=【翻唱】爱杀宝贝ed|id=BV15J41127VG|page=0|width=600|height=421|autoplay=false}}
+}}
+</code></pre>
+<p>效果图<br>
+<img src="https://cwlrin.wiki//post-images/1599283974521.png" alt="" loading="lazy"></p>
+<h1 id="歌曲相关以以恋结缘为例">歌曲相关（以以恋结缘为例）</h1>
+<h2 id="歌曲信息">歌曲信息</h2>
+<p>代码</p>
+<pre><code>{{Infobox Song
+|歌曲名= 恋ひ恋ふ縁
+|image= 千恋万花OST封面.jpg
+|图片信息= OST封面
+|图片大小= 250px 
+|演唱= [[KOTOKO]]
+|编曲= 井ノ原智
+|作曲= Famishin
+|填词= [[KOTOKO]]
+|吉他= Asai Yasuo 
+|三味线= 尾上秀樹
+|MV编导= 
+|收录专辑= 《千恋＊万花 オリジナル・サウンドトラック》
+}}
+</code></pre>
+<p>效果图<br>
+<img src="https://cwlrin.wiki//post-images/1599284404586.png" alt="" loading="lazy"></p>
+<h2 id="歌词">歌词</h2>
+<p>代码</p>
+<pre><code>{{Photrans/button}}
+{{LyricsKai
+|lstyle=color:#704A83|rstyle=color:#EE6174|reserveWidth=260px
+|original=
+{{Photrans|誠|まこと}}、{{Photrans|意地|いじ}}の{{Photrans|悪|わる}}い{{Photrans|神|かみ}}の{{Photrans|所業|しょぎょう}}か？
+{{Photrans|奇跡|きせき}}？{{Photrans|縁|えにし}}？ {{Photrans|袂|たもと}}{{Photrans|触合|ふれあ}}う{{Photrans|不思議|ふしぎ}}
+{{Photrans|花|はな}}ひとひら{{Photrans|揺|ゆ}}れて
+{{Photrans|不意|ふい}}に{{Photrans|宿|やど}}ってた
+うなじ{{Photrans|解|ほど}}いてく{{Photrans|春風|はるかぜ}}
+
+{{Photrans|戯|たわむ}}れはそこそこに
+{{Photrans|恋手|こいて}}ほどきしてくだしゃんせ
+{{Photrans|湯気|ゆげ}}にほんのり{{Photrans|頬染|ほほそめ}}て
+{{Photrans|夜風|よかぜ}}に{{Photrans|願ふ|ねがう}}
+
+|translated=
+是天意不善 在戏谑人间？&lt;ref&gt;翻译：七海芽生 已取得授权| 假名标注：[[User:MCPE White|MCPE White]]&lt;/ref&gt;
+玄妙的邂逅 奇迹还是缘？
+哪曾想
+摇曳花儿丛中掩
+春风吹人暖
+
+莫要再拿人调笑
+恋爱妙诀要请教
+水暖熏得双颊俏
+心愿随着夜风飘
+}}
+</code></pre>
+<p>效果图</p>
+<figure data-type="image" tabindex="6"><img src="https://cwlrin.wiki//post-images/1599284307681.png" alt="" loading="lazy"></figure>
+<h1 id="杂项">杂项</h1>
+<h2 id="latex-格式代码"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext>LaTeX</mtext></mrow><annotation encoding="application/x-tex">\LaTeX</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.89883em;vertical-align:-0.2155em;"></span><span class="mord text"><span class="mord textrm">L</span><span class="mspace" style="margin-right:-0.36em;"></span><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.68333em;"><span style="top:-2.904999em;"><span class="pstrut" style="height:2.7em;"></span><span class="mord text"><span class="mord textrm sizing reset-size6 size3">A</span></span></span></span></span></span><span class="mspace" style="margin-right:-0.15em;"></span><span class="mord text"><span class="mord textrm">T</span><span class="mspace" style="margin-right:-0.1667em;"></span><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.46782999999999997em;"><span style="top:-2.7845em;"><span class="pstrut" style="height:3em;"></span><span class="mord text"><span class="mord textrm">E</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2155em;"><span></span></span></span></span><span class="mspace" style="margin-right:-0.125em;"></span><span class="mord textrm">X</span></span></span></span></span></span> 格式代码</h2>
+<pre><code class="language-html">&lt;span class=&quot;texhtml&quot; style=&quot;font-family: 'CMU Serif', cmr10, LMRoman10-Regular, 'Latin Modern Math', 'Nimbus Roman No9 L', 'Times New Roman', Times, serif;&quot;&gt;L&lt;span style=&quot;text-transform: uppercase; font-size: 57.851%; vertical-align: 0.205em; margin-left: -0.36em; margin-right: -0.15em; line-height: 0&quot;&gt;a&lt;/span&gt;T&lt;span style=&quot;text-transform: uppercase; vertical-align: -0.2155em; margin-left: -0.125em; margin-right: -0.1667em; line-height: 0&quot;&gt;e&lt;/span&gt;X&lt;/span&gt;
+</code></pre>
 ]]></content>
     </entry>
 </feed>
