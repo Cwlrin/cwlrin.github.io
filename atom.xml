@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://cwlrin.wiki/</id>
     <title>七叶的个人小站</title>
-    <updated>2020-11-05T12:44:59.764Z</updated>
+    <updated>2020-11-05T15:32:27.940Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://cwlrin.wiki/"/>
     <link rel="self" href="https://cwlrin.wiki/atom.xml"/>
@@ -10,6 +10,323 @@
     <logo>https://cwlrin.wiki/images/avatar.png</logo>
     <icon>https://cwlrin.wiki/favicon.ico</icon>
     <rights>All rights reserved 2020, 七叶的个人小站</rights>
+    <entry>
+        <title type="html"><![CDATA[数据库——高级SQL]]></title>
+        <id>https://cwlrin.wiki/post/shu-ju-ku-gao-ji-sql/</id>
+        <link href="https://cwlrin.wiki/post/shu-ju-ku-gao-ji-sql/">
+        </link>
+        <updated>2020-11-05T07:31:56.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="使用程序设计语言访问数据库">使用程序设计语言访问数据库</h1>
+<p>API (application-program interface) 应用程序接口，连接数据库服务器</p>
+<p>应用可以：</p>
+<ul>
+<li>连接数据库</li>
+<li>发送 SQL 命令给数据库服务器</li>
+<li>把结果存入程序变量中，每次一个元组。</li>
+</ul>
+<p>通用编程语言的两种方法访问SQL：</p>
+<ul>
+<li>动态SQL：
+<ol>
+<li>JDBC (Java Database Connectivity) works with Java</li>
+<li>ODBC (Open Database Connectivity) works with C, C++, C#, and Visual Basic.  Other API’s such as ADO.NET sit on top of ODBC</li>
+</ol>
+</li>
+<li>嵌入式SQL</li>
+</ul>
+<h2 id="jdbc">JDBC</h2>
+<p>JDBC是Java语言的应用程序接口。定义了java程序连接数据库服务器的应用程序接口。</p>
+<p>JDBC提供了多种查询和更新数据的特性，并取回查询。</p>
+<p>JDBC 还支持元数据检索，例如，查询关系在哪个数据库中，属性名和类型</p>
+<p>与数据库通信的模型:</p>
+<ol>
+<li>打开一个数据库连接Open a connection</li>
+<li>创建一个“语句”对象Create a “statement” object</li>
+<li>使用语句对象发送语句执行语句并返回结果Execute queries using the Statement object to send queries and fetch results</li>
+<li>异常机制处理错误Exception mechanism to handle errors</li>
+</ol>
+<h2 id="odbc">ODBC</h2>
+<p>开放数据库互连（Open DataBase Connectivity (ODBC) ）标准</p>
+<ul>
+<li>为连接数据库服务器写的标 准应用程序。</li>
+<li>pplication program interface (API) to
+<ol>
+<li>打开数据库连接open a connection with a database,</li>
+<li>发送查询和更新send queries and updates,</li>
+<li>取回结果get back results.</li>
+</ol>
+</li>
+</ul>
+<p>应用程序，如，GUI, 电子表格，等，可以使用ODBC</p>
+<h2 id="嵌入式-sql">嵌入式 SQL</h2>
+<p>SQL标准定义了嵌入SQL到许多不同的语言中，如C, C++, Java, Fortran, 和PL/1,</p>
+<p>SQL查询所嵌入的语言被称为宿主语言（host language）, 宿主语言中使和SQL结构被称为嵌入式SQL（embedded SQL）.</p>
+<p>这些语言的基本形式沿用了系统 R 将 SQL 嵌入 PL/1 的形式。</p>
+<p>EXEC SQL 语句用来使预处理器识别嵌入式SQL请求。</p>
+<pre><code class="language-sql">EXEC SQL &lt;embedded SQL statement &gt;;
+</code></pre>
+<p>Note:  语法依赖宿主语言。</p>
+<ul>
+<li>例如，COBOL, 语句中的分号用 END-EXEC 代替</li>
+<li>在Java中嵌入使用 <code># SQL { .... };</code></li>
+</ul>
+<p>在执行任意SQL语句前，程序必须首先连接数据库，使用：</p>
+<pre><code class="language-sql">EXEC-SQL connect to  server  user user-name using password;
+</code></pre>
+<p>这里，server 标识将要建立连接的服务器</p>
+<p>在嵌入的SQL语句中可以使用宿主语言的变量，不过前面要加上冒号(😃 以区别于SQL变量。，(e.g.,  :credit_amount )</p>
+<p>如此使用的变量必须声明在一个DECLARE区段里，见下面的代码。但声明变量的语法还是因循宿主语言的惯例。</p>
+<pre><code class="language-sql">EXEC-SQL BEGIN DECLARE SECTION
+int  credit-amount ;
+EXEC-SQL END DECLARE SECTION;
+</code></pre>
+<p>写一个嵌入式SQL语句，我们要用下面语句</p>
+<pre><code class="language-sql">declare c cursor for  &lt;SQL query&gt; 
+</code></pre>
+<p>表达式中，变量 c 被称为该查询的游标</p>
+<p>Example:</p>
+<p>假设我们有一个宿主变量 credit_amount ，找出学分高于 credit_amount 的所有学生的名字。</p>
+<p>SQL查询语句如下</p>
+<pre><code class="language-sql">EXEC SQL
+declare c cursor for
+select ID, name
+from student
+where tot_cred &gt; :credit_amount
+END_EXEC
+</code></pre>
+<p>变量 c 用来标识该查询。</p>
+<p>open statement :</p>
+<pre><code>EXEC SQL open c ;
+</code></pre>
+<p>这条语句使得数据库系统执行这条查询并把执行结果存于一个临时关系中。当open语句被执行的时候，宿主变量credit-amount的值就会被应用到查询中。</p>
+<p>Fetch语句要求结果关系的每一个属性有一个宿主变量相对应</p>
+<pre><code class="language-sql">EXEC SQL fetch c into :si, :sn END_EXEC
+</code></pre>
+<p>一条单一fetch请求只能得到一个元组。如果我们想得到所有的结果，程序中必须包含对所有元组执行的一个循环。</p>
+<p>close 语句来告诉数据库系统删除用于保存查询结果的临时关系。</p>
+<pre><code class="language-sql">EXEC SQL close c ;
+</code></pre>
+<p>Note: 细节依赖于特定语言的细节。</p>
+<p>例如，Java嵌入定义了Java迭代器来步入结果元组。</p>
+<p>对数据库修改（update, insert, and delete）嵌入式SQL表达式</p>
+<p>通过游标来更新数据库关系。如，要为音乐系每个老师的salary属性都增加100，可以声明这样的游标：</p>
+<pre><code class="language-sql">EXEC SQL 
+declare c cursor for
+select *
+from instructor
+where dept_name = ‘Music’
+for update
+</code></pre>
+<p>然后我们利用在游标上的fetch操作对元组进行迭代（就像我们先前看到的例子一样），每取到一个元组我们都执行以下的代码。</p>
+<pre><code class="language-sql">update instructor
+set salary = salary + 1000
+where current of c
+</code></pre>
+<h1 id="函数和过程">函数和过程</h1>
+<p>SQL:1999支持函数和过程</p>
+<ul>
+<li>SQL允许定义函数、过程和方法。定义可以通过SQL的有关过程的组件，也可以外部的程序设计语言，例如C, Java</li>
+<li>用外部语言编写的函数对于特殊的数据类型（如图像和几何对象）特别有用。</li>
+<li>例如：检查多边形是否重叠，或比较图像是否相似的函数。</li>
+</ul>
+<p>一些数据库系统支持表值函数，它可以返回一个关系作为结果。</p>
+<p>SQL:1999还支持一组丰富的命令式构造，包括循环，if-then-else，赋值。</p>
+<p>许多数据库对SQL有专有的程序化扩展，与SQL:1999不同。</p>
+<h2 id="sql-函数functions">SQL 函数Functions</h2>
+<p>定义一个函数，给定一个系的名子，返回该系的教师数目。</p>
+<pre><code class="language-sql">create function dept_count (dept_name varchar(20))
+returns integer
+begin
+declare d_count  integer;
+    select count (* ) into d_count
+    from instructor
+    where instructor.dept_name = dept_name
+return d_count;
+end
+</code></pre>
+<p>这个函 数dept_count 可以用在返回教师数大于12的所有系的名称和预算的查询中。</p>
+<pre><code class="language-sql">select dept_name, budget
+from department
+where dept_count (dept_name ) &gt; 12
+</code></pre>
+<p>复合语句:  begin … end</p>
+<p>在begin 和 end之间会包含复杂的SQL语句.</p>
+<p>returns   -- 显示返回的变量类型，如，integer</p>
+<p>return  -- 作为调用函数的结果，返回指定的值</p>
+<p>SQL 函数可以被看作带参数的视图（parameterized views ），它通过允许参数把视图的概念更加一般化。</p>
+<h2 id="表函数table-functions">表函数Table Functions</h2>
+<p>SQL:2003标准支持返回关系作为结果的函数（表函数）</p>
+<p>Example: 返回一个包含某特定系的所有教师的表（图5-6）</p>
+<pre><code class="language-sql">create function instructor_of (dept_name char(20))
+	returns table  (  
+        ID varchar(5),
+        name varchar(20),
+        dept_name varchar(20),
+        salary numeric(8,2))
+	return table
+        (select ID, name, dept_name, salary
+        from instructor
+        where instructor.dept_name = instructor_of.dept_name)
+</code></pre>
+<p>该函数的使用：查询返回“MUSIC”系的所有教师</p>
+<pre><code class="language-sql">select *
+from table (instructor_of (‘Music’))
+</code></pre>
+<h2 id="sql过程-procedures">SQL过程 Procedures</h2>
+<p>dept_count 函数也可以写成一个过程：</p>
+<pre><code class="language-sql">create procedure dept_count_proc (in dept_name varchar(20), out d_count integer)
+begin
+	select count(*) into d_count
+    from instructor
+    where instructor.dept_name = dept_count_proc.dept_name
+end
+</code></pre>
+<p>可以从一个SQL过程中或者从嵌入式SQL中使和call 语句调用过程。</p>
+<pre><code class="language-sql">declare d_count integer;
+call dept_count_proc( ‘Physics’, d_count);
+</code></pre>
+<p>过程和函数可以通过动态SQL触发。</p>
+<p>SQL:1999允许多个函数或过程同名(called name overloading), ，只要同名过程的参数个数不同。或至少有一个参数类型不同。</p>
+<h2 id="支持过程和函数的语言构造-language-constructs-for-procedures-functions">支持过程和函数的语言构造 Language Constructs for Procedures &amp; Functions</h2>
+<p>SQL所支持的构造赋予了它与通用程序设计语言相当的几乎所有的功能。<br>
+Warning: most database systems implement their own variant of the standard syntax below.<br>
+复合语句 begin … end,<br>
+在begin和end之间会包含复杂的SQL语句。<br>
+可以在复合语句中声明局部变量。<br>
+While 和 repeat 语句:</p>
+<pre><code class="language-sql">while 布尔表达式 do
+    语句序列 ;
+end while
+</code></pre>
+<pre><code class="language-sql">repeat
+    语句序列;
+until  布尔表达式
+end repeat
+</code></pre>
+<p>For循环：允许对查询的所有结果重复执行<br>
+Example: 查询所有系的预算</p>
+<pre><code class="language-sql">declare n integer default 0;
+for r  as
+    select budget from department
+do
+    set n = n + r.budget
+end for
+</code></pre>
+<p>条件语句  (if-then-else)</p>
+<p>SQL:1999 也支持 case 语句，类似于C语言中的 case语句</p>
+<p>Example procedure: 定义过程，首先确认选课学生数没有超过该果所在教室的容量，然后完成学生对该课的注册。</p>
+<p>返回 0 表示成功，返回 -1 表示超过教室容量</p>
+<p>SQL支持发信号通知异常条件（exception conditions）,以及声明句柄（handlers）来处理异常</p>
+<pre><code class="language-sql">declare out_of_classroom_seats  condition
+declare exit handler for out_of_classroom_seats
+begin
+...
+..
+signal out_of_classroom_seats
+end
+</code></pre>
+<p>这个句柄是出口，一但条件发生，将会采取动作终止begin…and 中的语句。</p>
+<p>其他动作是后续可能异常语句。</p>
+<p>SQL:1999 允许用一种程序设计语言定义函数，如C或C++</p>
+<p>外部过程和函数可以这样指定：</p>
+<pre><code class="language-sql">create procedure dept_count_proc(in dept_name varchar(20), out count integer)
+language C
+external name ’ /usr/avi/bin/dept_count_proc’
+create function dept_count(dept_name varchar(20))
+returns integer
+language C
+external name ‘/usr/avi/bin/dept_count’
+</code></pre>
+<p>Benefits of external language functions/procedures:</p>
+<ul>
+<li>对很多运算更高效，表达更准确。</li>
+</ul>
+<p>Drawbacks</p>
+<ul>
+<li>执行函数的代码可能需要加载到数据库系统并执行。
+<ul>
+<li>程序中的错误可能破坏数据库内部的结构</li>
+<li>安全风险，允许用户访问未授权数据</li>
+</ul>
+</li>
+<li>关心安全性的数据库系统一般会将这些代码作为一个单独进程 一部分来执行，通过进程间通信，传入参数的值，取回结果</li>
+<li>如果数据库系统关心执行的效率胜过安全性则可以采用这种方式执行过程。</li>
+</ul>
+<h1 id="触发器triggers">触发器Triggers</h1>
+<p>触发器（ trigger ）是一条语句，当对数据库作修改时，它自动被系统执行。</p>
+<p>要设置触发器机制，必须满足两个要求：</p>
+<ul>
+<li>指明什么条件下执行触发器</li>
+<li>指明触发器执行时的动作</li>
+</ul>
+<p>尽管触发器在SQL:1999之前并不是SQL标准的一部分，但是它仍被广泛地应用在基于SQL的数据库中。</p>
+<h2 id="触发器事件和动作-in-sql">触发器事件和动作 in SQL</h2>
+<p>触发器事件可以是insert, delete或 update</p>
+<p>对于更新来说，触发器可以指定哪个属性使其执行</p>
+<ul>
+<li>如， after update of takes on grade  指定当更新关系takes的属性grade时执行触发器</li>
+</ul>
+<p>Referencing语句建立变量，用来在插入完成后存储所插入行的值。</p>
+<ul>
+<li>referencing old row as   :建立一个变量用来存储已经更新或删除行的旧值。</li>
+<li>referencing new row as  : 用于插入和更新操作<br>
+触发器可以在事件之前激发。在事件之前被执行的触发器可以作为避免非法更新、插入或删除的额外约束。如，假设所插入分数的值为空白则表明该分数发生缺失，将这个值用NULL值代替。Set语句可以用来执行这样的修改。</li>
+</ul>
+<pre><code class="language-sql">create trigger setnull_trigger before update of takes
+referencing new row as nrow
+for each row
+when (nrow.grade = ‘ ‘)
+begin atomic
+    set nrow.grade = null;
+end;
+</code></pre>
+<h2 id="级触发器语句">级触发器语句</h2>
+<p>我们可以对引起插入、删除或更新的SQL语句执行单一动作，而不是对每个被影响的行执行一个动作。</p>
+<ul>
+<li>使用    for each statement    子句来替代    for each row</li>
+<li>使用    referencing old table  或  referencing new table  来指向包含所有的被影响的行的临时表（称为过渡表transition tables)</li>
+<li>过渡表不能用于before触发器，无论它们是语句触发器还是行触发器，无论它们是语句触发器还是行触发器。</li>
+<li>在过渡表的基础上，一个单独的SQL语句就可以用来执行多个动作。</li>
+</ul>
+<h2 id="何时不用触发器">何时不用触发器</h2>
+<p>触发器早期被用于如下情况：</p>
+<ul>
+<li>维护统计数据（如，每个院系的总工资）</li>
+<li>复制或者备份数据库，在每一个关系的插入、删除或更新的操作上创建触发器，将改变记录在称为change或delta的关体系上。一个单独的进程将这些改变复制到数据库的副本。</li>
+</ul>
+<p>现在，有更好的方法完成这些</p>
+<ul>
+<li>许多数据库现在支持物化视图，由数据库系统自动维护汇总数据。</li>
+<li>现代的数据库系统提供内置的数据库复制工具。</li>
+</ul>
+<p>在许多情况下，可以使用封装工具代替触发器</p>
+<ul>
+<li>定义方法来更新域</li>
+<li>作为更新方法的一部分执行动作，来代替触发器</li>
+</ul>
+<p>触发器动作的非故意执行</p>
+<ul>
+<li>当数据从一个备份的拷贝中加载</li>
+<li>一个站点上的数据库更新复制到备份站点时</li>
+<li>在这些动作执行之前，触发器执行可以无效</li>
+</ul>
+<p>触发器的其他风险</p>
+<ul>
+<li>运行期间一个触发器错误会导致引发该触发器的动作语句失败。</li>
+<li>无限的触发链（Cascading execution）</li>
+</ul>
+<h1 id="递归查询">递归查询</h1>
+<p>使用迭代来计算传递闭包</p>
+<ul>
+<li>create temporary table创建临时表</li>
+</ul>
+<p>SQL中的递归</p>
+<ul>
+<li>使用递归视图with recursive</li>
+<li>create recursive view</li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[数据库——中级SQL]]></title>
         <id>https://cwlrin.wiki/post/shu-ju-ku-zhong-ji-sql/</id>
@@ -4183,204 +4500,6 @@ where instructor.ID = ‘22222’
 <li>编译为机器语言程序</li>
 <li>在硬件上执行程序，实现任务</li>
 </ol>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[数据结构——概论]]></title>
-        <id>https://cwlrin.wiki/post/shu-ju-jie-gou-gai-lun/</id>
-        <link href="https://cwlrin.wiki/post/shu-ju-jie-gou-gai-lun/">
-        </link>
-        <updated>2020-09-07T05:08:03.000Z</updated>
-        <content type="html"><![CDATA[<h1 id="数据结构的研究范畴">数据结构的研究范畴</h1>
-<p>对于数值计算问题的解决方法，主要是用数学方程建立数学模型，例如</p>
-<ul>
-<li>天气预报的数学模型为二阶椭圆偏微分方程。</li>
-<li>预测人口增长的数学模型为常微分方程。</li>
-</ul>
-<p>求解这些数学模型的方法是计算数学研究的范畴，比如采用。</p>
-<ul>
-<li>差分算法</li>
-<li>有限元算法</li>
-<li>无限元算法</li>
-</ul>
-<p>对于非数值计算问题，主要采用数据结构的方法建立数学模型</p>
-<p>简单说来，<strong>数据结构的研究范畴主要是非数值计算问题的操作元素及其它们之间的关系以及在计算机中的表示和实现</strong>。</p>
-<h1 id="数据结构的基本概念">数据结构的基本概念</h1>
-<h2 id="数据">数据</h2>
-<p>数据 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><mi>d</mi><mi>a</mi><mi>t</mi><mi>a</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">(data)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault">d</span><span class="mord mathdefault">a</span><span class="mord mathdefault">t</span><span class="mord mathdefault">a</span><span class="mclose">)</span></span></span></span> 是信息的载体，是描述客观事物的数、字符、以及所有能输入到计算机中，被计算机程序识别和处理的符号的集合。</p>
-<ul>
-<li>数值性数据</li>
-<li>非数值性数据</li>
-</ul>
-<h2 id="数据元素">数据元素</h2>
-<p>数据元素 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><mi>d</mi><mi>a</mi><mi>t</mi><mi>a</mi><mtext> </mtext><mi>e</mi><mi>l</mi><mi>e</mi><mi>m</mi><mi>e</mi><mi>n</mi><mi>t</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">(data \ element)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault">d</span><span class="mord mathdefault">a</span><span class="mord mathdefault">t</span><span class="mord mathdefault">a</span><span class="mspace"> </span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">e</span><span class="mord mathdefault">m</span><span class="mord mathdefault">e</span><span class="mord mathdefault">n</span><span class="mord mathdefault">t</span><span class="mclose">)</span></span></span></span> 是数据的<strong>基本单位</strong>。在计算机程序中常作为一个整体进行考虑和处理</p>
-<p>有时一个数据元素可以由若干<strong>数据项</strong>（<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mi>a</mi><mi>t</mi><mi>a</mi><mtext> </mtext><mi>i</mi><mi>t</mi><mi>e</mi><mi>m</mi></mrow><annotation encoding="application/x-tex">data\ item</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span><span class="mord mathdefault">a</span><span class="mord mathdefault">t</span><span class="mord mathdefault">a</span><span class="mspace"> </span><span class="mord mathdefault">i</span><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span><span class="mord mathdefault">m</span></span></span></span>）组成。数据元素又称为元素、结点、记录。</p>
-<h2 id="什么是数据结构">什么是数据结构</h2>
-<p>定义: 由某一数据元素的集合及该集合中所有数据元素之间的关系组成，记为：</p>
-<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mrow><mi mathvariant="normal">D</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">S</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">u</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">u</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">e</mi></mrow><mo>=</mo><mo>(</mo><mi>D</mi><mo separator="true">,</mo><mi>S</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">\mathrm{DataStructure} = (D, S)
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord"><span class="mord mathrm">D</span><span class="mord mathrm">a</span><span class="mord mathrm">t</span><span class="mord mathrm">a</span><span class="mord mathrm">S</span><span class="mord mathrm">t</span><span class="mord mathrm">r</span><span class="mord mathrm">u</span><span class="mord mathrm">c</span><span class="mord mathrm">t</span><span class="mord mathrm">u</span><span class="mord mathrm">r</span><span class="mord mathrm">e</span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mclose">)</span></span></span></span></span></p>
-<p>其中，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span></span></span></span> 是某一数据元素的有限集合，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span></span></span></span> 是该集合中所有数据元素之间的关系组成的有限集合。</p>
-<h2 id="数据的逻辑结构">数据的逻辑结构</h2>
-<p>数据的逻辑结构从逻辑关系上描述数据，与数据的存储无关。</p>
-<p>数据的逻辑结构可以看作是从具体问题抽象出来的数学模型。</p>
-<p>数据的逻辑结构可归结为以下四类：</p>
-<ul>
-<li>线性结构</li>
-<li>树形结构</li>
-<li>图状结构</li>
-<li>集合结构</li>
-</ul>
-<h2 id="数据的存储结构">数据的存储结构</h2>
-<p>数据的存储结构是逻辑结构用计算机语言的实现。<br>
-数据的存储结构依赖于计算机语言。</p>
-<h3 id="顺序存储结构">顺序存储结构</h3>
-<p>所有元素存放在一片连续的存储单元中，逻辑上相邻的元素存放到计算机内存仍然相邻。</p>
-<h3 id="链式存储结构">链式存储结构</h3>
-<p>所有元素存放在可以不连续的存储单元中，但元素之间的关系可以通过地址确定，逻辑上相邻的元素存放到计算机内存后不一定是相邻的。</p>
-<h1 id="抽象数据类型及其实现">抽象数据类型及其实现</h1>
-<h2 id="数据类型">数据类型</h2>
-<p>数据类型定义：一组性质相同的值的集合, 以及定义于这个值集合上的一组操作的总称。</p>
-<p>例如：C语言中有如下数据类型</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">char</th>
-<th style="text-align:center">int</th>
-<th style="text-align:center">float</th>
-<th style="text-align:center">double</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">字符型</td>
-<td style="text-align:center">整型</td>
-<td style="text-align:center">浮点型</td>
-<td style="text-align:center">双精度型</td>
-</tr>
-</tbody>
-</table>
-<p>构造数据类型由不同成员构成。</p>
-<p>基本数据类型可以看作是计算机中已实现的数据类型。</p>
-<h2 id="抽象数据类型">抽象数据类型</h2>
-<p>抽象数据类型 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><mi>A</mi><mi>D</mi><mi>T</mi><mo>:</mo><mi>A</mi><mi>b</mi><mi>s</mi><mi>t</mi><mi>r</mi><mi>a</mi><mi>c</mi><mi>t</mi><mtext> </mtext><mi>D</mi><mi>a</mi><mi>t</mi><mi>a</mi><mtext> </mtext><mi>T</mi><mi>y</mi><mi>p</mi><mi>e</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">(ADT:Abstract\ Data\ Type)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault">A</span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">A</span><span class="mord mathdefault">b</span><span class="mord mathdefault">s</span><span class="mord mathdefault">t</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">a</span><span class="mord mathdefault">c</span><span class="mord mathdefault">t</span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord mathdefault">a</span><span class="mord mathdefault">t</span><span class="mord mathdefault">a</span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mord mathdefault">p</span><span class="mord mathdefault">e</span><span class="mclose">)</span></span></span></span>   是指一个数学模型以及定义在此数学模型上的一组操作。</p>
-<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>A</mi><mi>D</mi><mi>T</mi></mrow><annotation encoding="application/x-tex">ADT</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">A</span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span></span></span></span> 有两个重要特征</p>
-<ul>
-<li>
-<p>抽象性</p>
-<p>用ADT描述程序处理的实体时，强调的是其本质的特征、其所能完成的功能以及它和外部用户的接口（即外界使用它的方法）。</p>
-</li>
-<li>
-<p>封装性</p>
-<p>将实体的外部特性和其内部实现细节分离，并且对外部用户隐藏其内部实现细节。</p>
-</li>
-</ul>
-<h1 id="抽象数据类型的表示和实现">抽象数据类型的表示和实现</h1>
-<p>抽象数据类型需要通过固有数据类型（高级编程语言中已实现的数据类型）来实现。</p>
-<h1 id="算法和算法分析">算法和算法分析</h1>
-<h2 id="算法定义">算法定义</h2>
-<p>算法是为了解决某类问题而规定的一个有限长的操作序列。</p>
-<h2 id="算法应具有的性质">算法应具有的性质</h2>
-<ol>
-<li>
-<p>正确性</p>
-<p>正确性指必须完成所期望的功能，对算法是否“<strong>正确</strong>”的理解可以有如下<strong>四个层次</strong>：</p>
-<ul>
-<li>程序中不含任何语法错误。</li>
-<li>程序对于几组输入数据能够得出满足要求的结果。</li>
-<li>程序对于精心选择的、典型的、苛刻的并带有刁难性的几组输入数据能够得出满足要求的结果。</li>
-<li>程序对于一切输入数据都能得出满足要求的结果。</li>
-</ul>
-</li>
-<li>
-<p>具体性</p>
-<p>一个算法必须由一系列<strong>具体操作</strong>组成，这时的“<strong>具体</strong>”指的所有操作都必须经过<strong>已实现</strong>的基本操作有限次来实现，并且所有操作都是可读的、可执行的，<strong>每一操作</strong>必须在<strong>有限时间</strong>内完成。</p>
-</li>
-<li>
-<p>确定性</p>
-<p><strong>算法中</strong>的所有操作都必须有<strong>确切的含义</strong>，不能产生歧义，算法的执行者或阅读者都能明确其<strong>含义</strong>及<strong>如何执行</strong>。</p>
-</li>
-<li>
-<p>有限性</p>
-<p>对于任意一组合法输入值，在执行<strong>有限步骤</strong>之后一定能结束，即：算法中的每个步骤都能在<strong>有限时间</strong>内完成</p>
-</li>
-<li>
-<p>可读性</p>
-<p><strong>算法</strong>应具备良好的<strong>可读性</strong>，这样的算法有利于算法的查错及对算法的理解，一般算法的<strong>逻辑必须清楚、结构简单</strong>，所有标识符必须具有<strong>实际含义</strong>，能<strong>见名知义</strong>。</p>
-</li>
-<li>
-<p>健壮性</p>
-<p>健壮性指当<strong>输入数据非法</strong>时，算法能作<strong>适当的处理</strong>并作出反应，而不应死机或输出异常结果</p>
-</li>
-</ol>
-<h2 id="算法描述方法">算法描述方法</h2>
-<ol>
-<li>
-<p>用自然语言描述算法</p>
-<p>用我们日常生活中的自然语言（可以是中文形式，也可以是英文形式）也可以描述算法</p>
-</li>
-<li>
-<p>用流程图描述算法</p>
-<p>一个算法可以用流程图的方式来描述，输入输出、判断、处理分别用不同的框图表示，用箭头表示流程的流向。这是一种描述算法的较好方法，目前在一些高级语言程序设计中仍然采用。也有其他的图形辅助工具</p>
-</li>
-<li>
-<p>用其它方式描述算法</p>
-<p>我们还可以用数学语言或约定的符号语言来描述算法。</p>
-</li>
-<li>
-<p>用C++描述算法</p>
-</li>
-</ol>
-<p>为表示各种状态信息，定义枚举类型StatusCode供使用，具体声明如下：</p>
-<pre><code class="language-cpp">// 自定义类型
-enum StatusCode {
-SUCCESS, FAIL, UNDER_FLOW, OVER_FLOW,RANGE_ERROR, DUPLICATE_ERROR, NOT_PRESENT, ENTRY_INSERTED, ENTRY_FOUND, VISITED, UNVISITED
-};
-</code></pre>
-<h2 id="算法和程序的关系">算法和程序的关系</h2>
-<p>算法着重体现思路和方法，程序着重体现计算机的实现。</p>
-<p>程序不一定满足有穷性（死循环），另外，程序中的指令必须是机器可执行的，算法中的指令无此限制。</p>
-<p>一个算法若用计算机语言来书写，它就是一个程序。</p>
-<h1 id="算法评价标准">算法评价标准</h1>
-<p>时间特性(时间复杂度<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>T</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">T(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span> ):度量算法执行的时间长短</p>
-<p>空间特性(空间复杂度<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">S(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span> )：度量算法所需存储空间的大小</p>
-<h2 id="算法的时间复杂度">算法的时间复杂度</h2>
-<p>一个特定<strong>算法的“运行工作量”<strong>的大小，只依赖于</strong>问题的规模</strong>（通常用整数量 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 表示），或者说，<strong>它是问题规模的函数</strong>。</p>
-<p><strong>算法的运行时间与运行工作量的增长率相同。算法花费的时间与算法中语句的执行次数成正比例。一个算法中语句执行次数称为语句频度或时间频度。记为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>T</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">T(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span>。</strong></p>
-<p>假如，随着问题规模 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 的增长，算法执行时间的增长率和 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>f</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">f(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span> 的增长率相同，则可记作：</p>
-<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>T</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>=</mo><mi>O</mi><mo>(</mo><mi>f</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">T (n) = O(f(n))
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span></p>
-<p>称 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>T</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">T (n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span> 为算法的<strong>渐近时间复杂度</strong>。</p>
-<p>算法的时间复杂度越低，算法的效率越高。</p>
-<p>将基本语句执行次数的数量级放入大 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi></mrow><annotation encoding="application/x-tex">O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span></span></span></span> 记号中，用大 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi></mrow><annotation encoding="application/x-tex">O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span></span></span></span> 记号表示算法的时间性能，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi></mrow><annotation encoding="application/x-tex">O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span></span></span></span> 表示量级。</p>
-<p>常见的时间复杂度有：<br>
-<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo>(</mo><mn>1</mn><mo>)</mo><mi mathvariant="normal">，</mi><mi>O</mi><mo>(</mo><mi>n</mi><mo>)</mo><mi mathvariant="normal">，</mi><mi>O</mi><mo>(</mo><msup><mi>n</mi><mn>2</mn></msup><mo>)</mo><mi mathvariant="normal">，</mi><mi>O</mi><mo>(</mo><msup><mi>n</mi><mn>3</mn></msup><mo>)</mo><mi mathvariant="normal">，</mi><mi>O</mi><mo>(</mo><mi>l</mi><mi>o</mi><msub><mi>g</mi><mn>2</mn></msub><mi>n</mi><mo>)</mo><mo>…</mo></mrow><annotation encoding="application/x-tex">O(1)，O(n)，O(n^2)，O(n^3)，O(log_2n) …</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mord cjk_fallback">，</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mord cjk_fallback">，</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord cjk_fallback">，</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord cjk_fallback">，</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span></span></span></span><br>
-例：</p>
-<pre><code class="language-cpp">x = x + 1;
-for(i = 1;i &lt;= n;i++)
-    x = x + 1;
-for(i = 1;i &lt;= n;i++)
-    for(j = 1;j &lt;= n;j++)
-        x = x + 1;
-</code></pre>
-<p>例：矩阵元素之和</p>
-<pre><code class="language-cpp">template &lt;class ElemType&gt;
-ElemType Sum( ElemType a[][MAX_SIZE], int n)
-// 操作结果: 返回矩阵a中元素之和
-{
-	ElemType s = 0;		// 暂存和
-	for (int row = 0; row &lt; n; row++)
-		for (int col = 0; col &lt; n; col++)
-			s = s + a[row][col];	// 遍历求和
-	return s;			// 返回元素之和
-}
-</code></pre>
-<p>基本操作: 加法“<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>+</mo></mrow><annotation encoding="application/x-tex">+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord">+</span></span></span></span>”</p>
-<p>时间复杂度: <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo>(</mo><msup><mi>n</mi><mn>2</mn></msup><mo>)</mo></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></p>
-<h2 id="算法的空间复杂度">算法的空间复杂度</h2>
-<p>算法的空间复杂度定义为:</p>
-<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>=</mo><mi>O</mi><mo>(</mo><mi>g</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">S(n) = O(g(n))
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span></p>
-<p>表示随着问题规模 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 的增大，算法运行所需存储量S(n)的增长率与 g(n) 的增长率相同，称S(n)(渐近)空间复杂度。</p>
 ]]></content>
     </entry>
 </feed>
