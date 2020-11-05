@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="keywords" content="Gridea静态个人博客">
+<meta name="description" content="七叶今天码代码了吗">
+<meta name="theme-color" content="#000">
+<title>数据库——中级SQL | 七叶的个人小站</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1604560535306">
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="stylesheet" href="/media/css/muse.css">
+
+<link rel="stylesheet" href="/media/fonts/font-awesome.css">
+<link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Rosario:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+<link href="/media/hljs/styles/androidstudio.css" rel="stylesheet">  
+
+<script src="/media/hljs/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.0/velocity.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.0/velocity.ui.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+
+    <meta name="description" content="数据库——中级SQL" />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div class="head-top-line"></div>
+    <div class="header-box">
+      
+<div class=" muse">
+  <header class="header bg-color ">
+    <div class="blog-header box-shadow-wrapper  " id="header">
+      <div class="nav-toggle" id="nav_toggle">
+        <div class="toggle-box">
+          <div class="line line-top"></div>
+          <div class="line line-center"></div>
+          <div class="line line-bottom"></div>
+        </div>
+      </div>
+      <div class="site-meta">       
+        <div class="site-title">
+          
+            <a href="/" class="brand">
+              <span>七叶的个人小站</span>
+            </a>  
+          
+        </div>
+        
+          <p class="subtitle">七叶今天码代码了吗？</p>
+        
+      </div>
+      <nav class="site-nav" id="site_nav">
+        <ul id="nav_ul">
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/" target="_self">
+                  <i class="fa fa-home"></i> 首页
+                </a>
+              
+            </li>
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/archives" target="_self">
+                  <i class="fa fa-archive"></i> 发布时间
+                </a>
+              
+            </li>
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/tags" target="_self">
+                  <i class="fa fa-tags"></i> 标签
+                </a>
+              
+            </li>
+          
+            <li class="nav-item ">
+              
+              
+                <a href="/post/guan-yu-ben-zhan" target="_self">
+                  <i class="fa fa-globe"></i> 关于
+                </a>
+              
+            </li>
+          
+          <li class="nav-item">
+            <a>
+              <i class="fa fa-search"></i> 搜索
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+</div>
+
+<script type="text/javascript"> 
+ 
+  let showNav = true;
+
+  let navToggle = document.querySelector('#nav_toggle'),
+  siteNav = document.querySelector('#site_nav');
+  
+  function navClick() {
+    let sideBar = document.querySelector('.sidebar');
+    let navUl = document.querySelector('#nav_ul');
+    navToggle.classList.toggle('nav-toggle-active');
+    siteNav.classList.toggle('nav-menu-active');
+    if (siteNav.classList.contains('nav-menu-active')) {
+      siteNav.style = "height: " + (navUl.children.length * 42) +"px !important";
+    } else {
+      siteNav.style = "";
+    }
+  }
+
+  navToggle.addEventListener('click',navClick);  
+</script>
+    </div>
+    <div class="main-continer">
+      
+      <div class="section-layout muse bg-color">
+        <div class="section-layout-wrapper">
+          
+
+<div class="sidebar">
+  
+    <div class="sidebar-box box-shadow-wrapper  right-motion" id="sidebar">
+      
+        <div class="post-list-sidebar">
+          <div class="sidebar-title">
+            <span id="tocSideBar" class="sidebar-title-item sidebar-title-active">文章目录</span>
+            <span id="metaSideBar" class="sidebar-title-item">站点概览</span>
+          </div>
+        </div>
+      
+      <div class="sidebar-body muse" id="sidebar_body">
+        
+          
+            <div class="post-side-meta" id="post_side_meta">
+              
+<div class="sidebar-wrapper box-shadow-wrapper ">
+  <div class="sidebar-item">
+    <img class="site-author-image right-motion" src="https://cwlrin.wiki//images/avatar.png"/>
+    <p class="site-author-name">七叶的个人小站</p>
+    <p class="site-description right-motion">七叶今天码代码了吗</p>
+  </div>
+  <div class="sidebar-item side-item-stat right-motion">
+    <div class="sidebar-item-box">
+      <a href="/archives/">
+        
+        <span class="site-item-stat-count">37</span>
+        <span class="site-item-stat-name">文章</span>
+      </a>
+    </div>
+    <div class="sidebar-item-box">
+      <a href="">
+        <span class="site-item-stat-count">6</span>
+        <span class="site-item-stat-name">分类</span>
+      </a>
+    </div>
+    <div class="sidebar-item-box">
+      <a href="/tags/">
+        <span class="site-item-stat-count">6</span>
+        <span class="site-item-stat-name">标签</span>
+      </a>
+    </div>
+  </div>
+  
+  
+    <div class="sidebar-item sidebar-item-social">
+      <div class="social-item">
+        
+          
+            <a href="https://steamcommunity.com/id/20304773/">
+              <i class="fa fa-steam"></i> steam
+            </a>
+          
+            <a href="https://music.163.com/#/user/home?id=411590211">
+              <i class="fa fa-music"></i> 网易云音乐
+            </a>
+          
+            <a href="https://www.zhihu.com/people/ying-xiao-lu-qi-xie">
+              <i class="fa fa-square"></i> 知乎
+            </a>
+          
+            <a href="https://space.bilibili.com/8013992">
+              <i class="fa fa-television"></i> 哔哩哔哩
+            </a>
+          
+        
+        
+      </div>
+    </div>
+  
+
+  <div class="sidebar-item">
+    <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=300 height=460 src="//music.163.com/outchain/player?type=0&id=3147695839&auto=0&height=430"></iframe>
+  </div>
+
+
+</div>
+            </div>
+            <div class="post-toc sidebar-body-active" id="post_toc" style="opacity: 1;">
+              <div class="toc-box right-motion">
+  <div class="toc-wrapper auto-number auto" id="toc_wrapper">
+    <ul class="markdownIt-TOC">
+<li><a href="#%E8%BF%9E%E6%8E%A5%E8%A1%A8%E8%BE%BE%E5%BC%8F">连接表达式</a>
+<ul>
+<li><a href="#%E8%BF%9E%E6%8E%A5%E6%9D%A1%E4%BB%B6">连接条件</a></li>
+<li><a href="#%E5%A4%96%E8%BF%9E%E6%8E%A5">外连接</a>
+<ul>
+<li><a href="#%E5%B7%A6%E5%A4%96%E8%BF%9E%E6%8E%A5">左外连接</a></li>
+<li><a href="#%E5%8F%B3%E5%A4%96%E8%BF%9E%E6%8E%A5">右外连接</a></li>
+<li><a href="#%E5%85%A8%E5%A4%96%E8%BF%9E%E6%8E%A5">全外连接</a></li>
+</ul>
+</li>
+<li><a href="#%E8%BF%9E%E6%8E%A5%E7%B1%BB%E5%9E%8B%E5%92%8C%E6%9D%A1%E4%BB%B6">连接类型和条件</a></li>
+</ul>
+</li>
+<li><a href="#%E8%A7%86%E5%9B%BE">视图</a>
+<ul>
+<li><a href="#%E8%A7%86%E5%9B%BE%E5%AE%9A%E4%B9%89">视图定义</a></li>
+<li><a href="#sql%E6%9F%A5%E8%AF%A2%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%A7%86%E5%9B%BE">SQL查询中使用视图</a></li>
+<li><a href="#%E7%89%A9%E5%8C%96%E8%A7%86%E5%9B%BE">物化视图</a></li>
+<li><a href="#%E8%A7%86%E5%9B%BE%E6%9B%B4%E6%96%B0">视图更新</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BA%8B%E5%8A%A1">事务</a></li>
+<li><a href="#%E5%AE%8C%E6%95%B4%E6%80%A7%E7%BA%A6%E6%9D%9F">完整性约束</a>
+<ul>
+<li><a href="#not-null%E7%BA%A6%E6%9D%9F">Not Null约束</a></li>
+<li><a href="#unique%E7%BA%A6%E6%9D%9F">unique约束</a></li>
+<li><a href="#check-%E5%AD%90%E5%8F%A5">check 子句</a></li>
+<li><a href="#%E5%8F%82%E7%85%A7%E5%AE%8C%E6%95%B4%E6%80%A7">参照完整性</a></li>
+<li><a href="#%E4%BA%8B%E5%8A%A1%E4%B8%AD%E5%AF%B9%E5%AE%8C%E6%95%B4%E6%80%A7%E7%BA%A6%E6%9D%9F%E7%9A%84%E8%BF%9D%E5%8F%8D">事务中对完整性约束的违反</a></li>
+<li><a href="#%E5%A4%8D%E6%9D%82check%E6%9D%A1%E4%BB%B6%E4%B8%8E%E6%96%AD%E8%A8%80">复杂check条件与断言</a></li>
+</ul>
+</li>
+<li><a href="#sql%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%B8%8E%E6%A8%A1%E5%BC%8F">SQL的数据类型与模式</a>
+<ul>
+<li><a href="#sql%E4%B8%AD%E7%9A%84%E6%97%A5%E6%9C%9F%E5%92%8C%E6%97%B6%E9%97%B4%E7%B1%BB%E5%9E%8B">SQL中的日期和时间类型</a></li>
+<li><a href="#%E9%BB%98%E8%AE%A4%E5%80%BC">默认值</a></li>
+<li><a href="#%E5%88%9B%E5%BB%BA%E7%B4%A2%E5%BC%95">创建索引</a></li>
+<li><a href="#%E5%A4%A7%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B">大对象类型</a></li>
+<li><a href="#%E7%94%A8%E6%88%B7%E5%AE%9A%E4%B9%89%E7%9A%84%E7%B1%BB%E5%9E%8B">用户定义的类型</a></li>
+<li><a href="#create-table%E7%9A%84%E6%89%A9%E5%B1%95">create table的扩展</a></li>
+<li><a href="#%E6%A8%A1%E5%BC%8F-%E7%9B%AE%E5%BD%95%E4%B8%8E%E7%8E%AF%E5%A2%83">模式、目录与环境</a></li>
+</ul>
+</li>
+<li><a href="#%E6%8E%88%E6%9D%83">授权</a>
+<ul>
+<li><a href="#%E6%9D%83%E9%99%90%E7%9A%84%E6%8E%88%E4%BA%88%E4%B8%8E%E6%94%B6%E5%9B%9E">权限的授予与收回</a></li>
+<li><a href="#%E8%A7%92%E8%89%B2">角色</a></li>
+<li><a href="#%E8%A7%86%E5%9B%BE%E7%9A%84%E6%8E%88%E6%9D%83">视图的授权</a></li>
+<li><a href="#%E6%A8%A1%E5%BC%8F%E7%9A%84%E6%8E%88%E6%9D%83">模式的授权</a></li>
+<li><a href="#%E6%9D%83%E9%99%90%E7%9A%84%E8%BD%AC%E7%A7%BB">权限的转移</a></li>
+<li><a href="#%E6%9D%83%E9%99%90%E7%9A%84%E6%94%B6%E5%9B%9E">权限的收回</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+</div>
+
+<script>
+
+let lastTop = 0, lList = [], hList = [], postBody, lastIndex = -1; 
+let active = 'active-show', activeClass = 'active-current';
+let tocWrapper = document.querySelector('#toc_wrapper');
+let tocContent = tocWrapper.children[0];
+let autoNumber = tocWrapper&&tocWrapper.classList.contains('auto-number');
+
+function addTocNumber(elem, deep) {
+  if (!elem) {
+    return;
+  }
+  let prop = elem.__proto__;
+
+  if (prop === HTMLUListElement.prototype) {
+    for (let i = 0; i < elem.children.length; i++) {
+      addTocNumber(elem.children[i], deep + (i + 1) + '.');
+    }
+  } else if (prop === HTMLLIElement.prototype) {
+    // 保存li元素
+    if (elem.children[0].__proto__ === HTMLAnchorElement.prototype) {
+      lList.push(elem);
+    }
+    for (let i = 0; i < elem.children.length; i++) {
+      let cur = elem.children[i];
+      if (cur.__proto__ === HTMLAnchorElement.prototype) {
+        if (autoNumber) {
+          cur.text =  deep + ' ' + cur.text;
+        }
+      } else if (cur.__proto__ === HTMLUListElement.prototype) {
+        addTocNumber(cur, deep);
+      }
+    }
+  }
+}
+
+function removeParentActiveClass() {
+  let parents = tocContent.querySelectorAll('.'+active)
+  parents.forEach(function(elem) {
+    elem.classList.remove(active);
+  });
+}
+
+function addActiveClass(index) {
+  if (index >= 0 && index < hList.length) {
+    lList[index].classList.add(activeClass);
+  }
+}
+
+function removeActiveClass(index) {
+  if (index >= 0 && index < hList.length) {
+    lList[index].classList.remove(activeClass);
+  }
+}
+
+function addActiveLiElemment(elem, parent) {
+  if (!elem || elem === parent) {
+    return;
+  } else {
+    if (elem.__proto__ === HTMLLIElement.prototype) {
+      elem.classList.add(active);
+    }
+    addActiveLiElemment(elem.parentElement, parent);
+  }
+}
+
+function showToc() {
+  if (tocWrapper) {
+    postBody = document.querySelector('#post_body');
+    for (let i = 0; i < postBody.children.length; i++) {
+      if (postBody.children[i].__proto__ === HTMLHeadingElement.prototype) {
+        hList.push(postBody.children[i]);
+      }
+    }
+    if (tocWrapper.classList.contains('compress')) {
+        tocContent.classList.add('closed');
+    } else if (tocWrapper.classList.contains('no_compress')){
+      tocContent.classList.add('expanded');
+    } else {
+      if (hList.length > 10) {
+        active = 'active-hidden'
+        tocContent.classList.add('closed');
+      } else {
+        tocContent.classList.add('expanded');
+      }
+    }
+  }
+}
+
+(function() {
+  // 处理不是从#一级标题开始目录
+  if (tocContent.children.length === 1 && tocContent.children[0].__proto__ === HTMLLIElement.prototype) {
+    let con = tocContent.children[0].children[0];
+    tocContent.innerHTML = con.innerHTML;
+  }
+  addTocNumber(tocContent, '');
+})();
+
+document.addEventListener('scroll', function(e) {
+  if (lList.length <= 0) {
+    return;
+  }
+  let scrollTop = document.scrollingElement.scrollTop + 10;
+  let dir;
+
+  if (lastTop - scrollTop > 0) {
+    dir = 'up';
+  } else {
+    dir = 'down';
+  }
+
+  lastTop = scrollTop;
+  if (scrollTop <= 0) {
+    if (lastIndex >= 0 && lastIndex < hList.length) {
+      lList[lastIndex].classList.remove(activeClass);
+    }
+    return;
+  }
+
+  let current = 0, hasFind = false;
+  for (let i = 0; i < hList.length; i++) {
+    if (hList[i].offsetTop > scrollTop) {
+      current = i;
+      hasFind = true;
+      break;
+    }
+  }
+  if (!hasFind && scrollTop > lList[lList.length - 1].offsetTop) {
+    current = hList.length - 1;
+  } else {
+    current--;
+  }
+  if (dir === 'down') {
+    if (current > lastIndex) {
+      addActiveClass(current);
+      removeActiveClass(lastIndex) 
+      lastIndex = current;
+      removeParentActiveClass();
+      lList[current] && addActiveLiElemment(lList[current].parentElement,tocContent);
+    }
+  } else {
+    if (current < lastIndex) {
+      addActiveClass(current);
+      removeActiveClass(lastIndex);
+      lastIndex = current;
+      removeParentActiveClass();
+      lList[current] && addActiveLiElemment(lList[current].parentElement,tocContent);
+    }
+  }
+});
+
+window.addEventListener('load', function() {
+  showToc();
+  document.querySelector('#sidebar').style='display: block;';
+  tocWrapper.classList.add('toc-active');
+  setTimeout(function() {
+    if ("createEvent" in document) {
+      let evt = document.createEvent("HTMLEvents");
+      evt.initEvent("scroll", false, true);
+      document.dispatchEvent(evt);
+    }
+    else {
+      document.fireEvent("scroll");
+    }
+  }, 500)
+})
+
+</script>
+            </div>
+          
+        
+      </div>
+    </div>
+  
+</div>
+<script>
+  const SIDEBAR_TITLE_ACTIVE = 'sidebar-title-active';
+  const SIDEBAR_BODY_ACTIVE = 'sidebar-body-active';
+  const SLIDE_UP_IN = 'slide-up-in';
+
+  let sidebar = document.querySelector('#sidebar'),
+  tocSideBar = document.querySelector('#tocSideBar'),
+  metaSideBar = document.querySelector('#metaSideBar'),
+  postToc = document.querySelector('#post_toc'),
+  postSiteMeta = document.querySelector('#post_side_meta'),
+  sidebarTitle = document.querySelector('.sidebar-title'),
+  sidebarBody = document.querySelector('#sidebar_body');
+
+  tocSideBar && tocSideBar.addEventListener('click', (e) => {
+    toggleSidebar(e);
+  });
+
+  metaSideBar && metaSideBar.addEventListener('click', (e) => {
+    toggleSidebar(e);
+  });
+
+  function toggleSidebar(e) {
+    let currentTitle = document.querySelector("."+SIDEBAR_TITLE_ACTIVE);
+    if (currentTitle == e.srcElement) {
+      return ;
+    }
+    let current, showElement, hideElement;
+    if (e.srcElement == metaSideBar) {
+      showElement = postSiteMeta;
+      hideElement = postToc;
+    } else if (e.srcElement == tocSideBar){
+      showElement = postToc;
+      hideElement = postSiteMeta;
+    }
+    currentTitle.classList.remove(SIDEBAR_TITLE_ACTIVE);
+    e.srcElement.classList.add(SIDEBAR_TITLE_ACTIVE);
+
+    window.Velocity(hideElement, 'stop');
+    window.Velocity(hideElement, 'transition.slideUpOut', {
+      display: 'none',
+      duration: 200,
+      complete: function () {
+        window.Velocity(showElement, 'transition.slideDownIn', {
+          duration: 200
+        });
+      }
+    })
+    hideElement.classList.remove(SIDEBAR_BODY_ACTIVE);
+    showElement.classList.add(SIDEBAR_BODY_ACTIVE);
+  }
+
+  postToc && postToc.addEventListener('transitionend', function() {
+    this.classList.remove(SLIDE_UP_IN);
+  });
+
+  if (sidebarBody) {
+    if (sidebarBody.classList.contains('pisces') || sidebarBody.classList.contains('gemini')) {
+      let hasFix = false;
+      let scrollEl = document.querySelector('.main-continer');
+      let limitTop = document.querySelector('#nav_ul').children.length * 42 + 162;
+      window.addEventListener('scroll', function(e) {
+        if (document.scrollingElement.scrollTop >= limitTop) {
+          if (!hasFix) {
+            sidebar.classList.add('sidebar-fixed');
+            hasFix = true;
+          }
+        } else {
+          if (hasFix) {
+            sidebar.classList.remove('sidebar-fixed');
+            hasFix = false;
+          }
+        }
+      });
+    }
+  }
+  
+</script>
+          <div class="section-box box-shadow-wrapper">
+            <div class="section bg-color post post-page">
+              <header class="post-header">
+  <h1 class="post-title">
+    <a class="post-title-link" href="https://cwlrin.wiki/post/shu-ju-ku-zhong-ji-sql/">
+      数据库——中级SQL
+    </a>
+  </h1>
+  <div class="post-meta">
+    
+    <span class="meta-item pc-show">
+      <i class="fa fa-calendar-o"></i>
+      <span>发布于</span>
+      <span>2020-11-05</span>
+      <span class="post-meta-divider pc-show">|</span>
+    </span>
+    
+    <span class="meta-item">
+      <i class="fa fa-clock-o"></i>
+      <span>22分钟</span>
+    </span>
+    <span class="meta-item">
+      <span class="post-meta-divider">|</span>
+      <i class="fa fa-file-word-o"></i>
+      <span>5428<span class="pc-show">字数</span></span>
+    </span>
+    
+      
+      
+        
+      
+      <span id="/post/shu-ju-ku-zhong-ji-sql/" data-flag-title="数据库——中级SQL" class="meta-item pc-show leancloud_visitors">
+        <span class="post-meta-divider">|</span>
+        <i class="fa fa-eye"></i>
+        <span>浏览量：<span class="leancloud-visitors-count" ></span></span>
+      </span>
+    
+  </div>
+</header>
+              <div class="post-body next-md-body" id="post_body">
+                <h1 id="连接表达式">连接表达式</h1>
+<h2 id="连接条件">连接条件</h2>
+<p>on：允许在参与连接的关系上设置通用的谓词</p>
+<pre><code class="language-sql">select * from student join takes on student.ID = takes.ID；
+</code></pre>
+<p>on表明：如果一个来自 student 的元组和一个来自 takes 的元组在 ID 上的取值相同，那么他们是匹配的</p>
+<pre><code class="language-sql">on student.ID = takes.ID    student natural join takes
+select * from student join takes where student.ID = takes.ID；
+</code></pre>
+<p>只显示一次ID</p>
+<pre><code class="language-sql">select student.ID  as ID , name , dept_name , tot_cred , course_id , sec_id , semester , year , grade from student join takes on student.ID = takes.ID；
+</code></pre>
+<p>on 条件可以表示任何SQL谓词，从而使用on条件的连接表达式就可以表示比自然连接更为丰富的连接条件</p>
+<p>使用带on条件的连接表达式的查询可以用不带on条件的等价表达式来替换，只要把on字句中的谓词移到where子句中即可</p>
+<p>引入on条件的优点：</p>
+<ul>
+<li>外连接：on条件的表现与where条件是不同的</li>
+<li>on子句中指定连接条件，并在where子句中出现其余的条件，这样的SQL查询更易懂</li>
+</ul>
+<h2 id="外连接">外连接</h2>
+<p>显示所有学生的ID、name、dept_name、tot_cred</p>
+<pre><code class="language-sql">select * from student natural join takes；
+</code></pre>
+<ul>
+<li>在参与连接的任何一个或两个关系中的某些元组可能会“丢失”</li>
+</ul>
+<p>外连接（outer join）运算：在结果中创建空值元组</p>
+<ul>
+<li>
+<p>左外连接</p>
+<p>内连接+左边失配的元组（缺少的右边关系属性用null）</p>
+</li>
+<li>
+<p>右外连接</p>
+<p>内连接+右边失配的元组（缺少的左边关系属性用null）</p>
+</li>
+<li>
+<p>全外连接</p>
+<p>内连接 + 左边失配的元组（缺少的右边关系属性用null）+ 右边失配的元组（缺少的左边关系属性用null）</p>
+</li>
+<li>
+<p>内连接</p>
+<p>舍弃不匹配的元组</p>
+</li>
+</ul>
+<h3 id="左外连接">左外连接</h3>
+<p>计算内连接结果</p>
+<p>对于在内连接的左侧关系中任意一个与右侧关系中任何元组都不匹配的元组 t，向连接结果中加入一个元组 r，r 的构造如下：</p>
+<ul>
+<li>元组 r 从左侧的关系得到的属性被赋为 t 中的值</li>
+<li>r 的其他属性被赋为 null</li>
+</ul>
+<p>查询一门课也没有选修的学生</p>
+<pre><code class="language-sql">select ID 
+from student natural left outer join takes
+where course_id is null;
+</code></pre>
+<h3 id="右外连接">右外连接</h3>
+<p>计算内连接结果</p>
+<p>对于在内连接的右侧关系中任意一个与左侧关系中任何元组都不匹配的元组 t，向连接结果中加入一个元组 r，r 的构造如下：</p>
+<ul>
+<li>元组 r 从右侧的关系得到的属性被赋为 t 中的值</li>
+<li>r 的其他属性被赋为null</li>
+</ul>
+<h3 id="全外连接">全外连接</h3>
+<p>左外连接和右外连接的组合</p>
+<p>内连接结果计算出来之后，左侧关系中个不匹配右侧关系任何元组的元组被添上空置并加到结果中；右侧关系执行同样操作</p>
+<p>查询：显示Comp.Sci.系所有学生以及他们在2009年春季选修的所有课程段的列表</p>
+<pre><code class="language-sql">select *
+from ( select *
+    	from student
+    	where dept_name=‘Comp.Sci’)
+natural full outer join
+(select *
+from takes
+where semester=‘Spring’ and year=2009);
+
+</code></pre>
+<p>on 子句可以和外连接一起使用</p>
+<pre><code class="language-sql">select * from student left outer join takes on studen.ID = takes.ID ; #ID出现两次
+</code></pre>
+<p>on 和 where 在连链接中的表现是不同的</p>
+<ul>
+<li>外连接：为那些对相应内连接结果没有贡献的元组补上null并加入结果</li>
+<li>on：外连接声明的一部分</li>
+<li>where子句不是</li>
+</ul>
+<pre><code class="language-sql">select * from student left outer join takes where studen.ID = takes.ID ;
+</code></pre>
+<h2 id="连接类型和条件">连接类型和条件</h2>
+<table>
+<thead>
+<tr>
+<th>连接类型</th>
+<th>连接条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>inner join</td>
+<td>nature</td>
+</tr>
+<tr>
+<td>left outer  join</td>
+<td>on&lt;谓词&gt;</td>
+</tr>
+<tr>
+<td>right outer join</td>
+<td>using <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">(A_1, A_2 ,…, A_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td>full outer join</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>自然连接</p>
+<ul>
+<li>出现在结果关系中的两个连接关系的元组在公共属性上取值相等，且公共属性只出现一次<br>
+on &lt;谓词P&gt;</li>
+<li>出现在结果关系中的两个连接关系的元组在公共属性上取值满足谓词条件P，且公共属性出现两次<br>
+using <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">(A_1, A_2 ,…, A_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></li>
+<li><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">(A_1, A_2 ,…, A_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 是两个连接关系的公共属性的子集，元组在 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">(A_1, A_2 ,…, A_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 上取值相等，且 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">(A_1, A_2 ,…, A_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 只出现一次</li>
+</ul>
+<h1 id="视图">视图</h1>
+<p>让所有用户都看到数据库的整个逻辑模型是不合适的，出于安全考虑，可能需要向用户隐藏特定的数据。</p>
+<p>考虑一个职员需要知道教师的标识、姓名和所在院系，但是没有权限看到教师工资值</p>
+<pre><code class="language-sql">select ID, name, dept_name
+from instructor
+</code></pre>
+<p>虚关系：概念上包含查询的结果，并不预先计算并存储，而是在使用虚关系的时候才通过执行查询被计算出来.</p>
+<p>视图：任何像这种不是逻辑模型的一部分，但作为虚关系对用户可见的关系.</p>
+<p>在任何给定的实际关系集合上能够支持大量视图</p>
+<h2 id="视图定义">视图定义</h2>
+<p>SQL中用create view 命令定义视图， 具体的格式为</p>
+<pre><code class="language-sql">create view v as &lt; query expression &gt;
+</code></pre>
+<p><query expression> 是任何合法的 SQL 表达式 。 v 表示视图名称</p>
+<p>例如：访问instructor关系中除salary之外的所有数据的职员</p>
+<pre><code class="language-sql">create view faculty as
+select ID , name , dept_name
+from instructor; 
+</code></pre>
+<p>Physics系2009年秋季学期所开设的所有课程段列表，其中包括每个课程段在哪栋建筑的哪个房间授课信息</p>
+<pre><code class="language-sql">create view physics_fall_2009 as
+select course.course_id , sec_id , building , room_number 
+from course, section
+where course.course_id = section.course_id
+        and course.dept_name = ‘Physics’
+        and section.semeter = ‘Fall ’
+        and section.year = ‘2009’ ;
+</code></pre>
+<h2 id="sql查询中使用视图">SQL查询中使用视图</h2>
+<p>一旦定义了一个视图，就可以用视图名指代该视图生成的虚关系</p>
+<pre><code class="language-sql">create view physics_fall_2009 as
+select course.course_id, sec_id, building, room_number
+from course, section
+where course.course_id = section.course_id
+	and course.dept_name = ’Physics’
+	and section.semester = ’Fall’
+	and section.year = ’2009’;
+</code></pre>
+<pre><code class="language-sql">select course_id from physics_fall_2009 where building = ‘Watson’;
+</code></pre>
+<p>视图的属性名可以按下述方式显式指定：</p>
+<pre><code class="language-sql">create view departments_total_salary(dept_name, total_salary) as
+select dept_name, sum (salary)
+from instructor
+group by dept_name;
+</code></pre>
+<p>直觉上，在任何给定时刻，视图关系中的元组集是该时刻视图定义中的查询表达式的计算结果。</p>
+<p>如果一个视图关系被计算并存储，一旦用于定义该视图的关系被修改，视图就会过期</p>
+<p>视图通常这样来实现：</p>
+<ul>
+<li>当我们定义一个视图时，数据库系统存储视图的定义本身，而不存储定义该视图的查询表达式的执行结果</li>
+</ul>
+<p>一个视图可能被用到定义另一个视图表达式中</p>
+<pre><code class="language-sql">create view physics_fall_2009_watson as
+	select course_id, room_number
+	from physics_fall_2009
+	where building= ’Watson’;
+</code></pre>
+<pre><code class="language-sql">create view physics_fall_2009_watson as
+(select course_id, room_number
+from (select course.course_id, building, room_number
+          from course, section
+          where course.course_id = section.course_id
+               and course.dept_name = ’Physics’
+               and section.semester = ’Fall’
+               and section.year = ’2009’)
+where building= ’Watson’;
+</code></pre>
+<h2 id="物化视图">物化视图</h2>
+<p>物化视图（materializing view）: 特定数据库系统允许存储视图关系，但是它们保证：如果用于定义视图的实际关系改变，视图也跟着改变</p>
+<pre><code class="language-sql"> create view departments_total_salary(dept_name, total_salary) as
+ select dept_name, sum (salary)
+ from instructor
+ group by dept_name;
+
+</code></pre>
+<p>保持物化视图一直在最新状态的过程称为物化视图维护（ materializing view maintenance），或者通常简称视图维护（ view maintenance ）</p>
+<ul>
+<li>更新后立即视图维护</li>
+<li>访问时维护</li>
+<li>周期性物化视图更新</li>
+</ul>
+<h2 id="视图更新">视图更新</h2>
+<p>用视图表达的数据库修改必须被翻译为对数据库逻辑模型中实际关系的修改</p>
+<p>例如：视图faculty被提供给一个职员</p>
+<pre><code class="language-sql">insert into faculty values( ‘30765’, ‘Green’, ‘Music’);
+</code></pre>
+<p>插入应表示为对instructor关系的插入   salary？</p>
+<ol>
+<li>拒绝插入，返回错误信息</li>
+<li>向 instructor 关系插入元组 <code>( ‘30765’, ‘Green’, ‘Music’,null)</code></li>
+</ol>
+<pre><code class="language-sql">create view instructor_info as
+select ID, name, building
+from instructor , department
+where instructor.dept_name = department. dept_name;
+</code></pre>
+<pre><code class="language-sql">insert into instructor_info values(‘69987’,’White’,’Taylor’ );
+</code></pre>
+<p>向 instructor 中插入元组 <code>(‘69987’,’White’,null,null )</code></p>
+<p>向 department 中插入元组 <code>(null，’Taylor’，null )</code></p>
+<p>一般不允许对视图关系进行修改</p>
+<p>不同的数据库系统指定了不同的条件以允许更新视图关系；参考数据库系统手册</p>
+<p>如果定义视图的查询对下列条件都能满足，我们称SQL视图是可更新的。</p>
+<ul>
+<li>from子句中只有一个数据库关系</li>
+<li>select子句中只包含关系的属性名，不包含任何表达式、聚集或distinct声明</li>
+<li>任何没有出现在select子句中的属性可以取空值；即这些属性上没有not null约束，也不构成主码的一部分</li>
+<li>查询中不含有group by或having子句</li>
+</ul>
+<pre><code class="language-sql">create view history_instrustors as
+select * from instructor where dept_name = ‘History’ ;
+</code></pre>
+<h1 id="事务">事务</h1>
+<p>事务（transaction）由查询和（或）更新语句的序列组成</p>
+<p>SQL标准规定当一条SQL语句被执行，就隐式地开始了一个事务</p>
+<ul>
+<li>Commit work：提交当前事务</li>
+<li>Rollback work：回滚当前事务</li>
+</ul>
+<p>一个事务或者在完成所有步骤后提交其行为，或者在不能成功完成其所有动作的情况下回滚其所有动作，通过这种方式数据库提供了对事物具有原子性的抽象</p>
+<p>默认方式下，每个SQL语句自成一个事务，且一执行完就提交</p>
+<p>如果一个事物要执行多条SQL语句，就必须关闭单独SQL语句的自动提交</p>
+<h1 id="完整性约束">完整性约束</h1>
+<p>完整性约束（Integrity constraints）保证授权用户对数据库所做的修改不会破坏数据库的一致性.</p>
+<p>一般来说，完整性约束可以是属于数据库的任意谓词</p>
+<p>完整性约束通常被看作是数据库模式设计过程的一部分</p>
+<h2 id="not-null约束">Not Null约束</h2>
+<p>not null</p>
+<p>宣布名称和预算不为空。</p>
+<pre><code class="language-sql">name varchar(20) not null
+budget numeric(12,2) not null
+</code></pre>
+<p>not null声明禁止在属性上插入空值</p>
+<p>任何可能导致向一个声明为not null的属性插入空值的数据库修改都会产生错误诊断信息</p>
+<p>例如：SQL禁止在关系模式的主码中出现空值</p>
+<h2 id="unique约束">unique约束</h2>
+<p>唯一性 ( <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">A_1, A_2, …, A_m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>)</p>
+<p>唯一的规范规定，属性 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">A_1, A_2, …, A_m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 形成一个候选码。</p>
+<p>候选码允许为空（与主码相反）</p>
+<h2 id="check-子句">check 子句</h2>
+<p>check (P)：指定谓词P，关系中的每个元组都必须满足P，其中P是一个谓词</p>
+<p>例如：确保学期是秋、冬、春、夏中的一个。</p>
+<pre><code class="language-sql">create table section (
+    course_id varchar (8),
+    sec_id varchar (8),
+    semester varchar (6),
+    year numeric (4,0),
+    building varchar (15),
+    room_number varchar (7),
+    time slot id varchar (4), 
+    primary key (course_id, sec_id, semester, year),
+    check (semester in (’Fall’, ’Winter’, ’Spring’, ’Summer’)));
+</code></pre>
+<h2 id="参照完整性">参照完整性</h2>
+<p>参照完整性（referential integrity）：一个关系中给定属性上的取值也在另一个关系的特定属性集的取值中出现.</p>
+<p>例如， 如果 &quot;生物学 &quot;是出现在教师关系中的一个元组中的部门名称，那么在部门关系中就存在一个 &quot;生物学 &quot;的元组。</p>
+<p>让 A 是一组属性，让 R 和 S 是两个包含属性 A 的关系，其中 A 是 S 的主码。 让 R 和 S 是两个包含属性 A 的关系，其中 A 是 S 的主码，如果 A 的任何值出现在 R 中，这些值也出现在 S 中，则称 A 是 R 的外码。</p>
+<pre><code class="language-sql">create table course (
+	course_id   char(5) primary key,
+	title             varchar(20),
+	dept_name varchar(20) references department)
+</code></pre>
+<pre><code class="language-sql">create table course (
+	…
+	dept_name varchar(20),
+	foreign key (dept_name) references department
+	on delete cascade
+	on update cascade,)
+</code></pre>
+<p>级联的替代动作：设置null，设置默认值。</p>
+<p>SQL中外码参照的是被参照表中的主码属性</p>
+<p>references子句</p>
+<p>指定的属性列表必须声明为被参照关系的候选码，primary key或unique约束</p>
+<pre><code class="language-sql">dept_name varchar(20) references department
+</code></pre>
+<p>当违反参照完整性约束时，通常的处理是拒绝执行导致完整性破坏的操作</p>
+<p>在foreign key子句中可以指明：如果被参照关系上的删除或更新动作违反了约束，那么系统必须采取一些步骤通过修改参照关系中的元组来恢复完整性约束，而不是拒绝这样的动作</p>
+<pre><code class="language-sql">create table course
+    ( …
+       foreign key (dept_name) references department
+              on delete cascade
+              on update cascade,
+       …);
+</code></pre>
+<h2 id="事务中对完整性约束的违反">事务中对完整性约束的违反</h2>
+<p>事务可能包括几个步骤，在某一步之后完整性约束也许会暂时被违反，但是后面的某一步也许就会消除这个违反</p>
+<p>SQL允许将initially deferred 子句加入到约束声明中；完整性约束不是在事物的中间步骤上检查，而是在事物结束时检查</p>
+<p>一个约束可以被指定为可延迟的（deferrable）</p>
+<p>默认：立即检查约束</p>
+<p>许多数据库实现不支持延迟约束检查</p>
+<h2 id="复杂check条件与断言">复杂check条件与断言</h2>
+<p>check子句中的谓词可以是包含子查询的任意谓词</p>
+<pre><code class="language-sql">check (time_slot_id in (select time_slot_id from time_slot))
+</code></pre>
+<p>每个课程段都需要有至少一位教师来讲授.</p>
+<p>复杂check条件在确保数据完整性时是很有效的，但其检测开销可能会很大</p>
+<p>一个断言（assertion）就是一个谓词，表达了我们希望数据库总能满足的一个条件</p>
+<p>域约束和参照完整性约束是断言的特殊形式</p>
+<pre><code class="language-sql">create assertion &lt;assertion-name&gt; check &lt;predicate&gt;;
+</code></pre>
+<p>创建断言时，要检测其有效性<br>
+目前，还没有一个广泛使用的数据库系统支持在check子句的谓词中使用子查询或create assertion结构</p>
+<h1 id="sql的数据类型与模式">SQL的数据类型与模式</h1>
+<h2 id="sql中的日期和时间类型">SQL中的日期和时间类型</h2>
+<p>date: 日期，包含（4位数）年、月、日。</p>
+<p>Example:  <code>date ‘2015-7-27’</code></p>
+<p>time: 一天中的时间，以时、分、秒为单位。</p>
+<p>Example:  <code>time ‘09:00:30’</code>          <code>time ‘09:00:30.75’</code></p>
+<p>timestamp: 日期加当天时间</p>
+<p>Example:  <code>timestamp ‘2015-7-27 09:00:30.75’</code></p>
+<p>cast e as t</p>
+<ul>
+<li>e:字符串（字符串表达式）</li>
+<li>t：time、date、timestamp</li>
+</ul>
+<p>extract（field from d）</p>
+<ul>
+<li>
+<p>从date或time值d中提取单独的域，可以是year、month、day、hour、minute、second</p>
+</li>
+<li>
+<p>时区信息可以用timezone_hour、timezone_minute来提取</p>
+</li>
+</ul>
+<p>current_date  返回当前日期</p>
+<p>current_time   返回当前时间（带时区）</p>
+<p>localtime   返回当前的本地时间（不带时区）</p>
+<p>current_timestamp（带时区）、localtimestamp（本地日期和时间，不带时区）    返回时间戳</p>
+<p>SQL允许在以上所有类型上进行比较运算，也允许在各种数字类型上进行算术运算和比较运算</p>
+<h2 id="默认值">默认值</h2>
+<p>SQL允许为属性指定默认值</p>
+<pre><code class="language-sql">create table student
+（ID varchar(5),
+   name varchar(20) not null,
+   dept_name varchar(20),
+   tot_cred numeric(3,0) default 0,
+   primary key(ID)）;
+insert into student (ID, name , depe_name) values (‘12789’, ‘Newman’, ‘Comp.Sci’);
+</code></pre>
+<h2 id="创建索引">创建索引</h2>
+<p>索引（index）：一种数据结构，允许数据库系统高效地找到关系中那些在索引属性上取给定值的元组，而不用扫描关系中的所有元组</p>
+<pre><code class="language-sql">create table student
+(ID varchar (5),
+name varchar (20) not null,
+dept_name varchar (20),
+tot_cred numeric (3,0) default 0,
+primary key (ID))
+</code></pre>
+<pre><code class="language-sql">create index studentID_index on student(ID)；
+</code></pre>
+<p>如果用户提交的SQL查询可以从索引的使用中获益，那么SQL查询处理器救护自动使用索引</p>
+<p>给定的SQL查询是选出ID为22201的student元组，SQL查询处理器就会使用studentID_index索引来找到所需元组，而不用读取整个关系</p>
+<h2 id="大对象类型">大对象类型</h2>
+<p>大对象（照片、视频、CAD文件等）以大对象的形式存储。</p>
+<ul>
+<li>blob（二进制数据的大对象数据类型）：二进制大对象————对象是未解释的二进制数据的大集合（其解释留给数据库系统之外的应用程序）。</li>
+<li>clob（字符数据的大对象数据类型）：字符大对象————对象是字符数据的大集合。</li>
+</ul>
+<p>“定位器”：JDBC应用接口允许获取一个定位器而不是整个大对象；然后用定位器一点一点取出大对象</p>
+<h2 id="用户定义的类型">用户定义的类型</h2>
+<p>独特类型（distinct type）</p>
+<p>结构化数据类型（structured data type）：允许创建具有嵌套记录结构、数组和多重集的复杂数据类型</p>
+<p>create type 子句定义新类型：强类型检查</p>
+<pre><code class="language-sql">create type Dollars as numeric (12,2) final 
+create type Pounds as numeric (12,2) final
+create table department
+(dept_name varchar (20),
+building varchar (15),
+budget Dollars);
+</code></pre>
+<p>cast：强制类型转换</p>
+<pre><code class="language-sql">cast(department.budget to numeric(12,2))
+</code></pre>
+<p>drop type、alter type</p>
+<p>类型和域的差别</p>
+<ul>
+<li>在域上可以声明约束，例如not null，也可以为域类型变量定义默认值，然而在用户定义类型上不能声明约束或默认值。设计用户定义类型不仅是用它来指定属性类型，而且还将它用在不能施加约束的地方对SQL进行过程扩展</li>
+<li>域并不是强制类型的。一个域类型的值可以被赋给另一个域类型，只要它们的基本类型是相容的<br>
+check子句应用到域上时，允许模式设计者指定一个谓词，被声明为来自该域的任何变量都必须满足这个谓词</li>
+</ul>
+<pre><code class="language-sql">create domain YearlySalary numeric(8,2)
+constraint salary_value_test check (value&gt;=29000.00)
+</code></pre>
+<p>使用in子句可以限定一个域只包含指定的一组值：</p>
+<pre><code class="language-sql">create domain degree_level varchar(10)
+constraint degree_level_test
+check (value in (’Bachelors’, ’Masters’,’Doctorate’));
+</code></pre>
+<h2 id="create-table的扩展">create table的扩展</h2>
+<p>create table like</p>
+<pre><code class="language-sql">create table temp_instructor like instructor;
+</code></pre>
+<p>书写复杂查询时，把查询结果存储成一个新表通常是很有用的，这个表通常是临时的</p>
+<p>需要两种语句，一条用于创建表（具有合适的列），另一条用于把查询结果插入到表中</p>
+<p>SQL：2003提供了一种更简单的技术来创建包含查询结果的表</p>
+<pre><code class="language-sql">create table t1 as
+(select * from instructor where dept_name=‘Music’)
+with data;
+</code></pre>
+<p>create table as、create table like与create view</p>
+<h2 id="模式-目录与环境">模式、目录与环境</h2>
+<p>当代数据库系统提供了三层结构的关系命名机制。最顶层由目录（catalog）构成，每个目录都可以包含模式（schema）。关系、视图等SQL对象都包含在模式中</p>
+<p>要在数据库上做任何操作，用户（或程序）都必须先连接到数据库。</p>
+<p>每个用户都有一个默认的目录和模式</p>
+<p>如果用户想访问存在于另外的模式中的关系，而不是该用户的默认模式，必须制定模式的名字<br>
+默认目录和模式是为每个链接建立的SQL环境的一部分。环境还包括用户标识</p>
+<h1 id="授权">授权</h1>
+<h2 id="权限的授予与收回">权限的授予与收回</h2>
+<p>权限所有权限（all privileges）可以用作所有允许权限的简写形式。一个创建了新关系的用户将自动被授予该关系上的所有权限</p>
+<p>grant 语句用来授予权限</p>
+<pre><code class="language-sql">grant &lt;权限列表&gt;
+on &lt;关系名或视图名&gt; to &lt;用户/角色列表&gt;
+</code></pre>
+<p>&lt;用户/角色列表&gt;</p>
+<ul>
+<li>用户id</li>
+<li>public，允许所有有效用户拥有被授予的权限。</li>
+</ul>
+<p>授予视图上的权限并不意味着授予基础关系上的任何权限。</p>
+<p>权限的授予者必须已经在指定的项目上拥有权限（或者是数据库管理员）。</p>
+<p>select: 允许用户修改关系中的任意元组<br>
+Example: 在讲师关系上授予用户U1、U2、U3选择授权:</p>
+<pre><code class="language-sql">grant select on instructor to U1, U2, U3
+</code></pre>
+<p>insert: 允许用户在关系中插入元组</p>
+<p>update: 允许用户修改关系中的任意元组，既可以在关系的所有属性上授予，又可以只在某些属性上授予</p>
+<p>delete: 允许用户从关系中删除元组</p>
+<p>用户名public：系统的所有当前用户和将来的用户</p>
+<p>默认情况下，被授予权限的用户/角色无权把此权限授予其他用户/角色。SQL允许用授予权限来指定权限的接受者可以进一步把权限授予其他用户</p>
+<p>SQL授权机制可以对整个关系或一个关系的指定属性授予权限；但不允许对一个关系的指定元组授权</p>
+<p>revoke ：回收权限</p>
+<pre><code class="language-sql">revoke &lt;权限列表&gt; on &lt;关系名或视图名&gt; from &lt;用户/角色列表&gt;
+</code></pre>
+<h2 id="角色">角色</h2>
+<p>创建角色：</p>
+<pre><code class="language-sql">create role instructor;
+</code></pre>
+<p>角色授予权限：</p>
+<pre><code class="language-sql">grant select on takes to instructor;
+</code></pre>
+<p>角色可以授予给用户，也可以授予给其他角色</p>
+<pre><code class="language-sql">create role teaching_assistant
+grant teaching_assistant to instructor;
+</code></pre>
+<p>角色链</p>
+<pre><code class="language-sql">create role dean;
+grant instructor to dean;
+grant dean to Satoshi;
+</code></pre>
+<p>一个用户或一个角色的权限包括：</p>
+<ul>
+<li>所有直接授予用户/角色的权限；</li>
+<li>所有授予给用户/角色所拥有角色的权限</li>
+</ul>
+<p>当一个用户登录到数据库系统时，在此会话中用户执行的动作拥有所有直接授予该用户的权限以及所有（直接地或通过其他角色间接地）授予该用户所拥有角色的权限。</p>
+<h2 id="视图的授权">视图的授权</h2>
+<pre><code class="language-sql">create view geo_instructor as
+(select *
+from instructor
+where dept_name = ’Geology’);
+</code></pre>
+<h2 id="模式的授权">模式的授权</h2>
+<p>SQL标准为数据库模式指定了一种基本的授权机制：只有模式的拥有者才能够执行对模式的任何修改</p>
+<p>references 权限：允许用户在创建关系时声明外码</p>
+<pre><code class="language-sql">grant reference (dept_name) on department to Mariano;
+</code></pre>
+<h2 id="权限的转移">权限的转移</h2>
+<p>获得了某些形式权限的用户被允许将此权限授权传递给其他用户</p>
+<p>默认方式下，被授予权限的用户/角色无权把得到的权限再授予给另外的用户/角色</p>
+<pre><code class="language-sql">grant select on department to Amit with grant option;
+</code></pre>
+<p>用户具有权限的充分必要条件是：当且仅当存在从授权图的根（即代表数据库管理员的顶点）到代表该用户顶点的路径</p>
+<h2 id="权限的收回">权限的收回</h2>
+<pre><code class="language-sql">revoke select on department from Amit, Satoshi cascade;
+revoke select on department from Amit, Satoshi restrict;
+</code></pre>
+
+              </div>
+              <div class="post-footer">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+      <strong>本文作者：</strong>
+      七叶的个人小站
+    </li>
+    <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://cwlrin.wiki/post/shu-ju-ku-zhong-ji-sql/" title="数据库——中级SQL">数据库——中级SQL</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong>
+      本博客所有文章除特别声明外，转载请注明出处！
+    </li>
+  </ul>
+  <div class="tags">
+    
+  </div>
+  <div class="nav">
+    <div class="nav-prev">
+      
+    </div>
+    <div class="nav-next">
+      
+        <a class="nav-pc-next" title="数据库——SQL" href="https://cwlrin.wiki/post/shu-ju-ku-sql/">数据库——SQL</a>
+        <a class="nav-mobile-next" title="数据库——SQL" href="https://cwlrin.wiki/post/shu-ju-ku-sql/">下一篇</a>
+        <i class="fa fa-chevron-right"></i>
+      
+    </div>
+  </div>
+</div>
+              
+                
+<script src="https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js"></script>
+<div id="vcomments" style="padding: 10px 0px 0px 0px"></div>
+<script>
+new Valine({
+    el: '#vcomments' ,
+    appId: 'miKfAllYGUAWs0flYNOazIKw-gzGzoHsz',
+    appKey: 'bq92hoypqYLisNGOWtqbgRF6',
+    notify: 'true' === 'true', 
+    avatar:'', 
+    placeholder: '',
+    pageSize: '',
+    lang: 'zh-cn',
+    visitor: 'true' === 'true',
+    highlight: 'true' === 'true',
+    avatarForce: 'true' === 'false',
+});
+</script>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-box">
+  <footer class="footer">
+    <div class="copyright">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | © 2019-2020 Theme By HsxyHao
+    </div>
+    <div class="poweredby">
+      
+    </div>
+  </footer>
+  
+  
+    <div class="drawer-box left" id="drawer_box">
+      <span class="muse-line muse-line-first"></span>
+      <span class="muse-line muse-line-middle"></span>
+      <span class="muse-line muse-line-last"></span>
+    </div>
+  
+  <div class="muse back-to-top" id="back_to_top">
+    <i class="fa fa-arrow-up"></i>
+    
+  </div>
+  
+    <div class="bg-img">
+      <img src="\media\images\custom-bgImg.jpg" />
+    </div>
+  
+  
+    <link rel="stylesheet" href="/media/live2d/histoire/css/live2d.css" />
+<div class="box-scale">
+  <div id="landlord" style="left:5px;bottom:0px;" data-key="">
+    <div class="message" style="opacity:0"></div>
+    <canvas id="live2d" width="500" height="560" class="live2d"></canvas>
+    <div class="live_talk_input_body">
+      <div class="live_talk_input_name_body">
+        <input name="name" type="text" class="live_talk_name white_input" id="AIuserName" autocomplete="off" placeholder="你的名字" />
+      </div>
+      <div class="live_talk_input_text_body">
+        <input name="talk" type="text" class="live_talk_talk white_input" id="AIuserText" autocomplete="off" placeholder="要和我聊什么呀？"/>
+        <button type="button" class="live_talk_send_btn" id="talk_send">发送</button>
+      </div>
+    </div>
+    <input name="live_talk" id="live_talk" value="1" type="hidden" />
+    <div class="live_ico_box">
+      <div class="live_ico_item type_info" id="showInfoBtn"></div>
+      <div class="live_ico_item type_talk" id="showTalkBtn"></div>
+      
+      <div class="live_ico_item type_youdu" id="youduButton"></div>
+      <div class="live_ico_item type_quit" id="hideButton"></div>
+      <input name="live_statu_val" id="live_statu_val" value="0" type="hidden" />
+      <audio src="" style="display:none;" id="live2d_bgm" data-bgm="0" preload="none"></audio>
+      <input id="duType" value="douqilai" type="hidden">
+      
+    </div>
+  </div>
+</div>
+<div id="open_live2d">召唤伊斯特瓦尔</div>
+<script src="https://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script>
+var message_Path = '/media/live2d/histoire/';
+let landlord = document.querySelector('#landlord');
+var apiKey = landlord.dataset.key;
+</script>
+<script type="text/javascript" src="/media/live2d/histoire/js/live2d.js"></script>
+<script type="text/javascript" src="/media/live2d/histoire/js/message.js"></script>
+  
+  
+    
+
+  
+</div>
+<script>
+
+  let sideBarOpen = 'sidebar-open';
+  let body = document.body;
+  let back2Top = document.querySelector('#back_to_top'),
+  back2TopText = document.querySelector('#back_to_top_text'),
+  drawerBox = document.querySelector('#drawer_box'),
+  rightSideBar = document.querySelector('.sidebar'),
+  viewport = document.querySelector('body');
+
+  function scrollAnimation(currentY, targetY) {
+   
+    let needScrollTop = targetY - currentY
+    let _currentY = currentY
+    setTimeout(() => {
+      const dist = Math.ceil(needScrollTop / 10)
+      _currentY += dist
+      window.scrollTo(_currentY, currentY)
+      if (needScrollTop > 10 || needScrollTop < -10) {
+        scrollAnimation(_currentY, targetY)
+      } else {
+        window.scrollTo(_currentY, targetY)
+      }
+    }, 1)
+  }
+
+  back2Top.addEventListener("click", function(e) {
+    scrollAnimation(document.scrollingElement.scrollTop, 0);
+    e.stopPropagation();
+    return false;
+  });
+  
+  window.addEventListener('scroll', function(e) {
+    let percent = document.scrollingElement.scrollTop / (document.scrollingElement.scrollHeight - document.scrollingElement.clientHeight) * 100;
+    if (percent > 1 && !back2Top.classList.contains('back-top-active')) {
+      back2Top.classList.add('back-top-active');
+    }
+    if (percent == 0) {
+      back2Top.classList.remove('back-top-active');
+    }
+    if (back2TopText) {
+      back2TopText.textContent = Math.floor(percent);
+    }
+  });
+
+  
+  let hasCacu = false;
+  window.onresize = function() {
+    if (window.width > 991) {
+      calcuHeight();
+    } else {
+      hasCacu = false;
+    }
+  }
+
+  function calcuHeight() {
+    // 动态调整站点概览高度
+    if (!hasCacu && back2Top.classList.contains('pisces') || back2Top.classList.contains('gemini')) {
+      let sideBar = document.querySelector('.sidebar');
+      let navUl = document.querySelector('#site_nav');
+      sideBar.style = 'margin-top:' + (navUl.offsetHeight + navUl.offsetTop + 15) + 'px;';
+      hasCacu = true;
+    }
+  }
+  calcuHeight();
+  
+  let open = false, MOTION_TIME = 300, RIGHT_MOVE_DIS = '320px';
+
+  if (drawerBox) {
+    let rightMotions = document.querySelectorAll('.right-motion');
+    let right = drawerBox.classList.contains('right');
+
+    let transitionDir = right ? "transition.slideRightIn" : "transition.slideLeftIn";
+
+    let openProp, closeProp;
+    if (right) {
+      openProp = {
+        paddingRight: RIGHT_MOVE_DIS 
+      };
+      closeProp = {
+        paddingRight: '0px'
+      };
+    } else {
+      openProp = {
+        paddingLeft: RIGHT_MOVE_DIS 
+      };
+      closeProp = {
+        paddingLeft: '0px'
+      };
+    }
+
+    drawerBox.onclick = function() {
+      open = !open;
+      window.Velocity(rightSideBar, 'stop');
+      window.Velocity(viewport, 'stop');
+      window.Velocity(rightMotions, 'stop');
+      if (open) {
+        window.Velocity(rightSideBar, {
+          width: RIGHT_MOVE_DIS
+        }, {
+          duration: MOTION_TIME,
+          begin: function() {
+            window.Velocity(rightMotions, transitionDir,{ });
+          }
+        })
+        window.Velocity(viewport, openProp,{
+          duration: MOTION_TIME
+        });
+      } else {
+        window.Velocity(rightSideBar, {
+          width: '0px'
+        }, {
+          duration: MOTION_TIME,
+          begin: function() {
+            window.Velocity(rightMotions, {
+              opacity: 0
+            });
+          }
+        })
+        window.Velocity(viewport, closeProp ,{
+          duration: MOTION_TIME
+        });
+      }
+      for (let i = 0; i < drawerBox.children.length; i++) {
+        drawerBox.children[i].classList.toggle('muse-line');
+      }
+      drawerBox.classList.toggle(sideBarOpen);
+    }
+  }
+
+  // 代码高亮
+  hljs.initHighlightingOnLoad();
+
+</script>
+    </div>
+  </body>
+  <script src="/media/js/motion.js"></script>
+</html>

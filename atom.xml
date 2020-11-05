@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://cwlrin.wiki/</id>
     <title>七叶的个人小站</title>
-    <updated>2020-11-04T16:04:40.558Z</updated>
+    <updated>2020-11-05T08:32:21.505Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://cwlrin.wiki/"/>
     <link rel="self" href="https://cwlrin.wiki/atom.xml"/>
@@ -10,6 +10,515 @@
     <logo>https://cwlrin.wiki/images/avatar.png</logo>
     <icon>https://cwlrin.wiki/favicon.ico</icon>
     <rights>All rights reserved 2020, 七叶的个人小站</rights>
+    <entry>
+        <title type="html"><![CDATA[数据库——中级SQL]]></title>
+        <id>https://cwlrin.wiki/post/shu-ju-ku-zhong-ji-sql/</id>
+        <link href="https://cwlrin.wiki/post/shu-ju-ku-zhong-ji-sql/">
+        </link>
+        <updated>2020-11-05T05:25:55.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="连接表达式">连接表达式</h1>
+<h2 id="连接条件">连接条件</h2>
+<p>on：允许在参与连接的关系上设置通用的谓词</p>
+<pre><code class="language-sql">select * from student join takes on student.ID = takes.ID；
+</code></pre>
+<p>on表明：如果一个来自 student 的元组和一个来自 takes 的元组在 ID 上的取值相同，那么他们是匹配的</p>
+<pre><code class="language-sql">on student.ID = takes.ID    student natural join takes
+select * from student join takes where student.ID = takes.ID；
+</code></pre>
+<p>只显示一次ID</p>
+<pre><code class="language-sql">select student.ID  as ID , name , dept_name , tot_cred , course_id , sec_id , semester , year , grade from student join takes on student.ID = takes.ID；
+</code></pre>
+<p>on 条件可以表示任何SQL谓词，从而使用on条件的连接表达式就可以表示比自然连接更为丰富的连接条件</p>
+<p>使用带on条件的连接表达式的查询可以用不带on条件的等价表达式来替换，只要把on字句中的谓词移到where子句中即可</p>
+<p>引入on条件的优点：</p>
+<ul>
+<li>外连接：on条件的表现与where条件是不同的</li>
+<li>on子句中指定连接条件，并在where子句中出现其余的条件，这样的SQL查询更易懂</li>
+</ul>
+<h2 id="外连接">外连接</h2>
+<p>显示所有学生的ID、name、dept_name、tot_cred</p>
+<pre><code class="language-sql">select * from student natural join takes；
+</code></pre>
+<ul>
+<li>在参与连接的任何一个或两个关系中的某些元组可能会“丢失”</li>
+</ul>
+<p>外连接（outer join）运算：在结果中创建空值元组</p>
+<ul>
+<li>
+<p>左外连接</p>
+<p>内连接+左边失配的元组（缺少的右边关系属性用null）</p>
+</li>
+<li>
+<p>右外连接</p>
+<p>内连接+右边失配的元组（缺少的左边关系属性用null）</p>
+</li>
+<li>
+<p>全外连接</p>
+<p>内连接 + 左边失配的元组（缺少的右边关系属性用null）+ 右边失配的元组（缺少的左边关系属性用null）</p>
+</li>
+<li>
+<p>内连接</p>
+<p>舍弃不匹配的元组</p>
+</li>
+</ul>
+<h3 id="左外连接">左外连接</h3>
+<p>计算内连接结果</p>
+<p>对于在内连接的左侧关系中任意一个与右侧关系中任何元组都不匹配的元组 t，向连接结果中加入一个元组 r，r 的构造如下：</p>
+<ul>
+<li>元组 r 从左侧的关系得到的属性被赋为 t 中的值</li>
+<li>r 的其他属性被赋为 null</li>
+</ul>
+<p>查询一门课也没有选修的学生</p>
+<pre><code class="language-sql">select ID 
+from student natural left outer join takes
+where course_id is null;
+</code></pre>
+<h3 id="右外连接">右外连接</h3>
+<p>计算内连接结果</p>
+<p>对于在内连接的右侧关系中任意一个与左侧关系中任何元组都不匹配的元组 t，向连接结果中加入一个元组 r，r 的构造如下：</p>
+<ul>
+<li>元组 r 从右侧的关系得到的属性被赋为 t 中的值</li>
+<li>r 的其他属性被赋为null</li>
+</ul>
+<h3 id="全外连接">全外连接</h3>
+<p>左外连接和右外连接的组合</p>
+<p>内连接结果计算出来之后，左侧关系中个不匹配右侧关系任何元组的元组被添上空置并加到结果中；右侧关系执行同样操作</p>
+<p>查询：显示Comp.Sci.系所有学生以及他们在2009年春季选修的所有课程段的列表</p>
+<pre><code class="language-sql">select *
+from ( select *
+    	from student
+    	where dept_name=‘Comp.Sci’)
+natural full outer join
+(select *
+from takes
+where semester=‘Spring’ and year=2009);
+
+</code></pre>
+<p>on 子句可以和外连接一起使用</p>
+<pre><code class="language-sql">select * from student left outer join takes on studen.ID = takes.ID ; #ID出现两次
+</code></pre>
+<p>on 和 where 在连链接中的表现是不同的</p>
+<ul>
+<li>外连接：为那些对相应内连接结果没有贡献的元组补上null并加入结果</li>
+<li>on：外连接声明的一部分</li>
+<li>where子句不是</li>
+</ul>
+<pre><code class="language-sql">select * from student left outer join takes where studen.ID = takes.ID ;
+</code></pre>
+<h2 id="连接类型和条件">连接类型和条件</h2>
+<table>
+<thead>
+<tr>
+<th>连接类型</th>
+<th>连接条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>inner join</td>
+<td>nature</td>
+</tr>
+<tr>
+<td>left outer  join</td>
+<td>on&lt;谓词&gt;</td>
+</tr>
+<tr>
+<td>right outer join</td>
+<td>using <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">(A_1, A_2 ,…, A_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td>full outer join</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>自然连接</p>
+<ul>
+<li>出现在结果关系中的两个连接关系的元组在公共属性上取值相等，且公共属性只出现一次<br>
+on &lt;谓词P&gt;</li>
+<li>出现在结果关系中的两个连接关系的元组在公共属性上取值满足谓词条件P，且公共属性出现两次<br>
+using <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">(A_1, A_2 ,…, A_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></li>
+<li><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">(A_1, A_2 ,…, A_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 是两个连接关系的公共属性的子集，元组在 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">(A_1, A_2 ,…, A_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 上取值相等，且 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">(A_1, A_2 ,…, A_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 只出现一次</li>
+</ul>
+<h1 id="视图">视图</h1>
+<p>让所有用户都看到数据库的整个逻辑模型是不合适的，出于安全考虑，可能需要向用户隐藏特定的数据。</p>
+<p>考虑一个职员需要知道教师的标识、姓名和所在院系，但是没有权限看到教师工资值</p>
+<pre><code class="language-sql">select ID, name, dept_name
+from instructor
+</code></pre>
+<p>虚关系：概念上包含查询的结果，并不预先计算并存储，而是在使用虚关系的时候才通过执行查询被计算出来.</p>
+<p>视图：任何像这种不是逻辑模型的一部分，但作为虚关系对用户可见的关系.</p>
+<p>在任何给定的实际关系集合上能够支持大量视图</p>
+<h2 id="视图定义">视图定义</h2>
+<p>SQL中用create view 命令定义视图， 具体的格式为</p>
+<pre><code class="language-sql">create view v as &lt; query expression &gt;
+</code></pre>
+<p><query expression> 是任何合法的 SQL 表达式 。 v 表示视图名称</p>
+<p>例如：访问instructor关系中除salary之外的所有数据的职员</p>
+<pre><code class="language-sql">create view faculty as
+select ID , name , dept_name
+from instructor; 
+</code></pre>
+<p>Physics系2009年秋季学期所开设的所有课程段列表，其中包括每个课程段在哪栋建筑的哪个房间授课信息</p>
+<pre><code class="language-sql">create view physics_fall_2009 as
+select course.course_id , sec_id , building , room_number 
+from course, section
+where course.course_id = section.course_id
+        and course.dept_name = ‘Physics’
+        and section.semeter = ‘Fall ’
+        and section.year = ‘2009’ ;
+</code></pre>
+<h2 id="sql查询中使用视图">SQL查询中使用视图</h2>
+<p>一旦定义了一个视图，就可以用视图名指代该视图生成的虚关系</p>
+<pre><code class="language-sql">create view physics_fall_2009 as
+select course.course_id, sec_id, building, room_number
+from course, section
+where course.course_id = section.course_id
+	and course.dept_name = ’Physics’
+	and section.semester = ’Fall’
+	and section.year = ’2009’;
+</code></pre>
+<pre><code class="language-sql">select course_id from physics_fall_2009 where building = ‘Watson’;
+</code></pre>
+<p>视图的属性名可以按下述方式显式指定：</p>
+<pre><code class="language-sql">create view departments_total_salary(dept_name, total_salary) as
+select dept_name, sum (salary)
+from instructor
+group by dept_name;
+</code></pre>
+<p>直觉上，在任何给定时刻，视图关系中的元组集是该时刻视图定义中的查询表达式的计算结果。</p>
+<p>如果一个视图关系被计算并存储，一旦用于定义该视图的关系被修改，视图就会过期</p>
+<p>视图通常这样来实现：</p>
+<ul>
+<li>当我们定义一个视图时，数据库系统存储视图的定义本身，而不存储定义该视图的查询表达式的执行结果</li>
+</ul>
+<p>一个视图可能被用到定义另一个视图表达式中</p>
+<pre><code class="language-sql">create view physics_fall_2009_watson as
+	select course_id, room_number
+	from physics_fall_2009
+	where building= ’Watson’;
+</code></pre>
+<pre><code class="language-sql">create view physics_fall_2009_watson as
+(select course_id, room_number
+from (select course.course_id, building, room_number
+          from course, section
+          where course.course_id = section.course_id
+               and course.dept_name = ’Physics’
+               and section.semester = ’Fall’
+               and section.year = ’2009’)
+where building= ’Watson’;
+</code></pre>
+<h2 id="物化视图">物化视图</h2>
+<p>物化视图（materializing view）: 特定数据库系统允许存储视图关系，但是它们保证：如果用于定义视图的实际关系改变，视图也跟着改变</p>
+<pre><code class="language-sql"> create view departments_total_salary(dept_name, total_salary) as
+ select dept_name, sum (salary)
+ from instructor
+ group by dept_name;
+
+</code></pre>
+<p>保持物化视图一直在最新状态的过程称为物化视图维护（ materializing view maintenance），或者通常简称视图维护（ view maintenance ）</p>
+<ul>
+<li>更新后立即视图维护</li>
+<li>访问时维护</li>
+<li>周期性物化视图更新</li>
+</ul>
+<h2 id="视图更新">视图更新</h2>
+<p>用视图表达的数据库修改必须被翻译为对数据库逻辑模型中实际关系的修改</p>
+<p>例如：视图faculty被提供给一个职员</p>
+<pre><code class="language-sql">insert into faculty values( ‘30765’, ‘Green’, ‘Music’);
+</code></pre>
+<p>插入应表示为对instructor关系的插入   salary？</p>
+<ol>
+<li>拒绝插入，返回错误信息</li>
+<li>向 instructor 关系插入元组 <code>( ‘30765’, ‘Green’, ‘Music’,null)</code></li>
+</ol>
+<pre><code class="language-sql">create view instructor_info as
+select ID, name, building
+from instructor , department
+where instructor.dept_name = department. dept_name;
+</code></pre>
+<pre><code class="language-sql">insert into instructor_info values(‘69987’,’White’,’Taylor’ );
+</code></pre>
+<p>向 instructor 中插入元组 <code>(‘69987’,’White’,null,null )</code></p>
+<p>向 department 中插入元组 <code>(null，’Taylor’，null )</code></p>
+<p>一般不允许对视图关系进行修改</p>
+<p>不同的数据库系统指定了不同的条件以允许更新视图关系；参考数据库系统手册</p>
+<p>如果定义视图的查询对下列条件都能满足，我们称SQL视图是可更新的。</p>
+<ul>
+<li>from子句中只有一个数据库关系</li>
+<li>select子句中只包含关系的属性名，不包含任何表达式、聚集或distinct声明</li>
+<li>任何没有出现在select子句中的属性可以取空值；即这些属性上没有not null约束，也不构成主码的一部分</li>
+<li>查询中不含有group by或having子句</li>
+</ul>
+<pre><code class="language-sql">create view history_instrustors as
+select * from instructor where dept_name = ‘History’ ;
+</code></pre>
+<h1 id="事务">事务</h1>
+<p>事务（transaction）由查询和（或）更新语句的序列组成</p>
+<p>SQL标准规定当一条SQL语句被执行，就隐式地开始了一个事务</p>
+<ul>
+<li>Commit work：提交当前事务</li>
+<li>Rollback work：回滚当前事务</li>
+</ul>
+<p>一个事务或者在完成所有步骤后提交其行为，或者在不能成功完成其所有动作的情况下回滚其所有动作，通过这种方式数据库提供了对事物具有原子性的抽象</p>
+<p>默认方式下，每个SQL语句自成一个事务，且一执行完就提交</p>
+<p>如果一个事物要执行多条SQL语句，就必须关闭单独SQL语句的自动提交</p>
+<h1 id="完整性约束">完整性约束</h1>
+<p>完整性约束（Integrity constraints）保证授权用户对数据库所做的修改不会破坏数据库的一致性.</p>
+<p>一般来说，完整性约束可以是属于数据库的任意谓词</p>
+<p>完整性约束通常被看作是数据库模式设计过程的一部分</p>
+<h2 id="not-null约束">Not Null约束</h2>
+<p>not null</p>
+<p>宣布名称和预算不为空。</p>
+<pre><code class="language-sql">name varchar(20) not null
+budget numeric(12,2) not null
+</code></pre>
+<p>not null声明禁止在属性上插入空值</p>
+<p>任何可能导致向一个声明为not null的属性插入空值的数据库修改都会产生错误诊断信息</p>
+<p>例如：SQL禁止在关系模式的主码中出现空值</p>
+<h2 id="unique约束">unique约束</h2>
+<p>唯一性 ( <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">A_1, A_2, …, A_m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>)</p>
+<p>唯一的规范规定，属性 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>A</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">A_1, A_2, …, A_m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 形成一个候选码。</p>
+<p>候选码允许为空（与主码相反）</p>
+<h2 id="check-子句">check 子句</h2>
+<p>check (P)：指定谓词P，关系中的每个元组都必须满足P，其中P是一个谓词</p>
+<p>例如：确保学期是秋、冬、春、夏中的一个。</p>
+<pre><code class="language-sql">create table section (
+    course_id varchar (8),
+    sec_id varchar (8),
+    semester varchar (6),
+    year numeric (4,0),
+    building varchar (15),
+    room_number varchar (7),
+    time slot id varchar (4), 
+    primary key (course_id, sec_id, semester, year),
+    check (semester in (’Fall’, ’Winter’, ’Spring’, ’Summer’)));
+</code></pre>
+<h2 id="参照完整性">参照完整性</h2>
+<p>参照完整性（referential integrity）：一个关系中给定属性上的取值也在另一个关系的特定属性集的取值中出现.</p>
+<p>例如， 如果 &quot;生物学 &quot;是出现在教师关系中的一个元组中的部门名称，那么在部门关系中就存在一个 &quot;生物学 &quot;的元组。</p>
+<p>让 A 是一组属性，让 R 和 S 是两个包含属性 A 的关系，其中 A 是 S 的主码。 让 R 和 S 是两个包含属性 A 的关系，其中 A 是 S 的主码，如果 A 的任何值出现在 R 中，这些值也出现在 S 中，则称 A 是 R 的外码。</p>
+<pre><code class="language-sql">create table course (
+	course_id   char(5) primary key,
+	title             varchar(20),
+	dept_name varchar(20) references department)
+</code></pre>
+<pre><code class="language-sql">create table course (
+	…
+	dept_name varchar(20),
+	foreign key (dept_name) references department
+	on delete cascade
+	on update cascade,)
+</code></pre>
+<p>级联的替代动作：设置null，设置默认值。</p>
+<p>SQL中外码参照的是被参照表中的主码属性</p>
+<p>references子句</p>
+<p>指定的属性列表必须声明为被参照关系的候选码，primary key或unique约束</p>
+<pre><code class="language-sql">dept_name varchar(20) references department
+</code></pre>
+<p>当违反参照完整性约束时，通常的处理是拒绝执行导致完整性破坏的操作</p>
+<p>在foreign key子句中可以指明：如果被参照关系上的删除或更新动作违反了约束，那么系统必须采取一些步骤通过修改参照关系中的元组来恢复完整性约束，而不是拒绝这样的动作</p>
+<pre><code class="language-sql">create table course
+    ( …
+       foreign key (dept_name) references department
+              on delete cascade
+              on update cascade,
+       …);
+</code></pre>
+<h2 id="事务中对完整性约束的违反">事务中对完整性约束的违反</h2>
+<p>事务可能包括几个步骤，在某一步之后完整性约束也许会暂时被违反，但是后面的某一步也许就会消除这个违反</p>
+<p>SQL允许将initially deferred 子句加入到约束声明中；完整性约束不是在事物的中间步骤上检查，而是在事物结束时检查</p>
+<p>一个约束可以被指定为可延迟的（deferrable）</p>
+<p>默认：立即检查约束</p>
+<p>许多数据库实现不支持延迟约束检查</p>
+<h2 id="复杂check条件与断言">复杂check条件与断言</h2>
+<p>check子句中的谓词可以是包含子查询的任意谓词</p>
+<pre><code class="language-sql">check (time_slot_id in (select time_slot_id from time_slot))
+</code></pre>
+<p>每个课程段都需要有至少一位教师来讲授.</p>
+<p>复杂check条件在确保数据完整性时是很有效的，但其检测开销可能会很大</p>
+<p>一个断言（assertion）就是一个谓词，表达了我们希望数据库总能满足的一个条件</p>
+<p>域约束和参照完整性约束是断言的特殊形式</p>
+<pre><code class="language-sql">create assertion &lt;assertion-name&gt; check &lt;predicate&gt;;
+</code></pre>
+<p>创建断言时，要检测其有效性<br>
+目前，还没有一个广泛使用的数据库系统支持在check子句的谓词中使用子查询或create assertion结构</p>
+<h1 id="sql的数据类型与模式">SQL的数据类型与模式</h1>
+<h2 id="sql中的日期和时间类型">SQL中的日期和时间类型</h2>
+<p>date: 日期，包含（4位数）年、月、日。</p>
+<p>Example:  <code>date ‘2015-7-27’</code></p>
+<p>time: 一天中的时间，以时、分、秒为单位。</p>
+<p>Example:  <code>time ‘09:00:30’</code>          <code>time ‘09:00:30.75’</code></p>
+<p>timestamp: 日期加当天时间</p>
+<p>Example:  <code>timestamp ‘2015-7-27 09:00:30.75’</code></p>
+<p>cast e as t</p>
+<ul>
+<li>e:字符串（字符串表达式）</li>
+<li>t：time、date、timestamp</li>
+</ul>
+<p>extract（field from d）</p>
+<ul>
+<li>
+<p>从date或time值d中提取单独的域，可以是year、month、day、hour、minute、second</p>
+</li>
+<li>
+<p>时区信息可以用timezone_hour、timezone_minute来提取</p>
+</li>
+</ul>
+<p>current_date  返回当前日期</p>
+<p>current_time   返回当前时间（带时区）</p>
+<p>localtime   返回当前的本地时间（不带时区）</p>
+<p>current_timestamp（带时区）、localtimestamp（本地日期和时间，不带时区）    返回时间戳</p>
+<p>SQL允许在以上所有类型上进行比较运算，也允许在各种数字类型上进行算术运算和比较运算</p>
+<h2 id="默认值">默认值</h2>
+<p>SQL允许为属性指定默认值</p>
+<pre><code class="language-sql">create table student
+（ID varchar(5),
+   name varchar(20) not null,
+   dept_name varchar(20),
+   tot_cred numeric(3,0) default 0,
+   primary key(ID)）;
+insert into student (ID, name , depe_name) values (‘12789’, ‘Newman’, ‘Comp.Sci’);
+</code></pre>
+<h2 id="创建索引">创建索引</h2>
+<p>索引（index）：一种数据结构，允许数据库系统高效地找到关系中那些在索引属性上取给定值的元组，而不用扫描关系中的所有元组</p>
+<pre><code class="language-sql">create table student
+(ID varchar (5),
+name varchar (20) not null,
+dept_name varchar (20),
+tot_cred numeric (3,0) default 0,
+primary key (ID))
+</code></pre>
+<pre><code class="language-sql">create index studentID_index on student(ID)；
+</code></pre>
+<p>如果用户提交的SQL查询可以从索引的使用中获益，那么SQL查询处理器救护自动使用索引</p>
+<p>给定的SQL查询是选出ID为22201的student元组，SQL查询处理器就会使用studentID_index索引来找到所需元组，而不用读取整个关系</p>
+<h2 id="大对象类型">大对象类型</h2>
+<p>大对象（照片、视频、CAD文件等）以大对象的形式存储。</p>
+<ul>
+<li>blob（二进制数据的大对象数据类型）：二进制大对象————对象是未解释的二进制数据的大集合（其解释留给数据库系统之外的应用程序）。</li>
+<li>clob（字符数据的大对象数据类型）：字符大对象————对象是字符数据的大集合。</li>
+</ul>
+<p>“定位器”：JDBC应用接口允许获取一个定位器而不是整个大对象；然后用定位器一点一点取出大对象</p>
+<h2 id="用户定义的类型">用户定义的类型</h2>
+<p>独特类型（distinct type）</p>
+<p>结构化数据类型（structured data type）：允许创建具有嵌套记录结构、数组和多重集的复杂数据类型</p>
+<p>create type 子句定义新类型：强类型检查</p>
+<pre><code class="language-sql">create type Dollars as numeric (12,2) final 
+create type Pounds as numeric (12,2) final
+create table department
+(dept_name varchar (20),
+building varchar (15),
+budget Dollars);
+</code></pre>
+<p>cast：强制类型转换</p>
+<pre><code class="language-sql">cast(department.budget to numeric(12,2))
+</code></pre>
+<p>drop type、alter type</p>
+<p>类型和域的差别</p>
+<ul>
+<li>在域上可以声明约束，例如not null，也可以为域类型变量定义默认值，然而在用户定义类型上不能声明约束或默认值。设计用户定义类型不仅是用它来指定属性类型，而且还将它用在不能施加约束的地方对SQL进行过程扩展</li>
+<li>域并不是强制类型的。一个域类型的值可以被赋给另一个域类型，只要它们的基本类型是相容的<br>
+check子句应用到域上时，允许模式设计者指定一个谓词，被声明为来自该域的任何变量都必须满足这个谓词</li>
+</ul>
+<pre><code class="language-sql">create domain YearlySalary numeric(8,2)
+constraint salary_value_test check (value&gt;=29000.00)
+</code></pre>
+<p>使用in子句可以限定一个域只包含指定的一组值：</p>
+<pre><code class="language-sql">create domain degree_level varchar(10)
+constraint degree_level_test
+check (value in (’Bachelors’, ’Masters’,’Doctorate’));
+</code></pre>
+<h2 id="create-table的扩展">create table的扩展</h2>
+<p>create table like</p>
+<pre><code class="language-sql">create table temp_instructor like instructor;
+</code></pre>
+<p>书写复杂查询时，把查询结果存储成一个新表通常是很有用的，这个表通常是临时的</p>
+<p>需要两种语句，一条用于创建表（具有合适的列），另一条用于把查询结果插入到表中</p>
+<p>SQL：2003提供了一种更简单的技术来创建包含查询结果的表</p>
+<pre><code class="language-sql">create table t1 as
+(select * from instructor where dept_name=‘Music’)
+with data;
+</code></pre>
+<p>create table as、create table like与create view</p>
+<h2 id="模式-目录与环境">模式、目录与环境</h2>
+<p>当代数据库系统提供了三层结构的关系命名机制。最顶层由目录（catalog）构成，每个目录都可以包含模式（schema）。关系、视图等SQL对象都包含在模式中</p>
+<p>要在数据库上做任何操作，用户（或程序）都必须先连接到数据库。</p>
+<p>每个用户都有一个默认的目录和模式</p>
+<p>如果用户想访问存在于另外的模式中的关系，而不是该用户的默认模式，必须制定模式的名字<br>
+默认目录和模式是为每个链接建立的SQL环境的一部分。环境还包括用户标识</p>
+<h1 id="授权">授权</h1>
+<h2 id="权限的授予与收回">权限的授予与收回</h2>
+<p>权限所有权限（all privileges）可以用作所有允许权限的简写形式。一个创建了新关系的用户将自动被授予该关系上的所有权限</p>
+<p>grant 语句用来授予权限</p>
+<pre><code class="language-sql">grant &lt;权限列表&gt;
+on &lt;关系名或视图名&gt; to &lt;用户/角色列表&gt;
+</code></pre>
+<p>&lt;用户/角色列表&gt;</p>
+<ul>
+<li>用户id</li>
+<li>public，允许所有有效用户拥有被授予的权限。</li>
+</ul>
+<p>授予视图上的权限并不意味着授予基础关系上的任何权限。</p>
+<p>权限的授予者必须已经在指定的项目上拥有权限（或者是数据库管理员）。</p>
+<p>select: 允许用户修改关系中的任意元组<br>
+Example: 在讲师关系上授予用户U1、U2、U3选择授权:</p>
+<pre><code class="language-sql">grant select on instructor to U1, U2, U3
+</code></pre>
+<p>insert: 允许用户在关系中插入元组</p>
+<p>update: 允许用户修改关系中的任意元组，既可以在关系的所有属性上授予，又可以只在某些属性上授予</p>
+<p>delete: 允许用户从关系中删除元组</p>
+<p>用户名public：系统的所有当前用户和将来的用户</p>
+<p>默认情况下，被授予权限的用户/角色无权把此权限授予其他用户/角色。SQL允许用授予权限来指定权限的接受者可以进一步把权限授予其他用户</p>
+<p>SQL授权机制可以对整个关系或一个关系的指定属性授予权限；但不允许对一个关系的指定元组授权</p>
+<p>revoke ：回收权限</p>
+<pre><code class="language-sql">revoke &lt;权限列表&gt; on &lt;关系名或视图名&gt; from &lt;用户/角色列表&gt;
+</code></pre>
+<h2 id="角色">角色</h2>
+<p>创建角色：</p>
+<pre><code class="language-sql">create role instructor;
+</code></pre>
+<p>角色授予权限：</p>
+<pre><code class="language-sql">grant select on takes to instructor;
+</code></pre>
+<p>角色可以授予给用户，也可以授予给其他角色</p>
+<pre><code class="language-sql">create role teaching_assistant
+grant teaching_assistant to instructor;
+</code></pre>
+<p>角色链</p>
+<pre><code class="language-sql">create role dean;
+grant instructor to dean;
+grant dean to Satoshi;
+</code></pre>
+<p>一个用户或一个角色的权限包括：</p>
+<ul>
+<li>所有直接授予用户/角色的权限；</li>
+<li>所有授予给用户/角色所拥有角色的权限</li>
+</ul>
+<p>当一个用户登录到数据库系统时，在此会话中用户执行的动作拥有所有直接授予该用户的权限以及所有（直接地或通过其他角色间接地）授予该用户所拥有角色的权限。</p>
+<h2 id="视图的授权">视图的授权</h2>
+<pre><code class="language-sql">create view geo_instructor as
+(select *
+from instructor
+where dept_name = ’Geology’);
+</code></pre>
+<h2 id="模式的授权">模式的授权</h2>
+<p>SQL标准为数据库模式指定了一种基本的授权机制：只有模式的拥有者才能够执行对模式的任何修改</p>
+<p>references 权限：允许用户在创建关系时声明外码</p>
+<pre><code class="language-sql">grant reference (dept_name) on department to Mariano;
+</code></pre>
+<h2 id="权限的转移">权限的转移</h2>
+<p>获得了某些形式权限的用户被允许将此权限授权传递给其他用户</p>
+<p>默认方式下，被授予权限的用户/角色无权把得到的权限再授予给另外的用户/角色</p>
+<pre><code class="language-sql">grant select on department to Amit with grant option;
+</code></pre>
+<p>用户具有权限的充分必要条件是：当且仅当存在从授权图的根（即代表数据库管理员的顶点）到代表该用户顶点的路径</p>
+<h2 id="权限的收回">权限的收回</h2>
+<pre><code class="language-sql">revoke select on department from Amit, Satoshi cascade;
+revoke select on department from Amit, Satoshi restrict;
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[数据库——SQL]]></title>
         <id>https://cwlrin.wiki/post/shu-ju-ku-sql/</id>
@@ -3872,252 +4381,6 @@ ElemType Sum( ElemType a[][MAX_SIZE], int n)
 <p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>=</mo><mi>O</mi><mo>(</mo><mi>g</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">S(n) = O(g(n))
 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span></p>
 <p>表示随着问题规模 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 的增大，算法运行所需存储量S(n)的增长率与 g(n) 的增长率相同，称S(n)(渐近)空间复杂度。</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[七叶自用的Wiki模板]]></title>
-        <id>https://cwlrin.wiki/post/qi-xie-zi-yong-de-wiki-mo-ban/</id>
-        <link href="https://cwlrin.wiki/post/qi-xie-zi-yong-de-wiki-mo-ban/">
-        </link>
-        <updated>2020-09-05T05:02:56.000Z</updated>
-        <content type="html"><![CDATA[<h1 id="概述">概述</h1>
-<p>这里整理出个人常用的萌娘百科编辑模板，如果你也是萌娘百科的编辑者或者是使用 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">M</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">w</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">k</mi><mi mathvariant="normal">i</mi></mrow><annotation encoding="application/x-tex">\mathrm{Mediawiki}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord"><span class="mord mathrm">M</span><span class="mord mathrm">e</span><span class="mord mathrm">d</span><span class="mord mathrm">i</span><span class="mord mathrm">a</span><span class="mord mathrm" style="margin-right:0.01389em;">w</span><span class="mord mathrm">i</span><span class="mord mathrm">k</span><span class="mord mathrm">i</span></span></span></span></span> 语法进行编辑的维基人，可以随意使用和转载该模板。</p>
-<p><a href="https://zh.moegirl.org.cn/User:%E6%A8%B1%E5%B0%8F%E8%B7%AF%E4%B8%83%E5%8F%B6">七叶的萌娘百科主页</a></p>
-<h1 id="galgame相关以恋花绽放樱飞时为例">Galgame相关（以恋花绽放樱飞时为例）</h1>
-<h2 id="游戏信息模板">游戏信息模板</h2>
-<p>代码</p>
-<pre><code class="language-wikitext">{{Video Game Infobox
-|标题         = '''恋花绽放樱飞时'''
-|image        = 恋花绽放樱飞时.jpg
-|图片大小     = 250px
-|图片信息     = 
-|tabs         = 
-|原名         = {{lj|恋がさくころ桜どき}}
-|假名         = {{lj|こいがさくころさくらどき}}
-|罗马字       = Koi ga Sakukoro Sakuradoki 
-|常用译名     = 恋花绽放樱飞时
-|类型         = ADV
-|平台         = Windows Vista / 7 / 8 / 10&lt;br&gt;PlayStation 4
-|分级         = R-18(PC)&lt;br&gt;全年龄(Steam)
-|发行         = [[Palette]]
-|开发         = [[Palette]]
-|总监         = 
-|制作人       = 
-|设计师       = 
-|编剧         = [[みなせ未来]]
-|程序         = 
-|美工         = [[和泉つばす]]、[[eco*]]
-|音乐         = [[BURTON]]
-|引擎         = 
-|模式         = 
-|发行时间     = 2014年6月27日（日文版）&lt;br&gt;2017年10月2日（英文版）&lt;br&gt;2019年2月28日（PS4）
-|标题颜色     = #CCCCFF
-|左栏颜色     = #E6E9FF
-}}
-</code></pre>
-<p>效果图</p>
-<figure data-type="image" tabindex="1"><img src="https://cwlrin.wiki//post-images/1599282502129.png" alt="" loading="lazy"></figure>
-<h2 id="hidebox">HideBox</h2>
-<p>代码</p>
-<pre><code>{{Hide
-|日语原文
-|正文
-}}
-</code></pre>
-<p>效果图</p>
-<figure data-type="image" tabindex="2"><img src="https://cwlrin.wiki//post-images/1599282805686.png" alt="" loading="lazy"></figure>
-<h2 id="角色模板">角色模板</h2>
-<p>代码</p>
-<pre><code>{{Main Characters Infolist
-|bg-color=#A2A9B1
-|th-color=#CCCCFF
-|td-color=#F8F9FA
-|cv-color=#E6E9FF
-|Name1       = '''[[神凤杏]]''' ({{ruby|神凤|じんぽう}} {{ruby|杏|あん}})
-|image1      = 神凤杏.jpg
-|info1       = 
-'''血型'''：O型
-
-'''生日'''：4月2日（白羊座）
-
-'''身高'''：162cm
-
-'''三围'''：B89 / W59/ H87
-
-美飒学园三年级学生，现役学生会长。
-
-拥有着连同性都憧憬的美貌，不过说起话来稍微有点让人残念。
-
-亲切待人的性格，宛若蝴蝶般的女孩子。
-
-对年下的悠真有些兴趣，想要把他拉进学生会。
-
-似乎从前就和恋爱妖精蒂娜认识……
-
-'''「从今天起，你就是我的仆人了♪」'''
-&lt;!-- 原文：
-
-美颯学園3年生。 現生徒会長。
-
-同性でも見惚れるほどの美貌を持つが、口を開くと少し残念。
-
-親しく接してきたかと思えば、はらりと手から逃れていく胡蝶のような女の子。
-
-ふとしたことから年下の悠真に興味を持ち、生徒会に引き込もうとする。
-
-恋の妖精・ティナとは以前から面識があるようだが……。
-
-「今日からキミ、あたしの下僕ね♪」 
- --&gt;
-|CV1         = [[井之上奈奈|夏峰いろは]]
-</code></pre>
-<p>效果图</p>
-<figure data-type="image" tabindex="3"><img src="https://cwlrin.wiki//post-images/1599282978974.png" alt="" loading="lazy"></figure>
-<h2 id="游戏攻略模板">游戏攻略模板</h2>
-<p>代码</p>
-<pre><code>{{剧透提醒}}
-
-{{Hide
-|杏线
-|
-帮忙
-
-邀她去食堂
-
-岔开话题
-
-接受邀请
-
-◆SAVE
-
-听听学姐的请求
-
-杏 END
-}}
-</code></pre>
-<p>效果图<br>
-<img src="https://cwlrin.wiki//post-images/1599283871636.png" alt="" loading="lazy"></p>
-<h2 id="相关音乐模板">相关音乐模板</h2>
-<p>代码</p>
-<pre><code>{{color|red|片头曲1(OP1)}}
-*曲名：'''[[恋爱绽放的未来|恋さくミライ]]'''（恋花绽放的未来）
-**歌：[[佐咲纱花]]
-**作词：[[rino]]，作、编曲：[[大久保薰]]
-
-{{BilibiliVideo|title=OP1|id=1rs41117zK}}
-</code></pre>
-<p>效果图</p>
-<figure data-type="image" tabindex="4"><img src="https://cwlrin.wiki//post-images/1599283912489.png" alt="" loading="lazy"></figure>
-<h1 id="虚拟主播相关以永远酱为例">虚拟主播相关（以永远酱为例）</h1>
-<h2 id="人物信息模板">人物信息模板</h2>
-<p>代码</p>
-<pre><code>{{人物信息
-|image=
-|tabs={{tabs|TextPadding=0px
- |color=white
- |TextBackgroundColor=white
- |LabelColor=#99ccff
- |bt1=星月银河
- |bt2=星辰万物
- |bt3=星空
- |bt4=(名字待定)
- |tab1=[[File:永远酱 星月银河.jpg|250px|画师：瓦瓦子]]
- |tab2=[[File:eienchan.jpg|250px|画师：瓦瓦子]]
- |tab3=[[File:C29f2a3e690185903c4f2d9c40afbc5155ece630 raw.jpg|250px|画师：永远酱]]
- |tab4=[[File:永远酱夏装.jpg|250px|画师：瓦瓦子]]
- |DefaultTab=2
-}}
-|本名=永远酱
-|别号=永远星{{黑幕|&lt;del&gt;永远猩&lt;/del&gt;}}
-|出生地=永远星
-|发色=淡紫
-|瞳色=绿
-|身高=155
-|体重=42kg {{黑幕|47万吨}}
-|三围=&lt;del&gt;直径32米&lt;/del&gt;
-|年龄=未知
-|生日=10月10日
-|星座=
-|血型=
-|声优=
-|萌点={{萌点|万年萝莉|傲娇|天然呆|冒失|元气|萝莉控|齐刘海|呆毛|大眼睛|虎牙|贫乳|兽耳，悬浮兽耳|背带裙|白色过膝袜，白丝|创可贴，头顶创可贴&lt;del&gt;煎蛋&lt;/del&gt;|露肩装|外星人|头槌|特殊第一人称，吾辈&lt;del&gt;焐被&lt;/del&gt;|翻译腔，日式翻译腔|熬夜|起床气|音痴|猫奴，铲屎官|片言，散装日语}}、自搜
-|出身地区=中国
-|活动范围=[[File:Bilibili Logo Blue.svg|40px|link=bilibili]]
-|粉丝勋章={{粉丝勋章|永远喵|40}}
-|目前B站粉丝数={{BilibiliUP|id=135980509|type=follower}}
-|所属团体=
-|个人状态=活动中
-|相关人士={{heimu|前世：[[新科娘]]（二代目） }}
-}}
-</code></pre>
-<p>效果图</p>
-<figure data-type="image" tabindex="5"><img src="https://cwlrin.wiki//post-images/1599283387877.png" alt="" loading="lazy"></figure>
-<h2 id="tioggle模板-bilibilivideo模板">Tioggle模板、bilibiliVideo模板</h2>
-<p>代码</p>
-<pre><code>{{Toggle
-|button={{color|#99CCFF|'''永远酱的音乐作品'''}}
-|content=
-{{bilibiliVideo|title=【翻唱】爱杀宝贝ed|id=BV15J41127VG|page=0|width=600|height=421|autoplay=false}}
-}}
-</code></pre>
-<p>效果图<br>
-<img src="https://cwlrin.wiki//post-images/1599283974521.png" alt="" loading="lazy"></p>
-<h1 id="歌曲相关以以恋结缘为例">歌曲相关（以以恋结缘为例）</h1>
-<h2 id="歌曲信息">歌曲信息</h2>
-<p>代码</p>
-<pre><code>{{Infobox Song
-|歌曲名= 恋ひ恋ふ縁
-|image= 千恋万花OST封面.jpg
-|图片信息= OST封面
-|图片大小= 250px 
-|演唱= [[KOTOKO]]
-|编曲= 井ノ原智
-|作曲= Famishin
-|填词= [[KOTOKO]]
-|吉他= Asai Yasuo 
-|三味线= 尾上秀樹
-|MV编导= 
-|收录专辑= 《千恋＊万花 オリジナル・サウンドトラック》
-}}
-</code></pre>
-<p>效果图<br>
-<img src="https://cwlrin.wiki//post-images/1599284404586.png" alt="" loading="lazy"></p>
-<h2 id="歌词">歌词</h2>
-<p>代码</p>
-<pre><code>{{Photrans/button}}
-{{LyricsKai
-|lstyle=color:#704A83|rstyle=color:#EE6174|reserveWidth=260px
-|original=
-{{Photrans|誠|まこと}}、{{Photrans|意地|いじ}}の{{Photrans|悪|わる}}い{{Photrans|神|かみ}}の{{Photrans|所業|しょぎょう}}か？
-{{Photrans|奇跡|きせき}}？{{Photrans|縁|えにし}}？ {{Photrans|袂|たもと}}{{Photrans|触合|ふれあ}}う{{Photrans|不思議|ふしぎ}}
-{{Photrans|花|はな}}ひとひら{{Photrans|揺|ゆ}}れて
-{{Photrans|不意|ふい}}に{{Photrans|宿|やど}}ってた
-うなじ{{Photrans|解|ほど}}いてく{{Photrans|春風|はるかぜ}}
-
-{{Photrans|戯|たわむ}}れはそこそこに
-{{Photrans|恋手|こいて}}ほどきしてくだしゃんせ
-{{Photrans|湯気|ゆげ}}にほんのり{{Photrans|頬染|ほほそめ}}て
-{{Photrans|夜風|よかぜ}}に{{Photrans|願ふ|ねがう}}
-
-|translated=
-是天意不善 在戏谑人间？&lt;ref&gt;翻译：七海芽生 已取得授权| 假名标注：[[User:MCPE White|MCPE White]]&lt;/ref&gt;
-玄妙的邂逅 奇迹还是缘？
-哪曾想
-摇曳花儿丛中掩
-春风吹人暖
-
-莫要再拿人调笑
-恋爱妙诀要请教
-水暖熏得双颊俏
-心愿随着夜风飘
-}}
-</code></pre>
-<p>效果图</p>
-<figure data-type="image" tabindex="6"><img src="https://cwlrin.wiki//post-images/1599284307681.png" alt="" loading="lazy"></figure>
-<h1 id="杂项">杂项</h1>
-<h2 id="latex-格式代码"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mtext>LaTeX</mtext></mrow><annotation encoding="application/x-tex">\LaTeX</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.89883em;vertical-align:-0.2155em;"></span><span class="mord text"><span class="mord textrm">L</span><span class="mspace" style="margin-right:-0.36em;"></span><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.68333em;"><span style="top:-2.904999em;"><span class="pstrut" style="height:2.7em;"></span><span class="mord text"><span class="mord textrm sizing reset-size6 size3">A</span></span></span></span></span></span><span class="mspace" style="margin-right:-0.15em;"></span><span class="mord text"><span class="mord textrm">T</span><span class="mspace" style="margin-right:-0.1667em;"></span><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.46782999999999997em;"><span style="top:-2.7845em;"><span class="pstrut" style="height:3em;"></span><span class="mord text"><span class="mord textrm">E</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2155em;"><span></span></span></span></span><span class="mspace" style="margin-right:-0.125em;"></span><span class="mord textrm">X</span></span></span></span></span></span> 格式代码</h2>
-<pre><code class="language-html">&lt;span class=&quot;texhtml&quot; style=&quot;font-family: 'CMU Serif', cmr10, LMRoman10-Regular, 'Latin Modern Math', 'Nimbus Roman No9 L', 'Times New Roman', Times, serif;&quot;&gt;L&lt;span style=&quot;text-transform: uppercase; font-size: 57.851%; vertical-align: 0.205em; margin-left: -0.36em; margin-right: -0.15em; line-height: 0&quot;&gt;a&lt;/span&gt;T&lt;span style=&quot;text-transform: uppercase; vertical-align: -0.2155em; margin-left: -0.125em; margin-right: -0.1667em; line-height: 0&quot;&gt;e&lt;/span&gt;X&lt;/span&gt;
-</code></pre>
 ]]></content>
     </entry>
 </feed>
