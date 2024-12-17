@@ -3974,8 +3974,8 @@ FROM User1;
             <link>http://example.com/c-cpp/c-sql/MySQL-C-API/</link>
             <category term="C/C++" scheme="http://example.com/categories/c-cpp/" />
             <category term="数据库" scheme="http://example.com/categories/c-cpp/db/" />
-            <category term="SQL" scheme="http://example.com/tags/sql/" />
             <category term="C" scheme="http://example.com/tags/c/" />
+            <category term="SQL" scheme="http://example.com/tags/sql/" />
             <pubDate>Tue, 20 Jun 2023 11:12:06 +0800</pubDate>
             <description><![CDATA[ &lt;h2 id=&#34;安装库&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#安装库&#34;&gt;#&lt;/a&gt; 安装库&lt;/h2&gt;
 &lt;h3 id=&#34;linux&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#linux&#34;&gt;#&lt;/a&gt; Linux&lt;/h3&gt;
