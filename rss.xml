@@ -3995,7 +3995,7 @@ Refs: #123
 &lt;li&gt;像素的范围从 (0, 0) 到 (宽度 - 1, 长度 - 1)&lt;/li&gt;
 &lt;li&gt;像素的中心在 (x + 0.5, y + 0.5)&lt;/li&gt;
 &lt;li&gt;屏幕覆盖范围为 (0, 0) 到 (宽，高)&lt;/li&gt;
-&lt;li&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://image.cwlrin.wiki/images/2022/12/29/ApplicationFrameHost_VR5983rDdJ.png&#34; alt=&#34;&#34; /&gt;&lt;/li&gt;
+&lt;li&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUMldPVHlYM1N4R2pEbm83WUtuRk9RQnFjbGllMWkyTnRKN1lJNENSaGNGUFE_ZT16RkpkQXo.jpg&#34; alt=&#34;&#34; /&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;视口变换&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#视口变换&#34;&gt;#&lt;/a&gt; 视口变换&lt;/h2&gt;
 &lt;ul&gt;
@@ -4084,7 +4084,7 @@ l0,-3144c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
 &lt;h1 id=&#34;采样&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#采样&#34;&gt;#&lt;/a&gt; 采样&lt;/h1&gt;
 &lt;p&gt;定义：一个函数离散化的过程&lt;/p&gt;
 &lt;figure class=&#34;highlight cpp&#34;&gt;&lt;figcaption data-lang=&#34;C++&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; x &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt; x &lt;span class=&#34;token operator&#34;&gt;&amp;lt;&lt;/span&gt; xmax&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;token operator&#34;&gt;++&lt;/span&gt;x&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;	output&lt;span class=&#34;token punctuation&#34;&gt;[&lt;/span&gt;x&lt;span class=&#34;token punctuation&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;token function&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;x&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;p&gt;采样可以是一维，二维，三维的。光栅化属于二维采样&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://image.cwlrin.wiki/images/2022/12/29/ApplicationFrameHost_ghj90iP8TX.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUenF0UVFsWDE1T2k3NTdDTldWbmtzQkZEV2JGQ28xcUgyOUNVY1h1bFdTZUE_ZT1qYzBmZ24.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 &lt;h2 id=&#34;光栅化的方法&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#光栅化的方法&#34;&gt;#&lt;/a&gt; 光栅化的方法&lt;/h2&gt;
 &lt;p&gt;给一个三角形，来判断像素中心是否在三角形内&lt;/p&gt;
 &lt;p&gt;定义一个二元函数  &lt;code&gt;inside(tri, x, y)&lt;/code&gt;&lt;/p&gt;
@@ -4098,7 +4098,7 @@ l0,-3144c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
 &lt;figure class=&#34;highlight cpp&#34;&gt;&lt;figcaption data-lang=&#34;C++&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; x &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt; x &lt;span class=&#34;token operator&#34;&gt;&amp;lt;&lt;/span&gt; xmax&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;token operator&#34;&gt;++&lt;/span&gt;x&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;2&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;    &lt;span class=&#34;token function&#34;&gt;fot&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; y &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt; y &lt;span class=&#34;token operator&#34;&gt;&amp;lt;&lt;/span&gt; ymax&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;token operator&#34;&gt;++&lt;/span&gt;y&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;3&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;    	image&lt;span class=&#34;token punctuation&#34;&gt;[&lt;/span&gt;x&lt;span class=&#34;token punctuation&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;[&lt;/span&gt;y&lt;span class=&#34;token punctuation&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;token function&#34;&gt;inside&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;tri&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; x &lt;span class=&#34;token operator&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;0.5&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; y &lt;span class=&#34;token operator&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;0.5&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;p&gt;遍历所有点，判断所有点是否在像素内，通过叉乘计算出（见叉乘在图形学的应用）点是否在三角形内。&lt;/p&gt;
 &lt;p&gt;点在三角形边上怎么处理：看自己定义（在边上不算，或者都算）&lt;/p&gt;
 &lt;p&gt;API（OpenGL）的严格规定：落在三角形的边的左边和上边就算，其次不算&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://image.cwlrin.wiki/images/2022/12/29/ApplicationFrameHost_6kHhbKKKVY.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlZUxUVWNmbHlOT25WOXNXLUY5SURZQkpxUEZtMHdLVFFqc0FQZnZqaG5kNVE_ZT1wYmJrNFY.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;快速寻找像素：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -4106,7 +4106,7 @@ l0,-3144c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;AABB 法&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://image.cwlrin.wiki/images/2022/12/29/ApplicationFrameHost_GJiykeV8mY.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhNDZRVDY3Qk1SSXVFMDNvY2FVX3pZQmFGZTR1LW53d212c1VWS3U1aGFEbUE_ZT1TUDNoN20.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;三角形所覆盖的区域，每一行都找最左和左右，这样就不考虑多一个像素，但是方法较难&lt;/li&gt;
 &lt;li&gt;三角形窄长，又是旋转了角度的，AABB 的方法就比较合适&lt;/li&gt;
