@@ -3,8 +3,8 @@
     <channel>
         <title>Nana7ha&#39;s Café Stella</title>
         <subtitle></subtitle>
-        <icon>http://cwlrin.github.io/assets/favicon.ico</icon>
-        <link>http://cwlrin.github.io</link>
+        <icon>https://cwlrin.wiki/assets/favicon.ico</icon>
+        <link>https://cwlrin.wiki</link>
         <author>
           <name>樱小路七叶</name>
         </author>
@@ -13,12 +13,12 @@
         <pubDate>Sun, 27 Oct 2024 19:37:53 +0800</pubDate>
         <lastBuildDate>Sun, 27 Oct 2024 19:37:53 +0800</lastBuildDate>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/c-cpp/modern-cpp/C++%20%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/c-cpp/modern-cpp/C++%20%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1/</guid>
             <title>C++ 面向对象设计</title>
-            <link>http://cwlrin.github.io/c-cpp/modern-cpp/C++%20%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1/</link>
-            <category term="C/C++" scheme="http://cwlrin.github.io/categories/c-cpp/" />
-            <category term="现代 C++" scheme="http://cwlrin.github.io/categories/c-cpp/modern-cpp/" />
-            <category term="C++" scheme="http://cwlrin.github.io/tags/cpp/" />
+            <link>https://cwlrin.wiki/c-cpp/modern-cpp/C++%20%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1/</link>
+            <category term="C/C++" scheme="https://cwlrin.wiki/categories/c-cpp/" />
+            <category term="现代 C++" scheme="https://cwlrin.wiki/categories/c-cpp/modern-cpp/" />
+            <category term="C++" scheme="https://cwlrin.wiki/tags/cpp/" />
             <pubDate>Sun, 27 Oct 2024 19:37:53 +0800</pubDate>
             <description><![CDATA[ &lt;h2 id=&#34;面向对象的基本概念&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#面向对象的基本概念&#34;&gt;#&lt;/a&gt; 面向对象的基本概念&lt;/h2&gt;
 &lt;p&gt;面向对象编程（Object-Oriented Programming，OOP）是一种编程范式，它基于 “对象” 的概念，将数据和操作数据的方法封装在一起。面向对象的四大基本特征是抽象、封装、继承和多态，这些特征构成了 OOP 的核心。&lt;/p&gt;
@@ -557,12 +557,12 @@
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/c-cpp/c-sql/SQL-%E4%BC%98%E5%8C%96/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/c-cpp/c-sql/SQL-%E4%BC%98%E5%8C%96/</guid>
             <title>SQL 优化</title>
-            <link>http://cwlrin.github.io/c-cpp/c-sql/SQL-%E4%BC%98%E5%8C%96/</link>
-            <category term="C/C++" scheme="http://cwlrin.github.io/categories/c-cpp/" />
-            <category term="数据库" scheme="http://cwlrin.github.io/categories/c-cpp/db/" />
-            <category term="SQL" scheme="http://cwlrin.github.io/tags/sql/" />
+            <link>https://cwlrin.wiki/c-cpp/c-sql/SQL-%E4%BC%98%E5%8C%96/</link>
+            <category term="C/C++" scheme="https://cwlrin.wiki/categories/c-cpp/" />
+            <category term="数据库" scheme="https://cwlrin.wiki/categories/c-cpp/db/" />
+            <category term="SQL" scheme="https://cwlrin.wiki/tags/sql/" />
             <pubDate>Thu, 10 Oct 2024 22:34:25 +0800</pubDate>
             <description><![CDATA[ &lt;h2 id=&#34;慢查询&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#慢查询&#34;&gt;#&lt;/a&gt; 慢查询&lt;/h2&gt;
 &lt;p&gt;MySQL 的慢查询日志是一个用于记录执行时间超过特定阈值的 SQL 查询的工具，它能帮助快速定位和优化这些查询。&lt;/p&gt;
@@ -759,12 +759,12 @@
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/misc/log4cpp-%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/misc/log4cpp-%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</guid>
             <title>log4cpp 简单使用</title>
-            <link>http://cwlrin.github.io/misc/log4cpp-%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</link>
-            <category term="杂项" scheme="http://cwlrin.github.io/categories/misc/" />
-            <category term="工具" scheme="http://cwlrin.github.io/tags/tools/" />
-            <category term="C++" scheme="http://cwlrin.github.io/tags/cpp/" />
+            <link>https://cwlrin.wiki/misc/log4cpp-%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</link>
+            <category term="杂项" scheme="https://cwlrin.wiki/categories/misc/" />
+            <category term="工具" scheme="https://cwlrin.wiki/tags/tools/" />
+            <category term="C++" scheme="https://cwlrin.wiki/tags/cpp/" />
             <pubDate>Mon, 09 Sep 2024 16:56:41 +0800</pubDate>
             <description><![CDATA[ &lt;h2 id=&#34;日志系统&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#日志系统&#34;&gt;#&lt;/a&gt; 日志系统&lt;/h2&gt;
 &lt;h3 id=&#34;日志系统的重要性&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#日志系统的重要性&#34;&gt;#&lt;/a&gt; 日志系统的重要性&lt;/h3&gt;
@@ -1009,11 +1009,11 @@
 &lt;figure class=&#34;highlight ini&#34;&gt;&lt;figcaption data-lang=&#34;ini&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;// log4cpp.properties&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;2&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.rootCategory&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;DEBUG, rootAppender&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;3&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.category.sub1&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;DEBUG, A1, A2&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;4&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.category.sub1.sub2&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;DEBUG, A3&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;5&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;6&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.rootAppender&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;ConsoleAppender&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;7&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.rootAppender.layout&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;PatternLayout&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;8&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.rootAppender.layout.ConversionPattern&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;%d [%p] %m%n&lt;/span&gt; &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;9&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;10&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A1&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;FileAppender&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;11&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A1.fileName&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;A1.log&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;12&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A1.layout&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;BasicLayout&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;13&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;14&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A2&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;FileAppender&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;15&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A2.threshold&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;WARN&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;16&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A2.fileName&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;A2.log&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;17&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A2.layout&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;PatternLayout&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;18&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A2.layout.ConversionPattern&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;%d [%p] %m%n&lt;/span&gt; &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;19&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;20&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A3&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;RollingFileAppender&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;21&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A3.fileName&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;A3.log&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;22&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A3.maxFileSize&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;200&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;23&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A3.maxBackupIndex&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;1&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;24&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A3.layout&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;PatternLayout&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;25&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token key attr-name&#34;&gt;log4cpp.appender.A3.layout.ConversionPattern&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token value attr-value&#34;&gt;%d [%p] %m%n&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;figure class=&#34;highlight cpp&#34;&gt;&lt;figcaption data-lang=&#34;C++&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token macro property&#34;&gt;&lt;span class=&#34;token directive-hash&#34;&gt;#&lt;/span&gt;&lt;span class=&#34;token directive keyword&#34;&gt;include&lt;/span&gt; &lt;span class=&#34;token string&#34;&gt;&amp;lt;log4cpp/Category.hh&gt;&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;2&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token macro property&#34;&gt;&lt;span class=&#34;token directive-hash&#34;&gt;#&lt;/span&gt;&lt;span class=&#34;token directive keyword&#34;&gt;include&lt;/span&gt; &lt;span class=&#34;token string&#34;&gt;&amp;lt;log4cpp/PropertyConfigurator.hh&gt;&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;3&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;4&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;token function&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; argc&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;token keyword&#34;&gt;char&lt;/span&gt;&lt;span class=&#34;token operator&#34;&gt;*&lt;/span&gt; argv&lt;span class=&#34;token punctuation&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;5&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token punctuation&#34;&gt;&amp;#123;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;6&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  std&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;string initFileName &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;token string&#34;&gt;&#34;log4cpp.properties&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;7&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  log4cpp&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;token class-name&#34;&gt;PropertyConfigurator&lt;/span&gt;&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;configure&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;initFileName&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;8&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;9&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  log4cpp&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;Category&lt;span class=&#34;token operator&#34;&gt;&amp;amp;&lt;/span&gt; root &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; log4cpp&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;token class-name&#34;&gt;Category&lt;/span&gt;&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;getRoot&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;10&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;11&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  log4cpp&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;Category&lt;span class=&#34;token operator&#34;&gt;&amp;amp;&lt;/span&gt; sub1 &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;12&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;    log4cpp&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;token class-name&#34;&gt;Category&lt;/span&gt;&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;getInstance&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;std&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token string&#34;&gt;&#34;sub1&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;13&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;14&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  log4cpp&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;Category&lt;span class=&#34;token operator&#34;&gt;&amp;amp;&lt;/span&gt; sub2 &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;15&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;    log4cpp&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;token class-name&#34;&gt;Category&lt;/span&gt;&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;getInstance&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;std&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token string&#34;&gt;&#34;sub1.sub2&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;16&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;17&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  root&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;warn&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token string&#34;&gt;&#34;Storm is coming&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;18&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;19&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  sub1&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token string&#34;&gt;&#34;Received storm warning&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;20&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  sub1&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;info&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token string&#34;&gt;&#34;Closing all hatches&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;21&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;22&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  sub2&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token string&#34;&gt;&#34;Hiding solar panels&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;23&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  sub2&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;error&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token string&#34;&gt;&#34;Solar panels are blocked&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;24&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  sub2&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token string&#34;&gt;&#34;Applying protective shield&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;25&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  sub2&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;warn&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token string&#34;&gt;&#34;Unfolding protective shield&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;26&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  sub2&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;info&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token string&#34;&gt;&#34;Solar panels are shielded&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;27&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;28&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  sub1&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;info&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token string&#34;&gt;&#34;All hatches closed&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;29&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;30&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  root&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;info&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token string&#34;&gt;&#34;Ready for storm.&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;31&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;32&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  log4cpp&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;token class-name&#34;&gt;Category&lt;/span&gt;&lt;span class=&#34;token double-colon punctuation&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;shutdown&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;33&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;34&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  &lt;span class=&#34;token keyword&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;35&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token punctuation&#34;&gt;&amp;#125;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt; ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/c-cpp/c-base/%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/c-cpp/c-base/%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4/</guid>
             <title>进程虚拟内存空间</title>
-            <link>http://cwlrin.github.io/c-cpp/c-base/%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4/</link>
-            <category term="C/C++" scheme="http://cwlrin.github.io/categories/c-cpp/" />
-            <category term="C 语言基础" scheme="http://cwlrin.github.io/categories/c-cpp/c-basic/" />
+            <link>https://cwlrin.wiki/c-cpp/c-base/%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4/</link>
+            <category term="C/C++" scheme="https://cwlrin.wiki/categories/c-cpp/" />
+            <category term="C 语言基础" scheme="https://cwlrin.wiki/categories/c-cpp/c-basic/" />
             <pubDate>Wed, 17 Jul 2024 19:29:10 +0800</pubDate>
             <description><![CDATA[ &lt;h2 id=&#34;进程虚拟内存空间&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#进程虚拟内存空间&#34;&gt;#&lt;/a&gt; 进程虚拟内存空间&lt;/h2&gt;
 &lt;h3 id=&#34;虚拟内存空间&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#虚拟内存空间&#34;&gt;#&lt;/a&gt; 虚拟内存空间&lt;/h3&gt;
@@ -1257,11 +1257,11 @@
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/misc/Doxygen-%E8%AF%AD%E6%B3%95%E7%AE%80%E4%BB%8B/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/misc/Doxygen-%E8%AF%AD%E6%B3%95%E7%AE%80%E4%BB%8B/</guid>
             <title>Doxygen 语法简介</title>
-            <link>http://cwlrin.github.io/misc/Doxygen-%E8%AF%AD%E6%B3%95%E7%AE%80%E4%BB%8B/</link>
-            <category term="杂项" scheme="http://cwlrin.github.io/categories/misc/" />
-            <category term="工具" scheme="http://cwlrin.github.io/tags/tools/" />
+            <link>https://cwlrin.wiki/misc/Doxygen-%E8%AF%AD%E6%B3%95%E7%AE%80%E4%BB%8B/</link>
+            <category term="杂项" scheme="https://cwlrin.wiki/categories/misc/" />
+            <category term="工具" scheme="https://cwlrin.wiki/tags/tools/" />
             <pubDate>Wed, 10 Jul 2024 16:10:50 +0800</pubDate>
             <description><![CDATA[ &lt;p&gt;&lt;code&gt;Doxygen&lt;/code&gt;  是一种广泛使用的文档生成工具，它允许开发者通过遵循特定的注释规范来提取文档。编写注释时，遵循  &lt;code&gt;Doxygen&lt;/code&gt;  的语法规则至关重要，因为这样不仅可以生成格式统一、易于导航的文档，还能提高文档的可读性和专业性。如果注释不符合  &lt;code&gt;Doxygen&lt;/code&gt;  的标准格式，生成的文档可能会显得杂乱无章，难以为其他开发者或用户所理解。&lt;/p&gt;
 &lt;h2 id=&#34;特殊命令简介&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#特殊命令简介&#34;&gt;#&lt;/a&gt; 特殊命令简介&lt;/h2&gt;
@@ -1410,10 +1410,10 @@
 &lt;figure class=&#34;highlight cpp&#34;&gt;&lt;figcaption data-lang=&#34;C++&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token comment&#34;&gt;// 定义一个整型变量 a&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;2&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; a&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;3&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;4&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token comment&#34;&gt;/**&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;5&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt; * @brief 定义一个整型变量 a&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;6&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt; */&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;7&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; a&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;8&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; a&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;token comment&#34;&gt;/*!&amp;lt; 定义一个整型变量 a */&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;9&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; a&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;token comment&#34;&gt;/**&amp;lt; 定义一个整型变量 a */&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;10&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; a&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;token comment&#34;&gt;//!&amp;lt; 定义一个整型变量 a&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;11&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; a&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;token comment&#34;&gt;///&amp;lt; 定义一个整型变量 a&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt; ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/</guid>
             <title>软考中级——事务管理</title>
-            <link>http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/</link>
-            <category term="软考" scheme="http://cwlrin.github.io/categories/qc-cstp/" />
+            <link>https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/</link>
+            <category term="软考" scheme="https://cwlrin.wiki/categories/qc-cstp/" />
             <pubDate>Fri, 24 May 2024 14:26:08 +0800</pubDate>
             <description><![CDATA[ &lt;h1 id=&#34;事务的基本概念&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#事务的基本概念&#34;&gt;#&lt;/a&gt; 事务的基本概念&lt;/h1&gt;
 &lt;h2 id=&#34;事务&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#事务&#34;&gt;#&lt;/a&gt; 事务&lt;/h2&gt;
@@ -1664,10 +1664,10 @@
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%8E%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%8E%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86/</guid>
             <title>软考中级——云计算与大数据处理</title>
-            <link>http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%8E%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86/</link>
-            <category term="软考" scheme="http://cwlrin.github.io/categories/qc-cstp/" />
+            <link>https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%8E%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86/</link>
+            <category term="软考" scheme="https://cwlrin.wiki/categories/qc-cstp/" />
             <pubDate>Wed, 15 May 2024 19:24:10 +0800</pubDate>
             <description><![CDATA[ &lt;h1 id=&#34;云计算基础知识&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#云计算基础知识&#34;&gt;#&lt;/a&gt; 云计算基础知识&lt;/h1&gt;
 &lt;p&gt;权威定义：云计算是一种将可伸缩、弹性、共享的物理和虚拟资源池以按需自服务的方式供应和管理，并提供网络访问的模式。&lt;/p&gt;
@@ -1723,10 +1723,10 @@
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1/</guid>
             <title>软考中级——数据库设计</title>
-            <link>http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1/</link>
-            <category term="软考" scheme="http://cwlrin.github.io/categories/qc-cstp/" />
+            <link>https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1/</link>
+            <category term="软考" scheme="https://cwlrin.wiki/categories/qc-cstp/" />
             <pubDate>Sat, 11 May 2024 15:51:17 +0800</pubDate>
             <description><![CDATA[ &lt;h1 id=&#34;数据库设计概述&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#数据库设计概述&#34;&gt;#&lt;/a&gt; 数据库设计概述&lt;/h1&gt;
 &lt;h2 id=&#34;数据库应用系统的生命期&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#数据库应用系统的生命期&#34;&gt;#&lt;/a&gt; 数据库应用系统的生命期&lt;/h2&gt;
@@ -1931,10 +1931,10 @@
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E7%B3%BB%E7%BB%9F%E5%BC%80%E5%8F%91%E5%92%8C%E8%BF%90%E8%A1%8C%E7%9F%A5%E8%AF%86/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E7%B3%BB%E7%BB%9F%E5%BC%80%E5%8F%91%E5%92%8C%E8%BF%90%E8%A1%8C%E7%9F%A5%E8%AF%86/</guid>
             <title>软考中级——系统开发和运行知识</title>
-            <link>http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E7%B3%BB%E7%BB%9F%E5%BC%80%E5%8F%91%E5%92%8C%E8%BF%90%E8%A1%8C%E7%9F%A5%E8%AF%86/</link>
-            <category term="软考" scheme="http://cwlrin.github.io/categories/qc-cstp/" />
+            <link>https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94%E7%B3%BB%E7%BB%9F%E5%BC%80%E5%8F%91%E5%92%8C%E8%BF%90%E8%A1%8C%E7%9F%A5%E8%AF%86/</link>
+            <category term="软考" scheme="https://cwlrin.wiki/categories/qc-cstp/" />
             <pubDate>Tue, 07 May 2024 19:19:23 +0800</pubDate>
             <description><![CDATA[ &lt;h1 id=&#34;软件生存周期&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#软件生存周期&#34;&gt;#&lt;/a&gt; 软件生存周期&lt;/h1&gt;
 &lt;p&gt;软件生存周期包括&lt;strong&gt;可行性分析与项目开发计划、需求分析、概要设计、详细设计、编码和单元 测试、综合测试及维护&lt;/strong&gt;阶段。&lt;/p&gt;
@@ -2169,10 +2169,10 @@
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94NoSQL/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94NoSQL/</guid>
             <title>软考中级——NoSQL</title>
-            <link>http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94NoSQL/</link>
-            <category term="软考" scheme="http://cwlrin.github.io/categories/qc-cstp/" />
+            <link>https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94NoSQL/</link>
+            <category term="软考" scheme="https://cwlrin.wiki/categories/qc-cstp/" />
             <pubDate>Thu, 02 May 2024 16:39:15 +0800</pubDate>
             <description><![CDATA[ &lt;h1 id=&#34;cap-理论和base-特性&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#cap-理论和base-特性&#34;&gt;#&lt;/a&gt; CAP 理论和 BASE 特性&lt;/h1&gt;
 &lt;h2 id=&#34;cap-理论&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#cap-理论&#34;&gt;#&lt;/a&gt; CAP 理论&lt;/h2&gt;
@@ -2247,10 +2247,10 @@
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94SQL%E8%AF%AD%E8%A8%80%EF%BC%88%E4%B8%8B%EF%BC%89/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94SQL%E8%AF%AD%E8%A8%80%EF%BC%88%E4%B8%8B%EF%BC%89/</guid>
             <title>软考中级——SQL语言（下）</title>
-            <link>http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94SQL%E8%AF%AD%E8%A8%80%EF%BC%88%E4%B8%8B%EF%BC%89/</link>
-            <category term="软考" scheme="http://cwlrin.github.io/categories/qc-cstp/" />
+            <link>https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94SQL%E8%AF%AD%E8%A8%80%EF%BC%88%E4%B8%8B%EF%BC%89/</link>
+            <category term="软考" scheme="https://cwlrin.wiki/categories/qc-cstp/" />
             <pubDate>Tue, 30 Apr 2024 19:10:54 +0800</pubDate>
             <description><![CDATA[ &lt;h1 id=&#34;授权与触发器&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#授权与触发器&#34;&gt;#&lt;/a&gt; 授权与触发器&lt;/h1&gt;
 &lt;h2 id=&#34;授权-grant&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#授权-grant&#34;&gt;#&lt;/a&gt; 授权 (GRANT)&lt;/h2&gt;
@@ -2466,10 +2466,10 @@
 &lt;figure class=&#34;highlight sql&#34;&gt;&lt;figcaption data-lang=&#34;SQL&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;CREATE&lt;/span&gt; PROCEDRUE buy_ticket &lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token keyword&#34;&gt;char&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;[&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;]&lt;/span&gt; flightno &lt;span class=&#34;token operator&#34;&gt;IN&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; ___&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;a&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;___&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; result &lt;span class=&#34;token keyword&#34;&gt;OUT&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;token keyword&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;token keyword&#34;&gt;BEGIN&lt;/span&gt; … …&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;2&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;UPDATE&lt;/span&gt; tickets&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;3&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;SET&lt;/span&gt; balance &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; ___&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;b&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;___&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;4&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;WHERE&lt;/span&gt; flght &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; flightno&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;5&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;SQLcode &lt;span class=&#34;token operator&#34;&gt;&amp;lt;&gt;&lt;/span&gt; SUCCESS&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt; &amp;#123; &lt;span class=&#34;token comment&#34;&gt;-- SQLcode 为 SQL 语句的执行状态 &lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;6&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;	___&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;c&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;___&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;7&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;	result &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;8&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;	&lt;span class=&#34;token keyword&#34;&gt;return&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;9&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&amp;#125; &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;10&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;COMMIT&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;11&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;___&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;d&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;___&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;12&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;END&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt; ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94SQL%E8%AF%AD%E8%A8%80%EF%BC%88%E4%B8%8A%EF%BC%89/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94SQL%E8%AF%AD%E8%A8%80%EF%BC%88%E4%B8%8A%EF%BC%89/</guid>
             <title>软考中级——SQL语言（上）</title>
-            <link>http://cwlrin.github.io/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94SQL%E8%AF%AD%E8%A8%80%EF%BC%88%E4%B8%8A%EF%BC%89/</link>
-            <category term="软考" scheme="http://cwlrin.github.io/categories/qc-cstp/" />
+            <link>https://cwlrin.wiki/qc-cstp/%E8%BD%AF%E8%80%83%E4%B8%AD%E7%BA%A7%E2%80%94%E2%80%94SQL%E8%AF%AD%E8%A8%80%EF%BC%88%E4%B8%8A%EF%BC%89/</link>
+            <category term="软考" scheme="https://cwlrin.wiki/categories/qc-cstp/" />
             <pubDate>Sun, 14 Apr 2024 19:05:03 +0800</pubDate>
             <description><![CDATA[ &lt;h1 id=&#34;sql-概述与数据库定义&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#sql-概述与数据库定义&#34;&gt;#&lt;/a&gt; SQL 概述与数据库定义&lt;/h1&gt;
 &lt;h2 id=&#34;sql-的基本组成&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#sql-的基本组成&#34;&gt;#&lt;/a&gt; SQL 的基本组成&lt;/h2&gt;
@@ -2876,12 +2876,12 @@
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/c-cpp/c-sql/MySQL-%E6%9D%82%E9%A1%B9/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/c-cpp/c-sql/MySQL-%E6%9D%82%E9%A1%B9/</guid>
             <title>MySQL 杂项</title>
-            <link>http://cwlrin.github.io/c-cpp/c-sql/MySQL-%E6%9D%82%E9%A1%B9/</link>
-            <category term="C/C++" scheme="http://cwlrin.github.io/categories/c-cpp/" />
-            <category term="数据库" scheme="http://cwlrin.github.io/categories/c-cpp/db/" />
-            <category term="SQL" scheme="http://cwlrin.github.io/tags/sql/" />
+            <link>https://cwlrin.wiki/c-cpp/c-sql/MySQL-%E6%9D%82%E9%A1%B9/</link>
+            <category term="C/C++" scheme="https://cwlrin.wiki/categories/c-cpp/" />
+            <category term="数据库" scheme="https://cwlrin.wiki/categories/c-cpp/db/" />
+            <category term="SQL" scheme="https://cwlrin.wiki/tags/sql/" />
             <pubDate>Thu, 14 Sep 2023 20:33:13 +0800</pubDate>
             <description><![CDATA[ &lt;h2 id=&#34;数据库的内部结构&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#数据库的内部结构&#34;&gt;#&lt;/a&gt; 数据库的内部结构&lt;/h2&gt;
 &lt;h3 id=&#34;数据库的分层结构&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#数据库的分层结构&#34;&gt;#&lt;/a&gt; 数据库的分层结构&lt;/h3&gt;
@@ -3198,13 +3198,13 @@
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/c-cpp/c-sql/MySQL-C-API/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/c-cpp/c-sql/MySQL-C-API/</guid>
             <title>MySQL C API</title>
-            <link>http://cwlrin.github.io/c-cpp/c-sql/MySQL-C-API/</link>
-            <category term="C/C++" scheme="http://cwlrin.github.io/categories/c-cpp/" />
-            <category term="数据库" scheme="http://cwlrin.github.io/categories/c-cpp/db/" />
-            <category term="C" scheme="http://cwlrin.github.io/tags/c/" />
-            <category term="SQL" scheme="http://cwlrin.github.io/tags/sql/" />
+            <link>https://cwlrin.wiki/c-cpp/c-sql/MySQL-C-API/</link>
+            <category term="C/C++" scheme="https://cwlrin.wiki/categories/c-cpp/" />
+            <category term="数据库" scheme="https://cwlrin.wiki/categories/c-cpp/db/" />
+            <category term="C" scheme="https://cwlrin.wiki/tags/c/" />
+            <category term="SQL" scheme="https://cwlrin.wiki/tags/sql/" />
             <pubDate>Tue, 20 Jun 2023 11:12:06 +0800</pubDate>
             <description><![CDATA[ &lt;h2 id=&#34;安装库&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#安装库&#34;&gt;#&lt;/a&gt; 安装库&lt;/h2&gt;
 &lt;h3 id=&#34;linux&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#linux&#34;&gt;#&lt;/a&gt; Linux&lt;/h3&gt;
@@ -3495,10 +3495,10 @@
 &lt;figure class=&#34;highlight c&#34;&gt;&lt;figcaption data-lang=&#34;c&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token macro property&#34;&gt;&lt;span class=&#34;token directive-hash&#34;&gt;#&lt;/span&gt;&lt;span class=&#34;token directive keyword&#34;&gt;include&lt;/span&gt; &lt;span class=&#34;token string&#34;&gt;&amp;lt;mysql/mysql.h&gt;&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;2&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token macro property&#34;&gt;&lt;span class=&#34;token directive-hash&#34;&gt;#&lt;/span&gt;&lt;span class=&#34;token directive keyword&#34;&gt;include&lt;/span&gt; &lt;span class=&#34;token string&#34;&gt;&amp;lt;stdc.h&gt;&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;3&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;4&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;token function&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;&amp;#123;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;5&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  MYSQL &lt;span class=&#34;token operator&#34;&gt;*&lt;/span&gt;conn&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;6&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;7&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  conn &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;token function&#34;&gt;mysql_init&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token constant&#34;&gt;NULL&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;8&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  &lt;span class=&#34;token keyword&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token operator&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;token function&#34;&gt;mysql_real_connect&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;conn&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;token string&#34;&gt;&#34;localhost&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;token string&#34;&gt;&#34;root&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;token string&#34;&gt;&#34;123456&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;token string&#34;&gt;&#34;wd&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;token constant&#34;&gt;NULL&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;9&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;                          &lt;span class=&#34;token number&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;&amp;#123;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;10&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;    &lt;span class=&#34;token function&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token string&#34;&gt;&#34;Error: %s\n&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;token function&#34;&gt;mysql_error&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;conn&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;11&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;    &lt;span class=&#34;token keyword&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;12&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  &lt;span class=&#34;token punctuation&#34;&gt;&amp;#125;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;13&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;14&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  &lt;span class=&#34;token function&#34;&gt;mysql_autocommit&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;conn&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;15&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;16&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  &lt;span class=&#34;token function&#34;&gt;mysql_query&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;conn&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;token string&#34;&gt;&#34;INSERT INTO class VALUES (4, &#39;四班&#39;)&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;17&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  &lt;span class=&#34;token keyword&#34;&gt;int&lt;/span&gt; ret &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;token function&#34;&gt;mysql_query&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;conn&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;token string&#34;&gt;&#34;INSERT INTO class VALUES (NULL, &#39;五班&#39;)&#34;&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;18&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;19&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  &lt;span class=&#34;token keyword&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;ret &lt;span class=&#34;token operator&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;&amp;#123;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;20&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;    &lt;span class=&#34;token function&#34;&gt;mysql_rollback&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;conn&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;21&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  &lt;span class=&#34;token punctuation&#34;&gt;&amp;#125;&lt;/span&gt; &lt;span class=&#34;token keyword&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;&amp;#123;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;22&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;    &lt;span class=&#34;token function&#34;&gt;mysql_rollback&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;conn&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;23&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  &lt;span class=&#34;token punctuation&#34;&gt;&amp;#125;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;24&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;25&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  &lt;span class=&#34;token function&#34;&gt;mysql_autocommit&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;conn&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;26&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;27&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  &lt;span class=&#34;token function&#34;&gt;mysql_close&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;conn&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;28&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;  &lt;span class=&#34;token keyword&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;29&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token punctuation&#34;&gt;&amp;#125;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt; ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/misc/%E7%BA%A6%E5%AE%9A%E5%BC%8F%E6%8F%90%E4%BA%A4-1-0-0/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/misc/%E7%BA%A6%E5%AE%9A%E5%BC%8F%E6%8F%90%E4%BA%A4-1-0-0/</guid>
             <title>约定式提交 1.0.0</title>
-            <link>http://cwlrin.github.io/misc/%E7%BA%A6%E5%AE%9A%E5%BC%8F%E6%8F%90%E4%BA%A4-1-0-0/</link>
-            <category term="杂项" scheme="http://cwlrin.github.io/categories/misc/" />
+            <link>https://cwlrin.wiki/misc/%E7%BA%A6%E5%AE%9A%E5%BC%8F%E6%8F%90%E4%BA%A4-1-0-0/</link>
+            <category term="杂项" scheme="https://cwlrin.wiki/categories/misc/" />
             <pubDate>Tue, 04 Apr 2023 18:58:13 +0800</pubDate>
             <description><![CDATA[ &lt;div class=&#34;note info&#34;&gt;
 &lt;p&gt;主要参考 &lt;a href=&#34;https://www.conventionalcommits.org/zh-hans/v1.0.0&#34;&gt;约定式提交&lt;/a&gt; 和 &lt;a href=&#34;https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines&#34;&gt;Contributing to Angular&lt;/a&gt;&lt;/p&gt;
@@ -3607,10 +3607,10 @@ Refs: #123
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/misc/%E4%BD%BF%E7%94%A8-ffmpeg-%E5%B0%86%E6%96%87%E4%BB%B6%E5%A4%B9%E4%B8%AD%E7%9A%84%E6%89%80%E6%9C%89%E8%A7%86%E9%A2%91%E5%90%88%E5%B9%B6%E4%B8%BA%E5%8D%95%E4%B8%AA%E8%A7%86%E9%A2%91%E6%96%87%E4%BB%B6/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/misc/%E4%BD%BF%E7%94%A8-ffmpeg-%E5%B0%86%E6%96%87%E4%BB%B6%E5%A4%B9%E4%B8%AD%E7%9A%84%E6%89%80%E6%9C%89%E8%A7%86%E9%A2%91%E5%90%88%E5%B9%B6%E4%B8%BA%E5%8D%95%E4%B8%AA%E8%A7%86%E9%A2%91%E6%96%87%E4%BB%B6/</guid>
             <title>使用 ffmpeg 将文件夹中的所有视频合并为单个视频文件</title>
-            <link>http://cwlrin.github.io/misc/%E4%BD%BF%E7%94%A8-ffmpeg-%E5%B0%86%E6%96%87%E4%BB%B6%E5%A4%B9%E4%B8%AD%E7%9A%84%E6%89%80%E6%9C%89%E8%A7%86%E9%A2%91%E5%90%88%E5%B9%B6%E4%B8%BA%E5%8D%95%E4%B8%AA%E8%A7%86%E9%A2%91%E6%96%87%E4%BB%B6/</link>
-            <category term="杂项" scheme="http://cwlrin.github.io/categories/misc/" />
+            <link>https://cwlrin.wiki/misc/%E4%BD%BF%E7%94%A8-ffmpeg-%E5%B0%86%E6%96%87%E4%BB%B6%E5%A4%B9%E4%B8%AD%E7%9A%84%E6%89%80%E6%9C%89%E8%A7%86%E9%A2%91%E5%90%88%E5%B9%B6%E4%B8%BA%E5%8D%95%E4%B8%AA%E8%A7%86%E9%A2%91%E6%96%87%E4%BB%B6/</link>
+            <category term="杂项" scheme="https://cwlrin.wiki/categories/misc/" />
             <pubDate>Thu, 23 Feb 2023 16:10:32 +0800</pubDate>
             <description><![CDATA[ &lt;p&gt;] 需要安装 ffmpeg&lt;/p&gt;
 &lt;p&gt;首先使用 Windows PowerShell 输入 bash 指令&lt;/p&gt;
@@ -3620,12 +3620,12 @@ Refs: #123
 &lt;figure class=&#34;highlight bash&#34;&gt;&lt;figcaption data-lang=&#34;bash&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;delete mylist.txt&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt; ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/games101/GAMES101-L05-Rasterization-Triangles/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/games101/GAMES101-L05-Rasterization-Triangles/</guid>
             <title>GAMES101 L05 Rasterization(Triangles)</title>
-            <link>http://cwlrin.github.io/games101/GAMES101-L05-Rasterization-Triangles/</link>
-            <category term="GAMES101" scheme="http://cwlrin.github.io/categories/games101/" />
-            <category term="技术美术" scheme="http://cwlrin.github.io/tags/ta/" />
-            <category term="图形学" scheme="http://cwlrin.github.io/tags/gpu/" />
+            <link>https://cwlrin.wiki/games101/GAMES101-L05-Rasterization-Triangles/</link>
+            <category term="GAMES101" scheme="https://cwlrin.wiki/categories/games101/" />
+            <category term="技术美术" scheme="https://cwlrin.wiki/tags/ta/" />
+            <category term="图形学" scheme="https://cwlrin.wiki/tags/gpu/" />
             <pubDate>Thu, 29 Dec 2022 18:31:42 +0800</pubDate>
             <description><![CDATA[ &lt;h1 id=&#34;标准立方体到屏幕&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#标准立方体到屏幕&#34;&gt;#&lt;/a&gt; 标准立方体到屏幕&lt;/h1&gt;
 &lt;h2 id=&#34;什么是屏幕&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#什么是屏幕&#34;&gt;#&lt;/a&gt; 什么是屏幕？&lt;/h2&gt;
@@ -3768,12 +3768,12 @@ l0,-3144c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/games101/GAMES101-L04-Transformation-Cont/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/games101/GAMES101-L04-Transformation-Cont/</guid>
             <title>GAMES101 L04 Transformation Cont</title>
-            <link>http://cwlrin.github.io/games101/GAMES101-L04-Transformation-Cont/</link>
-            <category term="GAMES101" scheme="http://cwlrin.github.io/categories/games101/" />
-            <category term="技术美术" scheme="http://cwlrin.github.io/tags/ta/" />
-            <category term="图形学" scheme="http://cwlrin.github.io/tags/gpu/" />
+            <link>https://cwlrin.wiki/games101/GAMES101-L04-Transformation-Cont/</link>
+            <category term="GAMES101" scheme="https://cwlrin.wiki/categories/games101/" />
+            <category term="技术美术" scheme="https://cwlrin.wiki/tags/ta/" />
+            <category term="图形学" scheme="https://cwlrin.wiki/tags/gpu/" />
             <pubDate>Mon, 29 Aug 2022 18:07:27 +0800</pubDate>
             <description><![CDATA[ &lt;h2 id=&#34;3d-变换&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#3d-变换&#34;&gt;#&lt;/a&gt; 3D 变换&lt;/h2&gt;
 &lt;h3 id=&#34;平移&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#平移&#34;&gt;#&lt;/a&gt; 平移&lt;/h3&gt;
@@ -4584,10 +4584,10 @@ l0,-1344c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/misc/Git-%E6%8F%90%E4%BA%A4%E4%BB%A3%E7%A0%81%E6%97%B6%E6%B7%BB%E5%8A%A0-emoji-%E5%9B%BE%E6%A0%87/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/misc/Git-%E6%8F%90%E4%BA%A4%E4%BB%A3%E7%A0%81%E6%97%B6%E6%B7%BB%E5%8A%A0-emoji-%E5%9B%BE%E6%A0%87/</guid>
             <title>Git 提交代码时添加 emoji 图标</title>
-            <link>http://cwlrin.github.io/misc/Git-%E6%8F%90%E4%BA%A4%E4%BB%A3%E7%A0%81%E6%97%B6%E6%B7%BB%E5%8A%A0-emoji-%E5%9B%BE%E6%A0%87/</link>
-            <category term="杂项" scheme="http://cwlrin.github.io/categories/misc/" />
+            <link>https://cwlrin.wiki/misc/Git-%E6%8F%90%E4%BA%A4%E4%BB%A3%E7%A0%81%E6%97%B6%E6%B7%BB%E5%8A%A0-emoji-%E5%9B%BE%E6%A0%87/</link>
+            <category term="杂项" scheme="https://cwlrin.wiki/categories/misc/" />
             <pubDate>Mon, 18 Jul 2022 17:13:04 +0800</pubDate>
             <description><![CDATA[ &lt;h2 id=&#34;在commit时添加一个emoji表情图标&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#在commit时添加一个emoji表情图标&#34;&gt;#&lt;/a&gt; 在 commit 时添加一个 emoji 表情图标&lt;/h2&gt;
 &lt;figure class=&#34;highlight git&#34;&gt;&lt;figcaption data-lang=&#34;git&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;git commit -m &lt;span class=&#34;token string&#34;&gt;&#39;:emoji: 此次提交的内容说明&#39;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;h2 id=&#34;添加多个emoji表情图标&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#添加多个emoji表情图标&#34;&gt;#&lt;/a&gt; 添加多个 emoji 表情图标&lt;/h2&gt;
@@ -4756,12 +4756,12 @@ l0,-1344c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
  ]]></description>
         </item>
         <item>
-            <guid isPermalink="true">http://cwlrin.github.io/games101/GAMES101-03-Transformation/</guid>
+            <guid isPermalink="true">https://cwlrin.wiki/games101/GAMES101-03-Transformation/</guid>
             <title>GAMES101 03 Transformation</title>
-            <link>http://cwlrin.github.io/games101/GAMES101-03-Transformation/</link>
-            <category term="GAMES101" scheme="http://cwlrin.github.io/categories/games101/" />
-            <category term="技术美术" scheme="http://cwlrin.github.io/tags/ta/" />
-            <category term="图形学" scheme="http://cwlrin.github.io/tags/gpu/" />
+            <link>https://cwlrin.wiki/games101/GAMES101-03-Transformation/</link>
+            <category term="GAMES101" scheme="https://cwlrin.wiki/categories/games101/" />
+            <category term="技术美术" scheme="https://cwlrin.wiki/tags/ta/" />
+            <category term="图形学" scheme="https://cwlrin.wiki/tags/gpu/" />
             <pubDate>Thu, 14 Jul 2022 10:56:42 +0800</pubDate>
             <description><![CDATA[ &lt;h2 id=&#34;2d-变换&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#2d-变换&#34;&gt;#&lt;/a&gt; 2D 变换&lt;/h2&gt;
 &lt;h3 id=&#34;线性变换&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#线性变换&#34;&gt;#&lt;/a&gt; 线性变换&lt;/h3&gt;
