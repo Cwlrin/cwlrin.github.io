@@ -1,0 +1,217 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=2"/><meta name="theme-color" content="#222"/><meta http-equiv="X-UA-COMPATIBLE" content="IE=edge,chrome=1"/><meta name="renderer" content="webkit"/><link rel="icon" type="image/ico" sizes="32x32" href="/assets/favicon.ico"/><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png"/><link rel="alternate" href="/rss.xml" title="Nana7ha's Café Stella" type="application/rss+xml"><link rel="alternate" href="/atom.xml" title="Nana7ha's Café Stella" type="application/atom+xml"><link rel="alternate" type="application/json" title="Nana7ha's Café Stella" href="https://cwlrin.wiki/feed.json"/><link rel="preconnect" href="https://s4.zstatic.net"/><link rel="preconnect" href="https://at.alicdn.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic%7CFredericka%20the%20Great:400,400italic,700,700italic%7CNoto%20Serif%20JP:400,400italic,700,700italic%7CNoto%20Serif%20SC:400,400italic,700,700italic%7CInconsolata:400,400italic,700,700italic&display=swap&subset=latin,latin-ext" media="none" onload="this.media&#x3D;&#39;all&#39;"><link rel="stylesheet" href="/css/app.css?v=0.4.20"><link rel="modulepreload" href="/js/chunk-7SEFNKBW.js"></link><link rel="modulepreload" href="/js/chunk-B6LR4GZ7.js"></link><link rel="modulepreload" href="/js/chunk-R2ID445Y.js"></link><link rel="modulepreload" href="/js/copy-tex-6KGJ4I7N.js"></link><link rel="modulepreload" href="/js/index.esm-77JWK77F.js"></link><link rel="modulepreload" href="/js/post-NFR2DBU7.js"></link><link rel="modulepreload" href="/js/quicklink-KETDXBC3.js"></link><link rel="modulepreload" href="/js/siteInit.js"></link><link rel="preload" href="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhejFvaF9WX3RCS3RfSjB1d3hsUmdnQnhXZEttOGJXWTF3NnZPMmhuMWtTUUE_ZT1IY3pYcjc.jpg" as="image" fetchpriority="high"><meta name="keywords" content="嵌入式"/><meta name="description" content="技术与美日新月异"/><link rel="canonical" href="https://cwlrin.wiki/embedded/stm32/%E6%B1%9F%E5%8D%8F%E7%A7%91%E6%8A%80%203-1%20GPIO%20%E8%BE%93%E5%87%BA/"><title>江协科技 STM32 3-1 GPIO 输出</title><meta name="generator" content="Hexo 7.3.0"></head><body itemscope itemtype="http://schema.org/WebPage"><div id="loading"><div class="cat"><div class="body"></div><div class="head"><div class="face"></div></div><div class="foot"><div class="tummy-end"></div><div class="bottom"></div><div class="legs left"></div><div class="legs right"></div></div><div class="paw"><div class="hands left"></div><div class="hands right"></div></div></div></div><div id="container"><header id="header" itemscope itemtype="http://schema.org/WPHeader"><div class="inner"><div id="brand"><div class="pjax"><h1 itemprop="name headline">江协科技 STM32 3-1 GPIO 输出</h1><div class="meta"><span class="item" title="创建时间：2025-04-13 17:22:25"><span class="icon"><i class="ic i-calendar"></i></span><span class="text">发表于</span><time itemprop="dateCreated datePublished" datetime="2025-04-13T17:22:25+08:00">2025-04-13</time></span><span class="item" title="本文字数"><span class="icon"><i class="ic i-pen"></i></span><span class="text">本文字数</span><span>12k</span><span class="text">字</span></span><span class="item" title="阅读时长"><span class="icon"><i class="ic i-clock"></i></span><span class="text">阅读时长</span><span>11 分钟</span></span></div></div></div><nav id="nav"><div class="inner"><div class="toggle"><div class="lines" aria-label="切换导航栏"><span class="line"></span><span class="line"></span><span class="line"></span></div></div><ul class="menu"><li class="item title"><a href="/" rel="start">七葉の喫茶ステラ</a></li></ul><ul class="right" id="rightNav"><li class="item theme"><i class="ic i-sun"></i></li><li class="item search"><i class="ic i-search"></i></li></ul></div></nav></div><div class="pjax" id="imgs"><img src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhejFvaF9WX3RCS3RfSjB1d3hsUmdnQnhXZEttOGJXWTF3NnZPMmhuMWtTUUE_ZT1IY3pYcjc.jpg" loading="eager" decoding="async" fetchpriority="high" alt="Nana7ha's Café Stella"></div></header><div id="waves"><svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path></defs><g class="parallax"><use xlink:href="#gentle-wave" x="48" y="0"></use><use xlink:href="#gentle-wave" x="48" y="3"></use><use xlink:href="#gentle-wave" x="48" y="5"></use><use xlink:href="#gentle-wave" x="48" y="7"></use></g></svg></div><main><div class="inner"><div class="pjax" id="main"><div class="article wrap"><div class="breadcrumb" itemListElement itemscope itemtype="https://schema.org/BreadcrumbList"><i class="ic i-home"></i><span><a href="/">首页</a></span><i class="ic i-angle-right"></i><span itemprop="itemListElement" itemscope="itemscope" itemtype="https://schema.org/ListItem"><a href="/categories/embedded/" itemprop="item" rel="index" title="分类于嵌入式开发"><span itemprop="name">嵌入式开发<meta itemprop="position" content="0"/></span></a></span><i class="ic i-angle-right"></i><span class="current" itemprop="itemListElement" itemscope="itemscope" itemtype="https://schema.org/ListItem"><a href="/categories/embedded/stm32/" itemprop="item" rel="index" title="分类于STM32"><span itemprop="name">STM32<meta itemprop="position" content="1"/></span></a></span></div><article class="post block" itemscope="itemscope" itemtype="http://schema.org/Article" lang="zh-CN"><link itemprop="mainEntityOfPage" href="https://cwlrin.wiki/embedded/stm32/%E6%B1%9F%E5%8D%8F%E7%A7%91%E6%8A%80%203-1%20GPIO%20%E8%BE%93%E5%87%BA/"/><span hidden="hidden" itemprop="author" itemscope="itemscope" itemtype="http://schema.org/Person"><meta itemprop="image" content="/assets/avatar.jpg"/><meta itemprop="name" content="樱小路七叶"/><meta itemprop="description" content=", 技术与美日新月异"/></span><span hidden="hidden" itemprop="publisher" itemscope="itemscope" itemtype="http://schema.org/Organization"><meta itemprop="name" content="Nana7ha's Café Stella"/></span><div class="body md" itemprop="articleBody"><h2 id="gpio-简介"><a class="anchor" href="#gpio-简介">#</a> GPIO 简介</h2>
+<p>GPIO（General Purpose Input Output）通用输入输出口。</p>
+<p>可配置为 8 种输入输出模式。</p>
+<p>引脚电平：0V~3.3V，部分引脚可容忍 5V。（0V 就是低电平是数据 0，3.3V 是高电平是数据 1。容忍 5V 意思是可以在这个端口输入 5V 的点电压，也认为是高电平，但是对于输出而言，最大就只能输出 3.3V，因为供电就只有 3.3V，具体哪些端口能容忍 5V，可以参考一下 STM32 的引脚定义，带 FT 的就是可以容忍 5V，不带 FT 的就只能接入 3.3V 电压）</p>
+<p>输出模式下可控制端口输出高低电平，用以驱动 LED、控制蜂鸣器、模拟通信协议输出时序等。（后面文章显示的 LED 和蜂鸣器的程序现象，就使用到了 GPIO 的输出模式。另外在其他的应用场景，只要是可以用高低电平来进行控制地方都可以用 GPIO 来完成；如果控制的是功率比较大的设备，只需要再加入驱动电路即可；此外，还可以用 GPIO 来模拟通信协议，比如 I2CC、spi 或某个芯片特定协议，我们都可以用 GPIO 的输出模式来模拟其中的输出时序部分）</p>
+<p>输入模式下可读取端口的高低电平或电压，用于读取按键输入、外接模块电平信号输入、ADC 电压采集、模拟通信协议接收数据等。（输入模式最常见的就是读取按键了，用来捕获我们的案件按下事件；另外，也可以读取带有数字输出的一些模块，比如，光敏电阻模块、热敏电阻模块等；如果这个模块输出的是模拟量，那 GPIO 还可以配置成模拟输入模式，再配合内部的 ADC 外设，就能读取端口的模拟电压了；除此之外，模拟通信协议时，接收线上的通信数据，也是靠 GPIO 的输入来完成的）</p>
+<h2 id="gpio-的基本结构"><a class="anchor" href="#gpio-的基本结构">#</a> GPIO 的基本结构</h2>
+<p>如下，为 GPIO 的整体构造，其中左边的是 APB2 外设总线；在 STM32 中所有的 GPIO 都是挂载在 APB2 外设总线上的，其中 GPIO 外设的名称都是按照 GPIOA、GPIOB 等等这样来命名的，每个 GPIO 外设，总共有 16 个引脚，编号是从 0 到 15，GPIO 的第 0 号引脚，我们一般把它称为 PA0，接着第一号就是 PA1~PA15 以此来命名；</p>
+<p>在每个 GPIO 模块内，组要包含了寄存器和驱动器，寄存器就是一段特殊的存储器，内核可以通过 APB2 总线对寄存器进行读写，这样就可以完成输出电平和读取电平的功能了，寄存器的每一位对应一个引脚，其中，输出寄存器写 1，对应的引脚就会输出高电平，写 0 就会输出低电平，输入寄存器读取为 1，就证明对应的端口目前是高电平，读取为 0，就是低电平；</p>
+<p>因为 STM32 是 32 位单片机，所以 STM32 内部的寄存器都是 32 位的，但这个端口只有 16 位，所以这个寄存器只有低 16 位对应的有端口，高 16 位是没有用的；</p>
+<p>驱动器是用来增加信号的驱动能力，寄存器只负责存储数据，如果要进行点灯这样的操作，还是需要驱动器来负责增大驱动能力。</p>
+<p>如下，这些就是 GPIO 的整体基本结构了。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWYm5DTnVoSFI5RmxEVHZGZVJJV2dBQjRmWGlxaWpnNHBxVks3SDduU0kwVVE_ZT1FVmJlOG4.jpg" alt="" /></p>
+<h2 id="gpio-位结构每一位的具体电路结构"><a class="anchor" href="#gpio-位结构每一位的具体电路结构">#</a> GPIO 位结构（每一位的具体电路结构）</h2>
+<p>下图为 STM32 参考手册中的 GPIO 位结构的电路图。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VYWWNGRnlvSXY1SGdkMnVnMzV4Wm5BQllGTTRWZEYwME9qOTZSb1NER0d5cmc_ZT10TFZkRkE.jpg" alt="" /></p>
+<p>左边三个就是寄存器，中间部分是驱动器，右边是某一个 IO 口的引脚。</p>
+<p>整体结构可以分为两个部分，上面是输入部分，下面是输出部分。</p>
+<h3 id="输入部分"><a class="anchor" href="#输入部分">#</a> 输入部分</h3>
+<h4 id="io-引脚"><a class="anchor" href="#io-引脚">#</a> IO 引脚</h4>
+<p>首先是这个 IO 引脚，这里接了两个保护二极管，这个是对输入电压进行限幅的，上面二极管接 VDD，3.3V，下面二极管接 VSS，0V；如果输入电压比 3.3V 还要高，那上方这个二极管就会导通，输入电压产生的电流就会直接流入 VDD 而不会流入内部电路，这样就可以避免过高的电压对内部电路产生伤害。</p>
+<p>如果输入电压比 0V 还要低，这个电压是相对于 VSS 的电压，所以是可以有负电压的，那这时下方这个二极管就会导通，电流会从 VSS 直接流出来，电流会从 VSS 直接流出去，而不会从内部电路汲取电流，也是可以保护内部电路的。</p>
+<p>如果输入电压在 0~3.3V 之间，那两个保护二极管均不会导通，这时二极管对电路没有影响。</p>
+<h4 id="上拉和下拉电阻"><a class="anchor" href="#上拉和下拉电阻">#</a> 上拉和下拉电阻</h4>
+<p>上拉和下拉的作用：是为了给输入提供一个默认的输入电平，因为对应一个数字的端口，输入不是高电平就是低电平；如果输入引脚什么都不接，这时输入就会处于一个浮空状态，引脚的输入电平极易受外界干扰而改变；为了避免引脚悬空导致的输入数据不稳定，我们就需要在这里加上上拉或下拉电阻。</p>
+<p>上拉电阻至 VDD，下拉电阻至 VSS，这个开关是可以通过程序进行配置的：上面导通、下面断开，就是上拉输入模式；上面断开、下面导通，就是下拉输入模式；上面断开、下面断开，就是浮空输入模式。</p>
+<p>如果接入上拉电阻，当引脚悬空时，还有上拉电阻来保证引脚的高电平，所以上拉输入是默认为高电平的输入模式，下拉也是同理。</p>
+<p>上拉电阻和下拉电阻的阻值都是比较大的，是一种弱上拉和弱下拉 ，目的是尽量不影响正常的输入操作。</p>
+<h4 id="ttl-肖特基触发器"><a class="anchor" href="#ttl-肖特基触发器">#</a> TTL 肖特基触发器</h4>
+<p>实际上这个应该是斯密特触发器（应该是一个翻译错误）。</p>
+<p>施密特触发器的作用：是对输入电压进行整形</p>
+<p>它的执行逻辑是：如果输入电压大于某一阈值，输出就会瞬间升为高电平，如果输入电压小于某一阈值，输出就会瞬间降为低电平。</p>
+<p>例子：因为这个引脚的波形是外界输入的（IO 口输入），虽然是数字信号，实际情况可能会产生各种失真，比如，如下波形夹杂了波动的高低变化的电平信号，如果没有施密特触发器，那很有可能因为干扰而导致误判，如果有了施密特触发器，那比如定一个阈值上限和下限，高于上限输出高，低于下限输出低，如下图蓝色为施密特信号，图中的第一个蓝色圈虽然由于波动再次低于上限了，但是对于施密特触发器来说，只有高于上限或者低于下限，输出才会变化，所以此时低于上限的情况，输出并不会变化，而是继续维持高电平，然后直到下次低于下限时，才会转为低电平，第二个蓝色圈信号即使在下限附近来回横跳，因为没有跳到上限上面去，所以输出仍然是稳定的，直到下一次高于上限，输出才会变成高电平，如下蓝色线就是施密特触发器的输出信号了，可以看到，相比较输入信号，经过整形的信号就很完美。在这里使用了两个比较阈值来进行判断，中间留有一定的变化范围，可以有效的避免因信号波动造成的输出抖动现象。</p>
+<p>施密特前（右）是模拟量，后（左）是 01 组成的数字量</p>
+<p>接下来，经过施密特触发器整形的波形就可以直接写入输入数据寄存器了，我们再用程序读取输入数据寄存器对应某一位的数据，就可以知道端口的输入电平了。</p>
+<p>最后，上面还有两路线路，是连接到片上外设的一些端口；其中一个是模拟输入，这个可以连接到 ADC 上，因为 ADC 需要接受模拟量，所以这根线是接到施密特触发器前面的，另一个是复用功能输入，这个是连接到其他需要读取端口的外设上的（比如，串口的输入引脚等），这根线接受的是数字量，所以在施密特触发器后面。</p>
+<h3 id="输出部分"><a class="anchor" href="#输出部分">#</a> 输出部分</h3>
+<p>输出部分由输出数据寄存器或片上外设控制，两种控制方式通过这个数据选择器接到输出控制部分；如果选择通过输出数据寄存器进行控制，就是普通的 IO 口输出，写这个输出数据寄存器的某一位就可以操作对应的某个端口了。</p>
+<h4 id="位设置-清除寄存器"><a class="anchor" href="#位设置-清除寄存器">#</a> 位设置 / 清除寄存器</h4>
+<p>2 左边还有个叫做位设置 / 清除寄存器，这个可以用来单独操作输出寄存器的某一位，而不影响其它位，因为这个输出数据寄存器同时控制 16 个端口，并且这个寄存器只能整体读写，所以如果想单独控制其中的某一个端口而不影响其它端口的话，就需要一些特殊的操作方式。</p>
+<p>第一种方式是，先读出这个寄存器，然后用按位与和按位或的方式更改某一位，最后再将更改后的数据写回去，在 C 语言中就是  <code>&amp;=</code>  和  <code>|=</code>  的操作，这种方法比较麻烦，效率不高，对于 IO 口的操作而言不太合适。</p>
+<p>第二种方式是，通过设置这个位设置和位清除寄存器，如果我们要对某一位进行置 1 的操作，在位设置寄存器的对应位写 1 即可，剩下不需要操作的位写 0，这样它内部就会有电路，自动将输出数据寄存器中对应位置为 1，而剩下写 0 的位则保持不变，这样就保证了只操作其中某一位而不影响其他位，并且这是一步到位的操作。如果想对某一位进行清 0 操作，就在位清除寄存器的对应位写 1 即可，这样内部电路就会把这一位清 0 了。</p>
+<p>第三种方式，就是读写 STM32 中的 “位带” 区域。在 STM32 中，专门分配的有一段地址区域，这段地址映射了 RAM 和外设寄存器所有的位，读写这段地址中的数据，就相当于读写所映射位置的某一位，这就是位带的操作方式。</p>
+<p>库函数使用的是读写位设置和位清除寄存器的方法。</p>
+<h4 id="mos-管"><a class="anchor" href="#mos-管">#</a> MOS 管</h4>
+<p>输出控制之后就接到了两个 MOS 管。上面是 P-MOS，下面是 N-MOS，这个 MOS 管就是一种电子开关，我们的信号来来控制开关的导通和关闭，开关负责将 IO 口接到 VDD 或者 VSS，在这里可以选择推挽、开漏或关闭三种输出方式。</p>
+<h5 id="推挽输出"><a class="anchor" href="#推挽输出">#</a> 推挽输出</h5>
+<p>在推挽输出模式下，P-MOS 和 N-MOS 均有效，这种模式下，高低电平均有较强的驱动能，所以推挽输出模式也可以叫强推输出模式，在推挽输出模式下，STM32 对 IO 口具有绝对的控制权，高低电平都由 STM32 说的算。</p>
+<p>数据寄存器为 1 时。上管导通，下管断开，输出直接接到 VDD，就是输出高电平；数据寄存器为 0 时。上管断开，下管导通，输出直接接到 VSS，就是输出低电平。</p>
+<h5 id="开漏输出"><a class="anchor" href="#开漏输出">#</a> 开漏输出</h5>
+<p>在开漏输出模式下，这个 P-MOS 是无效的，只有 N-MOS 在工作；这种模式下，只有低电平有驱动能力，高电平是没有驱动能力的</p>
+<p>这个模式的用处在于可以作为通信协议的驱动方式，比如 IIC 通信的引脚，就是使用开漏模式。在多机通信的情况下，这个模式可以避免各个设备的相互干扰；</p>
+<p>另外，开漏模式还可以用于输出 5V 的电平信号，比如在 IO 口外接一个上拉电阻到 5V 的电源，当输出低电平时，由内部的 N-MOS 直接接 VSS，当输出高电平时，由外部的上拉电阻拉高至 5V，这样就可输出 5V 的电平信号，用于兼容一些 5V 电平的设备，以上就是开漏输出的主要用途。</p>
+<p>数据寄存器为 1 时。下管断开，这时输出相当于断开，也就是高阻模式；数据寄存器为 0 时。下管导通，输出直接接到 VSS，也就是输出低电平</p>
+<h5 id="关闭状态输出"><a class="anchor" href="#关闭状态输出">#</a> 关闭状态输出</h5>
+<p>这个是当引脚配置为输入模式的时候，这两个 MOS 管都无效，也就是输出关闭，端口的电平由外部信号来控制。</p>
+<h2 id="gpio-工作模式8-种"><a class="anchor" href="#gpio-工作模式8-种">#</a> GPIO 工作模式（8 种）</h2>
+<p>通过配置 GPIO 的端口配置寄存器，上面的位结构的电路就会根据我们的配置进行改变（比如，开关的通断、N-MOS 和 P-MOS 是否有效、数据选择器的选择等），端口可以配置成以下 8 种模式：</p>
+<table>
+<thead>
+<tr>
+<th>模式名称</th>
+<th>性质</th>
+<th>特征</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浮空输入</td>
+<td>数字输入</td>
+<td>可读取引脚电平，若引脚悬空，则电平不确定</td>
+</tr>
+<tr>
+<td>上拉输入</td>
+<td>数字输入</td>
+<td>可读取引脚电平，内部连接上拉电阻，悬空时默认高电平</td>
+</tr>
+<tr>
+<td>下拉输入</td>
+<td>数字输入</td>
+<td>可读取引脚电平，内部连接下拉电阻，悬空时默认低电平</td>
+</tr>
+<tr>
+<td>模拟输入</td>
+<td>模拟输入</td>
+<td>GPIO 无效，引脚直接接入内部 ADC</td>
+</tr>
+<tr>
+<td>开漏输出</td>
+<td>数字输出</td>
+<td>可输出引脚电平，高电平为高阻态，低电平接 VSS</td>
+</tr>
+<tr>
+<td>推挽输出</td>
+<td>数字输出</td>
+<td>可输出引脚电平，高电平接 VDD，低电平接 VSS</td>
+</tr>
+<tr>
+<td>复用开漏输出</td>
+<td>数字输出</td>
+<td>由片上外设控制，高电平为高阻态，低电平接 VSS</td>
+</tr>
+<tr>
+<td>复用推挽输出</td>
+<td>数字输出</td>
+<td>由片上外设控制，高电平接 VDD，低电平接 VSS</td>
+</tr>
+</tbody>
+</table>
+<h3 id="浮空输入-上拉输入-下拉输入"><a class="anchor" href="#浮空输入-上拉输入-下拉输入">#</a> 浮空输入、上拉输入、下拉输入</h3>
+<p>首先是前三个，浮空输入、上拉输入、下拉输入</p>
+<p>这三个模式的电路结构基本是一样的，区别就是上拉电阻和下拉电阻的连接，它们都属于数字的输入口，特征就是，都可以读取端口的高低电平；当使用浮空输入时，端口一定要接上一个连续的驱动源，不能出现悬空状态。</p>
+<p>这三种模式的电路结构如下：</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VkbWlYUlBwd3NSRm9Na29YY3VzVm5zQld2TDlOcGU5cGxndzh3VDlWc3JCQ1E_ZT0xMDFiSkk.jpg" alt="" /></p>
+<p>可以看到，在输入模式下，输出驱动器是断开的，端口只能输入而不能输出；上面这两个电阻可以选择位上拉工作、下拉工作或者都不工作，对应的就是上拉输入、下拉输入和浮空输入，然后输入通过施密特触发器进行波形整形后，连接到输入数据寄存器。</p>
+<p>另外这个输入保护这里写的是 VDD 或 VDD_FT，这就是 3.3V 端口和容忍 5V 端口的区别，容忍 5V 端口的上面保护二极管要做一下处理，要不然直接接 VDD3.3V 的话，外部再接入 5V 电压就会导致上边二极管开启，并且产生比较大的电流，这个是不太妥当的。</p>
+<h3 id="模拟输入"><a class="anchor" href="#模拟输入">#</a> 模拟输入</h3>
+<p>模拟输入可以说是 ADC 模数转换器的专属配置了，模拟输入的结构如下：</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmOWl2em9IbUR4UHI2SWU0LWpTMzVFQnRlVUdnRllLaFRKYXJoX2Jrc0tKcmc_ZT03WUFRUVI.jpg" alt="" /></p>
+<p>这里输出是断开的，输入的施密特触发器也是关闭的无效状态，所以整个 GPIO 大部分都是无效的，只有下图的红色线有效，也就是从引脚直接接入片上外设，也就是 ADC，所以当我们使用 ADC 的时候，将引脚配置位模拟输入就行了。其他时候一般用不到模拟输入。</p>
+<h3 id="开漏输出和推挽输出"><a class="anchor" href="#开漏输出和推挽输出">#</a> 开漏输出和推挽输出</h3>
+<p>这两个电路结构也基本一样，数字输出，可以用于输出高低电平，区别就是开漏输出的高电平呈现的是高阻态，没有驱动能力，而推挽输出的高低电平都是具有驱动能力的，这两种模式的电路结构如下：</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWdmFkWXo3MXFoRmkyMHUyajM1N2JrQm9qRENHcjdkSXhQcVphWWtHdmVXQkE_ZT1hRmc1RzQ.jpg" alt="" /></p>
+<p>输出是由输出数据寄存器控制的，这个 P-MOS 无效就是开漏输出，如果 P-MOS 和 N-MOS 都有效，就是推挽输出；另外，在输出模式下，输入模式也是有效的（在上面电路，在输入模式下，输出无效；因为，一个端口只能有一个输出，但可以有多个输入，所以当配置成输出模式时，内部也可以顺便输入一下）。</p>
+<h3 id="复用开漏输出和复用推挽输出"><a class="anchor" href="#复用开漏输出和复用推挽输出">#</a> 复用开漏输出和复用推挽输出</h3>
+<p>这两模式和普通的开漏输出和推挽输出差不多，只不过是复用的输出，引脚电平是由片上外设控制的，模式结构如下：</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0Vid2VQODl0NGRGRnNqRkowX2tqRW04Qk5vQk1JWGRUZ2YwWldSbWQ4ZVRueVE_ZT01Tm9vbHo.jpg" alt="" /></p>
+<p>通用的输出是没有连接的，引脚的控制权转移到了片上外设，由片上外设控制，在输入部分，片上外设也可以读取引脚的电平，同时普通的输入也是有效的，顺便接收一下电平信号。</p>
+<p>在 GPIO 的 8 种模式下，除了模拟输入这个模式会关闭数字的输入功能，在其它的 7 个模式中，所有的输入都是有效的。不全之处，可参考手册查阅。</p>
+<h2 id="gpio-寄存器"><a class="anchor" href="#gpio-寄存器">#</a> GPIO 寄存器</h2>
+<p>首先是 GPIO 配置寄存器，每一个端口的模式由 4 位进行配置，16 个端口就需要 64 位，所以这里的配置寄存器有两个，一个是端口配置低寄存器，一个是端口配置高寄存器，可以看介绍进行配置。</p>
+<p>GPIO 的输出速度可以限制输出引脚的最大翻转速度，这个设计出来，是为了低功耗和稳定性的，我们一般要求不高时一般配置成 50MHz 就可以了。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0Vhc0t4U0xab045Q3NfZ0FZemR1akRRQkVzd0ZxbG96ZGNfaFdTUXU2X1c1c1E_ZT1xTVNvYnQ.jpg" alt="" /></p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTZXR3UEpTNzhSRHNTQWh6YnlpUDVrQkI3cFNGWm1NN1ZWLWJUZzJQc1paRVE_ZT1kMmtlTmc.jpg" alt="" /></p>
+<p>下为端口输入数据寄存器。就是上面 GPIO 位结构的输入数据寄存器，里面的低 16 位对应 16 个引脚，高 16 位没有使用。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVN0puaU9xRjI5QnJDT0h0V0tJM2pFQmVnVUxMbVFraVBtVERjTDhlTU5zVUE_ZT00RUpGWUQ.jpg" alt="" /></p>
+<p>下为端口输出数据寄存器，也就是上面 GPIO 位结构的输出数据寄存器，同样，低 16 位对应 16 个引脚，高 16 位没有使用。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTZnJMOVRJUW1GTnJqSkJjNDNvMXBvQnlxaDZ1OURNWjFud2hKX3h3OHh5RGc_ZT1sRkhWWFg.jpg" alt="" /></p>
+<p>下为端口位设置 / 清除寄存器，也就是上面 GPIO 位结构的那部分寄存器，这个寄存器的低 16 位是进行位设置的，高 16 位是进行位清除的。写 1 就是设置或者清除，写 0 就是不产生影响。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWZGRZUWFmM21ORXBDRGxTRmtfZUpnQnVMNEI3ZnlRd2RGcEQ2S2h5S0lWQkE_ZT1zZFpjek0.jpg" alt="" /></p>
+<p>下为端口位清除寄存器，低 16 位是进行位清除的。</p>
+<p>这个是为方便操作设置的，如果只想单一的进行设置或者位清除，位设置用上面寄存器，位清除用下面这个寄存器，因为在设置和清除时，使用的都是低 16 位的数据，这样就方便一些；如果想对多个端口同时进行位设置和位清除，那就使用第一个寄存器就行了，这样可以保证位设置和位清除的同步性，当然你要对信号的同步性要求不高的话，先位设置再位清除也是没问题的。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VYNXozeTlnLTBKR3RKbXBCQmxVaEZjQkVDNUxrd0ZjaDExQ2VuN01sNGpoUWc_ZT0zNnNNbks.jpg" alt="" /></p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VReEh2SGd4SUdkQm5yaHZkLTUtUHdjQkg5QWZ3dkVDZENkc1FZcXFKUnozLWc_ZT1aQkhnSE0.jpg" alt="" /></p>
+<p>下为端口配置锁定寄存器。这个可以对端口的配置进行锁定，防止意外更改，使用方法看介绍，这个我们暂时用的不多。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VkRDNvUjliOEJoR245aE9vY0swRzdvQmtuRmY0TWRZaDdwWFhaZ3ludzRwVVE_ZT1MVU5ObU4.jpg" alt="" /></p>
+<h2 id="led-和蜂鸣器介绍"><a class="anchor" href="#led-和蜂鸣器介绍">#</a> LED 和蜂鸣器介绍</h2>
+<p>LED：发光二极管，正向通电点亮，反向通电不亮。</p>
+<p>有源蜂鸣器：内部自带振荡源，将正负极接上直流电压即可持续发声，频率固定。</p>
+<p>无源蜂鸣器：内部不带振荡源，需要控制器提供振荡脉冲才可发声，调整提供振荡脉冲的频率，可发出不同频率的声音。</p>
+<p>LED 电路符号如下，左边是正级，右边是负极。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaVnluMmQyTm0xRWlMVm9EWkMyQ3dRQmFZUWlVZzJLNlN2bUNYVHdkNEpTcGc_ZT1XRTI1eDI.jpg" alt="" /></p>
+<p>下为 LED 实物图，如果引脚没有剪过，长脚为正极，短脚为负极 。通过 LED 内部也可以看正负极，较小的一半是正极，较大的一半是负极。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VkcFZiM1AxZkl0TWo0eEpDYkd3OTRVQmlDNFItckxUdExzTG44cnN2WE55cmc_ZT1PS1NyeWI.jpg" alt="" /></p>
+<p>有源蜂鸣器内部电路如下：</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhemswOVBSaU0xSmtJLV95aHdKcVJnQjFqUEpPRHlLaUEtRG11bkJrWXdpZ0E_ZT14ZXRQU3I.jpg" alt="" /></p>
+<p>这里用了一个三极管开关进行驱动，我们将 VCC 和 GND 分别接上正负极的供电，然后中间引脚 2 接低电平，蜂鸣器就会响，接高电平，蜂鸣器就关闭。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRNFlzVkVCNnFkT2pxdWRkdjNiVlo0QmpTLXlTN01reS1DWWJLcjFWZkkwM0E_ZT1nZERPQkc.jpg" alt="" /></p>
+<h2 id="led-和蜂鸣器的硬件电路"><a class="anchor" href="#led-和蜂鸣器的硬件电路">#</a> LED 和蜂鸣器的硬件电路</h2>
+<h3 id="led-电路"><a class="anchor" href="#led-电路">#</a> LED 电路</h3>
+<p>如下两个图是使用 STM32 的 GPIO 口驱动 LED 的电路。</p>
+<p>这里的限流电阻一般都是要接的，一方面它可以防止 LED 因为电流过大而烧毁，另一方面它可以调整 LED 的亮度，如果你觉得 LED 太亮可以适当的增大限流电阻的阻值。</p>
+<p>针对选择电平驱动哪个方式：就得看 IO 口高低电平的驱动能力如何了，上面讲到，GPIO 的推挽输出模式下，高低电平均有较强的驱动能力，所以两种方式都可以；在单片机的电路里，一般倾向使用第一种，低电平驱动的方式，因为很多单片机或者芯片，都使用了高电平弱驱动，低电平强驱动的规则，这样可以一定程度上避免高低电平打架，所以使用高电平驱动能力弱那就不能使用第二种连接方式了。</p>
+<p>下图是低电平驱动的电路，LED 正极接 3.3v，负极通过一个限流电阻接到 PA0 上，当 PA0 输出低电平时，LED 两端就会产生电压差，就会形成正向导通的电流，这样 LED 就会点亮了；当 PA0 输出高电平时，因为 LED 两端都是 3.3v 的电压，不会形成电流，所以高电平 LED 就会熄灭。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VYeDhSc0p1OFpCSGcxbWUwT0Ytdl9ZQnhfRVZTY0k5a29DTUxWay04dThBZGc_ZT01TVVHTGw.jpg" alt="" /></p>
+<p>下图是高电平驱动的电路。LED 负极接到 GND，正极通过一个限流电阻接到 PA0 上，这时就是高电平点亮，低电平熄灭。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VkYU45UlZFUlNKTHJzbTVUR0lKUTZNQlFiTGY1N2d6T1Q4S0tMdHJjeDZTaHc_ZT1tQjVNemI.jpg" alt="" /></p>
+<h3 id="蜂鸣器电路"><a class="anchor" href="#蜂鸣器电路">#</a> 蜂鸣器电路</h3>
+<p>这里使用了三极管开关的驱动方案，三极管开关是最简单的驱动电路了，对于功率稍微大一点的 ，直接用 IO 口驱动会导致 STM32 负担过重，这时可以用一个三极管驱动电路来完成驱动任务</p>
+<p>需要注意，PNP 的三极管最好接在上边，NPN 的三极管最好接到下边，这是因为三极管的通断是需要在发射极和基极产生一定的开启电压的，如果将负载接在发射极这边，可能会导致三极管不能开启。</p>
+<p>下图为 PNP 三极管的驱动电路，三极管的左边是基极，带箭头的是发射极，剩下的是集电极。左边的基极给低电平，三极管就会导通，再通过 3.3V 和 GND 就可以给 蜂鸣器提供驱动电流了。基极给高电平，三极管截止，蜂鸣器没有电流。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VYOXJ5dWowRUZORHFHMU1oZFZTT2dvQldIYjBBUUFmOHhQdjVFUEV3VmE4Q0E_ZT1obnJrbzc.jpg" alt="" /></p>
+<p>下图为 NPN 三极管的驱动电路，同样，左边是基极，带箭头的是发射极，剩下的是集电极；它的驱动逻辑和上面的是相反的，基极给高电平导通，低电平断开。</p>
+<p><img loading="lazy" data-src="https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaSld3TWxmODB0RHQyanVlby1KSmpZQkdSVVlfYVY4Z3JCV3F2OEJsZTMxN1E_ZT12R3N3QVg.jpg" alt="" /></p>
+<h2 id="面包板的使用方法"><a class="anchor" href="#面包板的使用方法">#</a> 面包板的使用方法</h2>
+<p>当我们把原件的引脚插到面包板的孔里时，它内部的金属爪就会抓住引脚；</p>
+<p>金属爪的排列规律是：中间的金属爪是竖着放的，上下四排是连在一个的四个整体的金属爪。那就对应这个面包板的孔的连接关系。竖着的五个孔内部是连接在一起的，如下，这样我们元件插在一纵排的不同孔位时，内部的金素爪就实现了线路的连接。</p>
+<p>上下四排孔整体是连在一起的，这四排是用于供电的，标有正负极；如果我们需要供电，就从上下的孔位中，用跳线印出来即可。另外，再说明一下，这个供电的引脚，有的面包板并不是一整排都是连接的（如果中间是断开的，用跳线再连接起来）</p>
+<p>演示：若用面包板实现电源点亮一个 LED 等的电路</p>
+<p>首先，把上面两排的供电引脚接上电源的正负极，然后用跳线将正极引下来到一个孔（5 孔其 1）里，然后在纵向下面的孔，横着插一个限流电阻到右边的孔，横着插一个 LED 到右边的孔，然后再用跳线把右边引到负极。这样就可以了。</p>
+<div class="tags"><a href="/tags/eb/" rel="tag"><i class="ic i-tag"></i>嵌入式</a></div></div><footer><div class="meta"><span class="item"><span class="icon"><i class="ic i-calendar-check"></i></span><span class="text">更新于 </span><time title="修改时间：2025-04-20 23:14:40" itemprop="dateModified" datetime="2025-04-20T23:14:40+08:00">2025-04-20</time></span></div><div id="copyright"><ul><li class="author"><strong>本文作者：</strong>樱小路七叶<i class="ic i-at"><em>@</em></i>Nana7ha's Café Stella</li><li class="link"><strong>本文链接：</strong><a href="https://cwlrin.wiki/embedded/stm32/%E6%B1%9F%E5%8D%8F%E7%A7%91%E6%8A%80%203-1%20GPIO%20%E8%BE%93%E5%87%BA/" title="江协科技 STM32 3-1 GPIO 输出">https://cwlrin.wiki/embedded/stm32/江协科技 3-1 GPIO 输出/</a></li><li class="license"><strong>版权声明：</strong>本站所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh"><i class="ic i-creative-commons"><em>(CC)</em></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li></ul></div></footer></article></div><div class="post-nav"><div class="item left"><a href="/embedded/stm32/%E6%B1%9F%E5%8D%8F%E7%A7%91%E6%8A%80%201-2%20STM32%20%E7%AE%80%E4%BB%8B/" rel="prev" itemprop="url" title="江协科技 STM32 1-2 STM32 简介" style="background-image: linear-gradient(to bottom right, #f4b38a, #b4deab);"><span class="type">上一篇</span><span class="category"><i class="ic i-flag"></i>STM32</span><h3>江协科技 STM32 1-2 STM32 简介</h3></a></div><div class="item right"><a href="/embedded/stm32/%E6%B1%9F%E5%8D%8F%E7%A7%91%E6%8A%80%203-2%20LED%20%E9%97%AA%E7%83%81%20&%20LED%20%E6%B5%81%E6%B0%B4%E7%81%AF%20&%20%E8%9C%82%E9%B8%A3%E5%99%A8/" rel="next" itemprop="url" title="江协科技 STM32 3-2 LED 闪烁 &amp; LED 流水灯 &amp; 蜂鸣器" style="background-image: linear-gradient(to bottom right, #aedff5, #aa9ecb);"><span class="type">下一篇</span><span class="category"><i class="ic i-flag"></i>STM32</span><h3>江协科技 STM32 3-2 LED 闪烁 & LED 流水灯 & 蜂鸣器</h3></a></div></div><div class="wrap" id="comments"></div></div><div id="sidebar"><div class="inner"><div class="panels"><div class="inner"><div class="contents panel pjax" data-title="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#gpio-%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text"> GPIO 简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gpio-%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text"> GPIO 的基本结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gpio-%E4%BD%8D%E7%BB%93%E6%9E%84%E6%AF%8F%E4%B8%80%E4%BD%8D%E7%9A%84%E5%85%B7%E4%BD%93%E7%94%B5%E8%B7%AF%E7%BB%93%E6%9E%84"><span class="toc-number">3.</span> <span class="toc-text"> GPIO 位结构（每一位的具体电路结构）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BE%93%E5%85%A5%E9%83%A8%E5%88%86"><span class="toc-number">3.1.</span> <span class="toc-text"> 输入部分</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#io-%E5%BC%95%E8%84%9A"><span class="toc-number">3.1.1.</span> <span class="toc-text"> IO 引脚</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8A%E6%8B%89%E5%92%8C%E4%B8%8B%E6%8B%89%E7%94%B5%E9%98%BB"><span class="toc-number">3.1.2.</span> <span class="toc-text"> 上拉和下拉电阻</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ttl-%E8%82%96%E7%89%B9%E5%9F%BA%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="toc-number">3.1.3.</span> <span class="toc-text"> TTL 肖特基触发器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BE%93%E5%87%BA%E9%83%A8%E5%88%86"><span class="toc-number">3.2.</span> <span class="toc-text"> 输出部分</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%8D%E8%AE%BE%E7%BD%AE-%E6%B8%85%E9%99%A4%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-number">3.2.1.</span> <span class="toc-text"> 位设置 &#x2F; 清除寄存器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#mos-%E7%AE%A1"><span class="toc-number">3.2.2.</span> <span class="toc-text"> MOS 管</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8E%A8%E6%8C%BD%E8%BE%93%E5%87%BA"><span class="toc-number">3.2.2.1.</span> <span class="toc-text"> 推挽输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%BC%80%E6%BC%8F%E8%BE%93%E5%87%BA"><span class="toc-number">3.2.2.2.</span> <span class="toc-text"> 开漏输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%85%B3%E9%97%AD%E7%8A%B6%E6%80%81%E8%BE%93%E5%87%BA"><span class="toc-number">3.2.2.3.</span> <span class="toc-text"> 关闭状态输出</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gpio-%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F8-%E7%A7%8D"><span class="toc-number">4.</span> <span class="toc-text"> GPIO 工作模式（8 种）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%AE%E7%A9%BA%E8%BE%93%E5%85%A5-%E4%B8%8A%E6%8B%89%E8%BE%93%E5%85%A5-%E4%B8%8B%E6%8B%89%E8%BE%93%E5%85%A5"><span class="toc-number">4.1.</span> <span class="toc-text"> 浮空输入、上拉输入、下拉输入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E6%8B%9F%E8%BE%93%E5%85%A5"><span class="toc-number">4.2.</span> <span class="toc-text"> 模拟输入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%80%E6%BC%8F%E8%BE%93%E5%87%BA%E5%92%8C%E6%8E%A8%E6%8C%BD%E8%BE%93%E5%87%BA"><span class="toc-number">4.3.</span> <span class="toc-text"> 开漏输出和推挽输出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%8D%E7%94%A8%E5%BC%80%E6%BC%8F%E8%BE%93%E5%87%BA%E5%92%8C%E5%A4%8D%E7%94%A8%E6%8E%A8%E6%8C%BD%E8%BE%93%E5%87%BA"><span class="toc-number">4.4.</span> <span class="toc-text"> 复用开漏输出和复用推挽输出</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gpio-%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-number">5.</span> <span class="toc-text"> GPIO 寄存器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#led-%E5%92%8C%E8%9C%82%E9%B8%A3%E5%99%A8%E4%BB%8B%E7%BB%8D"><span class="toc-number">6.</span> <span class="toc-text"> LED 和蜂鸣器介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#led-%E5%92%8C%E8%9C%82%E9%B8%A3%E5%99%A8%E7%9A%84%E7%A1%AC%E4%BB%B6%E7%94%B5%E8%B7%AF"><span class="toc-number">7.</span> <span class="toc-text"> LED 和蜂鸣器的硬件电路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#led-%E7%94%B5%E8%B7%AF"><span class="toc-number">7.1.</span> <span class="toc-text"> LED 电路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%9C%82%E9%B8%A3%E5%99%A8%E7%94%B5%E8%B7%AF"><span class="toc-number">7.2.</span> <span class="toc-text"> 蜂鸣器电路</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%A2%E5%8C%85%E6%9D%BF%E7%9A%84%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="toc-number">8.</span> <span class="toc-text"> 面包板的使用方法</span></a></li></ol></div><div class="related panel pjax" data-title="系列文章"><ul><li ><a href="/embedded/stm32/%E6%B1%9F%E5%8D%8F%E7%A7%91%E6%8A%80%201-2%20STM32%20%E7%AE%80%E4%BB%8B/" rel="bookmark" title="江协科技 STM32 1-2 STM32 简介">江协科技 STM32 1-2 STM32 简介</a></li><li  class="active"><a href="/embedded/stm32/%E6%B1%9F%E5%8D%8F%E7%A7%91%E6%8A%80%203-1%20GPIO%20%E8%BE%93%E5%87%BA/" rel="bookmark" title="江协科技 STM32 3-1 GPIO 输出">江协科技 STM32 3-1 GPIO 输出</a></li><li ><a href="/embedded/stm32/%E6%B1%9F%E5%8D%8F%E7%A7%91%E6%8A%80%203-2%20LED%20%E9%97%AA%E7%83%81%20&%20LED%20%E6%B5%81%E6%B0%B4%E7%81%AF%20&%20%E8%9C%82%E9%B8%A3%E5%99%A8/" rel="bookmark" title="江协科技 STM32 3-2 LED 闪烁 & LED 流水灯 & 蜂鸣器">江协科技 STM32 3-2 LED 闪烁 & LED 流水灯 & 蜂鸣器</a></li><li ><a href="/embedded/stm32/%E6%B1%9F%E5%8D%8F%E7%A7%91%E6%8A%80%203-3%20GPIO%20%E8%BE%93%E5%85%A5/" rel="bookmark" title="江协科技 STM32 3-3 GPIO 输入">江协科技 STM32 3-3 GPIO 输入</a></li><li ><a href="/embedded/stm32/%E6%B1%9F%E5%8D%8F%E7%A7%91%E6%8A%80%204-1%20OLED%20%E8%B0%83%E8%AF%95%E5%B7%A5%E5%85%B7/" rel="bookmark" title="江协科技 STM32 4-1 OLED 调试工具">江协科技 STM32 4-1 OLED 调试工具</a></li></ul></div><div class="overview panel" data-title="站点概览"><div class="author" itemprop="author" itemscope="itemscope" itemtype="http://schema.org/Person"><img class="image" loading="lazy" decoding="async" itemprop="image" alt="樱小路七叶" src="/assets/avatar.jpg"/><p class="name" itemprop="name">樱小路七叶</p><div class="description" itemprop="description">技术与美日新月异</div></div><nav class="state"><div class="item posts"><a href="/archives/"><span class="count">97</span><span class="name">文章</span></a></div><div class="item categories"><a href="/categories/"><span class="count">13</span><span class="name">分类</span></a></div><div class="item tags"><a href="/tags/"><span class="count">14</span><span class="name">标签</span></a></div></nav><div class="social"><a target="_blank" rel="noopener" href="https://github.com/cwlrin" class="item github" title="https:&#x2F;&#x2F;github.com&#x2F;cwlrin"><i class="ic i-github"></i></a><a target="_blank" rel="noopener" href="https://www.zhihu.com/people/ying-xiao-lu-qi-ye" class="item zhihu" title="https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ying-xiao-lu-qi-ye"><i class="ic i-zhihu"></i></a><a target="_blank" rel="noopener" href="https://music.163.com/#/user/home?id=411590211" class="item music" title="https:&#x2F;&#x2F;music.163.com&#x2F;#&#x2F;user&#x2F;home?id&#x3D;411590211"><i class="ic i-cloud-music"></i></a><a target="_blank" rel="noopener" href="https://space.bilibili.com/8013992" class="item bilibili" title="https:&#x2F;&#x2F;space.bilibili.com&#x2F;8013992"><i class="ic i-bilibili"></i></a></div><div class="menu"><li class="item"><a href="/" rel="section"><i class="ic i-home"></i>首页</a></li><li class="item dropdown"><a href="#" onclick="return false;"><i class="ic i-user"></i>关于</a><ul class="submenu"><li class="item"><a href="/about/" rel="section"><i class="ic i-user"></i>关于本站</a></li><li class="item"><a href="/admiration/" rel="section"><i class="ic i-coffee"></i>赞赏博主</a></li></ul></li><li class="item dropdown"><a href="#" onclick="return false;"><i class="ic i-feather"></i>文章</a><ul class="submenu"><li class="item"><a href="/archives/" rel="section"><i class="ic i-list-alt"></i>归档</a></li><li class="item"><a href="/categories/" rel="section"><i class="ic i-th"></i>分类</a></li><li class="item"><a href="/tags/" rel="section"><i class="ic i-tags"></i>标签</a></li></ul></li><li class="item"><a href="/friends/" rel="section"><i class="ic i-heart"></i>友链</a></li></div></div></div></div><ul id="quick"><li class="prev pjax"><a href="/embedded/stm32/%E6%B1%9F%E5%8D%8F%E7%A7%91%E6%8A%80%203-2%20LED%20%E9%97%AA%E7%83%81%20&%20LED%20%E6%B5%81%E6%B0%B4%E7%81%AF%20&%20%E8%9C%82%E9%B8%A3%E5%99%A8/" rel="prev" title="上一篇"><i class="ic i-chevron-left"></i></a></li><li class="up"><i class="ic i-arrow-up"></i></li><li class="down"><i class="ic i-arrow-down"></i></li><li class="next pjax"><a href="/embedded/stm32/%E6%B1%9F%E5%8D%8F%E7%A7%91%E6%8A%80%201-2%20STM32%20%E7%AE%80%E4%BB%8B/" rel="next" title="下一篇"><i class="ic i-chevron-right"></i></a></li><li class="percent"></li></ul></div></div><div class="dimmer"></div></div></main><footer id="footer"><div class="inner"><div class="widgets"></div><div class="status"><div class="copyright">&copy; 2020 -<span itemprop="copyrightYear">2025</span><span class="with-love"><i class="ic i-sakura rotate"></i></span><span class="author" itemprop="copyrightHolder">樱小路七叶 @ 七葉の喫茶ステラ</span></div><div class="count"><span class="post-meta-item-icon"><i class="ic i-chart-area"></i></span><span title="站点总字数">1.5m 字</span><span class="post-meta-divider"> | </span><span class="post-meta-item-icon"><i class="ic i-coffee"></i></span><span title="站点阅读时长">22:27</span></div><div class="powered-by">基于 <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & Theme.<a target="_blank" rel="noopener" href="https://github.com/theme-shoka-x/hexo-theme-shokaX/">ShokaX</a></div></div></div></footer></div><script data-config type="text/javascript">var LOCAL = {
+    ispost: true,
+    path: `embedded/stm32/江协科技 3-1 GPIO 输出/`,
+    favicon: {
+        show: `（●´3｀●）やれやれだぜ`,
+        hide: `(´Д｀)大変だ！`
+    },
+    search: {
+        placeholder: "文章搜索",
+        empty: "关于 「 ${query} 」，什么也没搜到",
+        stats: "${time} ms 内找到 ${hits} 条结果"
+    },
+    nocopy: "false",
+    copyright: `复制成功，转载请遵守 <i class="ic i-creative-commons"></i>BY-NC-SA 协议。`,
+    copy_tex: false,
+    katex: false,
+    mermaid: false,
+    audio: undefined,
+    fancybox: true,
+    nocopy: false,
+    outime: true,
+    template: `<div class="note warning"><p><span class="label warning">文章时效性提示</span><br>这是一篇发布于 {{publish}} 天前，最后一次更新在 {{updated}} 天前的文章，部分信息可能已经发生改变，请注意甄别。</p></div>`,
+    quiz: {
+        choice: `单选题`,
+        multiple: `多选题`,
+        true_false: `判断题`,
+        essay: `问答题`,
+        gap_fill: `填空题`,
+        mistake: `错题备注`
+    },
+    ignores: [
+        (uri) => uri.includes('#'),
+        (uri) => new RegExp(LOCAL.path + '$').test(uri),
+            []
+    ]
+};
+</script><script src="https://s4.zstatic.net/ajax/libs/pace/1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous" fetchpriority="high"></script><script src="https://s4.zstatic.net/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha384-ZvpUoO&#x2F;+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn&#x2F;6Z&#x2F;hRTt8+pR6L4N2" crossorigin="anonymous" fetchpriority="high"></script><script src="https://s4.zstatic.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha384-Zm+UU4tdcfAm29vg+MTbfu&#x2F;&#x2F;q5B&#x2F;lInMbMCr4T8c9rQFyOv6PlfQYpB5wItcXWe7" crossorigin="anonymous" fetchpriority="high"></script><script src="https://s4.zstatic.net/ajax/libs/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js" integrity="sha384-TOxsBplaL96&#x2F;QDWPIUg+ye3v89qSE3s22XNtJMmCeZEep3cVDmXy1zEfZvVv+y2m" crossorigin="anonymous" fetchpriority="high"></script><script src="/js/siteInit.js?v=0.4.20" type="module" fetchpriority="high" defer></script></body></html>
