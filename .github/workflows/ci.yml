@@ -61,8 +61,8 @@ jobs:
       - name: Run unit tests
         run: pnpm run test
 
-  build-and-e2e:
-    name: Build & E2E
+  build-and-links:
+    name: Build & Links
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
@@ -86,17 +86,6 @@ jobs:
           sudo snap install lychee
           pnpm install --frozen-lockfile
 
-      - name: Cache Playwright browsers
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
-
       - name: Build site
         run: pnpm run build
 
@@ -108,27 +97,6 @@ jobs:
           restore-keys: cache-lychee-
 
       - name: Check for broken links
+        # 迁移到 Astro 后不再跑 Playwright E2E：tests/ 里是针对模板示例文章的回归用例，
+        # 本项目已用真实文章替换示例内容，这些用例不再适用。
         run: pnpm run check-links
-
-      - name: Run E2E smoke tests
-        run: pnpm run e2e:smoke
-
-      - name: Run E2E critical
-        id: e2e_critical
-        run: pnpm run e2e:critical
-
-      - name: Run E2E regression
-        id: e2e_regression
-        # critical 失败也继续跑 regression，尽量收集中间态失败信息
-        if: always()
-        run: pnpm run e2e:regression
-
-      - name: Upload Playwright artifacts on failure
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: playwright-artifacts
-          path: |
-            test-results
-            playwright-report
-          if-no-files-found: ignore
