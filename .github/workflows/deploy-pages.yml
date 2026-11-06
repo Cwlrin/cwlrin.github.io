@@ -12,7 +12,6 @@ on:
   push:
     branches:
       - main
-      - master
   workflow_dispatch:
 
 # 只允许一个发布流程同时进行；新的提交会取消排队中的旧任务，但不打断正在部署的那次
