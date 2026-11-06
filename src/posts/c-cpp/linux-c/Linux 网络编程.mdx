@@ -1,0 +1,2091 @@
+---
+title: "Linux 网络编程"
+date: 2020-10-01T21:42:28+08:00
+categories: ["C 与 C++", "Linux C"]
+tags: ["C", "Linux", "计算机网络"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhZktOSk82ZGdwTmhBTFJOOHM2U1E0QkhBc1BxbDNmTy1oWjZLVV9HeHVNekE_ZT0yNmdVUkU.png"
+---
+
+## 地址处理
+
+### 大端地址和小端地址
+
+#### 大端法和小端法
+
+**大端法（Big-Endian）**
+
+在大端法中，一个多字节值的高位字节（即“大端”）存储在内存的低地址端，而低位字节（即“小端”）存储在高地址端。这种存储顺序使得大端法在字节对齐的内存访问中更为直观。
+
+**小端法（Little-Endian）**
+
+小端法与大端法相反，低位字节存储在内存的低地址端，而高位字节存储在高地址端。这种存储顺序在某些处理器架构中更为常见，如 x86 和 x64 架构。
+
+**TCP/IP 协议中的字节序**
+
+根据 TCP/IP 协议，当数据在网络上传输时，统一使用网络字节序，即大端法。这确保了不同主机间数据交换的一致性和兼容性。
+
+**主机字节序**
+
+大多数现代主机，尤其是使用 x86 和 x64 架构的个人电脑和服务器，包括 Intel 和 AMD 的处理器，通常使用小端法存储数据。这意味着在进行网络通信时，主机需要将数据从主机字节序转换为网络字节序。
+
+### 大小端转换
+
+#### `htonl` 转换为大端序
+
+`htonl` 是一个网络编程中常用的函数，用于将主机字节序（host byte order）的无符号整数转换为网络字节序（big-endian 字节序）。网络字节序总是大端序（big-endian），即最高位字节（most significant byte）在前。这个函数特别适用于在发送数据到网络或从网络接收数据时，确保数据的字节序一致性。
+
+函数原型如下：
+
+```c
+#include <arpa/inet.h>
+uint32_t htonl(uint32_t hostlong);
+```
+
+参数说明：`uint32_t hostlong`: 这是需要转换的主机字节序的 32 位无符号整数。
+
+返回值：返回转换后的网络字节序的 32 位无符号整数。
+
+使用场景：
+
+- 当需要将数据发送到网络时，使用 `htonl` 将主机字节序的整数转换为网络字节序。
+- 当从网络接收数据时，使用 `ntohl` 将接收到的网络字节序整数转换回主机字节序。
+
+工作机制：`htonl` 通过重新排列字节来转换整数的字节序。在小端序（little-endian）系统中，字节重新排列以形成大端序格式；在大端序系统中，整数保持不变。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <arpa/inet.h>
+
+int main() {
+    uint32_t host_long = 0x12345678; // 示例主机字节序整数
+    uint32_t net_long = htonl(host_long); // 转换为网络字节序
+
+    printf("Host byte order: 0x%08X\n", host_long);
+    printf("Network byte order: 0x%08X\n", net_long);
+
+    return 0;
+}
+```
+
+这个示例中定义了一个主机字节序的整数 `host_long`，然后使用 `htonl` 函数将其转换为网络字节序的整数 `net_long`，并打印出这两个整数。
+
+#### `htons` 转换为大端序
+
+`htons` 是一个网络编程中用于字节序转换的函数，它将主机字节序（host byte order）的无符号短整数（`uint16_t`）转换为网络字节序（big-endian 字节序）。网络字节序是一种标准，用于确保在不同计算机架构之间通过网络传输数据时，多字节数据的字节序保持一致。
+
+函数原型如下：
+
+```c
+#include <arpa/inet.h>
+uint16_t htons(uint16_t hostshort);
+```
+
+参数说明：`uint16_t hostshort`: 这是需要转换的主机字节序的 16 位无符号整数。
+
+返回值：返回转换后的网络字节序的 16 位无符号整数。
+
+使用场景：
+
+- 当需要将 16 位的整数发送到网络时，使用 `htons` 将主机字节序的整数转换为网络字节序。
+- 当从网络接收 16 位的整数时，使用 `ntohs` 将接收到的网络字节序整数转换回主机字节序。
+
+工作机制：`htons` 通过交换整数的高位字节和低位字节来转换字节序。在小端序（little-endian）系统中，这个交换是必需的，以确保网络传输的数据具有统一的字节序。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <arpa/inet.h>
+
+int main() {
+    uint16_t host_short = 0x1234; // 示例主机字节序短整数
+    uint16_t net_short = htons(host_short); // 转换为网络字节序
+
+    printf("Host byte order: 0x%04X\n", host_short);
+    printf("Network byte order: 0x%04X\n", net_short);
+
+    return 0;
+}
+```
+
+这个示例中定义了一个主机字节序的短整数 `host_short`，然后使用 `htons` 函数将其转换为网络字节序的短整数 `net_short`，并打印出这两个整数。
+
+#### `ntohl` 转换为小端序
+
+  是一个网络编程中用于将网络字节序（big-endian 字节序）的无符号整数转换回主机字节序的函数。这个函数与 `htonl` 相对应，`htonl` 用于将主机字节序的整数转换为网络字节序，而 `ntohl` 则用于完成相反的转换。
+
+函数原型如下：
+
+```c
+#include <arpa/inet.h>
+uint32_t ntohl(uint32_t netlong);
+```
+
+参数说明：`uint32_t netlong`: 这是需要转换的网络字节序的 32 位无符号整数。
+
+返回值：返回转换后的主机字节序的 32 位无符号整数。
+
+使用场景：当从网络接收到一个 32 位整数数据时，使用 `ntohl` 将网络字节序的整数转换为主机字节序，以确保数据在主机上能够正确解释和使用。
+
+工作机制：`ntohl` 执行的转换操作与 `htonl` 相反。它通过重新排列字节来将大端序格式的整数转换为主机字节序。在小端序（little-endian）的主机上，这涉及到交换字节；在大端序（big-endian）的主机上，整数保持不变。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <arpa/inet.h>
+
+int main() {
+    uint32_t net_long = 0x12345678; // 示例网络字节序整数
+    uint32_t host_long = ntohl(net_long); // 转换为主机字节序
+
+    printf("Network byte order: 0x%08X\n", net_long);
+    printf("Host byte order: 0x%08X\n", host_long);
+
+    return 0;
+}
+```
+
+这个示例中定义了一个网络字节序的整数 `net_long`，然后使用 `ntohl` 函数将其转换为主机字节序的整数 `host_long`，并打印出这两个整数。
+
+#### `ntohs` 转换为小端序
+
+`ntohs` 是一个网络编程中用于将网络字节序（big-endian 字节序）的无符号短整数（`uint16_t` 类型）转换回主机字节序的函数。这个函数与 `htons` 对应，`htons` 用于将主机字节序的短整数转换为网络字节序，而 `ntohs` 则用于完成相反的转换。
+
+函数原型如下：
+
+```c
+#include <arpa/inet.h>
+uint16_t ntohs(uint16_t netshort);
+```
+
+参数说明：`uint16_t netshort`: 这是需要转换的网络字节序的 16 位无符号整数。
+
+返回值：返回转换后的主机字节序的 16 位无符号整数。
+
+使用场景：当从网络接收到一个 16 位整数数据时，使用 `ntohs` 将网络字节序的整数转换为主机字节序，以确保数据在主机上能够正确解释和使用。
+
+工作机制：`ntohs` 执行的转换操作与 `htons` 相反。它通过交换整数的高位字节和低位字节来转换字节序。在小端序（little-endian）的主机上，这个交换是必需的，以确保网络传输的数据在主机上具有正确的字节序。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <arpa/inet.h>
+
+int main() {
+    uint16_t net_short = 0x1234; // 示例网络字节序短整数
+    uint16_t host_short = ntohs(net_short); // 转换为主机字节序
+
+    printf("Network byte order: 0x%04X\n", net_short);
+    printf("Host byte order: 0x%04X\n", host_short);
+
+    return 0;
+}
+```
+
+在这个示例中，我们定义了一个网络字节序的短整数 `net_short`，然后使用 `ntohs` 函数将其转换为主机字节序的短整数 `host_short`，并打印出这两个整数。
+
+### 点分十进制转化
+
+#### IP 结构体
+
+ `sockaddr` 是一种通用的网络地址结构体，设计用于兼容 IPv4 和 IPv6 地址。由于其通用性，`sockaddr` 类型被广泛用作参数在各种网络接口中，如 `addrinfo` 结构体中的 `ai_addr` 成员。
+
+尽管 `sockaddr` 足够通用，但它将 IP 地址和端口信息混合在一起，使用起来不够直观。因此，POSIX 标准进一步定义了 `sockaddr_in` 用于 IPv4 地址，`sockaddr_in6` 用于 IPv6 地址，提供了更具体的地址描述。
+
+在需要通用地址参数的函数调用中，如 `bind()`、`connect()`、`accept()` 等，这些函数通常接受 `sockaddr` 类型的参数。在这种情况下，可以直接将 `sockaddr_in` 或 `sockaddr_in6` 结构体的指针转换为 `sockaddr` 类型，这种转换是安全的，因为 `sockaddr_in` 和 `sockaddr_in6` 是 `sockaddr` 的特定版本。
+
+**IPv4 地址结构体**
+`in_addr` 结构体用于存储 IPv4 地址，它包含一个 `s_addr` 成员，这是一个 `in_addr_t` 类型的无符号整数，用于表示 32 位的 IPv4 地址。
+
+```c
+struct in_addr {
+    in_addr_t s_addr;  // 存储IPv4地址的32位无符号整数
+};
+```
+
+**IPv4 套接字地址结构体**
+`sockaddr_in` 结构体用于表示 IPv4 套接字地址，它包含地址族、端口号和 IPv4 地址。
+
+```c
+struct sockaddr_in {
+    sa_family_t sin_family;   // 地址族，对于IPv4是AF_INET
+    in_port_t sin_port;       // 端口号，使用网络字节序
+    struct in_addr sin_addr;   // IPv4地址
+};
+```
+
+**IPv6 地址结构体**
+对于 IPv6，`in6_addr` 结构体用于存储 128 位的 IPv6 地址。
+
+```c
+struct in6_addr {
+    uint8_t s6_addr[16];  // 存储IPv6地址的16个字节
+};
+```
+
+#### **IP 地址转换函数**
+
+POSIX 提供了一组函数来转换点分十进制的 IP 地址字符串和无符号整数表示的 IP 地址：
+
+##### `inet_addr` 
+
+`inet_addr`  是一个 C 语言标准库函数，用于将一个以点分十进制表示的 IPv4 地址字符串转换为相应的 32 位网络字节序整数格式。这个函数是网络编程中常见的工具，用于处理和解析 IP 地址。
+
+函数原型如下：
+
+```c
+#include <arpa/inet.h>
+in_addr_t inet_addr(const char *cp);
+```
+
+参数说明：`const char *cp`: 这是一个指向以 null 结尾的字符串的指针，该字符串包含了以点分十进制格式表示的 IPv4 地址，例如 `"192.168.1.1"`。
+
+返回值：
+
+- 如果转换成功，返回一个 `in_addr_t` 类型的值，这是 IPv4 地址的网络字节序表示。
+- 如果字符串不是有效的 IP 地址，返回 `INADDR_NONE` 宏指定的特殊值，其通常定义为 `-1`。
+
+使用场景：当需要将用户输入的 IP 地址或配置文件中的 IP 地址字符串转换为可用于网络操作的格式时。
+
+工作机制：`inet_addr` 函数解析传入的字符串，将其分割为四个十进制数，并按照字符串中的顺序将这些数转换成一个 32 位的整数。这个整数是网络字节序格式，即大端序。
+
+示例一：
+
+```c
+#include <arpa/inet.h> // 应包含inet_addr函数的头文件
+
+int main() {
+    char *ip = "116.162.172.51";
+    printf("IP address in dotted decimal notation: %s\n", ip);
+
+    // 使用inet_addr将点分十进制IP地址转换为网络字节序的整型数
+    in_addr_t ip_int = inet_addr(ip);
+    printf("IP address in network byte order (big-endian): %d\n", ip_int);
+
+    // 在小端存储的主机上，内存中的字节序与大端序不同
+    // 因此，直接解引用ip_int的地址可能得到错误的字节
+    char *chr = (char *)&ip_int;
+    printf("First byte in memory (little-endian host): %c\n", *chr);
+
+    return 0;
+}
+```
+
+- `inet_addr` 函数接受一个点分十进制的 IP 地址字符串，并将其转换为网络字节序的整型数。网络字节序始终是大端序，即最高有效字节（MSB）存储在最低的内存地址处。
+- 在小端存储的主机上，内存中的字节序与网络字节序不同。因此，直接访问 `ip_int` 的地址可能会得到错误的字节。在您的示例中，解引用 `ip_int` 的第一个字节作为字符输出，这在小端主机上将输出 IP 地址的最后一个字节对应的 ASCII 字符。
+- 该代码演示了如何在小端主机上观察到这种差异，并且展示了如何将 IP 地址的整数表示转换回其原始的点分十进制形式。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUV1E5a1c5bHVkRXNRVHhLakNfdjRBQktvVkdDSHFWVjl6VHgtOENTMEtCU3c_ZT1JRGZjZmk.png)
+
+##### `inet_aton` 
+
+`inet_aton` 是一个用于将 IPv4 地址的字符串表示形式转换为其二进制形式的函数。这个函数接受一个点分十进制的 IP 地址字符串，并尝试将其转换为一个 `in_addr` 结构，该结构内部使用网络字节序存储 IPv4 地址。
+
+函数原型如下：
+
+```c
+#include <arpa/inet.h>
+int inet_aton(const char *cp, struct in_addr *inp);
+```
+
+参数说明：
+
+1. `const char *cp`: 这是一个指向包含 IPv4 地址的字符串的指针，格式为点分十进制，例如 `"192.168.1.1"`。
+
+2. `struct in_addr *inp`: 这是一个指向 `in_addr` 结构的指针，该结构用于接收转换后的 IPv4 地址。`in_addr` 结构通常定义为包含一个 `s_addr` 成员，这是一个 `uint32_t` 类型的值，存储网络字节序的 IPv4 地址。
+
+返回值：
+
+- 如果转换成功，返回一个非零值（通常是 1）。
+- 如果字符串不是有效的 IPv4 地址，返回 0。
+
+使用场景：当需要将表示为字符串的 IP 地址转换为二进制形式，以便于网络通信或进一步处理时。
+
+工作机制：`inet_aton` 函数解析传入的字符串，验证它是否是有效的 IPv4 地址格式，并将其转换为网络字节序的 32 位整数。
+
+示例：
+
+```c
+#include <arpa/inet.h> // 应包含inet_aton函数的头文件
+#include <stdio.h>
+
+int main() {
+    char *ip = "116.162.172.51";
+    printf("IP address in dotted decimal notation: %s\n", ip);
+
+    // 使用inet_aton将点分十进制IP地址转换为in_addr结构体
+    struct in_addr inp;
+    if (inet_aton(ip, &inp) == 0) {
+        printf("Invalid IP address format.\n");
+        return 1;
+    }
+    printf("IP address in network byte order: %u\n", inp.s_addr);
+
+    // 在小端存储的主机上，第一个字节将是最低有效字节
+    char *chr = (char *)&inp.s_addr;
+    printf("First byte in memory (little-endian host): %c\n", *chr);
+
+    return 0;
+}
+```
+
+- `inet_aton` 函数接受一个点分十进制的 IP 地址字符串和一个 `in_addr` 结构体的指针。如果转换成功，它将 IP 地址转换为网络字节序的整型数并存储在 `in_addr` 结构体的 `s_addr` 成员中，函数返回非零值；如果转换失败，返回零。
+- `inp.s_addr` 以网络字节序（大端序）存储 IP 地址。在网络通信中，这是标准形式。
+- 在小端存储的主机上，当我们通过 `&inp.s_addr` 获取 `s_addr` 的地址并将其作为字符解引用时，我们得到的是 IP 地址的最低有效字节对应的 ASCII 字符。在您的示例中，输出的是字符 `'t'`，它是 IP 地址最后一个字节的 ASCII 表示。
+
+##### `inet_ntoa`
+
+`inet_ntoa` 是一个将 IPv4 地址从其二进制形式转换回它的点分十进制字符串形式的函数。这个函数广泛用于网络编程，尤其是在需要将 IP 地址以人类可读的格式显示或记录到日志中时。
+
+函数原型如下：
+
+```c
+#include <arpa/inet.h>
+char *inet_ntoa(struct in_addr in);
+```
+
+参数说明：`struct in_addr in`: 这是一个 `in_addr` 结构，包含了要转换的 IPv4 地址。这个地址必须以网络字节序存储，即大端序。
+
+返回值：函数返回一个指向字符数组的指针，该数组包含了转换后的点分十进制格式的 IPv4 地址字符串。例如，对于给定的二进制 IPv4 地址，它可能返回 `"192.168.1.1"`。
+
+使用场景：当你有一个以二进制形式存储的 IPv4 地址，并且需要将其转换为字符串形式以进行显示或记录。
+
+工作机制：`inet_ntoa` 函数接受一个 `in_addr` 结构作为参数，并将其中的网络字节序的 IPv4 地址转换为一个 null 结尾的字符串。
+
+```c
+#include <arpa/inet.h> // 应包含inet_aton和inet_ntoa函数的头文件
+#include <stdio.h>
+
+int main(int argc, char* argv[]) {
+    char *ip1 = "192.168.10.1";
+    struct in_addr inp;
+
+    // 使用inet_aton将点分十进制IP地址转换为网络字节序的IP地址
+    if (inet_aton(ip1, &inp) == 0) {
+        printf("Invalid IP address format.\n");
+        return 1;
+    }
+
+    // 使用inet_ntoa将网络字节序的IP地址转换回点分十进制IP地址的字符串形式
+    char *ipStr = inet_ntoa(inp);
+    printf("IP address in dotted decimal notation: %s\n", ipStr);
+
+    return 0;
+}
+```
+
+- `inet_aton` 函数将点分十进制格式的 IP 地址字符串转换为网络字节序的整型数，并存储在 `in_addr` 结构体中。如果输入的字符串不是有效的 IP 地址，`inet_aton` 将返回 0。
+- `inet_ntoa` 函数执行相反的操作，它将 `in_addr` 结构体中的网络字节序 IP 地址转换为点分十进制格式的字符串。这个字符串是通过动态分配内存创建的，因此程序员需要确保在使用完毕后释放它。
+
+### DNS
+
+在网络通信中，域名和 IP 地址之间的映射至关重要。DNS 协议作为核心机制，通过全球分布的 DNS 服务器来维护这一映射关系。虽然可以通过修改本地 `hosts` 文件来实现简单的映射，但面对广泛的互联网访问，DNS 提供了一种更为通用和强大的解决方案。
+
+在编程实践中，可以使用 `getaddrinfo` 函数来执行域名解析，获取主机的 IP 地址信息。这个函数支持 IPv4 和 IPv6，并且能够返回与给定域名相关的所有 IP 地址。相比之下，`gethostbyname` 函数由于其局限性，已逐渐被新的 API 所取代。
+
+## TCP
+
+###  基于 TCP 的 Socket 通信流程
+
+![TCPSocket.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZYW8tLURXWnpaS2xvVFhaTy1QSVVnQm5TVnFuVlAyM0hDQ0F2UzN2eVEyUEE_ZT1hdkplZXM.png)
+
+### `socket` 创建通信端点
+
+`socket` 函数是网络编程中的一个基础函数，用于创建一个端点（endpoint），即 socket。在 POSIX 兼容的操作系统中，几乎所有的网络通信都是通过 socket 进行的。
+
+函数原型如下：
+
+```c
+#include <sys/socket.h>
+int socket(int domain, int type, int protocol);
+```
+
+参数说明：
+
+1. `int domain`: 指定通信协议的家族。最常见的值是 `AF_INET` 用于 IPv4 通信，`AF_INET6` 用于 IPv6 通信，还有 `AF_UNIX` 用于 Unix 域套接字等。
+
+2. `int type`: 指定 socket 的类型，这决定了 socket 支持的通信语义。常见的类型包括：
+   - `SOCK_STREAM`：提供基于连接的、可靠的字节流服务，通常用于 TCP 连接。
+   - `SOCK_DGRAM`：提供无连接的、尽最大努力交付的数据报服务，通常用于 UDP 通信。
+   - `SOCK_SEQPACKET`：提供有序、可靠的、固定长度的包服务。
+
+3. `int protocol`: 指定使用的具体协议。对于 `AF_INET` 域，常用的值是 `IPPROTO_TCP` 和 `IPPROTO_UDP`。如果设置为 0，系统会自动选择一个合适的协议。
+
+返回值：
+
+- 如果创建成功，返回一个新的 socket 文件描述符。
+- 如果创建失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：
+
+- 当需要建立网络连接，无论是客户端还是服务器端。
+- 当需要使用高级网络特性，如多播、广播或其他特定的网络协议。
+
+工作机制：
+
+- `socket` 函数调用操作系统内核，请求创建一个 socket 结构，并分配一个文件描述符用于后续操作。
+- 创建的 socket 可以用于绑定（`bind`）、监听（`listen`）、接受连接（`accept`）、连接（`connect`）、发送数据（`send`、`recv`）等操作。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main() {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        perror("Failed to create socket");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Socket created successfully, sockfd: %d\n", sockfd);
+
+    // 接下来可以对 socket 进行其他操作，如 bind、listen 等
+
+    // 最后关闭 socket
+    close(sockfd);
+    return 0;
+}
+```
+
+在这个示例中，我们创建了一个基于 IPv4 的 TCP socket。如果 socket 创建成功，我们打印出 socket 文件描述符。在实际使用中，接下来会对这个 socket 进行绑定端口、监听连接等操作。最后，使用 `close` 函数关闭 socket。
+
+![socket.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaVGVMRTZsV0cxUG5mOHRzdzFNVE8wQlczNUhuUGZNZWhKUDFhdnJvRm1QTmc_ZT1XOXZ1RVU.png)
+
+**socket 函数的作用**： `socket` 函数在内核中创建了一个用于网络通信的对象。尽管它返回一个文件描述符来标识这个对象，但这个对象并不是传统意义上的文件对象。它是一个特殊的内核对象，用于管理和维护网络连接的状态和信息。
+
+**socket 对象包含的信息**： socket 对象中包含了进行网络通信所需的各种信息和状态，例如：
+
+- 地址族（Address Family，如 AF_INET 用于 IPv4 或 AF_INET6 用于 IPv6）
+- 类型（Type，如 SOCK_STREAM 用于 TCP 或 SOCK_DGRAM 用于 UDP）
+- 协议（Protocol，指定使用的传输协议，如 IPPROTO_TCP 或 IPPROTO_UDP）
+- 地址（Socket Address，包含 IP 地址和端口号）
+
+**缓冲区的重要性**： 除了上述信息，socket 对象还维护了两个极其重要的缓冲区：
+
+- 输入缓冲区（SO_RCVBUF）：用于临时存储从网络接收的数据。当数据到达时，首先被存储在这个缓冲区中，直到应用程序准备好读取它们。
+- 输出缓冲区（SO_SNDBUF）：用于存储待发送到网络的数据。应用程序写入数据后，数据会被放入这个缓冲区，并在适当的时候被发送出去。
+
+这两个缓冲区对于流量控制和避免数据丢失至关重要。它们的默认大小可以在系统级别进行配置，通过读取和修改 `/proc/sys/net/core/rmem_default` 和 `/proc/sys/net/core/wmem_default` 文件来实现。
+
+### `bind` 绑定 socket 到网络地址和端口
+
+`bind` 函数在网络编程中用于将一个 socket 绑定到一个特定的网络地址和端口上。这个函数允许 socket 监听特定地址上的连接请求或数据报。
+
+函数原型如下：
+
+```c
+#include <sys/socket.h>
+int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+```
+
+参数说明：
+
+1. `int sockfd`: 这是由 `socket` 函数创建的 socket 的文件描述符。
+
+2. `const struct sockaddr *addr`: 这是一个指向 `sockaddr` 结构的指针，该结构包含了要绑定到 socket 上的地址信息。`sockaddr` 是一个通用的结构，对于不同的地址族（如 `AF_INET`、`AF_INET6` 等），它可能包含不同的具体结构（如 `sockaddr_in`、`sockaddr_in6` 等）。
+
+3. `socklen_t addrlen`: 这是 `addr` 参数指向的地址结构的大小（以字节为单位）。这个参数应该准确设置，以便 `bind` 函数知道结构的长度。
+
+返回值：
+
+- 如果绑定成功，返回 0。
+- 如果绑定失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：
+
+- 当服务器应用程序需要在特定的端口上监听客户端的连接请求时。
+- 当需要在特定的网络接口上接收数据报时。
+
+工作机制：
+
+- `bind` 函数将 socket 关联到 `addr` 指定的地址和端口上。这通常用于服务器应用程序，它们需要在固定的端口上监听。
+- 一旦绑定，socket 就可以使用 `listen` 和 `accept` 函数来接受传入的连接请求，或者使用 `recvfrom` 和 `sendto` 函数来接收和发送数据报。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+int main() {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        perror("Failed to create socket");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Socket created successfully, sockfd: %d\n", sockfd);
+    
+    struct sockaddr_in server_addr;
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(8080); // 绑定到 8080 端口
+    server_addr.sin_addr.s_addr = htonl(INADDR_ANY); // 绑定到所有可用接口
+
+    if (bind(sockfd, (const struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
+        perror("Failed to bind");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Server bound to port 8080\n");
+
+    // 接下来可以对 socket 进行监听等操作
+
+    // 最后关闭 socket
+    close(sockfd);
+    return 0;
+}
+```
+
+在这个示例中，我们首先创建了一个 socket，然后初始化了一个 `sockaddr_in` 结构，设置为监听所有接口上的 8080 端口。我们使用 `bind` 函数将 socket 绑定到这个地址和端口上。如果绑定成功，我们可以继续使用 `listen` 和 `accept` 函数来接受客户端连接。最后，我们关闭 socket。
+
+在网络编程实践中，合理选择端口号并正确使用 `bind` 函数对于网络服务的配置至关重要。知名端口通常被保留给标准服务使用，因此建议新应用程序使用 1024 以上的端口号以避免冲突。
+
+使用 `bind` 函数时，需要确保提供的地址信息采用大端法表示，这可能涉及到适当的类型转换。服务器在设置监听地址时，可以选择使用特殊 IP 地址，如 `0.0.0.0` 表示接受所有接口的连接，或者 `127.0.0.1` 用于仅限本机的回环连接。
+
+对于客户端，通常不需要显式执行 `bind` 操作，因为操作系统会自动分配一个临时端口。但在需要指定通信接口时，客户端也可以执行 `bind` 操作。服务端则必须执行 `bind` 操作以监听并接受进入的连接，不执行 `bind` 的服务端在逻辑上没有意义，也不符合网络服务的常规操作。
+
+### `listen` 转换 socket 为被动监听模式
+
+`listen` 函数在网络编程中用于将一个 socket 从主动连接模式转换为被动监听模式。也就是说，它使得 socket 准备好接受来自其他 socket 的连接请求。通常在服务器端的 socket 初始化过程中使用。
+
+函数原型如下：
+
+```c
+#include <sys/socket.h>
+int listen(int sockfd, int backlog);
+```
+
+参数说明：
+
+1. `int sockfd`: 这是由 `socket` 函数创建并由 `bind` 函数绑定到特定地址和端口的 socket 的文件描述符。
+
+2. `int backlog`: 这个参数指定了操作系统可以挂起的未完成连接请求的最大数量。当新的连接到来时，如果服务器还没有接受这个连接，那么这个连接会被放入一个队列中，队列的最大长度由 `backlog` 参数决定。
+
+返回值：
+
+- 如果调用成功，返回 0。
+- 如果调用失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：当服务器应用程序准备就绪，可以开始接受客户端的连接请求时。
+
+工作机制：
+
+- `listen` 函数使得 socket 进入监听状态，准备好接受传入的连接请求。
+- 一旦调用 `listen` 函数，socket 就不能再用于发起连接，而只能用于接受连接。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main() {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        perror("Failed to create socket");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Socket created successfully, sockfd: %d\n", sockfd);
+    
+    struct sockaddr_in server_addr;
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(8080); // 绑定到 8080 端口
+    server_addr.sin_addr.s_addr = htonl(INADDR_ANY); // 绑定到所有可用接口
+
+    if (bind(sockfd, (const struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
+        perror("Failed to bind");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Server bound to port 8080\n");
+
+    // 将 socket 设置为监听模式
+    if (listen(sockfd, 5) == -1) { // 例如，设置 backlog 为 5
+        perror("Failed to listen");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Server is listening for connections...\n");
+
+    // 接下来可以使用 accept 函数来接受客户端连接
+
+    // 最后关闭 socket
+    close(sockfd);
+    return 0;
+}
+```
+
+在这个示例中，我们首先创建了一个 socket，然后调用 `listen` 函数将其设置为监听模式，并指定了 backlog 参数。如果 `listen` 调用成功，服务器就准备好接受连接请求了。我们使用 `accept` 函数来接受客户端的连接。
+
+![listensocket.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhQWxyUXRxX2hKT3RXWk9WdGhLSVNjQm5KdC03MzFMbG82Zk5SSWdESW9ZOEE_ZT1QbmFpZlo.png)
+
+启用 `listen` 函数后，服务端套接字在操作系统内核中的行为发生变化，内核将不再使用该套接字的发送和接收缓冲区，而是开始维护两个关键队列：半连接队列和全连接队列。
+
+- **半连接队列**：管理那些已经通过 TCP 三次握手的第一次握手的连接请求。这通常发生在客户端发送 SYN 报文后，服务端收到并准备响应。
+- **全连接队列**：管理已经完成 TCP 三次握手的连接。这意味着客户端和服务器端已经交换了 SYN 和 ACK 报文，连接已建立。
+
+`backlog` 参数定义了全连接队列的最大长度。在一些系统中，它可能影响半连接队列的长度或两者的总长度。如果全连接队列已满，新的连接请求将被服务端丢弃，且通常不会有任何响应发送给客户端，这促使客户端根据 TCP 的重传机制进行重传。通常设置一个合理的正数值即可。
+
+可以使用 `netstat -an` 命令来检查特定端口的监听状态，通过结合 `grep` 工具可以快速过滤出特定端口的相关信息，从而监控和诊断网络服务的状态。例如，通过管道命令 `netstat -an | grep 12345` 可以过滤并查看端口 12345 的监听状态。
+
+### `connect` 初始化连接到指定服务器的 socket
+
+`connect` 函数在网络编程中用于初始化一个连接到指定的服务器 socket。对于客户端应用程序来说，`connect` 函数是建立到服务器的主动连接的关键步骤。
+
+函数原型如下：
+
+```c
+#include <sys/socket.h>
+int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+```
+
+参数说明：
+
+1. `int sockfd`: 这是由 `socket` 函数创建的 socket 的文件描述符。
+
+2. `const struct sockaddr *addr`: 这是一个指向 `sockaddr` 结构的指针，该结构包含了要连接到的服务器的地址信息。这通常包括服务器的 IP 地址和端口号。
+
+3. `socklen_t addrlen`: 这是 `addr` 参数指向的地址结构的大小（以字节为单位）。这个参数应该准确设置，以便 `connect` 函数知道结构的长度。
+
+返回值：
+
+- 如果连接建立成功，返回 0。
+- 如果连接建立失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：当客户端应用程序需要与服务器建立 TCP 或 UDP 连接时。
+
+工作机制：
+
+- `connect` 函数尝试将 socket 连接到 `addr` 指定的远程地址和端口。
+- 对于非阻塞 socket，如果连接正在进行中，`connect` 函数会立即返回，此时可以通过选择机制（使用 `select` 或 `poll`）来检测 socket 是否已连接。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+int main() {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        perror("Failed to create socket");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Socket created successfully, sockfd: %d\n", sockfd);
+
+    struct sockaddr_in server_addr;
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(8080); // 连接到端口 8080
+    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // 连接到本地地址
+
+    // 尝试连接到服务器
+    if (connect(sockfd, (const struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
+        perror("Failed to connect");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Connected to server\n");
+
+    // 接下来可以进行数据传输等操作
+
+    // 最后关闭 socket
+    close(sockfd);
+    return 0;
+}
+```
+
+在这个示例中，我们首先创建了一个 socket，然后初始化了一个 `sockaddr_in` 结构，设置为连接到本地主机的 8080 端口。我们使用 `connect` 函数尝试建立到服务器的连接。如果连接成功，我们可以进行数据传输等操作。最后，我们关闭 socket。
+
+在 TCP/IP 网络通信中，客户端通过调用 `connect` 函数来尝试与服务端建立连接。如果客户端在调用 `connect` 之前没有使用 `bind` 函数来明确指定本地端口，操作系统将自动为客户端选择一个临时端口号作为源端口。
+
+`connect` 函数的目标是完成 TCP 协议中的三次握手过程，这是建立一个可靠连接的必要步骤。然而，如果服务端没有在目标端口上监听，或者端口号未被正确配置，客户端将收到一个重置（RST）报文。这种情况下，客户端的 `connect` 调用将失败，并报告 "Connection refused" 错误。
+
+### `accept` 接受一个连接请求
+
+`accept` 函数在网络编程中用于接受一个连接请求。当服务器 socket 通过 `listen` 函数设置为监听模式后，它会等待客户端的连接请求。当一个连接请求到达时，服务器可以使用 `accept` 函数来接受这个连接，从而创建一个新的连接 socket。
+
+函数原型如下：
+
+```c
+#include <sys/socket.h>
+int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+```
+
+参数说明：
+
+1. `int sockfd`: 这是服务器端的 socket 文件描述符，该 socket 已经通过 `listen` 函数设置为监听模式。
+
+2. `struct sockaddr *addr`: 这是一个指向 `sockaddr` 结构的指针，用于接收连接客户端的地址信息。如果不需要客户端地址，可以传递 `NULL`。
+
+3. `socklen_t *addrlen`: 这是一个指向 `socklen_t` 类型的指针，指定 `addr` 参数指向的地址结构的大小。在调用 `accept` 时，这个值应该设置为地址结构的最大期望大小。调用成功后，`accept` 函数会更新这个值为实际的地址结构大小。
+
+返回值：
+
+- 如果连接被成功接受，返回一个新的 socket 文件描述符，用于与连接的客户端进行通信。
+- 如果连接请求被拒绝或等待队列为空，`accept` 函数会阻塞，直到有新的连接请求到达（对于阻塞 socket）。
+- 如果出现错误，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：当服务器应用程序需要接受客户端的连接请求时。
+
+工作机制：
+
+- `accept` 函数从服务器 socket 的连接请求队列中取出第一个请求，并创建一个新的 socket 用于与客户端通信。
+- 如果 `addr` 参数不是 `NULL`，`accept` 函数会填充该参数指向的结构，包含连接客户端的地址信息。
+
+示例：
+
+
+```c
+#include <stdio.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main() {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        perror("Failed to create socket");
+        exit(EXIT_FAILURE);
+    }
+
+    // 绑定 socket 到地址和端口的代码 ...
+    struct sockaddr_in server_addr;
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(8080);
+    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    if (bind(sockfd, (const struct sockaddr*)&server_addr, sizeof(server_addr)) ==
+        -1) {
+        perror("Failed to bind");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    // 将 socket 设置为监听模式
+    if (listen(sockfd, 5) == -1) {
+        perror("Failed to listen");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    struct sockaddr_in client_addr;
+    socklen_t client_addrlen = sizeof(client_addr);
+
+    // 接受客户端连接
+    int client_sockfd = accept(sockfd, (struct sockaddr *)&client_addr, &client_addrlen);
+    if (client_sockfd == -1) {
+        perror("Failed to accept connection");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Accepted connection from client\n");
+
+    // 使用 client_sockfd 与客户端进行通信
+
+    // 最后关闭 socket
+    close(sockfd);
+    return 0;
+}
+```
+
+在这个示例中，我们首先创建了一个 socket 并将其设置为监听模式。然后我们使用 `accept` 函数接受客户端的连接请求。如果连接成功，`accept` 函数返回一个新的 socket 文件描述符 `client_sockfd`，我们可以使用这个新的 socket 来与客户端进行通信。如果连接失败，我们打印错误信息并关闭 socket。
+
+在使用 `accept` 函数时，需要注意 `addrlen` 参数是一个传入传出参数，需要调用者预先分配足够的内存空间，以存储客户端的地址信息。通常使用 `sizeof(addr)` 来确定所需空间。
+
+`accept` 函数是服务端用来从全连接队列中提取已完成 TCP 三次握手的连接的。如果队列为空，`accept` 将阻塞，等待新的连接请求。当有新连接到达时，`accept` 变得“读就绪”，允许服务端接受连接。
+
+一旦 `accept` 被调用并执行，内核将为新的 TCP 连接创建一个新的套接字文件对象，其文件描述符由 `accept` 返回。这个新套接字拥有独立的发送和接收缓冲区，专门用于这条 TCP 连接上的数据传输。
+
+![accept.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhQWxyUXRxX2hKT3RXWk9WdGhLSVNjQm5KdC03MzFMbG82Zk5SSWdESW9ZOEE_ZT1QbmFpZlo.png)
+
+服务端通常使用两个套接字对象：监听套接字和已连接套接字。
+
+- **监听套接字**：用于管理连接队列，负责建立新的 TCP 连接。只要源 IP、源端口、目的 IP、目的端口四元组中任意字段有区别，就认为是一个新的 TCP 连接。
+- **已连接套接字**：用于特定 TCP 连接的数据通信。服务端通过这个套接字与客户端进行数据的发送和接收。
+
+### `send` 向已连接的 socket 发送数据
+
+`send` 函数在网络编程中用于向已连接的 socket 发送数据。对于基于连接的通信协议（如 TCP），`send` 函数用于发送数据到与 socket 已建立连接的远程 socket。对于无连接的通信协议（如 UDP），`send` 函数用于向指定的地址和端口发送数据。
+
+函数原型如下：
+
+```c
+#include <sys/socket.h>
+ssize_t send(int sockfd, const void *buf, size_t len, int flags);
+```
+
+参数说明：
+
+1. `int sockfd`: 这是 socket 的文件描述符，该 socket 可以是已连接的也可以是无连接的，取决于使用的通信协议。
+
+2. `const void *buf`: 这是一个指向要发送数据缓冲区的指针。数据将从这个缓冲区中取得并发送。
+
+3. `size_t len`: 这是要发送数据的长度（以字节为单位）。
+
+4. `int flags`: 这是一组选项标志，用于修改发送行为。常用的标志包括：
+   - `MSG_OOB`: 发送带外数据（out-of-band data）。
+   - `MSG_DONTROUTE`: 不要对数据执行路由查找，直接发送。
+   - `MSG_EOR`: 表示记录结束（仅用于 SOCK_SEQPACKET 类型的 socket）。
+   - 大多数情况下设置为 0。
+
+返回值：
+
+- 如果调用成功，返回已发送的字节数。
+- 如果调用失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：
+
+- 当需要向已建立连接的远程 socket 发送数据时。
+- 当需要向特定地址发送无连接的数据报时。
+
+工作机制：
+
+- `send` 函数从 `buf` 指向的缓冲区中取得数据，并尝试发送 `len` 字节的数据。
+- 对于非阻塞 socket，如果数据不能立即发送，`send` 函数会返回已经发送的字节数，剩余的数据可以稍后再发送。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main() {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        perror("Failed to create socket");
+        exit(EXIT_FAILURE);
+    }
+
+    // 连接到服务器的代码 ...
+
+    const char *message = "Hello, server!";
+    ssize_t sent = send(sockfd, message, strlen(message), 0);
+    if (sent == -1) {
+        perror("Failed to send message");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Sent %zd bytes to server\n", sent);
+
+    // 关闭 socket
+    close(sockfd);
+    return 0;
+}
+```
+
+在这个示例中，我们首先创建了一个 socket，然后使用 `send` 函数向已连接的服务器发送一条消息。如果消息成功发送，我们打印出发送的字节数。如果发送失败，我们打印错误信息并关闭 socket。
+
+### `recv` 从 socket 接收数据
+
+`recv` 函数在网络编程中用于从 socket 接收数据。这个函数可以用于阻塞和非阻塞 socket，并且支持多种通信协议，包括 TCP 和 UDP。
+
+函数原型如下：
+
+```c
+#include <sys/socket.h>
+ssize_t recv(int sockfd, void *buf, size_t len, int flags);
+```
+
+参数说明：
+
+1. `int sockfd`: 这是 socket 的文件描述符，用于指定从哪个 socket 接收数据。
+
+2. `void *buf`: 这是一个指向缓冲区的指针，`recv` 函数将把接收到的数据存储在这个缓冲区。
+
+3. `size_t len`: 这是缓冲区的大小，即可以接收的数据的最大字节数。
+
+4. `int flags`: 这是一个选项标志，用于修改接收行为。常用的标志包括：
+   - `0`: 正常接收数据。
+   - `MSG_OOB`: 接收带外数据（out-of-band data）。
+   - `MSG_PEEK`: 窥视接收数据，即读取数据但不去删除缓冲区中的数据。
+
+返回值：
+
+- 如果调用成功，返回接收到的字节数，这个值可能会小于 `len`，表示接收到的数据量。
+- 如果连接已关闭并且没有更多数据可接收，返回 0。
+- 如果调用失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：
+
+- 当需要从已连接的 socket 或无连接的 socket 接收数据时。
+
+工作机制：
+
+- `recv` 函数从 socket 的接收缓冲区中提取数据，并将其存储到 `buf` 指向的缓冲区。
+- 对于非阻塞 socket，如果缓冲区中没有数据可接收，`recv` 函数会立即返回，而不是等待数据到达。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main() {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        perror("Failed to create socket");
+        exit(EXIT_FAILURE);
+    }
+
+    // 连接到服务器的代码 ...
+
+    char buffer[1024];
+    ssize_t received = recv(sockfd, buffer, sizeof(buffer), 0);
+    if (received == -1) {
+        perror("Failed to receive data");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    } else if (received == 0) {
+        printf("Connection closed by the server.\n");
+    } else {
+        printf("Received %zd bytes from server\n", received);
+        // 处理接收到的数据
+    }
+
+    // 关闭 socket
+    close(sockfd);
+    return 0;
+}
+```
+
+在这个示例中，我们首先创建了一个 socket，然后使用 `recv` 函数从服务器接收数据。如果数据成功接收，我们打印出接收到的字节数。如果接收到的数据为 0，表示连接已被关闭。如果接收失败，我们打印错误信息并关闭 socket。
+
+### `close`  关闭文件描述符
+
+`close` 函数用于关闭一个文件描述符（file descriptor），释放与该描述符关联的所有资源。在 UNIX 和类 UNIX 系统（包括 POSIX 兼容的系统）中，文件描述符不仅用于文件 I/O，也用于网络通信、管道等其他 I/O 操作。
+
+函数原型如下：
+
+```c
+#include <unistd.h>
+int close(int fd);
+```
+
+参数说明：`int fd`: 这是要关闭的文件描述符的整数标识符。
+
+返回值：
+
+- 如果函数调用成功，返回 0。
+- 如果调用失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：
+
+- 当文件或 socket 等资源不再需要时，应当关闭它们以释放系统资源。
+- 在完成 I/O 操作后，确保不会有数据丢失或资源泄露。
+
+工作机制：
+
+- `close` 函数通知操作系统关闭指定的文件描述符，操作系统随后会释放与该描述符关联的所有资源，包括内存、内核缓冲区等。
+- 如果文件描述符关联的是文件，`close` 函数还会触发任何必要的数据同步操作，确保所有缓冲区中的数据被写入到磁盘。
+
+### TCP 通信代码示例
+
+#### 客户端
+
+```c
+#include <stdc.h>
+
+int main() {
+  char *sourceIP = "172.16.0.3";
+  char *sourcePort = "8080";
+
+  int socketFd = socket(AF_INET, SOCK_STREAM, 0);
+  if (socketFd == -1) {
+    perror("Failed to create socket");
+    close(socketFd);
+    exit(EXIT_FAILURE);
+  }
+
+  // 方式一: inet_addr
+  // 把点分十进制, 转成 in_addr_t 类型 (网络 IP),  把其存储到结构体 in_addr
+  // 类型中 in_addr_t addrTIP = inet_addr(sourceIP); struct in_addr inAddr;
+  // inAddr.s_addr = addrTIP;
+
+  // 方式二: inet_aton
+  struct in_addr inAddr;
+  inet_aton(sourceIP, &inAddr);
+
+  // 把端口转为int类型
+  int sourcePortInt = atoi(sourcePort);
+  // 把端口号: 有主机字节序, 转为网络字节序
+  int sourcePortNet = htons(sourcePortInt);
+
+  // 构建"struct sockaddr"类型
+  struct sockaddr_in socketAddr;
+  socketAddr.sin_addr = inAddr;
+  socketAddr.sin_port = sourcePortNet;
+  socketAddr.sin_family = AF_INET;
+
+  // 客户端向服务器发起建立连接请求
+  int res_connet = connect(socketFd, (const struct sockaddr *)&socketAddr,
+                           sizeof(socketAddr));
+  if (res_connet == -1) {
+    perror("Failed to connet socket");
+    close(socketFd);
+    exit(EXIT_FAILURE);
+  }
+
+  while (1) {
+    char buf[1024] = {0};
+    // 读取标准输入
+    read(STDIN_FILENO, buf, sizeof(buf) - 1);
+    // 把标准输入, 发送给服务器
+    int res_send = send(socketFd, buf, sizeof(buf), 0);
+    if (res_send == -1) {
+      perror("Failed to send socket");
+      close(socketFd);
+      exit(EXIT_FAILURE);
+    }
+
+    char buf2[1024] = {0};
+    // 读取对方输入
+    int ret_recv = recv(socketFd, buf2, sizeof(buf2), 0);
+    if (ret_recv == -1) {
+      perror("Failed to recv socket");
+      close(socketFd);
+      exit(EXIT_FAILURE);
+    } else if (ret_recv == 0) {
+      perror("other close");
+      close(socketFd);
+      exit(EXIT_FAILURE);
+    }
+    // 打印到标准输出
+    write(STDOUT_FILENO, buf2, sizeof(buf2));
+  }
+
+  close(socketFd);
+  return 0;
+}
+```
+
+#### 服务端
+
+```c
+#include <stdc.h>
+
+int main() {
+  char *sourceIP = "172.16.0.3";
+  char *sourcePort = "8080";
+
+  int socketFd = socket(AF_INET, SOCK_STREAM, 0);
+  if (socketFd == -1) {
+    perror("Failed to create socket");
+    close(socketFd);
+    exit(EXIT_FAILURE);
+  }
+
+  // 方式一: inet_addr
+  // 把 点分十进制, 转成 in_addr_t 类型 (网络 IP),  把其存储到结构体 in_addr 类型中
+  // in_addr_t addrTIP = inet_addr(sourceIP);
+  // struct in_addr inAddr;
+  // inAddr.s_addr = addrTIP;
+
+  // 方式二: inet_aton
+  struct in_addr inAddr;
+  inet_aton(sourceIP, &inAddr);
+
+  // 把端口转为 int 类型
+  int sourcePortInt = atoi(sourcePort);
+  // 把端口号: 有主机字节序, 转为网络字节序
+  int sourcePoreNet = htons(sourcePortInt);
+
+  // 构建 "struct sockaddr" 类型
+  struct sockaddr_in socketAddr;
+  socketAddr.sin_family = AF_INET;
+  socketAddr.sin_addr = inAddr;
+  socketAddr.sin_port = sourcePoreNet;
+
+  // bind: 绑定端口
+  int res_bind =
+      bind(socketFd, (struct sockaddr *)&socketAddr, sizeof(socketAddr));
+  if (res_bind == -1) {
+    perror("Faild to bind socket");
+    close(socketFd);
+    exit(EXIT_FAILURE);
+  }
+
+  // listen: 监听端口
+  if (listen(socketFd, 10) == -1) {
+    perror("Failed to listen socket");
+    close(socketFd);
+    exit(EXIT_FAILURE);
+  }
+
+  // accept: 获取连接
+  int connectFd = accept(socketFd, NULL, NULL);
+  if (connectFd == -1) {
+    perror("Failed to accept socket");
+    close(socketFd);
+    exit(EXIT_FAILURE);
+  }
+
+  while (1) {
+    char buf2[1024] = {0};
+    // 读取对方输入
+    int res_recv = recv(connectFd, buf2, sizeof(buf2), 0);
+    if (res_recv == -1) {
+      perror("Failed to recv socket");
+      close(socketFd);
+      exit(EXIT_FAILURE);
+    } else if (res_recv == 0) {
+      perror("Other close");
+      close(socketFd);
+      exit(EXIT_FAILURE);
+    }
+    // 打印到标准输出
+    write(STDOUT_FILENO, buf2, sizeof(buf2));
+
+    char buf[1024] = {0};
+    // 读取标准输入
+    read(STDIN_FILENO, buf, sizeof(buf));
+
+    // 把标准输入, 发送给服务器
+    int res_send = send(connectFd, buf, sizeof(buf), 0);
+    if (res_send == -1) {
+      perror("Failed to send socket");
+      close(socketFd);
+      exit(EXIT_FAILURE);
+    }
+  }
+  close(socketFd);
+
+  return 0;
+}
+```
+
+
+
+### 结合 `Select` 通信
+
+#### 客户端
+
+```c
+#include <stdc.h>
+
+int main() {
+  char *sourceIP = "172.16.0.3";
+  char *sourcePort = "8080";
+
+  int socketFd = socket(AF_INET, SOCK_STREAM, 0);
+  if (socketFd == -1) {
+    perror("Failed to create socket");
+    close(socketFd);
+    exit(EXIT_FAILURE);
+  }
+
+  // 方式一: inet_addr
+  // 把 点分十进制, 转成 in_addr_t 类型 (网络 IP),  把其存储到结构体 in_addr
+  // 类型中 in_addr_t addrTIP = inet_addr(sourceIP); struct in_addr inAddr;
+  // inAddr.s_addr = addrTIP;
+
+  // 方式二: inet_aton
+  struct in_addr inAddr;
+  inet_aton(sourceIP, &inAddr);
+
+  // 把端口转为 int 类型
+  int sourcePortInt = atoi(sourcePort);
+  // 把端口号: 有主机字节序, 转为网络字节序
+  int sourcePortNet = htons(sourcePortInt);
+
+  // 构建 "struct sockaddr" 类型
+  struct sockaddr_in socketAddr;
+  socketAddr.sin_family = AF_INET;
+  socketAddr.sin_port = sourcePortInt;
+  socketAddr.sin_addr = inAddr;
+
+  // 客户端向服务器发起建立连接请求
+  int res_connect =
+      connect(socketFd, (struct sockaddr *)&socketAddr, sizeof(socketAddr));
+  if (res_connect) {
+    perror("Failed to connect socket");
+    close(socketFd);
+    exit(EXIT_FAILURE);
+  }
+
+  fd_set read_fd_set;
+  while (1) {
+    FD_ZERO(&read_fd_set);
+    FD_SET(socketFd, &read_fd_set);
+    FD_SET(STDIN_FILENO, &read_fd_set);
+
+    select(socketFd + 1, &read_fd_set, NULL, NULL, NULL);
+
+    if (FD_ISSET(STDIN_FILENO, &read_fd_set)) {
+      char buf[60] = {0};
+      // 读取标准输入
+      int res_read = read(STDIN_FILENO, buf, sizeof(buf));
+      if (res_read == 0) {
+        // 用户输入了 EOF 字符：在大多数 UNIX 和 Linux 系统上，EOF 字符默认是
+        // Ctrl+D
+        break;
+      }
+      // 把标准输入, 发送给服务器
+      int res_send = send(socketFd, buf, sizeof(buf), 0);
+      if (res_send == -1) {
+        perror("Failed to send socket");
+        close(socketFd);
+        exit(EXIT_FAILURE);
+      }
+    }
+
+    if (FD_ISSET(socketFd, &read_fd_set)) {
+      char buf2[60] = {0};
+      // 读取对方输入
+      int res_recv = recv(socketFd, buf2, sizeof(buf2), 0);
+      if (res_recv == -1) {
+        perror("Failed to recv socket");
+        close(socketFd);
+        exit(EXIT_FAILURE);
+      }
+      if (res_recv == 0) {
+        printf("对方已断开连接 \ n");
+        break;
+      }
+      // 打印到标准输出
+      write(STDOUT_FILENO, buf2, sizeof(buf2));
+    }
+  }
+  close(socketFd);
+  return 0;
+}
+```
+
+#### 服务端
+
+```c
+#include <stdc.h>
+
+int main() {
+  char *sourceIP = "172.16.0.3";
+  char *sourcePort = "8080";
+
+  int socketFd = socket(AF_INET, SOCK_STREAM, 0);
+  if (socketFd == -1) {
+    perror("Failed to create socket");
+    close(socketFd);
+    exit(EXIT_FAILURE);
+  }
+
+  // 方式一: inet_addr
+  // 把 点分十进制, 转成 in_addr_t 类型 (网络 IP),  把其存储到结构体 in_addr 类型中
+  // in_addr_t addrTIP = inet_addr(sourceIP);
+  // struct in_addr inAddr;
+  // inAddr.s_addr = addrTIP;
+
+  // 方式二: inet_aton
+  struct in_addr inAddr;
+  inet_aton(sourceIP, &inAddr);
+  // 把端口转为 int 类型
+  int sourcePortInt = atoi(sourcePort);
+  // 把端口号: 有主机字节序, 转为网络字节序
+  int sourcePortNet = htons(sourcePortInt);
+  // 构建 "struct sockaddr" 类型
+  struct sockaddr_in socketAddr;
+  socketAddr.sin_family = AF_INET;
+  socketAddr.sin_port = sourcePortInt;
+  socketAddr.sin_addr = inAddr;
+  // bind: 绑定端口
+  int res_bind =
+      bind(socketFd, (struct sockaddr *)&socketAddr, sizeof(socketAddr));
+  if (res_bind) {
+    perror("Failed to bind socket");
+    close(socketFd);
+    exit(EXIT_FAILURE);
+  }
+  // listen: 监听端口
+  listen(socketFd, 10);
+  // accept: 获取连接
+  int connectFd = accept(socketFd, NULL, NULL);
+
+  fd_set read_fd_set;
+  while (1) {
+    FD_ZERO(&read_fd_set);
+    FD_SET(connectFd, &read_fd_set);
+    FD_SET(STDIN_FILENO, &read_fd_set);
+    select(connectFd + 1, &read_fd_set, NULL, NULL, NULL);
+
+    if (FD_ISSET(connectFd, &read_fd_set)) {
+      char buf2[60] = {0};
+      // 读取对方输入
+      int res_recv = recv(connectFd, buf2, sizeof(buf2), 0);
+      if (res_recv == -1) {
+        perror("Failed to recv socket");
+        close(socketFd);
+        exit(EXIT_FAILURE);
+      } else if (res_recv == 0) {
+        // 判断对方是否已经关闭连接
+        printf("對方斷開連接 \n");
+        break;
+      }
+      // 打印到标准输出
+      write(STDOUT_FILENO, buf2, sizeof(buf2));
+    }
+
+    if (FD_ISSET(STDIN_FILENO, &read_fd_set)) {
+      char buf[60] = {0};
+      // 读取标准输入
+      int res_read = read(STDIN_FILENO, buf, sizeof(buf));
+      if (res_read == -1) {
+        perror("Failed to read socket");
+        close(socketFd);
+        exit(EXIT_FAILURE);
+      } else if (res_read == 0) {
+        // 用户输入了 EOF 字符：在大多数 UNIX 和 Linux 系统上，EOF 字符默认是 Ctrl+D
+        break;
+      }
+      // 把标准输入, 发送给服务器
+      int res_send = send(connectFd, buf, sizeof(buf), 0);
+      if (res_send == -1) {
+        perror("Failed to send socket");
+        close(socketFd);
+        exit(EXIT_FAILURE);
+      }
+    }
+  }
+  close(connectFd);
+  close(socketFd);
+}
+```
+
+#### Select 断开重连
+
+在现代网络通信中，客户端与服务器之间的连接可能会由于多种不可预测的因素而中断。为了确保会话的持续性并提供连贯的服务体验，当客户端尝试重新建立连接时，服务器端必须具备有效的重连策略。
+
+每次在重新调用 Select 函数之前，必须重置文件描述符集合。Select 函数在执行后，会更新集合以仅包含那些已经准备好进行 IO 操作的文件描述符。为了确保所有可能的连接请求都能被检测到，需要在每次调用前重置集合。
+
+Select 函数的第一个参数，即最大文件描述符加 1 的值，应该设置得足够大。这样做可以避免因文件描述符范围限制而错过对新连接套接字的监听。
+
+通过 Socket 的全连接队列获取新连接的过程，本质上是一种读操作的就绪状态。这意味着可以使用 Select 来监听 Socket 的状态，当检测到读操作就绪时，即表示有新的连接请求到达，此时应调用 accept 函数来接受这一连接。
+
+### DDoS
+
+在网络通信中，半连接队列的设计初衷是为了处理并发连接请求，但这一机制也可能被恶意利用。攻击者通过发送伪造的 SYN 请求，却无意完成 TCP 三次握手过程，从而发起所谓的 "半开放连接" 攻击。这些请求的源地址可能是随机生成的，或者通过感染其他计算机来发起，导致服务器端必须维护一个庞大的半连接队列。
+
+当半连接数量积累到一定程度时，服务器的资源将被大量占用，从而无法及时响应新的正常连接请求。这种现象被称为分布式拒绝服务攻击（DDoS）。
+
+为了防御 DDoS 攻击，可以采取多种措施，包括减少 SYN+ACK 的重传次数、增加半连接队列的长度，以及启用 SYN Cookies。SYN Cookies 是一种在 TCP 连接建立过程中，服务器不立即为请求分配存储空间，而是通过生成一个带有签名的序列号来验证请求的合法性，从而有效过滤掉伪造的连接请求。
+
+然而，在面对高强度的 DDoS 攻击时，仅仅调整 `tcp_syn_retries`（SYN 重传次数）和 `tcp_max_syn_backlog`（半连接队列的最大长度）并不能从根本上解决问题。更有效的防御策略是启用 `tcp_syncookies`。该机制允许服务器在确认连接请求的合法性之前，不分配资源来存储连接状态，从而减轻服务器的负担并提高对伪造请求的抵抗力。
+
+### tcpdump 
+
+**tcpdump** 是一款强大的网络分析工具，它能够捕获并分析网络上的数据包。在网络问题诊断过程中，`tcpdump` 可以提供实时的网络流量信息，帮助我们理解连接的状态。
+
+**观察连接状态**：
+
+- 使用 `ss -tn` 命令可以查看 TCP 连接的状态，其中 `-t` 表示显示 TCP 连接，`-n` 表示不解析服务名称，直接显示端口号。
+- `netstat -tn` 命令同样可以提供 TCP 连接的统计信息，包括端口号和连接状态。
+
+**使用 tcpdump 捕获数据包**：
+
+- `tcpdump` 命令可以捕获经过网络接口的数据包。为了保存捕获的数据包以供后续分析，可以使用 `-w` 选项指定输出文件。
+- 示例命令：`sudo tcpdump -w a.txt`，该命令会将捕获的数据包保存到 `a.txt` 文件中。
+
+**数据包分析**：
+
+- 捕获的数据包可以使用 `Wireshark` 或其他网络分析工具打开和分析。这有助于进一步诊断网络问题，如连接中断、数据包丢失等。
+
+## UDP
+
+![UDP.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaWk1mYmNEZnlwRGdMQjN5ZGh0MEkwQnMxUWhSd3o4ajR1RVh3d2Y4TlM3dEE_ZT1lYVUxcWQ.png)
+
+### `socket` 创建通信端点
+
+函数定义同 2.2
+
+### `bind` 绑定 socket 到网络地址和端口
+
+函数定义同 2.3
+
+### `sendto` 发送数据
+
+`sendto` 函数用于在数据报（无连接）socket 上发送数据。与 `send` 函数不同，`sendto` 需要显式指定目标地址，因为数据报 socket 是无连接的，所以每次发送数据时都需要指明接收方的地址。
+
+函数原型如下：
+
+```c
+#include <sys/socket.h>
+ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
+                const struct sockaddr *dest_addr, socklen_t addrlen);
+```
+
+参数说明：
+
+1. `int sockfd`: 要用来发送数据的 socket 的文件描述符。
+
+2. `const void *buf`: 指向要发送的数据缓冲区的指针。
+
+3. `size_t len`: 要发送的数据的长度（以字节为单位）。
+
+4. `int flags`: 用于修改发送行为的选项标志。常用的标志包括：
+   - `MSG_DONTROUTE`: 不对数据进行路由选择，直接发送。
+   - `MSG_OOB`: 发送带外数据（out-of-band data）。
+
+5. `const struct sockaddr *dest_addr`: 指向目标地址的 `sockaddr` 结构的指针，该结构包含了接收方的地址信息。
+
+6. `socklen_t addrlen`: `dest_addr` 参数指向的地址结构的大小（以字节为单位）。
+
+返回值：
+
+- 如果调用成功，返回已发送的字节数。
+- 如果调用失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：
+
+- 当需要使用 UDP 协议发送数据到特定的地址和端口时。
+- 当 socket 是无连接的，并且每次发送都需要指定目标地址时。
+
+工作机制：
+
+- `sendto` 函数从 `buf` 指向的缓冲区中取出数据，并将其发送到 `dest_addr` 指定的地址。
+- 该函数适用于 `SOCK_DGRAM` 类型的 socket，它允许应用程序发送数据报到网络，而不需要事先建立连接。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
+int main() {
+    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd == -1) {
+        perror("Failed to create socket");
+        exit(EXIT_FAILURE);
+    }
+
+    const char *message = "Hello, UDP server!";
+    struct sockaddr_in server_addr;
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(12345); // 服务器端口号
+    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // 服务器地址
+
+    ssize_t sent = sendto(sockfd, message, strlen(message), 0,
+                          (const struct sockaddr *)&server_addr, sizeof(server_addr));
+    if (sent == -1) {
+        perror("Failed to send message");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Sent %zd bytes to server\n", sent);
+
+    close(sockfd);
+    return 0;
+}
+```
+
+在这个示例中，我们首先创建了一个 UDP socket，然后构造了一个包含服务器地址信息的 `sockaddr_in` 结构。使用 `sendto` 函数将消息发送到这个地址。如果发送成功，我们打印出发送的字节数。如果发送失败，我们打印错误信息并关闭 socket。
+
+### `recvfrom` 接收数据
+
+`recvfrom` 函数在网络编程中用于接收无连接 socket 上的数据报。与 `recv` 函数不同，`recvfrom` 允许你接收来自任何远程地址的数据，因为你在无连接 socket 上接收数据时，可能不知道数据的来源。
+
+函数原型如下：
+
+```c
+#include <sys/socket.h>
+ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
+                  struct sockaddr *src_addr, socklen_t *addrlen);
+```
+
+参数说明：
+
+1. `int sockfd`: 要用来接收数据的 socket 的文件描述符。
+
+2. `void *buf`: 指向一个缓冲区的指针，`recvfrom` 函数将把接收到的数据存储在这个缓冲区。
+
+3. `size_t len`: 缓冲区的大小，即可以接收的最大数据长度（以字节为单位）。
+
+4. `int flags`: 用于修改接收行为的选项标志。常用的标志包括：
+   - `0`: 正常接收数据。
+   - `MSG_PEEK`: 窥视接收数据，即读取数据但不去删除缓冲区中的数据。
+
+5. `struct sockaddr *src_addr`: 这是一个可选参数，指向 `sockaddr` 结构的指针，用于接收发送方的地址信息。如果不需要发送方地址，可以传递 `NULL`。
+
+6. `socklen_t *addrlen`: 指向 `socklen_t` 类型的指针，指定 `src_addr` 参数指向的地址结构的大小。在调用 `recvfrom` 时，这个值应该设置为地址结构的最大期望大小。调用成功后，`recvfrom` 函数会更新这个值为实际的地址结构大小。
+
+返回值：
+
+- 如果调用成功，返回接收到的字节数。
+- 如果调用失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：当需要使用 UDP 协议接收数据时，因为 UDP 是无连接的，每次接收数据都需要知道发送方的地址。
+
+工作机制：
+
+- `recvfrom` 函数从指定的 socket 接收数据，并将数据存储在 `buf` 指向的缓冲区。
+- 如果提供了 `src_addr` 参数，`recvfrom` 函数会填充该参数指向的结构，包含发送方的地址信息。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
+int main() {
+    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd == -1) {
+        perror("Failed to create socket");
+        exit(EXIT_FAILURE);
+    }
+
+    char buffer[1024];
+    struct sockaddr_in src_addr;
+    socklen_t src_addrlen = sizeof(src_addr);
+
+    ssize_t received = recvfrom(sockfd, buffer, sizeof(buffer), 0,
+                                 (struct sockaddr *)&src_addr, &src_addrlen);
+    if (received == -1) {
+        perror("Failed to receive data");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    } else if (received == 0) {
+        printf("No data received.\n");
+    } else {
+        printf("Received %zd bytes from %s:%d\n",
+               received, inet_ntoa(src_addr.sin_addr), ntohs(src_addr.sin_port));
+        // 处理接收到的数据
+    }
+
+    // 关闭 socket
+    close(sockfd);
+    return 0;
+}
+```
+
+这个示例中首先创建了一个 UDP socket，然后使用 `recvfrom` 函数接收数据。如果数据成功接收，打印出接收到的字节数以及发送方的地址和端口。如果接收失败，打印错误信息并关闭 socket。
+
+## Epoll
+
+### `select` 的缺陷
+
+在实现 I/O 多路复用技术时采用 `select` 函数来监听多个文件描述符的状态能够使得程序在单个线程或进程中同时管理多个 I/O 操作。这种方法避免了为每个 I/O 操作使用阻塞调用或为每个操作分配独立的线程或进程，从而提高了效率。
+
+然而在处理大量文件描述符或追求更高性能的场景中，`select` 函数的一些局限性变得明显，这促使我们考虑更先进的替代方案，如 `epoll`。
+
+### `select` 函数的局限性：
+
+1. **文件描述符数量限制**：`select` 函数支持的文件描述符数量有限，通常 `fd_set` 的大小为 1024。对于需要处理成千上万个并发连接的大型服务器来说，这一限制可能成为瓶颈。
+2. **数据复制开销**：每次调用 `select` 时，都需要将整个 **文件描述符集合** 从 **用户空间** 复制到 **内核空间**，检查完毕后再将 **就绪描述符集合** 从 **内核空间** 复制回 **用户空间**。随着监听的文件描述符数量增加，这种数据复制操作的开销也随之增大，导致效率降低。
+3. **文件描述符集合的重置**：`select` 函数在每次调用后都需要重新设置文件描述符集合。由于 `select` 的输入和输出文件描述符集合未分离，返回的 `fd_set` 会清空所有未就绪的文件描述符，这增加了编程的复杂性。
+
+### `epoll` 特点
+
+Linux 内核提供了一种高效的 I/O 多路复用技术 `epoll`，以解决 `select` 函数在处理大量并发网络连接时的一些缺点。`epoll` 专为高性能网络服务器设计，能够高效地管理成千上万的并发连接。
+
+`epoll` 属于 Linux 内核提供 I/O 多路复用技术，在 Windows 或者 MAC 系统上， 可以使用其对应 IOCP 或者 Kqueue。
+
+`epoll` 的主要特点：
+
+1. **无文件描述符数量限制**：与 `select` 不同，`epoll` 没有硬性限制文件描述符的数量。其上限取决于系统内存的大小，可以通过 `/proc/sys/fs/file-max` 查看和配置。
+2. **高效的数据结构**：`epoll` 在内核中维护了一个常驻的文件对象，内部使用红黑树来管理监听集合，这使得在大量文件描述符中进行查找、添加和删除操作变得高效。就绪集合则使用线性表来维护。
+3. **事件驱动机制**：`epoll` 采用事件驱动的方式，只检测那些变为活跃状态的文件描述符。当监听的设备有事件发生时，比如数据到达，硬件会通过中断通知操作系统，操作系统将这些就绪事件加入到就绪事件队列中，并唤醒等待在 `epoll_wait` 上的线程。
+4. **减少 CPU 负担**：与 `select` 的轮询检测不同，`epoll` 在内核态只检测活跃的文件描述符，显著减少了 CPU 的负担，从而提高了应用程序的性能。
+5. **简化的 API 使用**：当应用程序调用 `epoll_wait` 时，内核会检查就绪列表，并将就绪列表复制到用户空间提供的缓冲区中，通知应用程序哪些文件描述符上的事件已经就绪。在这个过程中，原始的文件监听集合不会被修改，这意味着不需要像 `select` 那样在每次调用后重新初始化监听集合。
+
+![epoll.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSc3FnMV9BRDRsUHRCc2JDWXFJc0Z3QjBVSUxDT3lSSk1xNHhFcGk0MTBNakE_ZT1lWWNjVXg.png)
+
+### `epoll_create`  创建 epoll 实例
+
+`epoll_create` 函数用于在 Linux 系统上创建一个 epoll 实例，它是 Linux 特有的一种高效的 I/O 事件通知机制。epoll 允许应用程序监听多个文件描述符（如 socket），并能够知道哪些文件描述符已经准备好进行读取或写入操作。
+
+函数原型如下：
+
+```c
+#include <sys/epoll.h>
+int epoll_create(int size);
+```
+
+参数说明：`int size`: 这个参数指定了 epoll 实例所能容纳的最大文件描述符数量。它并不是一个硬性的限制，而是一个提示，告诉内核 epoll 实例预期的大小。实际上，epoll 实例可以在运行时动态地增加容量。
+
+返回值：
+
+- 如果调用成功，返回一个新的 epoll 实例的文件描述符。
+- 如果调用失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：当应用程序需要同时管理多个网络连接或文件 I/O 操作，并且希望以非阻塞的方式高效地处理这些连接时。
+
+工作机制：
+
+- `epoll_create` 调用会创建一个内核中的 epoll 实例，该实例可以被用来注册感兴趣的事件，并查询发生的事件。
+- 应用程序可以通过 `epoll_ctl` 函数将文件描述符注册到 epoll 实例中，并指定感兴趣的事件类型（如读就绪、写就绪等）。
+- 使用 `epoll_wait` 函数可以等待并查询发生的事件，这比传统的 select 或 poll 更加高效，特别是在处理大量并发连接时。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/epoll.h>
+
+int main() {
+    int epollfd = epoll_create(10); // 创建一个 epoll 实例
+    if (epollfd == -1) {
+        perror("Failed to create epoll instance");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Created epoll instance, fd: %d\n", epollfd);
+
+    // 使用 epollfd 来注册事件、等待事件等
+
+    // 最后关闭 epoll 实例
+    close(epollfd);
+    return 0;
+}
+```
+
+这个示例使用了 `epoll_create` 函数创建了一个 epoll 实例，并检查返回值以确保创建成功。创建 epoll 实例后，可以使用它来注册事件和等待事件。最后，使用 `close` 函数关闭 epoll 实例。
+
+### `epoll_ctl` 控制 epoll 实例
+
+`epoll_ctl` 函数用于对 epoll 实例进行控制操作，它是 epoll I/O 事件通知机制的一部分。这个函数允许你添加、修改或删除对特定文件描述符（fd）的事件监控。
+
+函数原型如下：
+
+```c
+#include <sys/epoll.h>
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+```
+
+参数说明：
+
+1. `int epfd`: 这是 epoll 实例的文件描述符，由 `epoll_create` 函数返回。
+
+2. `int op`: 这是一个操作类型，指定了要对文件描述符执行的操作。可能的操作包括：
+   - `EPOLL_CTL_ADD`: 添加新的文件描述符到 epoll 实例中。
+   - `EPOLL_CTL_MOD`: 修改已经在 epoll 实例中的文件描述符的监控事件。
+   - `EPOLL_CTL_DEL`: 从 epoll 实例中删除文件描述符。
+
+3. `int fd`: 这是要被添加、修改或删除的文件描述符。
+
+4. `struct epoll_event *event`: 这是一个指向 `epoll_event` 结构的指针，该结构定义了文件描述符上感兴趣的事件类型以及相关的回调信息。结构体中的关键成员包括：
+   - `events`: 指定了感兴趣的事件类型，可以是以下事件的组合：
+     - `EPOLLIN`: 文件描述符可读（有数据可被读取）。
+     - `EPOLLOUT`: 文件描述符可写（可以发送数据）。
+     - `EPOLLERR`: 文件描述符发生错误。
+     - `EPOLLHUP`: 挂断事件，表示对端关闭了连接。
+   - `data`: 一个联合体，可以包含与事件相关的数据，如一个指针或特定的用户数据。
+
+返回值：
+
+- 如果调用成功，返回 0。
+- 如果调用失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：
+
+- 当需要将新的文件描述符注册到 epoll 实例中，以便监听其 I/O 事件时。
+- 当需要修改已注册文件描述符的事件类型或删除不再需要监控的文件描述符时。
+
+工作机制：
+
+- `epoll_ctl` 根据 `op` 参数指定的操作类型，对 epoll 实例中的文件描述符进行控制。
+- 当文件描述符上指定的事件发生时，epoll 机制会将该文件描述符加入到就绪列表中，应用程序可以通过 `epoll_wait` 函数查询这个列表。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/epoll.h>
+
+int main() {
+    int epollfd = epoll_create(1); // 创建 epoll 实例
+    if (epollfd == -1) {
+        perror("Failed to create epoll instance");
+        exit(EXIT_FAILURE);
+    }
+
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        perror("Failed to create socket");
+        close(epollfd);
+        exit(EXIT_FAILURE);
+    }
+
+    struct epoll_event event;
+    event.events = EPOLLIN; // 我们对读事件感兴趣
+    event.data.fd = sockfd; // 关联的文件描述符
+
+    // 将 socket 添加到 epoll 实例中
+    if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &event) == -1) {
+        perror("Failed to add socket to epoll");
+        close(sockfd);
+        close(epollfd);
+        exit(EXIT_FAILURE);
+    }
+
+    // 接下来可以使用 epoll_wait 等待事件
+
+    // 关闭资源
+    close(sockfd);
+    close(epollfd);
+    return 0;
+}
+```
+
+这个示例中首先创建了一个 epoll 实例和一个 socket。然后初始化了一个 `epoll_event` 结构，指定对 socket 的读事件，并将这个 socket 添加到 epoll 实例中。当 socket 上有数据可读时，它就会出现在 epoll 的就绪列表中，可以通过 `epoll_wait` 函数来检测这一点。
+
+### `struct epoll_event` 结构体
+
+`struct epoll_event` 是 Linux 中 epoll 机制使用的一个结构体，用于定义 epoll 事件和相关数据。结构体定义如下：
+
+```c
+struct epoll_event {
+    uint32_t     events;	
+    epoll_data_t data;		
+};
+```
+
+
+
+这个结构体包括两个主要成员：
+
+1. `uint32_t events`: 这是一个 32 位的无符号整数，用于指定感兴趣的事件类型。可以指定的事件类型包括但不限于以下几种：
+   - `EPOLLIN`: 表示对应的文件描述符可以读取数据（如 socket 可读）。
+   - `EPOLLOUT`: 表示对应的文件描述符可以写入数据（如 socket 可写）。
+   - `EPOLLERR`: 表示对应的文件描述符发生了错误。
+   - `EPOLLHUP`: 表示对应的文件描述符被挂断，即对端关闭了连接。
+   - `EPOLLRDHUP`: 表示对端关闭了连接，并且所有数据都已读取完毕。
+   - `EPOLLET`: 将 socket 设置为边缘触发（Edge Triggered）模式，这是与水平触发（Level Triggered）相对的模式。
+   - `EPOLLONESHOT`: 表示事件被触发一次后，不会再次触发，直到再次通过 `epoll_ctl` 注册。
+
+2. `epoll_data_t data`: 这是一个联合体，用于存储与事件关联的特定于应用程序的数据。`epoll_data_t` 定义如下：
+   ```c
+   union epoll_data {
+       void *ptr;            // 通用指针，可用于存储任意类型的指针
+       int fd;               // 文件描述符
+       uint32_t u32;         // 32位无符号整数
+       uint64_t u64;         // 64位无符号整数
+   };
+   ```
+   这个联合体提供了几种不同的数据存储选项，以适应不同的使用场景：
+   - `ptr`: 可以指向任何类型的数据，通常用于指向特定的应用程序数据。
+   - `fd`: 存储文件描述符，方便在事件回调中直接使用。
+   - `u32` 和 `u64`: 提供了存储 32 位和 64 位无符号整数的能力。
+
+### `epoll_wait` 等待事件
+
+`epoll_wait` 函数是 Linux 系统中 epoll I/O 事件通知机制中用于等待事件的函数。它允许应用程序等待注册到 epoll 实例上的文件描述符上的 I/O 事件。
+
+函数原型如下：
+
+```c
+#include <sys/epoll.h>
+int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);
+```
+
+参数说明：
+
+1. `int epfd`: 这是 epoll 实例的文件描述符，由 `epoll_create` 或 `epoll_create1` 函数返回。
+
+2. `struct epoll_event *events`: 这是一个指向 `epoll_event` 结构体数组的指针，用于从 epoll 实例中接收发生的事件。数组的大小由 `maxevents` 参数指定。
+
+3. `int maxevents`: 这个参数指定了 `events` 数组可以存储的最大事件数量。`epoll_wait` 将返回实际发生的事件数量，这个数量可能小于或等于 `maxevents`。
+
+4. `int timeout`: 这是等待事件的最长时间，单位为毫秒。如果设置为 -1，`epoll_wait` 将阻塞直到至少有一个事件被触发。如果设置为 0，函数将立即返回，即使没有事件被触发。
+
+返回值：
+
+- 如果调用成功，返回数组中填充的事件数量。
+- 如果调用失败或在超时时间内没有事件发生，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：
+
+- 当应用程序需要等待多个文件描述符上的 I/O 事件时。
+- 当需要以非阻塞方式或在指定超时时间内等待 I/O 事件时。
+
+工作机制：
+
+- `epoll_wait` 函数检查 `epfd` 指定的 epoll 实例中注册的文件描述符，等待它们上的 I/O 事件发生。
+- 当一个或多个事件发生时，`epoll_wait` 将这些事件的信息填充到 `events` 数组中，并返回发生的事件数量。
+- `events` 数组中的每个 `epoll_event` 结构体都包含了事件类型、发生的文件描述符以及可能的用户数据。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/epoll.h>
+
+int main() {
+    int epollfd = epoll_create1(0); // 创建 epoll 实例
+    if (epollfd == -1) {
+        perror("Failed to create epoll instance");
+        exit(EXIT_FAILURE);
+    }
+
+    // 假设已经将一些 socket 添加到 epoll 实例...
+
+    struct epoll_event events[10]; // 存储最大 10 个事件
+    int nevents = epoll_wait(epollfd, events, 10, -1); // 无限期等待事件
+
+    if (nevents == -1) {
+        perror("Failed to wait for events");
+        close(epollfd);
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; i < nevents; i++) {
+        // 处理每个事件
+        printf("Event occurred on fd: %d\n", events[i].data.fd);
+    }
+
+    // 关闭 epoll 实例
+    close(epollfd);
+    return 0;
+}
+```
+
+这个示例中首先创建了一个 epoll 实例，然后使用 `epoll_wait` 函数等待最多 10 个事件的发生，并无限期地阻塞直到至少有一个事件发生。当事件发生时遍历 `events` 数组并打印出每个事件关联的文件描述符。
+
+### 触发模式
+
+#### 水平触发
+
+水平触发是 `epoll` 的默认工作模式，它提供了一种持续通知机制。在这种模式下，只要被监视的文件描述符上有待处理的事件，`epoll_wait` 就会不断地通知应用程序，直到应用程序明确地处理了这些事件。
+
+以读事件为例，当某个文件描述符变得可读时，`epoll_wait` 会通知应用程序该文件描述符上存在可读取的数据。即使应用程序没有一次性读取缓冲区中的所有数据，`epoll_wait` 在下一次调用时仍会再次通知该文件描述符处于可读状态。
+
+以下是使用 `epoll` 进行网络通信的示例代码片段，展示了如何处理读事件：
+
+```c
+// ... 其他代码 ...
+
+else if(cfd == netfd) {
+    // 读取socket数据
+    char buf[2] = {0}; // 定义一个长度为2的字符数组
+    int res_recv = recv(netfd, buf, sizeof(buf), 0); 
+    if(res_recv == 0) {
+        printf("对方断开连接\n");
+        goto end;
+    }
+    // 打印接收到的数据
+    write(STDOUT_FILENO, buf, sizeof(buf));
+    printf("-- \n");
+}
+
+// ... 其他代码 ...
+```
+
+在这段代码中，当 `epoll_wait` 检测到 `netfd`（网络文件描述符）上有可读事件时，它会进入此分支。应用程序尝试从 `netfd` 读取数据到 `buf` 数组中。如果 `recv` 函数返回 0，表示对端已经关闭连接；如果返回值是其他值，表示读取了数据。读取的数据随后被打印到标准输出。
+
+#### 边缘触发
+
+边缘触发模式是 `epoll` 的一种工作方式，与水平触发模式不同，它仅在文件描述符状态发生变化时通知应用程序。这意味着，只有当相关事件发生，例如从不可用变为可用时，`epoll_wait` 才会通知应用程序。
+
+以读事件为例：在边缘触发模式下，如果缓冲区中的数据量没有增加，即使其中已有数据，`epoll_wait` 也不会再次就绪。只有当缓冲区中的数据量增加时，`epoll_wait` 才会触发。
+
+边缘触发模式可以通过在 `epoll_ctl` 函数调用时，为 `struct epoll_event *event` 参数的 `events` 字段设置 `EPOLLET` 标志来启用。
+
+以下是使用边缘触发模式进行网络通信的示例代码片段，展示了如何处理读事件：
+
+```c
+// ...
+int epollfd = epoll_create(1);
+struct epoll_event event;
+event.events = EPOLLIN | EPOLLET; // 启用边缘触发
+event.data.fd = netfd;
+epoll_ctl(epollfd, EPOLL_CTL_ADD, netfd, &event);
+
+// ...
+if (cfd == netfd) {
+    char buf[2] = {0}; // 定义一个长度为2的字符数组
+    int res_recv = recv(netfd, buf, sizeof(buf), 0);
+    if (res_recv == 0) {
+        printf("对方断开连接\n");
+        goto end;
+    }
+    write(STDOUT_FILENO, buf, sizeof(buf));
+    printf("-- \n");
+}
+// ...
+```
+
+在这段代码中，当 `epoll_wait` 检测到 `netfd` 上有可读事件时，它会进入此分支。应用程序尝试从 `netfd` 读取数据到 `buf` 数组中。如果 `recv` 函数返回 0，表示对端已经关闭连接；如果返回值是其他值，表示读取了数据。读取的数据随后被打印到标准输出。
+
+改进读取操作：
+
+为了一次性读取对方发送的所有字符，可以配合 `while` 循环来连续读取：
+
+```c
+// ...
+if (cfd == netfd) {
+    while (1) {
+        char buf[2] = {0};
+        int res_recv = recv(netfd, buf, sizeof(buf), 0);
+        if (res_recv == 0) {
+            printf("对方断开连接\n");
+            break; // 退出循环
+        }
+        write(STDOUT_FILENO, buf, sizeof(buf));
+    }
+    printf("-- \n");
+}
+// ...
+```
+
+这种方式可以在一次就绪中读取所有字符。然而，这也带来了新的问题：由于 `recv` 是一个阻塞调用，如果没有更多的数据可读，它会阻塞等待。这就需要在循环中添加适当的逻辑来处理这种情况，例如使用非阻塞 `recv` 或设置超时。
+
+### 非阻塞模式的 recv
+
+在网络编程中，`recv` 函数通常用于从套接字中接收数据。默认情况下，`recv` 是阻塞的，这意味着如果没有数据可读，调用线程将被阻塞，直到有数据到达或连接关闭。
+
+为了解决在循环读取时可能遇到的阻塞问题，我们可以将 `recv` 设置为非阻塞模式。这可以通过在调用 `recv` 时指定 `flags` 参数为 `MSG_DONTWAIT` 来实现。
+
+非阻塞 `recv` 的实现：
+
+```c
+#include <sys/types.h>
+#include <sys/socket.h>
+
+// 接收来自套接字的消息
+ssize_t recv(
+    int sockfd,      // 套接字文件描述符
+    void *buf,       // 接收缓冲区
+    size_t len,      // 缓冲区长度
+    int flags        // 接收行为的标志位
+);
+// 返回值：
+// - 成功时返回实际读取的字节数。
+// - 如果连接已经关闭，返回0（对方执行了四次挥手）。
+// - 读取失败或在非阻塞模式下没有数据可读时返回-1。
+```
+
+示例代码：
+
+以下是使用非阻塞 `recv` 进行网络通信的示例代码片段，展示了如何在读取操作中避免阻塞：
+
+```c
+// ...
+else if(cfd == netfd){
+    while(1){
+        // 读取套接字数据，设置为非阻塞模式
+        char buf[2] = {0};
+        int res_recv = recv(netfd, buf, sizeof(buf), MSG_DONTWAIT); 
+        
+        // 如果没有数据可读，recv将返回-1，跳出循环
+        if(res_recv == -1){
+            break;
+        }
+        
+        // 如果连接关闭，recv将返回0
+        if(0 == res_recv){
+            printf("对方断开连接\n");
+            goto end;
+        }
+        
+        // 打印接收到的数据
+        write(STDOUT_FILENO, buf, sizeof(buf));
+    }
+    printf("- \n");
+}
+// ...
+```
+
+这段代码通过设置 `MSG_DONTWAIT` 标志将 `recv` 函数调用设置为非阻塞模式。如果在调用 `recv` 时没有数据可读，它将立即返回-1，而不是阻塞线程。这允许我们在循环中读取数据，一旦没有更多数据可读，就跳出循环。
+
+## 修改 socket 的属性
+
+### 使用 `setsockopt` 调整套接字属性
+
+`setsockopt` 函数用于在套接字上设置选项，以调整其行为。相应的，`getsockopt` 函数用于获取当前的套接字选项值。这些函数定义在 `<sys/socket.h>` 头文件中。
+
+函数原型：
+
+```c
+#include <sys/types.h>
+#include <sys/socket.h>
+
+// 获取套接字选项
+int getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optlen);
+
+// 设置套接字选项
+int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen);
+```
+
+### 调整接收/发送缓冲区大小
+
+`SO_RCVBUF` 和 `SO_SNDBUF`：用来获取和设置接收和发送缓冲区的大小。需要注意的是，即使使用 `setsockopt` 设置了缓冲区大小，调用 `getsockopt` 所得到的值可能与设置的值不同，因为系统可能会根据当前系统资源和策略进行调整。
+
+示例代码：
+
+```c
+int bufsize;
+socklen_t buflen = sizeof(int);
+int ret = getsockopt(sfd, SOL_SOCKET, SO_RCVBUF, &bufsize, &buflen);
+printf("原始接收缓冲区大小: %d\n", bufsize);
+
+bufsize = 8192; // 设置新的接收缓冲区大小
+ret = setsockopt(sfd, SOL_SOCKET, SO_RCVBUF, &bufsize, sizeof(int));
+ret = getsockopt(sfd, SOL_SOCKET, SO_RCVBUF, &bufsize, &buflen);
+printf("新的接收缓冲区大小: %d\n", bufsize);
+```
+
+### 设置缓冲区的灵敏度
+
+`SO_RCVLOWAT` 和 `SO_SNDLOWAT`：这些选项定义了缓冲区的下限，用来设置缓冲区的灵敏度。例如，`SO_RCVLOWAT` 的值设置较高时，读操作将等待直到缓冲区中的数据量达到这个值才返回，这有助于减少处理次数，提高效率。
+
+示例代码：
+
+```c
+else if (events[i].data.fd == sfd) {
+    int newFd = accept(sfd, NULL, NULL);
+    printf("新连接的文件描述符: %d\n", newFd);
+
+    int buflowat = 10; // 设置接收缓冲区的下限
+    int ret = setsockopt(newFd, SOL_SOCKET, SO_RCVLOWAT, &buflowat, sizeof(int));
+    // 错误检查代码省略
+
+    // 表示有客户端登录
+    int flag = 1;
+    struct epoll_event event;
+    event.data.fd = newFd;
+    event.events = EPOLLIN;
+    ret = epoll_ctl(epfd, EPOLL_CTL_ADD, newFd, &event);
+    // 错误检查代码省略
+}
+```
+
+通过设置 `SO_RCVLOWAT`，如果发送方的数据量较少，将不会触发 `epoll_wait` 的读就绪事件，直到接收缓冲区中的数据量达到设定的下限。
+

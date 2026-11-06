@@ -1,0 +1,76 @@
+name: Deploy to GitHub Pages
+
+# 发布流程说明：
+# - 站点主域名是 cwlrin.wiki（CNAME），cwlrin.github.io 会自动 301 跳到 cwlrin.wiki，
+#   与迁移前的 Hexo 站点行为一致。
+# - 这里用 GitHub Actions 构建并发布 dist：Astro 产出的 /_astro 目录不需要 Jekyll 处理，
+#   因此不走「从分支发布」的默认流水线。
+# - 注意：Actions 发布模式下 GitHub 不读取仓库里的 CNAME 文件，
+#   自定义域名必须在 Settings → Pages → Custom domain 里保留 cwlrin.wiki。
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+# 只允许一个发布流程同时进行；新的提交会取消排队中的旧任务，但不打断正在部署的那次
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build site
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          # 必须与 package.json 的 packageManager 保持一致
+          version: 11.22.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (Astro + Pagefind 索引)
+        # pnpm run build = astro build + pagefind --site ./dist
+        run: pnpm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

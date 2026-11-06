@@ -1,0 +1,13 @@
+---
+interface Props {
+  type?: "true" | "false" | "single" | "multi" | "fill";
+}
+
+const { type = "single" }: Props = Astro.props;
+---
+
+<div class={`quiz-item ${type}`.trim()} data-quiz-type={type}>
+  <div class="quiz-question">
+    <slot />
+  </div>
+</div>

@@ -1,0 +1,147 @@
+a:before,
+a:after {
+  transition: all 0.4s ease-in-out;
+}
+
+body {
+  background: linear-gradient(to top, var(--body-bg-shadow) 0, var(--grey-1) 20%) no-repeat bottom;
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  font-size: 1em;
+  line-height: 2;
+  overflow: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+  line-height: 1.5;
+  margin: 1.25rem 0 0.9375rem;
+}
+
+a,
+li,
+div {
+  -webkit-tap-highlight-color: transparent;
+}
+
+li {
+  list-style: none;
+}
+
+iframe,
+img,
+video {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+}
+
+hr {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--grey-3),
+    var(--grey-4) 0.25rem,
+    transparent 0.25rem,
+    transparent 0.5rem
+  );
+  border: none;
+  height: 0.125rem;
+  margin: 1.5rem 0;
+}
+blockquote {
+  border-left: 0.25rem solid var(--grey-4);
+  color: var(--grey-6);
+  margin: 1.25rem 0;
+  padding: 0.625rem 1.25rem;
+}
+
+blockquote cite::before {
+  content: "-";
+  padding: 0 0.3125rem;
+}
+
+dt {
+  font-weight: bold;
+}
+
+dd {
+  margin: 0;
+  padding: 0;
+}
+
+input,
+textarea {
+  color: var(--text-color);
+}
+
+::selection {
+  background: var(--color-orange);
+  color: var(--grey-2);
+}
+
+/* Layout Structure */
+#container {
+  min-height: 100%;
+  min-width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.inner {
+  margin: 0 auto;
+  width: 100%;
+}
+
+main {
+  background: linear-gradient(to top, var(--body-bg-shadow) 0, var(--grey-1) 20%) no-repeat bottom;
+  position: relative;
+  z-index: var(--z-content);
+}
+
+#main {
+  background: linear-gradient(to top, var(--grey-0) 0, var(--grey-1) 20%) no-repeat top;
+  box-shadow: 0 1.25rem 1rem 0.3125rem var(--body-bg-shadow);
+  min-width: 0;
+  width: 100%;
+  min-height: 37.5rem;
+}
+
+#main .wrap {
+  position: relative;
+  padding: 1.25rem;
+}
+
+#main .wrap:nth-child(1) {
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 1023px) {
+  #main {
+    width: 100%;
+  }
+
+  #main .wrap {
+    padding: 0.625rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #main .wrap {
+    padding: 0.5rem;
+  }
+}
+
+.dimmer {
+  display: none;
+}
+
+.body.md {
+  text-autospace: normal;
+}

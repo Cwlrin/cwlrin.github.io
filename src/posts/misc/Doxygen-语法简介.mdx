@@ -1,0 +1,91 @@
+---
+title: "Doxygen 语法简介"
+date: 2024-07-10T16:10:50+08:00
+categories: ["杂项"]
+tags: ["工具"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VYX1JmNERkMENsTWpoX0g2Y3JNUTZRQllPbnJZNC1jVmZqMG5VcjVfQTdBWXc_ZT1QV2Z1OXg.png"
+---
+
+`Doxygen` 是一种广泛使用的文档生成工具，它允许开发者通过遵循特定的注释规范来提取文档。编写注释时，遵循 `Doxygen` 的语法规则至关重要，因为这样不仅可以生成格式统一、易于导航的文档，还能提高文档的可读性和专业性。如果注释不符合 `Doxygen` 的标准格式，生成的文档可能会显得杂乱无章，难以为其他开发者或用户所理解。
+
+## 特殊命令简介
+
+| 命令        | 字段名                                     | 语法                                                      |      |
+| ----------- | ------------------------------------------ | --------------------------------------------------------- | ---- |
+| @file       | 文件名                                     | file [&lt; name >]                                           |      |
+| @brief      | 简介                                       | brief &#123; brief description &#125;                               |      |
+| @author     | 作者                                       | author &#123; list of authors &#125;                                |      |
+| @mainpage   | 主页信息                                   | mainpage [(title)]                                        |      |
+| @date       | 年-月-日                                   | date &#123; date description &#125;                                 |      |
+| @author     | 版本号                                     | version &#123; version number &#125;                                |      |
+| @copyright  | 版权                                       | copyright &#123; copyright description &#125;                       |      |
+| @param      | 参数                                       | param [(dir)] &lt; parameter-name> &#123; parameter description &#125; |      |
+| @return     | 返回                                       | return &#123; description of the return value &#125;                |      |
+| @retval     | 返回值                                     | retval &#123; description &#125;                                    |      |
+| @bug        | 漏洞                                       | bug &#123; bug description &#125;                                   |      |
+| @details    | 细节                                       | details &#123; detailed description &#125;                          |      |
+| @pre        | 前提条件                                   | pre &#123; description of the precondition &#125;                   |      |
+| @see        | 参考                                       | see &#123; references &#125;                                        |      |
+| @link       | 连接(与 @see 类库，&#123;@link www.google.com&#125;) | link &lt; link-object>                                       |      |
+| @throw      | 异常描述                                   | throw &lt; exception-object> &#123; exception description &#125;       |      |
+| @todo       | 待处理                                     | todo &#123; paragraph describing what is to be done &#125;          |      |
+| @warning    | 警告信息                                   | warning &#123; warning message &#125;                               |      |
+| @deprecated | 弃用说明。可用于描述替代方案，预期寿命等   | deprecated &#123; description &#125;                                |      |
+| @example    | 弃用说明。可用于描述替代方案，预期寿命等   | deprecated &#123; description &#125;                                |      |
+
+## 文件注释
+
+一般放在文件开头
+
+```cpp
+/**
+ * @file 文件名
+ * @brief 简介
+ * @details 细节
+ * @author 作者
+ * @version 版本号
+ * @date 年-月-日
+ * @copyright 版权
+ */
+```
+
+## 结构体注释
+
+```cpp
+ /**
+  * @brief 类的详细描述
+  */
+```
+
+## 函数注释
+
+```cpp
+ /**
+  * @brief 函数描述
+  * @param 参数描述
+  * @return 返回描述
+  * @retval 返回值描述
+  */
+```
+
+## 常量/变量注释
+
+一般常量/变量可以有两种形式：
+
+- 常量/变量上一行注释
+- 常量/变量后注释
+
+```cpp
+//定义一个整型变量a
+int a;
+
+/**
+ * @brief 定义一个整型变量a
+ */
+int a;
+int a; /*!< 定义一个整型变量a */
+int a; /**< 定义一个整型变量a */
+int a; //!< 定义一个整型变量a
+int a; ///< 定义一个整型变量a
+```
+

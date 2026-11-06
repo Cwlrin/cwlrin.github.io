@@ -1,0 +1,78 @@
+---
+import { currentLocale, getT } from "@/i18n";
+import { generateRandomBrightColor } from "@/toolkit/tools/generateRandomBrightColor";
+import { covers } from "../Images.astro";
+import { sample } from "es-toolkit";
+
+interface NavPost {
+  title: string;
+  slug: string;
+  category?: string;
+  cover?: string;
+}
+
+interface Props {
+  prevPost?: NavPost;
+  nextPost?: NavPost;
+  nextGradientCover?: boolean;
+}
+
+const { prevPost, nextPost, nextGradientCover = false } = Astro.props;
+const t = getT(currentLocale);
+---
+
+<div class="post-nav">
+  <div class="item left">
+    {
+      prevPost && (
+        <a
+          href={`/posts/${prevPost.slug}/`}
+          itemprop="url"
+          rel="prev"
+          title={prevPost.title}
+          style={
+            nextGradientCover
+              ? `background-image: linear-gradient(to bottom right, ${generateRandomBrightColor()}, ${generateRandomBrightColor()});`
+              : `background-image: url(${prevPost.cover || sample(covers ?? []).src});`
+          }
+        >
+          <span class="type">{t("post.previousPost")}</span>
+          {prevPost.category && (
+            <span class="category">
+              <i class="ic i-ri-flag-line" />
+              {prevPost.category}
+            </span>
+          )}
+          <span class="post-nav-title">{prevPost.title}</span>
+        </a>
+      )
+    }
+  </div>
+
+  <div class="item right">
+    {
+      nextPost && (
+        <a
+          href={`/posts/${nextPost.slug}/`}
+          itemprop="url"
+          rel="next"
+          title={nextPost.title}
+          style={
+            nextGradientCover
+              ? `background-image: linear-gradient(to bottom right, ${generateRandomBrightColor()}, ${generateRandomBrightColor()});`
+              : `background-image: url(${nextPost.cover || sample(covers ?? []).src});`
+          }
+        >
+          <span class="type">{t("post.nextPost")}</span>
+          {nextPost.category && (
+            <span class="category">
+              <i class="ic i-ri-flag-line" />
+              {nextPost.category}
+            </span>
+          )}
+          <span class="post-nav-title">{nextPost.title}</span>
+        </a>
+      )
+    }
+  </div>
+</div>

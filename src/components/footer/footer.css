@@ -1,0 +1,71 @@
+/* Footer component minimal CSS
+   Most styles are applied via UnoCSS classes in the component
+   This file contains only complex animations and fallback styles
+*/
+
+@layer components {
+  #footer {
+    position: relative;
+    z-index: var(--z-base);
+    color: var(--grey-5);
+    font-size: 0.875rem;
+  }
+
+  #footer .inner {
+    margin: 2rem auto 0.625rem;
+    width: calc(100% - 0.625rem);
+    position: relative;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  @media (min-width: 1024px) {
+    #footer .inner {
+      width: min(72.5rem, calc(100% - 0.625rem));
+    }
+
+    body[data-layout-mode="two-column"] #footer .inner,
+    body[data-layout-mode="three-column"] #footer .inner {
+      padding-left: 15.875rem;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    #footer .inner {
+      width: 73%;
+    }
+
+    body[data-layout-mode="three-column"] #footer .inner {
+      padding-left: 0;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    #footer .inner {
+      width: auto;
+    }
+  }
+
+  .with-love {
+    display: inline-block;
+    margin: 0 0.3125rem 0 0.125rem;
+  }
+
+  .icp img {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  a {
+    transition: opacity 0.3s ease;
+  }
+
+  .powered-by,
+  .theme-info {
+    display: inline-block;
+  }
+
+  .site-uptime {
+    color: var(--grey-6);
+  }
+}

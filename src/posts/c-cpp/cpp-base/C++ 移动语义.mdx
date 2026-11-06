@@ -1,0 +1,469 @@
+---
+title: "C++ 移动语义"
+date: 2020-12-08T20:05:13+08:00
+categories: ["C 与 C++", "C++ 基础"]
+tags: ["C++"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0ViRzNxeS1uQ2tCR284MG5ZdFVRRThnQm43aDgxRGI4VE9aQ2I5RFBOQ056c0E_ZT1zU0hrTVk.png"
+---
+
+## 移动语义（Move Semantics）
+
+在 C++ 11 之前，当对象作为函数参数传递，或者从函数返回，或者作为复制构造函数的参数时，经常会造成不必要的性能开销，因为这些操作会进行对象的拷贝，包括其资源的拷贝（如动态分配的内存）。为了解决这个问题，C++ 11 引入了移动语义。
+
+为什么要用移动语义？
+
+**移动语义** 的核心思想是，当一个临时对象提供了右值引用时，可以将其内部资源“移动”到新的对象中，而不是进行复制。这样，新对象可以重用临时对象的资源，而临时对象在移动后会处于有效但未定义的状态。
+
+**好处**：
+
+1. **性能提升**：避免了不必要的资源复制，减少了性能开销。
+2. **资源利用**：可以重用临时对象的资源，避免资源的浪费。
+
+我们回顾一下之前模拟的 String.cc
+
+```cpp String.cc
+#include <cstring>
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+class String {
+ public:
+  String()
+  /* : _pstr(nullptr) */
+      : _pstr(new char[1]()) {
+    cout << "String()" << endl;
+  }
+
+  String(const char *pstr)
+      : _pstr(new char[strlen(pstr) + 1]()) {
+    cout << "String(const char *)" << endl;
+    strcpy(_pstr, pstr);
+  }
+
+  String(const String &rhs)
+      : _pstr(new char[strlen(rhs._pstr) + 1]()) {
+    cout << "String(const String &)" << endl;
+    strcpy(_pstr, rhs._pstr);
+  }
+
+  String &operator=(const String &rhs) {
+    cout << "String &operator=(const String &)" << endl;
+    if (this != &rhs) {
+      delete[] _pstr;
+      _pstr = new char[strlen(rhs._pstr) + 1]();
+      strcpy(_pstr, rhs._pstr);
+    }
+    return *this;
+  }
+
+  size_t length() const {
+    size_t len = 0;
+    if (_pstr) {
+      len = strlen(_pstr);
+    }
+    return len;
+
+  }
+
+  const char *c_str() const {
+    if (_pstr) {
+      return _pstr;
+    } else {
+      return nullptr;
+    }
+  }
+
+  ~String() {
+    cout << "~String()" << endl;
+    if (_pstr) {
+      delete[] _pstr;
+      _pstr = nullptr;
+    }
+  }
+
+  void print() const {
+    if (_pstr) {
+      cout << "_pstr = " << _pstr << endl;
+    } else {
+      cout << endl;
+    }
+  }
+
+ private:
+  char *_pstr;
+};
+
+void test0() {
+  String s1("hello");
+  // 拷贝构造
+  String s2 = s1;
+  // 先构造，再拷贝构造
+  // 利用"hello"这个字符串创建了一个临时对象
+  // 并复制给了 s3
+  // 这一步实际上 new 了两次
+  String s3 = "hello";
+}
+```
+
+创建 `s3` 的过程中实际创建了一个临时对象，也会在堆空间上申请一片空间，然后把字符串内容复制给 `s3` 的 `pstr`，这一行结束时临时对象的生命周期结束，它申请的那片空间被回收。这片空间申请了，又马上被回收，实际上可以视作一种不必要的开销。我们希望能够少 `new` 一次，可以直接将 `s3` 能够复用临时对象申请的空间。
+
+这其实也可以视为是一种隐式转换。
+
+## 左值和右值
+
+在 C++ 中，左值（lvalue）和右值（rvalue）是根据表达式在表达结束后是否继续存在来区分的。
+
+- **左值**：表达式结束后仍然存在的表达式称为左值，左值通常指向内存中的具体位置。
+- **右值**：表达式结束后不再存在的临时表达式称为右值，右值通常用于表示临时对象或即将被销毁的对象。
+
+如何区分左值和右值：
+
+- **能取地址的表达式**：如果一个表达式可以取地址（即 `&` 操作符可以应用于该表达式），那么它是一个左值。
+- **不能取地址的表达式**：不能取地址的表达式是右值。
+
+右值的存储位置可以是内存，也可以是寄存器，具体取决于多种因素：
+
+1. **内存中存储**：对于较大的临时对象或者编译器认为在内存中分配更高效的场合，右值可能会在内存中分配空间。例如，一个复杂的临时对象可能会在内存中创建，以便于存储其状态。
+2. **寄存器中存储**：对于那些简单的右值，如基本数据类型的算术表达式结果，编译器可能会将其存储在寄存器中以优化性能。使用寄存器可以减少对内存的访问次数，从而提高程序的执行速度。
+
+C++ 标准并没有明确规定对象必须存储在内存中还是寄存器中，这是由编译器根据具体情况来决定的。编译器会根据以下因素来做出优化决策：
+
+- **对象的类型和大小**：对于大型对象，内存分配可能更合适；而对于小型对象，寄存器可能更高效。
+- **上下文**：对象的使用上下文也会影响存储决策。例如，作为函数参数传递的临时对象可能在寄存器中处理更为合适。
+- **编译器的优化策略**：现代编译器使用复杂的优化算法来决定对象的存储位置，旨在减少程序的总运行时间和内存使用。
+
+```cpp
+int main() {
+    int a = 1, b = 2;
+    &a;  // 正确，a 是左值
+    &b;  // 正确，b 是左值
+    &(a + b);  // 错误，a + b 是一个右值
+    &10;  // 错误，10 是一个字面值常量，是一个右值
+    &String("hello");  // 错误，String("hello") 是一个临时对象，是一个右值
+    
+    // 非 const 引用尝试绑定
+    int & r1 = a;  // 正确，a 是左值
+    int & r2 = 1;  // 错误，1 是一个字面值常量，是一个右值
+    
+    // const引用尝试绑定
+    const int & r3 = 1;  // 正确，1 是一个字面值常量，但可以绑定到 const 引用
+    const int & r4 = a;  // 正确，a 是左值，也可以绑定到 const 引用
+    
+    String s1("hello");
+    String s2("wangdao");
+    &s1;  // 正确，s1 是左值
+    &s2;  // 正确，s2 是左值
+    &(s1 + s2);  // 错误，s1 + s2 是一个临时对象，是一个右值
+}
+```
+
+如上定义的 `int &r1` 和 `const int &r3` 叫作左值引用与 `const` 左值引用
+
+非 `const` 左值引用只能绑定到左值，不能绑定到右值，也就是非 `const` 左值引用只能识别出左值。
+
+`const` 左值引用既可以绑定到左值，也可以绑定到右值，也就是表明 `const` 左值引用不能区分是左值还是右值。
+
+## 右值引用
+
+C++11 引入了右值引用，这是一种特殊的引用类型，它旨在解决资源的移动语义问题。右值引用允许程序直接操作临时对象，而不需要进行不必要的复制。
+
+右值引用的特点:
+
+1. **不能绑定到左值**：右值引用只能绑定到右值，即那些临时的、即将销毁的对象。
+2. **可以绑定到右值**：右值引用提供了一种机制，使得临时对象的资源可以被“移动”而不是被复制。
+
+```cpp
+// 非 const 左值引用不能绑定右值
+int & r1 = a;
+int & r2 = 1; //error
+
+// const 左值引用既可以绑定左值，又可以绑定右值
+const int & r3 = 1;
+const int & r4 = a;
+
+// 右值引用只能绑定右值
+int && r_ref = 10;
+int && r_ref2 = a; // error
+```
+
+## 移动构造函数
+
+移动构造函数是 C++11 引入的关键特性之一，用于实现资源的移动语义，从而提高性能并减少不必要的复制。
+
+之前 `String str1 = String("hello");` 这种操作调用的是拷贝构造函数，形参为 `const String&` 类型，既能绑定右值又能绑定左值。为了确保右值的复制不出错，拷贝构造的参数设为 `const` 引用；为了确保进行左值的复制时不出错，一律采用重新开辟空间的方式。有了能够分辨出右值的右值引用之后，我们就可以定义一个新的构造函数了 —— 移动构造函数。
+
+![undefined202403221006005.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTam5SZ2pmY0tkQmg3QkNKbzUzNzRZQjB0eDIyLUE1UGNXdE12LUlJSjN4b0E_ZT0zZ2NlM28.png)
+
+移动构造函数接受一个右值引用作为参数，用于从传递进来的临时对象中“移动”资源，而不是进行复制。
+
+```cpp
+class String {
+  public:
+  // 移动构造函数
+  String(String&& rhs) : _pstr(rhs._pstr) {
+    std::cout << "String(String&&)" << std::endl;
+    rhs._pstr = nullptr;  // 将源对象置于安全状态
+  }
+
+  private:
+  char* _pstr;
+};
+```
+
+在这个例子中，移动构造函数接受一个 `String` 类型的右值引用 `rhs`，将其内部的资源（`_pstr`）移动到新创建的对象中，并将源对象 `rhs` 的指针设置为 `nullptr`，以确保当临时对象被销毁时，其资源不会被释放。
+
+移动构造函数的特点：
+
+1. **优先级**：移动构造函数的优先级高于拷贝构造函数。如果一个类同时定义了拷贝构造函数和移动构造函数，对于右值引用参数，编译器会优先调用移动构造函数。
+2. **自动生成**：如果一个类没有显式定义构造函数、拷贝构造函数、赋值运算符函数和析构函数，编译器会自动生成移动构造函数和移动赋值运算符函数。
+3. **性能优化**：移动构造函数可以显著提高性能，因为它避免了不必要的资源复制。
+
+编译器优化
+
+- **拷贝省略**：C++11 标准中，编译器可以省略某些显而易见的拷贝操作，这称为拷贝省略（Copy Elision）。
+- **移动构造函数**：当使用临时对象初始化对象时，移动构造函数会被调用。
+
+```cpp
+String s3 = String("hello");
+```
+
+在这个例子中，由于 `String("hello")` 是一个临时对象，编译器会调用 `String` 的移动构造函数，而不是拷贝构造函数。
+
+C++17 标准进一步强化了编译器优化，即使在某些情况下定义了拷贝构造函数，编译器也可能自动使用移动构造函数。
+
+如果需要禁用拷贝省略，可以使用编译器参数 `-fno-elide-constructors`。如果需要指定 C++11 标准，可以使用 `-std=c++11`。
+
+> 以引用的形式给函数传递实参的思想非常经典，它的历史和高级程序设计语言一样悠久（Fortran 语言最早的版本就用到了这种思想）。
+>
+> 为了体现左值 / 右值以及 const / 非 const 的区别，存在三种形式的引用：
+>
+> - 左值引用（lvalue reference）：引用那些我们希望改变值的对象。
+> - const 引用(const reference）：引用那些我们不希望改变值的对象（比如常量）。
+> - 右值引用（rvaluereference)：所引对象的值在我们使用之后就无须保留了（比如临时变量）。
+>
+> 这三种形式统称为引用，其中前两种形式都是左值引用
+
+## 移动赋值函数
+
+移动赋值函数是实现移动语义的关键部分，它允许将一个临时对象的资源“移动”到另一个对象中，而不是进行复制。这对于性能优化至关重要，特别是在处理大型对象或资源密集型对象时。
+
+比如，我们进行如下操作时
+
+```cpp
+String s3("hello");
+s3 = String("wangdao");
+```
+
+原本赋值运算符函数的做法:
+
+![image-20231107100059563.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSeUx4cGE4OEg5Q21fZi03bGZmRkdnQkhrWWZMdTlqdjV4S2lzVmZtUXRIQmc_ZT03dWNjQU8.png)
+
+我们希望复用临时对象申请的空间，那么也同样需要赋值运算符函数能够分辨出接收的参数是左值还是右值，同样可以利用右值引用
+
+![image-20231107100306135.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmWlMxNG1hREVKTHNENk5zdFptbzJzQmFPcTgzNmhfVloyN0hvaWlEWWFzZVE_ZT1SZ1FiWlk.png)
+
+移动赋值函数接受一个右值引用作为参数，并进行资源的转移。
+
+```cpp
+class String {
+ public:
+  // 移动赋值运算符函数
+  String& operator=(String&& rhs) {
+    if (this != &rhs) { // 1. 自赋值的判断
+      delete[] _pstr; // 2. 回收左操作数原本管理的堆空间
+      _pstr = rhs._pstr; // 3. 浅拷贝
+      rhs._pstr = nullptr; // 4. 右操作数底层的指针置空
+      cout << "String& operator=(String&&)" << endl;
+    }
+    return *this; // 5. 返回左操作数
+  }
+
+ private:
+  char* _pstr;
+};
+```
+
+在这个例子中，移动赋值运算符函数接受一个右值引用 `rhs`，释放当前对象的资源，然后将 `rhs` 的资源转移到当前对象，并把 `rhs` 的指针设置为 `nullptr`，以确保 `rhs` 的析构函数不会被调用时释放已经转移的资源。
+
+移动赋值函数的特点：
+
+1. 移动赋值函数的优先级高于赋值运算符函数。如果一个类同时定义了赋值运算符函数和移动赋值函数，对于右值引用参数，编译器会优先调用移动赋值函数。
+2. 如果一个类没有显式定义构造函数、拷贝构造、赋值运算符函数、析构函数，编译器会自动生成移动赋值函数。使用右值的内容进行赋值会调用移动赋值函数。
+3. 如果显式定义了赋值运算符函数，而没有显式定义移动赋值函数，那么使用右值的内容进行赋值会调用赋值运算符函数。
+4. 如果显式定义了移动赋值函数和赋值运算符函数，那么使用右值的内容进行赋值会调用移动赋值函数。
+
+将拷贝构造函数和赋值运算符函数称为具有复制控制语义的函数；
+
+将移动构造函数和移动赋值函数称为具有移动语义的函数(移交控制权)；
+
+具有移动语义的函数优于具有复制控制语义的函数执行。
+
+虽然在某些情况下，移动赋值函数中的自赋值判断可能看起来不必要，但最佳实践是保留它。这是因为 `std::move` 可以将左值转换为右值，如果没有自赋值检查，可能会导致不必要的资源释放和重新分配。
+
+**示例代码**：
+
+```cpp
+String s1("hello");
+s1 = String("world");  // 右值给左值赋值，不是同一个对象
+String("wangdao") = String("wangdao");  // 临时对象之间的赋值
+```
+
+在这些例子中，自赋值检查确保了即使使用 `std::move` 将左值转换为右值，也不会导致错误的资源释放。
+
+## `std::move` 函数
+
+`std::move` 是 C++11 引入的一个标准库函数，它用来将左值转换为对应的右值引用。这允许我们将一个对象的资源“移动”到另一个对象，而不是进行复制。
+
+`std::move` 的作用：
+
+- **左值转右值引用**：`std::move` 可以将左值转换为对应的右值引用，从而触发移动构造函数或移动赋值函数。
+- **强制转换**：`std::move` 的本质是在底层进行强制转换，将左值转换为右值引用。
+
+```cpp
+int a = 1;
+&(std::move(a)); // error，左值转成了右值
+String s1("hello");
+cout << "s1:" << s1 << endl;
+// 如果经历了 std::move 的强转之后没有进行修改操作
+// 之后 s1 对象还是可以正常使用的
+std::move(s1);
+cout << "s1:" << s1 << endl;
+
+// 调用移动构造
+// 在移动构造函数中形参 String && rhs = std::move(s1)
+// rhs._pstr = nullptr;
+// 会使 s1 对象本身的 _pstr 变成空指针
+String s2 = std::move(s1);
+cout << "s1:" << s1 << endl;  // 注意，s1 处于有效但未定义状态
+cout << "s2:" << s2 << endl;
+```
+
+注意事项
+
+1. **自赋值判断**：在移动赋值函数中，自赋值判断是必要的，因为 `std::move` 可以将左值转换为右值引用，如果没有自赋值判断，可能会导致资源的双重释放或其他错误。
+
+   ```cpp
+   String s1("hello");
+   s1 = std::move(s1);
+   s1.print();
+   ```
+
+2. **对象状态**：经过 `std::move` 操作后，原对象可能会处于一个有效但未定义的状态，需要谨慎处理。
+
+3. **C++ 11 和 C++ 17**：在 C++ 11 中，`std::move` 是实现移动语义的关键工具。在 C++ 17 中，编译器优化（如返回值优化 RVO）可能会减少 `std::move` 的必要性。
+
+将移动赋值函数中的浅拷贝去掉，让左操作数 `s1` 的 `_pstr` 重新指向一片空间，后面对右操作数的 `_pstr` 设为空指针，
+
+但是通过输出流运算符输出 `s1` 的 `_pstr` 依然造成了程序的中断，所以说明对 `std::move(s1)` 的内容进行修改，会导致 `s1` 的内容也被修改。
+
+`std:: move` 的本质是在底层做了强制转换（并不是像名字表面的意思一样做了移动）
+
+``` cpp
+String & operator=(String && rhs){
+  delete [] _pstr;
+  _pstr = new char[1]();
+  rhs._pstr = nullptr;
+  cout << "String& operator=(String&&)" << endl;
+  return *this;
+}
+```
+
+所以移动赋值函数的自赋值判断不应该省略。
+
+## 右值引用的本身性质
+
+右值引用本身可以是左值，也可以是右值，这取决于它是否有一个持久的标识。如果有，它就是一个左值；如果没有，它就是一个右值。
+
+1. **有名字的右值引用**：是一个左值，可以取地址。
+2. **没有名字的右值引用**：是一个右值，不能取地址。
+
+```cpp
+int gNum = 10;
+
+int &&func() {
+  return std::move(gNum);
+}
+
+int main() {
+  // &func();  // 错误，无法取址，说明返回的右值引用本身也是一个右值
+  int &&ref = func();
+  &ref;  // 正确，可以取址，此时 ref 是一个右值引用，其本身是左值
+}
+```
+
+在这个例子中，`func()` 返回一个右值引用，`ref` 是一个有名字的右值引用，因此它是一个左值。
+
+使用右值引用时，需要确保其绑定的对象是安全的，即在引用的生命周期内，被引用的对象是有效的。
+
+```cpp
+int &&func(int a, int b) {
+  return a + b;
+}
+
+int main() {
+  // &func(1,2);  //无法取址
+  int &&ref = func(1, 2);
+  &ref;  // 正确，可以取址
+}
+```
+
+在这个例子中，`func(1, 2)` 返回一个匿名右值引用，绑定到变量 `ref`。由于 `ref` 是一个有名字的右值引用，它是左值，可以安全地使用。
+
+如果一个没有名字的右值引用绑定到一个临时对象，并且尝试访问它，可能会导致未定义的行为。
+
+```cpp
+int &&dangerousRef = func(1, 2);
+// ...
+// 在某些情况下，尝试使用 dangerousRef 可能会导致未定义的行为
+```
+
+在这个例子中，`dangerousRef` 是一个匿名右值引用，绑定到一个临时对象。在访问 `dangerousRef` 时，如果临时对象已经销毁，就会导致悬空引用。
+
+要。
+
+## 拷贝构造函数调用时机的补充
+
+在C++中，移动构造函数通常在涉及到临时对象时被调用，而拷贝构造函数则在涉及持久对象时被调用。然而，对象的生命周期也会影响调用哪个构造函数。
+
+当函数返回一个局部对象时，该对象是一个临时对象，其生命周期仅在表达式中有效。在这种情况下，如果返回类型是按值返回，编译器倾向于调用移动构造函数而不是拷贝构造函数。
+
+![image-20240507170434328.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTTVdYOFRERnhwR25vRTBlYUxnc2xnQnpvTnFmZmxkczZNZ0lSdndGSGZoYkE_ZT1aMEJkOWw.png)
+
+```cpp
+String func2() {
+  String str1("wangdao");
+  str1.print();
+  return str1; // 返回局部对象，调用移动构造函数
+}
+
+void test2() {
+  func2(); // 调用移动构造函数
+  //&func2(); //error,右值
+}
+```
+
+在这个例子中，`func2` 返回一个局部对象 `str1`，调用移动构造函数将 `str1` 的资源移动到调用处。
+
+如果函数返回一个静态或全局对象，那么这个对象的生命周期大于函数本身。在这种情况下，执行 return 语句时，调用拷贝构造函数是合适的。
+
+```cpp
+String s10("beijing");
+
+String func3() {
+  s10.print();
+  return s10; // 返回静态或全局对象，调用拷贝构造函数
+}
+
+void test3() {
+  func3(); // 调用拷贝构造函数
+}
+```
+
+在这个例子中，`s10` 是一个全局对象，`func3` 返回 `s10` 时调用拷贝构造函数。
+
+![image-20240507170454625.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRaHA2YjNkaThwRm8tNUIyajdXVFNnQnRvNldoaE5LSVdqYWI4dFFycHFmcFE_ZT1MRDRqWGo.png)
+
+总结：当类中同时定义移动构造函数和拷贝构造函数，需要对以前的规则进行补充，调用哪个函数还需要取决于返回的对象本体的生命周期。
+

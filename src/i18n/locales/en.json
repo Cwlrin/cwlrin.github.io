@@ -1,0 +1,244 @@
+{
+  "nav": {
+    "home": "Home",
+    "posts": "Posts",
+    "categories": "Categories",
+    "tags": "Tags",
+    "archives": "Archives",
+    "statistics": "Statistics"
+  },
+  "post": {
+    "wordCount": "Word Count",
+    "readingTime": "Reading Time",
+    "minutes": "min",
+    "words": "words",
+    "author": "Author",
+    "link": "Link",
+    "copyright": "Copyright",
+    "sticky": "Sticky Posts",
+    "latest": "Latest Posts",
+    "noContent": "No posts available",
+    "publishedAt": "Published on",
+    "createdAt": "Created at",
+    "updatedAt": "Updated on",
+    "previousPost": "Previous Post",
+    "nextPost": "Next Post",
+    "rewardSupport": "Support",
+    "rewardDescription": "Your support keeps my writing going",
+    "readingNeed": "Takes",
+    "license": {
+      "text": "This article is licensed under",
+      "suffix": "license. Please indicate the source for reprints",
+      "noreprint": "All rights reserved. Reprinting is prohibited",
+      "CC-BY-4.0": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "CC-BY-SA-4.0": "Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)",
+      "CC-BY-ND-4.0": "Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)",
+      "CC-BY-NC-4.0": "Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
+      "CC-BY-NC-SA-4.0": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)",
+      "CC-BY-NC-ND-4.0": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"
+    },
+    "encryptedExcerpt": "This is an encrypted post, the excerpt cannot be displayed"
+  },
+  "category": {
+    "title": "Categories",
+    "all": "All",
+    "subcategories": "subcategories",
+    "posts": "posts",
+    "label": "Category",
+    "noContent": "No posts in this category",
+    "untitled": "Untitled"
+  },
+  "tag": {
+    "title": "Tags"
+  },
+  "archive": {
+    "title": "Archives",
+    "all": "All",
+    "year": "Year",
+    "month": "Month",
+    "excellent": "Excellent",
+    "great": "Great",
+    "good": "Good",
+    "nice": "Nice",
+    "ok": "OK",
+    "emh": "Hmm..",
+    "keepTrying": "Keep it up"
+  },
+  "statistics": {
+    "title": "Article Statistics",
+    "totalPosts": "Total Posts",
+    "totalCategories": "Total Categories",
+    "totalTags": "Total Tags",
+    "topCategory": "Most Used Category",
+    "postCount": "Posts",
+    "monthlyPosts": "Monthly Publishing Trend",
+    "categoryDistribution": "Category Distribution (Top 10)",
+    "tagDistribution": "Tag Distribution (Top 16)",
+    "latestMonthSummary": "In {{month}}, {{count}} posts were published."
+  },
+  "sidebar": {
+    "toc": "Table of Contents",
+    "overview": "Site Overview",
+    "author": "Author",
+    "scrollTop": "Back to Top",
+    "scrollBottom": "Go to Bottom",
+    "relatedPosts": "Related Posts",
+    "state": {
+      "posts": "Posts",
+      "categories": "Categories",
+      "tags": "Tags"
+    },
+    "related": {
+      "noContent": "No related posts"
+    },
+    "calendar": {
+      "title": "Calendar",
+      "subtitle": "Three-column preview",
+      "placeholder": "More sidebar widgets are on the way"
+    },
+    "search": {
+      "title": "Site Search",
+      "subtitle": "Find things fast",
+      "action": "Open search panel",
+      "helper": "Reuse the existing Pagefind search to jump to posts, tags, and keywords."
+    },
+    "moments": {
+      "title": "Recent Moments",
+      "subtitle": "Fresh updates"
+    },
+    "randomPosts": {
+      "title": "Random Posts",
+      "subtitle": "Something different"
+    },
+    "tagCloud": {
+      "title": "Tag Cloud",
+      "subtitle": "Popular topics",
+      "browseAll": "Browse all tags →"
+    },
+    "announcement": {
+      "title": "Announcement",
+      "subtitle": "Pinned notes"
+    },
+    "extra": {
+      "title": "Right Rail",
+      "subtitle": "Additional widgets",
+      "empty": "No right sidebar content is enabled right now"
+    },
+    "panels": {
+      "contents": "Contents",
+      "related": "Related",
+      "overview": "Overview"
+    }
+  },
+  "footer": {
+    "poweredBy": "Powered by",
+    "and": "&",
+    "poweredSuffix": "Theme",
+    "totalWordsTitle": "Total words",
+    "estimatedReadingTimeTitle": "Estimated reading time",
+    "randomPosts": "Random Posts",
+    "recentComments": "Recent Comments",
+    "noRecentComments": "No comments yet. Start a conversation!",
+    "recentCommentsLoadFailed": "Failed to load recent comments. Please try again later.",
+    "commentAnonymous": "Anonymous",
+    "walineNotConfigured": "Waline server URL is not configured"
+  },
+  "pagination": {
+    "prev": "Previous",
+    "next": "Next"
+  },
+  "button": {
+    "readMore": "Read More",
+    "more": "More"
+  },
+  "tags": {
+    "title": "Tags",
+    "allTags": "All Tags",
+    "tagged": "Tagged"
+  },
+  "common": {
+    "loading": "Loading",
+    "more": "More",
+    "total": "Total",
+    "home": "Home",
+    "in": "in"
+  },
+  "search": {
+    "devModeSkipped": "Development mode is active, so Pagefind loading has been skipped.",
+    "buildHint": "Please run a production build (with index generation) before previewing on-site search."
+  },
+  "encrypted": {
+    "title": "Encrypted Post",
+    "description": "This post requires a password to view",
+    "passwordPlaceholder": "Enter password",
+    "submit": "Decrypt",
+    "decrypting": "Decrypting content...",
+    "error": "Incorrect password, please try again",
+    "passwordRequired": "Please enter password"
+  },
+  "moments": {
+    "title": "Moments",
+    "noContent": "No moments available",
+    "publishedAt": "Published on",
+    "imageAlt": "Moment image {{index}}"
+  },
+  "imageZoom": {
+    "dialog": "Image preview",
+    "close": "Close image preview",
+    "previous": "View previous image",
+    "next": "View next image"
+  },
+  "random": {
+    "title": "Random Post",
+    "redirecting": "Redirecting to a random post...",
+    "noPost": "No posts available",
+    "retry": "Try Again",
+    "noScript": "JavaScript is disabled in this browser. Please go back home and pick a post manually."
+  },
+  "aboutDialog": {
+    "defaults": {
+      "title": "Quick Chat",
+      "intro": "Choose an option to continue the conversation. You can predefine branches and replies in the component.",
+      "authorName": "Author",
+      "authorInitial": "A",
+      "endHint": "This conversation has ended. Click \"Restart\" to chat again."
+    },
+    "defaultNodes": {
+      "intro": {
+        "text": "Hi, this is a configurable chat component example. Please choose a reply to continue.",
+        "optionA": {
+          "label": "Sample Question A",
+          "reply": "I want to see the reply for sample question A."
+        },
+        "optionB": {
+          "label": "Sample Question B",
+          "reply": "I want to see the reply for sample question B."
+        }
+      },
+      "answerA": {
+        "text": "This is sample answer A. You can replace node texts and options with your own content."
+      },
+      "answerB": {
+        "text": "This is sample answer B. You can also override the default dialogue through the nodes prop."
+      },
+      "backToMenu": {
+        "label": "Back to Menu",
+        "reply": "Back to menu."
+      }
+    },
+    "runtime": {
+      "noNodesConfigured": "No dialogue nodes are configured yet.",
+      "branchNotConfigured": "This branch is not configured yet. Please choose another option.",
+      "noDialogContent": "No dialogue content available. Please configure nodes first."
+    },
+    "typing": {
+      "ariaLabel": "Typing",
+      "peerTyping": "The other side is typing…",
+      "inputPlaceholder": "Type a message here (demo input)"
+    },
+    "actions": {
+      "send": "Send",
+      "restart": "Restart"
+    }
+  }
+}

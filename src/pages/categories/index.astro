@@ -1,0 +1,129 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import {
+  formatCategories,
+  type Category,
+} from "@/toolkit/posts/formatCategories";
+import { toCategoryHref } from "@/toolkit/posts/url";
+import { t } from "@/i18n";
+import "../../styles/collapse.css";
+
+// Get all published posts
+const allPosts = await getCollection("posts");
+const publishedPosts = allPosts.filter((post) => !post.data.draft);
+
+// Create a map to track category hierarchy
+// Categories format: ["Parent", "Child", "Grandchild"] - array represents path
+const categoryMap = new Map<string, Category>();
+
+publishedPosts.forEach((post) => {
+  const categories = post.data.categories || [];
+
+  // Build hierarchy from category array
+  categories.forEach((cat, index) => {
+    const catId = cat.toLowerCase().replaceAll(/\s+/g, "-");
+
+    if (!categoryMap.has(catId)) {
+      categoryMap.set(catId, {
+        _id: catId,
+        name: cat,
+        posts: [],
+        length: 0,
+      });
+    }
+
+    // Set parent relationship (previous category in array is parent)
+    if (index > 0) {
+      const parentCat = categories[index - 1];
+      const parentId = parentCat.toLowerCase().replaceAll(/\s+/g, "-");
+      categoryMap.get(catId)!.parent = parentId;
+    }
+
+    // Add post to the deepest category only
+    if (index === categories.length - 1) {
+      const catData = categoryMap.get(catId)!;
+      catData.posts.push(post);
+      catData.length = catData.posts.length;
+    }
+  });
+});
+
+// Update length counts for parent categories
+categoryMap.forEach((cat) => {
+  if (cat.parent) {
+    const parent = categoryMap.get(cat.parent);
+    if (parent) {
+      parent.length += cat.length;
+    }
+  }
+});
+
+// Convert to array and format with depth 3
+const categoriesArray = Array.from(categoryMap.values());
+const hierarchicalCategories = formatCategories(categoriesArray, { depth: 3 });
+
+type CategoryWithChildren = Category & { children?: CategoryWithChildren[] };
+---
+
+<Layout pageTitle={t("category.title")}>
+  <div class="wrap">
+    <div class="timeline">
+      {
+        hierarchicalCategories.map((cat: CategoryWithChildren) => (
+          <div>
+            <h2 class="item header">
+              <a href={toCategoryHref(cat.name)} itemprop="url">
+                {cat.name}
+              </a>
+              <small>( {cat.length} )</small>
+            </h2>
+
+            {cat.children &&
+              cat.children.map((child: CategoryWithChildren) => (
+                <>
+                  <h3 class="item section">
+                    <a href={toCategoryHref(child.name)} itemprop="url">
+                      {child.name}
+                    </a>
+                    <small>( {child.length} )</small>
+                  </h3>
+
+                  {child.children &&
+                    child.children.map((grandchild: CategoryWithChildren) => (
+                      <div class="item normal">
+                        <div class="title">
+                          <a
+                            href={toCategoryHref(grandchild.name)}
+                            itemprop="url"
+                          >
+                            {grandchild.name}
+                          </a>
+                          <small>( {grandchild.length} )</small>
+                        </div>
+                      </div>
+                    ))}
+                </>
+              ))}
+          </div>
+        ))
+      }
+
+      {
+        hierarchicalCategories.length === 0 && (
+          <div class="empty-state">
+            <p>{t("post.noContent")}</p>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--grey-5);
+  }
+</style>

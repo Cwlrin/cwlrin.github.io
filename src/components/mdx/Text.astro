@@ -1,0 +1,21 @@
+---
+interface Props {
+  type?:
+    | "rainbow"
+    | "red"
+    | "pink"
+    | "orange"
+    | "yellow"
+    | "green"
+    | "aqua"
+    | "blue"
+    | "purple"
+    | "grey";
+}
+
+const { type = "red" }: Props = Astro.props;
+---
+
+<span class={`text ${type}`.trim()}>
+  <slot />
+</span>

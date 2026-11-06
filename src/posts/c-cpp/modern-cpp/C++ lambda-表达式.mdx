@@ -1,0 +1,285 @@
+---
+title: "C++ lambda 表达式"
+date: 2021-05-10T13:40:30+08:00
+categories: ["C 与 C++", "现代 C++"]
+tags: ["C++"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUUlBFN3d0ZE8xQm9rb2g3QVNDZ1FNQlNzRy14OVRLREtNSXpoSEc0NkQ2X0E_ZT1FNWRPQXg.png"
+---
+
+## 基本语法特性
+
+```cpp
+[capture](params) opt -> retureType
+{
+  body;
+};
+```
+
+其中 `capture` 是捕获列表，`params` 是参数列表，`opt` 是函数选项，`retureType` 是返回值类型，`body` 是函数体。
+
+### 捕获列表
+
+不能省略。捕获一定范围内的变量。
+
+- `[]` 不捕捉任何变量。
+- `[&]` 捕获外部作用域中所有变量, 并作为引用在函数体内使用 (按引用捕获)。
+- `[=]` 捕获外部作用域中所有变量, 并作为副本在函数体内使用 (按值捕获)，拷贝的副本在匿名函数体内部是只读的。
+- `[=, &bar]` 按值捕获外部作用域中所有变量, 并按照引用捕获外部变量 `bar` 
+- `[bar]` 按值捕获 `bar` 变量, 同时不捕获其他变量。
+- `[&bar]` 按引用捕获 `bar` 变量，同时不捕获其他变量。
+- `[&, bar]` 按引用捕获其他变量，同时按值捕获 `bar` 变量 。
+- `[this]` 捕获当前类中的 `this` 指针。让 `lambda` 表达式拥有和当前类成员函数同样的访问权限；可以修改类的成员变量，使用类的成员函数。如果已经使用了 `&` 或者 `=`, 默认添加此选项。
+
+```cpp
+class Example {
+ public:
+  void print(int x, int y) {
+    auto x1 = [] { return _number; }; // error
+    auto x2 = [this] { return _number; }; // ok
+    auto x3 = [this] { return _number + x + y; }; // error
+    auto x4 = [this, x, y] { return _number + x + y; }; // ok
+    auto x5 = [this] { return _number++; }; // ok
+    auto x6 = [=] { return _number + x + y; }; // ok
+    auto x7 = [&] { return _number + x + y; }; // ok
+  }
+
+  int _number = 100;
+};
+
+void test() {
+  int a = 10, b = 20;
+  auto f1 = [] { return a; }; // error
+  auto f2 = [&] { return a++; }; // ok
+  auto f3 = [=] { return a; }; // ok
+  auto f4 = [=] { return a++; }; // error
+  auto f5 = [a] { return a + b; }; // error
+  auto f6 = [a, &b] { return a + (b++); }; // ok
+  auto f7 = [=, &b] { return a + (b++); }; // ok
+}
+```
+
+在匿名函数内部，需要通过 `lambda` 表达式的捕获列表控制如何捕获外部变量，以及访问哪些变量。默认状态下 `lambda` 表达式无法修改通过复制方式捕获外部变量，如果希望修改这些外部变量，需要通过引用的方式进行捕获。
+
+### 参数列表 params 
+
+和普通函数的参数列表一样，如果没有参数，参数列表可以省略不写。
+
+```cpp
+auto f = [](){ return 10; } // 没有参数, 参数列表为空
+auto f = []{ return 10; }   // 没有参数, 参数列表省略不写
+```
+
+### 选项 opt
+
+可以省略。 
+
+`mutable`: 可以修改按值传递进来的拷贝（注意是能修改拷贝，而不是值本身）
+
+`exception`: 指定函数抛出的异常，如抛出整数类型的异常，可以使用 `throw()`;
+
+### 返回类型 retureType
+
+可以省略。通过返回值后置语法来定义的。一般情况下，不指定 `lambda` 表达式的返回值，编译器会根据 `return` 语句自动推导返回值的类型，但需要注意的是 `labmda` 表达式不能通过列表初始化自动推导出返回值类型。
+
+```cpp
+// ok，可以自动推导出返回值类型
+auto f = [](int i) {
+  return i;
+}
+// error,不能推导出返回值类型
+auto f1 = []() {
+  return {1, 2}; // 基于列表初始化推导返回值，错误
+}
+```
+
+lambda 表达式的返回值可以使用 `function` 进行接收，这样同一个 lambda 表达式可以被多次调用。
+
+```cpp
+int num = 10;
+int age = 200;
+// void(int)
+function<void(int)> f = [num, &age](int value){
+  cout << "value = " << value << endl;
+  cout << "num = " << num << endl;
+  ++age;
+  cout << "age = " << age << endl;
+};
+
+f(1111);
+```
+
+### 函数体 body
+
+不能省略。但函数体可以为空。
+
+## 函数本质
+
+默认情况下，lambda 表达式按值捕获外部变量时，这些变量会在 lambda 的函数体内被拷贝，并成为该 lambda 对象的成员变量。由于 lambda 表达式的 `operator()` 通常被定义为 `const`，这意味着它不能修改其成员变量的值，因此按值捕获的外部变量在 lambda 函数体内是只读的。
+
+如果你需要在 lambda 表达式中修改按值捕获的外部变量，可以使用 `mutable` 关键字。`mutable` 关键字允许 `operator()` 成为一个非 `const` 成员函数，从而可以修改 lambda 对象的成员变量。
+
+以下是使用 `mutable` 关键字的一个例子：
+
+```cpp
+int value = 10;
+auto lambda = [value]() mutable {
+  value = 20; // 修改捕获的变量
+};
+lambda(); // 调用lambda表达式，value现在为20
+```
+
+在这个例子中，即使 `value` 是按值捕获的，使用 `mutable` 关键字后，我们可以在 lambda 的 `operator()` 内修改它的值。
+
+为什么按值捕获的外部变量是只读的，原因在于 C++标准规定 lambda 表达式的 `operator()` 是 `const` 的。由于 `const` 成员函数不能修改对象的任何成员变量，因此捕获的变量默认是不可修改的。这种设计是为了确保 lambda 表达式的线程安全性，因为 `const` 成员函数可以在多线程环境中安全调用。
+
+使用 `mutable` 关键字可以允许在 lambda 表达式中修改捕获的变量。但这样做可能会引入线程不安全的因素，因此在多线程环境中使用 `mutable` 关键字时要特别小心。
+
+lambda 表达式在 C++ 中可以被视为仿函数，它们可以被存储在 `std::function` 对象中，或通过 `std::bind` 进行绑定。
+
+```cpp
+//包装可调用函数
+function<int(int)> f1 = [](int a) {return a; };
+//绑定可调用函数
+function<int(int)> f2 = bind([](int a) {return a; }, placeholders::_1);
+//函数调用
+cout << f1(100) << endl;
+cout << f2(200) << endl;
+```
+
+## 捕获列表
+
+```cpp
+int num = 10;
+string name("sekai");
+int age = 100;
+
+[](const string& value) {
+  /* cout << "num = " << num << endl; */
+  /* cout << "name = " << name<< endl; */
+  cout << "gNum = " << gNum << endl;
+  cout << "value = " << value << endl;
+}("miku");
+cout << endl;
+
+// 值捕获
+[num, name](const string& value) {
+  cout << "num = " << num << endl;
+  cout << "name = " << name << endl;
+  cout << "value = " << value << endl;
+}("miku");
+
+// 引用捕获
+cout << endl;
+[&num, &name](const string& value) {
+  num = 100;
+  name = "sekai";
+  cout << "num = " << num << endl;
+  cout << "name = " << name << endl;
+  cout << "value = " << value << endl;
+}("rin");
+
+cout << "num = " << num << ", name = " << name << endl;
+cout << endl << endl;
+
+// 全部用值捕获，name 用引用捕获
+[=, &name]() {
+  // num = 1000; // error
+  name = "welcome";
+  cout << "num = " << num << endl;
+  cout << "age = " << age << endl;
+  cout << "name = " << name << endl;
+}();
+cout << endl << endl;
+
+// 全部引用捕获，name 值捕获
+[&, name]() {
+  num = 1000; // ok
+  age = 100; // ok
+  // name = "welcome"; //error
+  cout << "num = " << num << endl;
+  cout << "age = " << age << endl;
+  cout << "name = " << name << endl;
+}();
+
+// 如果对于外部局部变量的捕获方式不一样
+// 最简单的方式是分别列出捕获方式以及变量的名字
+[name, &num, &age](int value) {
+  cout << "value = " << value << endl;
+  cout << "name = " << name << endl;
+  ++num;
+  cout << "num = " << num << endl;
+  ++age;
+  cout << "age = " << age << endl;
+  cout << "gNum = " << gNum << endl;
+}(16);
+
+cout << endl << endl;
+// = 表明值捕获外部所有局部变量
+// [name, num, age](int value){ 
+[=](int value) {
+  cout << "value = " << value << endl;
+  cout << "name = " << name << endl;
+  cout << "num = " << num << endl;
+  cout << "age = " << age << endl;
+}(22);
+
+cout << endl << endl;
+// = 表明引用捕获外部所有局部变量
+// [&name, &num, &age](int value){ 
+[&](int value) {
+  cout << "value = " << value << endl;
+  name = "len";
+  cout << "name = " << name << endl;
+  ++num;
+  cout << "num = " << num << endl;
+  ++age;
+  cout << "age = " << age << endl;
+}(22);
+
+cout << endl << endl;
+// 某一个变量进行读，其他的全部进行写
+[&, name](int value) {
+  cout << "value = " << value << endl;
+  cout << "name = " << name << endl;
+  ++num;
+  cout << "num = " << num << endl;
+  ++age;
+  cout << "age = " << age << endl;
+}(22);
+
+cout << endl << endl;
+// 某一个变量进行写，其他的全部进行读
+[=, &num](int value) {
+  cout << "value = " << value << endl;
+  cout << "name = " << name << endl;
+  ++num;
+  cout << "num = " << num << endl;
+  cout << "age = " << age << endl;
+}(22);
+return 0;
+```
+
+## 注意事项
+
+使用 lambda 表达式捕获局部变量的引用时候，局部变量一定不能离开其作用域，否则就是捕获生命周期结束的变量的引用，就会报错。
+
+```cpp
+vector<function<void(const string &)>> vec;//vec是一个全局对象
+
+void test() {
+  int num = 100;
+  string name("sekai");
+
+  vec.push_back([&num, &name](const string &value) {
+    cout << "num = " << num << endl;
+    cout << "name = " << name << endl;
+    cout << "value = " << value << endl;
+  });
+  
+  for (auto elem : vec) {
+    elem("hello");
+  }
+}
+```
+
+

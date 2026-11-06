@@ -1,0 +1,149 @@
+---
+import type { ImageMetadata } from 'astro'
+import CoverImage from './CoverImage.astro'
+
+interface Props {
+  enable?: boolean
+  preload?: boolean
+  fixedCover?: ImageMetadata | string
+  gradient?: boolean
+  covers?: Array<ImageMetadata | string>
+  title?: string
+  advancedCarousel?: boolean
+}
+
+const {
+  enable = false,
+  fixedCover,
+  gradient = false,
+  covers = [],
+  title = '',
+  advancedCarousel = false,
+} = Astro.props as Props
+
+// 是否显示多图轮播
+// 新版行为（advancedCarousel）：≥2 张即可
+// 旧版行为：必须恰好 6 张
+const minCoversForCarousel = advancedCarousel ? 2 : 6
+const isMultipleImages =
+  !fixedCover && !gradient && covers.length >= minCoversForCarousel
+
+// 单图模式图片来源
+const singleImage =
+  fixedCover || (gradient ? 'https://7ed.net/bing/api' : covers[0])
+---
+{enable && (
+    <div class="spacer"></div>
+
+    <div
+      id="imgs"
+      class="imgs-container"
+    >
+      {isMultipleImages ? (
+        <ul class="image-list">
+          {covers.map((cover, index) => (
+            <CoverImage
+              src={cover}
+              alt={title}
+              index={index}
+              isListItem={true}
+            />
+          ))}
+        </ul>
+      ) : (
+        <CoverImage
+          src={singleImage}
+          alt={title}
+          index={0}
+          isListItem={false}
+        />
+      )}
+
+      <div class="imgs-overlay"></div>
+    </div>
+)}
+
+<script>
+  const imgs = document.querySelector('#imgs')
+
+  if (imgs) {
+    const toggleHoverByPointer = (event: MouseEvent) => {
+      const rect = imgs.getBoundingClientRect()
+      const isInside =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom
+
+      imgs.classList.toggle('is-hovered', isInside)
+    }
+
+    const clearHover = () => {
+      imgs.classList.remove('is-hovered')
+    }
+
+    window.addEventListener('mousemove', toggleHoverByPointer, {
+      passive: true,
+    })
+    window.addEventListener('blur', clearHover)
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) clearHover()
+    })
+  }
+</script>
+
+<style>
+  :global(:root) {
+    --header-cover-brightness: 0.95;
+  }
+
+  :global(:root[data-theme='dark']) {
+    --header-cover-brightness: 1.05;
+  }
+
+  .spacer {
+    height: 48vh;
+  }
+
+  @media (max-width: 1024px) {
+    .spacer {
+      height: 42vh;
+    }
+  }
+
+  .imgs-container {
+    background-color: var(--header-cover-bg);
+    width: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: var(--z-behind);
+    height: 70vh;
+    min-height: 25rem;
+    content-visibility: auto;
+    contain-intrinsic-size: 100vw 70vh;
+    filter: blur(4px) brightness(var(--header-cover-brightness));
+    transition: filter 0.35s ease;
+  }
+
+  .imgs-container.is-hovered {
+    filter: blur(0) brightness(var(--header-cover-brightness));
+  }
+
+  .image-list {
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
+
+  .imgs-overlay {
+    background-color: var(--grey-9-a2);
+    height: 100%;
+    width: 100%;
+    transition: opacity 0.3s;
+    left: 0;
+    top: 0;
+    position: absolute;
+    z-index: var(--z-content);
+  }
+</style>

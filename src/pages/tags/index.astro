@@ -1,0 +1,84 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import { generateTagCloud } from "@/toolkit/posts/generateTagCloud";
+import { toTagHref } from "@/toolkit/posts/url";
+import { t } from "@/i18n";
+import themeConfig from "@/theme.config";
+import "../../styles/tags.css";
+
+// Get all published posts
+const allPosts = await getCollection("posts");
+const publishedPosts = allPosts.filter((post) => !post.data.draft);
+
+// Collect all tags with their counts
+interface TagCount {
+  name: string;
+  count: number;
+}
+
+const tagMap = new Map<string, number>();
+
+publishedPosts.forEach((post) => {
+  const tags = post.data.tags || [];
+  tags.forEach((tag) => {
+    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+  });
+});
+
+// Convert to array and generate tag cloud
+const tags: TagCount[] = Array.from(tagMap.entries()).map(([name, count]) => ({
+  name,
+  count,
+}));
+
+// Generate tag cloud with colors and font sizes
+const tagCloud = generateTagCloud(tags, {
+  minFontSize: 12,
+  maxFontSize: 30,
+  startColor: themeConfig.tagCloud?.startColor,
+  endColor: themeConfig.tagCloud?.endColor,
+  limit: 200,
+});
+
+// Sort tag cloud alphabetically for display
+const sortedTagCloud = [...tagCloud].toSorted((a, b) =>
+  a.name.localeCompare(b.name),
+);
+
+// Total tag count
+const totalTags = tags.length;
+
+---
+
+<Layout pageTitle={t("tag.title")}>
+  <div class="wrap">
+    <div class="tag-cloud-container">
+      <h2 class="item header">
+        <a href="/">{t("nav.home")}</a>
+        <small>/</small>
+        {t("common.total")}
+        {totalTags}
+        {t("tag.title")}
+      </h2>
+
+      <div class="tag-cloud">
+        {
+          sortedTagCloud.map((tag) => (
+            <a
+              href={toTagHref(tag.name)}
+              aria-label={`${tag.name} 标签`}
+              class="tag-cloud-item"
+              style={`font-size: ${tag.fontSize}px; color: ${tag.color};`}
+              title={`${tag.name} (${tag.count})`}
+            >
+              <i class="i-ri-price-tag-3-line" />
+              {tag.name}
+              <span class="tag-count">({tag.count})</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</Layout>

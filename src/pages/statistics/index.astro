@@ -1,0 +1,136 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import { t } from "@/i18n";
+import { buildSiteStatistics } from "@/toolkit/posts/buildSiteStatistics";
+import HyacineOutlet from "@hyacine/plugin-astro/components/HyacineOutlet.astro";
+import "@/styles/collapse.css";
+
+const allPosts = await getCollection("posts");
+const statistics = buildSiteStatistics(allPosts);
+
+const latestMonth =
+  statistics.monthlyPostCounts.at(-1) || null;
+---
+
+<Layout pageTitle={t("statistics.title")}>
+  <div class="wrap statistics-wrap">
+    <h2 class="item header">
+      <a href="/">{t("nav.home")}</a>
+      <small>/</small>
+      {t("statistics.title")}
+    </h2>
+
+    <div class="statistics-kpi" role="list">
+      <article class="statistics-kpi-card" role="listitem">
+        <div class="statistics-kpi-label">{t("statistics.totalPosts")}</div>
+        <div class="statistics-kpi-value">{statistics.totalPosts}</div>
+      </article>
+      <article class="statistics-kpi-card" role="listitem">
+        <div class="statistics-kpi-label">
+          {t("statistics.totalCategories")}
+        </div>
+        <div class="statistics-kpi-value">{statistics.totalCategories}</div>
+      </article>
+      <article class="statistics-kpi-card" role="listitem">
+        <div class="statistics-kpi-label">{t("statistics.totalTags")}</div>
+        <div class="statistics-kpi-value">{statistics.totalTags}</div>
+      </article>
+      <article class="statistics-kpi-card" role="listitem">
+        <div class="statistics-kpi-label">{t("statistics.topCategory")}</div>
+        <div class="statistics-kpi-value statistics-kpi-value-sm">
+          {
+            statistics.topCategory
+              ? `${statistics.topCategory.name} (${statistics.topCategory.count})`
+              : t("post.noContent")
+          }
+        </div>
+      </article>
+    </div>
+
+    <p class="statistics-summary">
+      {
+        latestMonth
+          ? t("statistics.latestMonthSummary", {
+              month: latestMonth.label,
+              count: latestMonth.count,
+            })
+          : t("post.noContent")
+      }
+    </p>
+
+    <HyacineOutlet
+      name="article-statistics"
+      monthlyPostCounts={statistics.monthlyPostCounts}
+      categoryCounts={statistics.categoryCounts}
+      tagCounts={statistics.tagCounts}
+      extraProps={{
+        monthlyPostCounts: statistics.monthlyPostCounts,
+        categoryCounts: statistics.categoryCounts,
+        tagCounts: statistics.tagCounts,
+      }}
+    />
+  </div>
+</Layout>
+
+<style>
+  .statistics-wrap {
+    max-width: 68rem;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .statistics-kpi {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 0.875rem;
+    margin: 0.75rem 0 1rem;
+  }
+
+  .statistics-kpi-card {
+    border: 1px solid color-mix(in srgb, var(--grey-4) 24%, transparent);
+    border-radius: 0.875rem;
+    background: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--grey-1) 96%, transparent),
+      color-mix(in srgb, var(--grey-2) 92%, transparent)
+    );
+    box-shadow: var(--shadow-card-soft);
+    padding: 0.9rem 1rem;
+  }
+
+  .statistics-kpi-label {
+    color: var(--grey-5);
+    font-size: 0.875rem;
+  }
+
+  .statistics-kpi-value {
+    margin-top: 0.35rem;
+    color: var(--text-color);
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .statistics-kpi-value-sm {
+    font-size: 1.1rem;
+  }
+
+  .statistics-summary {
+    margin: 0.5rem 0 1rem;
+    color: var(--grey-5);
+    line-height: 1.8;
+  }
+
+  @media (min-width: 42rem) {
+    .statistics-kpi {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 72rem) {
+    .statistics-kpi {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+</style>

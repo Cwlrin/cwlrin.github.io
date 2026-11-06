@@ -1,0 +1,105 @@
+---
+import "@/styles/layout-common.css";
+import "@/styles/layout-three-column.css";
+import type { CollectionEntry } from "astro:content";
+import type { NavItemType } from "@/components/navbar/NavTypes";
+import type { WidgetPost } from "@/toolkit/posts/createWidgetPosts";
+import type {
+  TocItem,
+  RelatedPost,
+  QuickNavigation,
+  SidebarConfig,
+} from "@/components/sidebar/SidebarTypes";
+import { RightSidebar } from "@/components/sidebar/RightSidebar";
+import LayoutMainColumn from "./shared/LayoutMainColumn.astro";
+import LayoutPrimarySidebar from "./shared/LayoutPrimarySidebar.astro";
+import AnnouncementContent from "@/content/announcement.md";
+
+interface WidgetsConfig {
+  randomPosts?: boolean;
+  recentComments?: boolean;
+  recentCommentsLimit?: number;
+  recentCommentsServerURL?: string;
+}
+
+interface Props {
+  widgetPosts: WidgetPost[];
+  widgetsConfig?: WidgetsConfig;
+  sidebarConfig?: SidebarConfig;
+  rightSidebarConfig?: {
+    order?: Array<
+      | "announcement"
+      | "search"
+      | "calendar"
+      | "recentMoments"
+      | "randomPosts"
+      | "tagCloud"
+    >;
+    search?: boolean;
+    calendar?: boolean;
+    recentMoments?: boolean;
+    randomPosts?: boolean;
+    tagCloud?: boolean;
+    announcement?: boolean;
+  };
+  rightSidebarPosts?: CollectionEntry<"posts">[];
+  rightSidebarMoments?: CollectionEntry<"moments">[];
+  rightSidebarTagCloud?: Array<{
+    name: string;
+    count: number;
+    fontSize: number;
+    color: string;
+    href: string;
+  }>;
+  navLinks?: NavItemType[];
+  toc?: TocItem[];
+  relatedPosts?: RelatedPost[];
+  currentSlug?: string;
+  navigation?: QuickNavigation;
+  siteState: {
+    categories: number;
+    posts: number;
+    tags: number;
+  };
+}
+
+const {
+  widgetPosts,
+  widgetsConfig = {},
+  sidebarConfig,
+  rightSidebarConfig = {},
+  rightSidebarPosts = [],
+  rightSidebarMoments = [],
+  rightSidebarTagCloud = [],
+  navLinks = [],
+  toc = [],
+  relatedPosts = [],
+  currentSlug = "",
+  navigation = {},
+  siteState,
+} = Astro.props;
+---
+
+<div class="inner layout-frame layout-three-column">
+  <LayoutPrimarySidebar
+    config={sidebarConfig}
+    {navLinks}
+    {toc}
+    {relatedPosts}
+    {currentSlug}
+    {navigation}
+    {siteState}
+  />
+  <LayoutMainColumn posts={widgetPosts} {widgetsConfig}>
+    <slot />
+  </LayoutMainColumn>
+  <RightSidebar
+    config={rightSidebarConfig}
+    posts={rightSidebarPosts}
+    moments={rightSidebarMoments}
+    tagCloudItems={rightSidebarTagCloud}
+    client:visible
+  >
+    <AnnouncementContent slot="announcement" />
+  </RightSidebar>
+</div>

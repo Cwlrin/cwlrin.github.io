@@ -1,0 +1,75 @@
+name: Release
+
+# 触发方式：
+# 1. 推送 v* 标签（如 v1.7.0）时自动发布
+# 2. 手动运行（workflow_dispatch）：为当前最新的版本标签重新生成并更新 Release
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          # 需要完整历史与标签，git-cliff 才能计算版本区间
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 解析本次发布的版本标签
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            # push 标签触发：标签名直接来自 ref
+            TAG="${GITHUB_REF_NAME}"
+          else
+            # 手动触发：取当前分支上最新可达的版本标签
+            TAG="$(git describe --tags --abbrev=0)"
+          fi
+          echo "tag=${TAG}" >> "${GITHUB_OUTPUT}"
+
+      - name: 判断是否为预发布版本
+        id: prerelease
+        run: |
+          if [[ "${{ steps.version.outputs.tag }}" =~ -(alpha|beta|rc)([.-]|$) ]]; then
+            echo "is_prerelease=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "is_prerelease=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: 生成 changelog（git-cliff）
+        run: pnpm exec git-cliff -l -o CHANGELOG.md
+
+      - name: 预览 changelog
+        run: head -30 CHANGELOG.md
+
+      - name: 创建 GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          body_path: CHANGELOG.md
+          prerelease: ${{ steps.prerelease.outputs.is_prerelease }}

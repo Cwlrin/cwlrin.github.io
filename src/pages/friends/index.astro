@@ -1,0 +1,167 @@
+---
+import { Code } from "astro:components";
+import Layout from "../../layouts/Layout.astro";
+import FriendLinks from "@/components/friends/FriendLinks.astro";
+import FriendRules from "@/content/friends-rules.md";
+import HyacineOutlet from "@hyacine/plugin-astro/components/HyacineOutlet.astro";
+import themeConfig from "@/theme.config";
+// 只取 Shiki 主题名，避免反向 import astro.config.mjs（dev 下会拉起 CJS 依赖导致 500）
+import { SHIKI_THEMES } from "@/toolkit/shikiThemes";
+
+const friendsConfig = themeConfig.friends;
+const friendLinks = friendsConfig?.links ?? [];
+const pageTitle = friendsConfig?.title ?? "友链";
+const pageDescription =
+  friendsConfig?.description ?? "卡片式展示，支持站点预览与主题色点缀。";
+const siteUrl = import.meta.env.SITE?.toString() ?? "";
+const codeThemes = SHIKI_THEMES;
+const friendsSnippet = {
+  url: siteUrl,
+  title: themeConfig.brand?.title ?? themeConfig.siteName,
+  desc: themeConfig.sidebar?.description ?? "",
+  author: themeConfig.sidebar?.author ?? "",
+  ...(friendsConfig?.avatar ? { avatar: friendsConfig.avatar } : {}),
+  ...(friendsConfig?.color ? { color: friendsConfig.color } : {}),
+  ...(friendsConfig?.siteImage ? { siteImage: friendsConfig.siteImage } : {}),
+};
+const friendsJson = JSON.stringify(friendsSnippet, null, 2);
+---
+
+<Layout pageTitle={pageTitle}>
+  <div class="wrap friend-page">
+    <div class="friend-header">
+      <h2>{pageTitle}</h2>
+      <p>{pageDescription}</p>
+    </div>
+    <section class="friend-section friend-rules">
+      <h3>友链规则</h3>
+      <div class="friend-rules-content">
+        <FriendRules />
+      </div>
+    </section>
+    <section class="friend-section friend-snippet">
+      <h3>友链配置示例</h3>
+      <p>添加本站时，请将下面内容追加到自己的 links 配置中。</p>
+      <code-block>
+        <Code
+          code={friendsJson}
+          lang="json"
+          themes={codeThemes}
+          class="friend-code"
+        />
+      </code-block>
+    </section>
+    <section class="friend-section friend-links-section">
+      <h3>友链列表</h3>
+      <FriendLinks links={friendLinks} />
+    </section>
+    {
+      friendsConfig?.comments && (
+        <section class="friend-section friend-comments" id="comments">
+          <h3>评论区</h3>
+          <div class="comment">
+            <HyacineOutlet name="comment" />
+          </div>
+        </section>
+      )
+    }
+  </div>
+</Layout>
+
+<style>
+  .friend-page {
+    padding: 1.5rem 1.75rem 2.5rem;
+  }
+
+  .friend-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .friend-section {
+    margin-top: 2rem;
+  }
+
+  .friend-header h2 {
+    margin: 0 0 0.35rem;
+    font-size: 1.75rem;
+    color: var(--grey-7);
+  }
+
+  .friend-header p {
+    margin: 0;
+    color: var(--grey-6);
+  }
+
+  .friend-rules h3 {
+    margin: 0 0 0.75rem;
+    color: var(--grey-7);
+  }
+
+  .friend-rules-content {
+    padding: 1rem 1.1rem;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, var(--grey-0), var(--grey-1));
+    border: 1px solid var(--grey-2);
+    color: var(--grey-7);
+    box-shadow: 0 0.6rem 1.2rem var(--box-bg-shadow);
+  }
+
+  .friend-rules-content :global(p) {
+    margin: 0 0 0.75rem;
+    color: var(--grey-6);
+    line-height: 1.7;
+  }
+
+  .friend-rules-content :global(ul) {
+    margin: 0;
+    padding-left: 1.2rem;
+    color: var(--grey-6);
+  }
+
+  .friend-rules-content :global(li) {
+    margin: 0.4rem 0;
+    line-height: 1.7;
+  }
+
+  .friend-rules-content :global(li::marker) {
+    color: var(--color-blue);
+  }
+
+  .friend-rules-content :global(strong) {
+    color: var(--grey-7);
+  }
+
+  .friend-snippet h3 {
+    margin: 0 0 0.5rem;
+    color: var(--grey-7);
+  }
+
+  .friend-links-section h3 {
+    margin: 0 0 0.75rem;
+    color: var(--grey-7);
+  }
+
+  .friend-snippet p {
+    margin: 0 0 1rem;
+    color: var(--grey-6);
+  }
+
+  .friend-code :global(pre) {
+    margin: 0;
+    padding: 1rem 1.1rem;
+    border-radius: 0.75rem;
+    background: var(--grey-2);
+    border: 1px solid var(--grey-3);
+    color: var(--grey-7);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  @media (max-width: 768px) {
+    .friend-page {
+      padding: 1.25rem 1rem 2rem;
+    }
+  }
+</style>

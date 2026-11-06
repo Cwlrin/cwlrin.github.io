@@ -1,0 +1,31 @@
+---
+interface Props {
+  type?: "primary" | "info" | "success" | "warning" | "danger" | "default";
+  title?: string;
+  icon?: string | "none";
+}
+
+const { type = "primary", title, icon }: Props = Astro.props;
+
+const iconMap: Record<NonNullable<Props["type"]>, string> = {
+  default: "i-ri-file-list-3-fill",
+  primary: "i-ri-lightbulb-flash-fill",
+  info: "i-ri-information-fill",
+  success: "i-ri-checkbox-circle-fill",
+  warning: "i-ri-alert-fill",
+  danger: "i-ri-close-circle-fill",
+};
+
+const resolvedIcon = icon ?? iconMap[type];
+const showIcon = resolvedIcon !== "none";
+---
+
+<div class={`note note-card ${type}`.trim()}>
+  {showIcon ? <i class={`note-icon ${resolvedIcon}`.trim()} /> : null}
+  <div class="note-body">
+    {title ? <div class="note-title">{title}</div> : null}
+    <div class="note-content">
+      <slot />
+    </div>
+  </div>
+</div>

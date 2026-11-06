@@ -1,0 +1,1216 @@
+---
+title: "Linux 线程"
+date: 2020-09-11T14:13:00+08:00
+categories: ["C 与 C++", "Linux C"]
+tags: ["C", "Linux"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlNDNmRnlmRl9wRXUwV2xyUXVoOXlNQl91ZXJIc1cxbWtnTUg5NE5HTzQwN2c_ZT05Vm81VTc.png"
+---
+
+## 线程概述
+
+###  从进程到线程
+
+在计算机系统中，多进程设计允许用户在同一台计算机上同时处理多个独立的工作任务。操作系统负责管理这些进程，通过调度算法合理地在它们之间分配 CPU 资源、内存、文件等资源。使用多进程设计不仅可以提高单个应用的吞吐量和响应时间，还可以在某个进程因死循环或等待 IO 操作而无法完成任务时，由操作系统调度其他进程来完成任务或响应用户请求。
+
+例如，在文本处理程序中，可以并发地处理用户输入和保存已完成的文件任务。然而，随着进程数量的增加，系统在切换不同进程时会消耗更多的时间。这是因为进程执行过程中，CPU 寄存器中需要保存一些必要的信息，如堆栈、代码段等，这些状态被称为上下文。上下文切换涉及到大量的寄存器和内存之间的保存和载入工作。
+
+在 Linux 操作系统中，每个用户进程都拥有自己独立的地址空间，这要求每个进程有自己独立的页目录表（用于映射虚拟地址到物理地址）。TLB（Translation Lookaside Buffer）是页目录表的缓存，用于存储最近使用的物理和虚拟地址映射。因此，在 Linux 操作系统中，进程切换包括以下两步：
+
+1. 切换页目录表，以支持新进程的地址空间。
+2. 进入内核态，将硬件上下文（即 CPU 寄存器的内容）以及内核态栈切换到新的进程。
+
+这种设计确保了进程之间的隔离和独立性，同时也带来了上下文切换的开销。
+
+![TLBCache.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VjVThMTkpHRk9SS2w5Uzdsbldwdm1NQm42eThjRnI2NWFmdjR3eXJPSEQteWc_ZT1xMkJNMXI.jpg)
+
+线程的引入旨在减少进程切换的开销，提供一种更高效的并发执行方式。线程，也称为轻量级进程（Light Weight Process, LWP），允许一个进程被分解为多个独立的运行实体。这些线程能够并发运行，使得线程成为 CPU 分配和调度的最小单位。
+
+在 Linux 操作系统中，每个线程都拥有自己独立的 `task_struct` 结构体，这是线程管理和调度的基础。尽管属于同一个进程的多个线程会共享许多资源，但它们的 `task_struct` 结构体中仍然包含一些独立的字段。
+
+Linux 中的线程并没有脱离进程而独立存在。计算机的内存、文件、IO 设备等资源仍然是按进程为单位进行分配的。同一个进程内的多个线程会共享进程的地址空间，每个线程在执行过程中拥有自己独立的栈，而堆、数据段、代码段、文件描述符和信号屏蔽字等资源则是共享的。
+
+![e7d82e742e4d66a8b5332280a6578084.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSODloMkNwd2NKQXBtQ3gySU9MOWc0QnY0VVhScE93T1JXVEYzSGw2TVhWYnc_ZT1Vc0s1aVM.png)
+
+由于同一进程内的多个线程共享相同的地址空间，线程切换不需要执行页目录表的切换。这意味着在进行线程切换时，上下文切换的开销大大减少。在线程切换过程中，只需要更新栈指针（用于指向当前线程的栈帧）和程序计数器（PC 指针，用于指示下一条指令）。除此之外，其他控制信息如数据段和代码段等保持不变，因为它们是线程间共享的。
+
+尽管每个线程都拥有独立的栈，但它们位于进程的统一地址空间内。这使得一个线程可以通过地址引用来访问另一个线程的栈区域，但在实践中出于线程安全考虑，通常不鼓励这样做。
+
+> 在 Linux 文件系统中，`/proc` 是一个特殊的伪文件系统，它提供了一种访问内核数据结构的方式。用户可以通过传统的文件操作，如使用 `read` 系统调用，来读取这些数据。
+>
+> `/proc` 文件系统中的每个目录都对应着一个正在运行的进程。例如，`/proc/[num]` 目录包含了进程 ID 为 `num` 的进程的相关信息。这些信息包括进程的状态、内存使用情况、打开的文件等。
+>
+> 进一步地，`/proc/[num]/task` 目录包含了该进程中所有线程的内核数据。这些数据对于分析进程的线程行为、性能调优等方面非常有用。
+
+###  用户级线程和内核级线程
+
+在 Linux 2.4 及之前的版本中，由于缺乏线程概念，Linux 内核并不识别线程。随着技术的发展，人们逐渐认识到线程相比进程具有更少的创建开销和更快的切换速度，因此开始寻求在 Linux 上实现多线程编程的方法。然而，修改操作系统内核并非易事，因此最初的解决方案是通过编写函数库来模拟线程，而不是直接修改内核。这些函数库构成了最初的用户级线程库，它们在 Linux 内核中使用进程来模拟线程的行为。
+
+尽管当时的线程库已经非常接近 POSIX 标准，但在信号处理等方面仍存在一些细微差别。这些差异主要是由于底层 Linux 内核的限制，而非函数库本身所能改变的。为了改善 Linux 对线程的支持，许多项目开始研究如何将用户级线程映射到内核级线程。
+
+IBM 公司的 NGPT（Next Generation POSIX Threads）和 Red Hat 公司的 NPTL（Native POSIX Thread Library）通过修改 Linux 内核来支持新的线程库，两者都显著提高了性能。2002 年，NGPT 项目组宣布停止为 NGPT 添加新功能，以避免团队分化。因此，NPTL 成为了 Linux 线程的新标准。在 NPTL 中，内核负责处理每个线程堆栈所使用的内存的回收工作，并在清除父线程之前等待，以实现对所有线程结束的管理。
+
+当前最广泛使用的线程库是 **NPTL**（Native POSIX Threads Library），自 Linux 内核 2.6 版本起，它已经取代了旧版的 LinuxThreads 线程库。NPTL 遵循了 POSIX 线程标准库，提供了对多线程编程的原生支持。
+
+在早期版本中，NPTL 仅支持用户级线程，这意味着线程的创建和管理并没有深入到内核层面。但随着 Linux 内核的不断演进，NPTL 现在已经能够支持每个用户级线程对应一个内核态线程。这种设计使得 NPTL 线程本质上成为了内核级线程，能够被操作系统直接调度和管理。
+
+用户级线程和内核级线程在操作系统中扮演着不同的角色，它们之间的主要差异如下:
+
+1. **实现层面**：用户级线程完全在用户空间实现，这意味着它们不依赖于操作系统内核的直接支持。相反，内核级线程则是由操作系统内核直接创建和管理的，它们与内核紧密集成。
+2. **执行环境**：用户级线程在用户态下执行，这意味着它们无法直接访问内核态的资源和功能。而内核级线程则具有在任何 CPU 模式下运行的能力，可以充分利用操作系统提供的全部资源。
+3. **上下文切换**：用户级线程的上下文切换完全由用户程序控制，这提供了更高的灵活性，但同时也要求程序员具备更高的并发控制能力。内核级线程的上下文切换则由操作系统内核处理，这通常更加高效，但可能不如用户级线程灵活。
+4. **调度机制**：用户级线程的调度是由用户程序中的线程库来管理的，这允许开发者根据应用需求定制调度策略。内核级线程的调度则遵循操作系统的调度算法，由内核负责分配处理器时间。
+
+## 线程的创建
+
+| 线程函数         | 功能                   | 类似的进程函数 |
+| ---------------- | ---------------------- | -------------- |
+| `pthread_create` | 创建一个线程           | `fork`         |
+| `pthread_exit`   | 线程退出               | `exit`         |
+| `pthread_join`   | 等待线程结束并回收资源 | `wait`         |
+| `pthread_self`   | 获取线程 id             | `getpid`       |
+
+### `pthread_create`  创建新的线程
+
+`pthread_create` 是 POSIX 线程库中的一个函数，用于创建一个新的线程。这个函数是多线程编程中的核心，允许程序并行执行多个任务。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine)(void *), void *arg);
+```
+
+参数说明：
+
+1. **pthread_t \*thread**: 这是一个指向 `pthread_t` 类型的指针，用于存储新创建线程的标识符。`pthread_t` 是线程的全局唯一标识符。
+2. **const pthread_attr_t \*attr**: 这是一个指向 `pthread_attr_t` 结构的指针，该结构包含了线程的属性，如栈大小、调度策略等。如果不需要设置特定的属性，可以传递 `NULL`，此时线程将使用默认属性。
+3. **void \*(\*start_routine)(void \*)**: 这是一个函数指针，指向新线程将执行的函数。这个函数应该接受一个 `void*` 类型的参数，并返回一个 `void*` 类型的值。
+4. **void \*arg**: 这是传递给线程启动函数 `start_routine` 的参数。
+
+返回值：
+
+- 如果 `pthread_create` 调用成功，返回 0。
+- 如果调用失败，返回一个错误码，如 `EAGAIN`（资源暂时不可用）或 `ENOMEM`（内存不足）。
+
+使用 `pthread_create` 时，需要注意以下几点：
+
+- **线程函数**: 线程启动函数应该具有特定的签名，即接受 `void*` 类型的参数并返回 `void*` 类型的值。
+- **线程属性**: 可以通过 `pthread_attr_init` 初始化线程属性，并通过一系列 `pthread_attr_set*` 函数设置属性。
+- **线程标识符**: 成功创建线程后，`thread` 参数将包含新线程的标识符，可用于其他线程操作，如等待线程结束（`pthread_join`）。
+- **线程同步**: 多线程程序中需要考虑线程同步问题，以避免竞态条件和数据不一致。
+
+下面是一个简单的 `pthread_create` 函数使用示例：
+
+```c
+#include <stdio.h>
+#include <pthread.h>
+
+void *print_hello(void *arg) {
+    printf("Hello from thread!\n");
+    return NULL;
+}
+
+int main() {
+    pthread_t thread_id;
+    if (pthread_create(&thread_id, NULL, print_hello, NULL) != 0) {
+        perror("Failed to create thread");
+        return 1;
+    }
+
+    // 等待线程结束
+    pthread_join(thread_id, NULL);
+
+    printf("Thread finished.\n");
+    return 0;
+}
+```
+
+在这个示例中，我们定义了一个简单的线程函数 `print_hello`，它打印一条消息。在 `main` 函数中，我们使用 `pthread_create` 创建了一个新的线程，该线程执行 `print_hello` 函数。然后，我们使用 `pthread_join` 等待线程结束，以确保在主线程退出前，新线程已经完成执行。
+
+注意：当使用与线程相关的函数时，编译链接过程中需加入 `-lpthread` 和 `-pthread` 选项，以确保正确链接到线程库。
+
+在进程的生命周期内，每个线程都拥有一个独立且唯一的标识符，即线程 ID。在 NPTL（Native POSIX Thread Library）中，线程 ID 通过 `pthread_t` 类型进行存储。值得注意的是，不同操作系统对 `pthread_t` 的底层实现各有差异；在 Linux 系统中，它通常是一个无符号整数。此外，可以通过 `pthread_self()` 函数获取当前线程的 ID。
+
+操作系统在创建新进程时（例如，通过运行一个程序），会自动生成一个线程，即该进程的主线程。当主线程结束其执行（例如，通过 `main()` 函数返回或调用 `exit()` 函数），这将导致整个进程及其所有子线程随之终止。然而，如果主线程是通过调用 `pthread_exit()` 来结束的，它不会引发进程的终止，允许进程内的其他线程继续执行。
+
+### 线程函数错误处理
+
+在传统的 POSIX 系统中，当系统调用或库函数遇到错误时，它们会更新全局变量 `errno`，该变量在每个进程中是独立的。这样做允许程序通过调用 `perror` 函数来获取易于理解的错误信息。然而，在多线程编程中，全局变量可能成为多个线程共享的资源，从而面临并发读写的风险。
+
+为了优化这一问题，`pthread` 系列的函数采用了一种不同的错误检测方法。这些函数通过返回特定的错误代码来指示错误类型，而不是修改全局的 `errno` 变量。随后，程序可以使用 `strerror` 函数，根据这些错误代码来获取对应的、易于理解的错误描述字符串。
+
+```c
+char *strerror(int errnum);
+
+#define THREAD_ERROR_CHECK(ret, msg)                   \
+  {                                                    \
+    if (ret != 0) {                                    \
+      fprintf(stderr, "%s:%s \n", msg, strerror(ret)); \
+    }                                                  \
+  }
+```
+
+## 线程和数据共享
+
+### 共享数据段
+
+在多线程编程中，共享地址空间意味着多个线程能够并发访问相同的数据段、堆空间以及其他内存区域。这为线程间的数据共享和通信提供了便利，但同时也需要谨慎处理，以避免竞态条件和数据不一致的问题。
+
+下面是一个共享数据段的例子：
+
+```c
+#include <pthread.h> // 引入线程库头文件
+#include <stdio.h>
+#include <stdlib.h> // 引入标准库头文件，用于exit函数
+#include <unistd.h> // 引入unistd.h以使用sleep函数
+
+// 定义全局变量，所有线程共享
+int global = 100;
+
+// 定义线程函数
+void* threadFunc(void* arg) {
+    // 打印子线程信息
+    printf("I am child thread\n");
+    // 打印全局变量的值
+    printf("child thread, global = %d\n", global);
+    return NULL;
+}
+
+// 定义错误检查宏
+#define THREAD_ERROR_CHECK(err, msg) \
+    do { \
+        if (err != 0) { \
+            perror(msg); \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (0)
+
+int main() {
+    pthread_t tid;
+    int ret;
+
+    // 创建线程
+    ret = pthread_create(&tid, NULL, threadFunc, NULL);
+    THREAD_ERROR_CHECK(ret, "pthread_create");
+
+    // 打印主线程信息
+    printf("I am main thread\n");
+
+    // 修改全局变量的值
+    global = 200;
+    // 打印主线程中全局变量的值
+    printf("main thread, global = %d\n", global);
+
+    // 等待一段时间，让子线程有机会执行
+    sleep(1);
+
+    // 等待子线程结束
+    pthread_join(tid, NULL);
+
+    return 0;
+}
+```
+
+###  共享堆空间
+
+在多线程编程中，堆空间的共享是一个常见的做法，它允许不同的线程访问和操作同一块内存区域。这种共享机制需要谨慎使用，以确保线程安全和避免潜在的内存问题。
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+// 定义错误检查宏
+#define THREAD_ERROR_CHECK(err, msg) \
+    do { \
+        if (err != 0) { \
+            perror(msg); \
+            free(pHeap); // 释放内存以防内存泄漏 \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (0)
+
+// 定义线程函数
+void* threadFunc(void* arg) {
+    char* pHeap = (char*)arg;
+    printf("I am child thread\n");
+
+    // 子线程修改堆空间内容
+    strcpy(pHeap, "world");
+    printf("child thread, %s\n", pHeap);
+
+    return NULL;
+}
+
+int main() {
+    char* pHeap = (char*)malloc(20); // 分配堆空间
+    if (pHeap == NULL) {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+    strcpy(pHeap, "hello"); // 初始化堆空间内容
+
+    pthread_t tid;
+    int ret = pthread_create(&tid, NULL, threadFunc, (void*)pHeap);
+    THREAD_ERROR_CHECK(ret, "pthread_create");
+
+    printf("I am main thread\n");
+
+    // 主线程等待子线程完成
+    pthread_join(tid, NULL);
+
+    // 主线程输出堆空间内容
+    printf("parent thread, %s\n", pHeap);
+
+    free(pHeap); // 释放堆空间
+    return 0;
+}
+```
+
+###  访问栈数据
+
+在多线程编程中，每个线程确实拥有自己独立的栈空间，但它们共享同一个地址空间。这意味着，如果一个线程获得了另一个线程栈帧中数据的地址，它理论上可以访问或修改这些数据。然而，这种做法是不安全的，因为它可能导致数据竞争和不可预测的行为。
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+// 定义错误检查宏
+#define THREAD_ERROR_CHECK(err, msg) \
+    do { \
+        if (err != 0) { \
+            perror(msg); \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (0)
+
+// 定义线程函数
+void* threadFunc(void* arg) {
+    printf("I am child thread\n");
+
+    // 子线程修改通过参数传递的值
+    int* pval = (int*)arg;
+    *pval = 1002;
+    printf("child, val = %d\n", *pval);
+
+    return NULL;
+}
+
+int main() {
+    pthread_t tid;
+    int val = 1001; // 主线程栈上的数据
+    int ret = pthread_create(&tid, NULL, threadFunc, (void*)&val);
+    THREAD_ERROR_CHECK(ret, "pthread_create");
+
+    printf("I am main thread\n");
+
+    // 主线程等待子线程完成，以确保数据安全
+    pthread_join(tid, NULL);
+
+    // 主线程输出修改后的值
+    printf("main, val = %d\n", val);
+
+    return 0;
+}
+```
+
+### long 作为 8 字节参数
+
+在多线程编程中，`void*` 类型的参数 `arg` 通常用于传递指向数据的指针。然而，如果需要传递的只是一个简单的值，可以将 `void*` 类型参数直接视为一个 8 字节的数据类型（如 `long`），这样可以避免指针的间接引用。
+
+**传递地址的方式：**
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define THREAD_ERROR_CHECK(err, msg) \
+    do { \
+        if (err != 0) { \
+            perror(msg); \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (0)
+
+void* threadFunc(void* arg) {
+    printf("I am child thread\n");
+    int* intnum = (int*)arg;
+    printf("child, val = %d\n", *intnum);
+    return NULL;
+}
+
+int main() {
+    pthread_t tid;
+    int val = 1001;
+    int ret = pthread_create(&tid, NULL, threadFunc, &val);
+    THREAD_ERROR_CHECK(ret, "pthread_create");
+
+    // 修改 val 的值，但子线程不会看到这个改变
+    val = 1002;
+    ret = pthread_create(&tid, NULL, threadFunc, &val);
+    THREAD_ERROR_CHECK(ret, "pthread_create");
+
+    printf("I am main thread\n");
+    pthread_join(tid, NULL); // 等待子线程完成
+
+    return 0;
+}
+```
+
+**直接传递 8 字节数据的方式：**
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define THREAD_ERROR_CHECK(err, msg) \
+    do { \
+        if (err != 0) { \
+            perror(msg); \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (0)
+
+void* threadFunc(void* arg) {
+    printf("I am child thread\n");
+    // 直接将参数视为 long 类型
+    printf("child, val = %ld\n", (long)arg);
+    return NULL;
+}
+
+int main() {
+    pthread_t tid;
+    long val = 1001;
+    int ret = pthread_create(&tid, NULL, threadFunc, (void*)val);
+    THREAD_ERROR_CHECK(ret, "pthread_create");
+
+    // 修改 val 的值，子线程将看到这个改变
+    val = 1002;
+    ret = pthread_create(&tid, NULL, threadFunc, (void*)val);
+    THREAD_ERROR_CHECK(ret, "pthread_create");
+
+    printf("I am main thread\n");
+    pthread_join(tid, NULL); // 等待子线程完成
+
+    return 0;
+}
+```
+
+### 栈数据共享的释放
+
+在多线程编程中，如果一个线程需要访问另一个线程的栈数据，必须确保数据在被访问时仍然有效。在下面的示例代码中，`func` 函数创建了一个线程来访问其局部变量 `val` 的地址。然而，当 `func` 函数返回时，局部变量 `val` 的生命周期结束，其内存被释放，这可能导致未定义行为，因为子线程可能还在访问这个内存。
+
+为了解决这个问题，需要确保 `val` 在子线程访问期间保持有效。这通常通过在 `func` 函数外部定义 `val` 来实现，或者使用动态分配的内存，并在所有线程完成访问后才释放它。
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#define THREAD_ERROR_CHECK(err, msg) \
+    do { \
+        if (err != 0) { \
+            fprintf(stderr, "%s\n", msg); \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (0)
+
+void* threadFunc(void* arg) {
+    sleep(1); // 模拟耗时操作
+    int* intnum = (int*)arg;
+    printf("I am child thread\n");
+    printf("child, val = %d\n", *intnum);
+    return NULL;
+}
+
+void func() {
+    static int val = 1001; // 使用静态变量以延长生命周期
+
+    pthread_t tid;
+    int ret = pthread_create(&tid, NULL, threadFunc, &val);
+    THREAD_ERROR_CHECK(ret, "Failed to create thread");
+
+    // 等待子线程完成
+    pthread_join(tid, NULL);
+    printf("function over\n");
+}
+
+int main() {
+    func(); // 调用函数
+
+    printf("I am main thread\n");
+    sleep(2); // 确保子线程有足够的时间执行
+    return 0;
+}
+```
+
+##  获取线程的退出状态
+
+### `ps -elLf` 
+
+`ps -elLf` 是一个在 Unix-like 系统中用于显示当前进程和线程信息的命令。`ps` 命令的各个选项的含义如下：
+
+- `-e` 显示所有进程。
+- `-l` 显示长格式输出，包括更多详细信息。
+- `-L` 显示线程信息。
+- `-f` 显示完整格式。
+
+对于下面的代码：
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#define THREAD_ERROR_CHECK(err, msg) \
+    do { \
+        if (err != 0) { \
+            fprintf(stderr, "%s\n", msg); \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (0)
+
+void* fun1(void* arg) {
+    // 子线程将睡眠10秒
+    sleep(10);
+    return NULL;
+}
+
+int main() {
+    pthread_t pid;
+    int ret = pthread_create(&pid, NULL, fun1, NULL);
+    THREAD_ERROR_CHECK(ret, "Error creating thread");
+
+    // 主线程将睡眠20秒，确保子线程有足够的时间执行
+    sleep(20);
+
+    // 等待子线程结束
+    pthread_join(pid, NULL);
+
+    printf("Main thread finished.\n");
+    return 0;
+}
+```
+
+执行 `ps -elLf` 如下：
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWeE0tSHBNZXo5TXJmV0htbEw1bk9BQlJLSTMxSnFIVXFqc2xqMS1qV3hneXc_ZT0waloxSTM.png)
+
+### `pthread_join`  等待线程结束
+
+`pthread_join` 是 POSIX 线程库中的一个函数，用于等待一个线程结束。当一个线程（称为“工作线程”）被创建后，通常主线程或其他线程可能需要等待这个工作线程完成其任务。`pthread_join` 函数允许调用线程（通常称为“等待线程”）挂起，直到被指定的工作线程终止。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+int pthread_join(pthread_t thread, void **retval);
+```
+
+参数说明：
+
+1. **pthread_t thread**: 这是要等待的线程的标识符。这个标识符是通过 `pthread_create` 函数返回的。
+2. **void \*\*retval**: 这是一个可选参数，如果提供了这个指针的地址，`pthread_join` 将把工作线程的返回值存储在这个地址指向的位置。如果不需要工作线程的返回值，可以传递 `NULL`。
+
+返回值：
+
+- 如果 `pthread_join` 调用成功，返回 0。
+- 如果调用失败，返回一个错误码。例如，如果指定的线程已经结束了，或者 `thread` 参数指定的线程标识符无效，将返回 `EINVAL`。
+
+使用 `pthread_join` 时，需要注意以下几点：
+
+- **线程同步**: `pthread_join` 是一种同步机制，确保工作线程在等待线程继续执行之前已经结束。
+- **资源清理**: 通常在 `pthread_join` 成功返回后，可以安全地释放工作线程可能分配的资源。
+- **线程返回值**: 如果需要获取工作线程的返回值，可以传递一个指针来接收这个值。
+
+下面是一个简单的 `pthread_join` 函数使用示例：
+
+```c
+#include <stdio.h>
+#include <pthread.h>
+
+void *thread_function(void *arg) {
+    printf("Thread is running.\n");
+    return (void *)1; // 返回值，表示线程成功执行
+}
+
+int main() {
+    pthread_t tid;
+    int *retval;
+
+    // 创建线程
+    if (pthread_create(&tid, NULL, thread_function, NULL) != 0) {
+        perror("Failed to create thread");
+        return 1;
+    }
+
+    // 等待线程结束，并获取返回值
+    if (pthread_join(tid, (void **)&retval) == 0) {
+        printf("Thread finished with return value: %d\n", (int)(long)retval);
+    } else {
+        perror("Failed to join thread");
+    }
+
+    return 0;
+}
+```
+
+在这个示例中，我们创建了一个线程，该线程执行 `thread_function` 函数，并返回一个整数值。在 `main` 函数中，我们使用 `pthread_join` 等待这个线程结束，并通过 `retval` 参数获取线程的返回值。如果 `pthread_join` 成功，我们打印出线程的返回值。如果 `pthread_join` 失败，我们打印出错误信息。
+
+ `pthread_join` 函数使得调用它的线程（等待线程）挂起，直到被指定的线程（目标线程）终止。一旦目标线程结束，等待线程将被唤醒，并继续执行。如果提供了 `retval` 指针，目标线程的退出状态将被存储在 `retval` 指向的内存位置中。
+
+`pthread_join` 可以由任何线程调用，以等待任何其他线程的结束，而不仅仅是由创建该线程的父线程调用。这意味着线程之间的捕获关系不必是严格的父子关系。
+
+尽管多个线程可以尝试通过调用 `pthread_join` 来捕获同一个线程的结束状态，但只有一个调用会成功捕获该线程的退出状态。其他调用将失败，并返回错误。
+
+使用 `retval` 指针捕获线程函数内部的局部数据时，需要特别小心。因为局部变量在线程函数返回时生命周期结束，如果尝试通过 `retval` 指针访问这些数据，可能会导致未定义的行为或程序崩溃。
+
+##  线程的主动退出
+
+### 线程的 return 退出
+
+**示例 1：线程正常退出**
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#define THREAD_ERROR_CHECK(err, msg) \
+    do { \
+        if (err != 0) { \
+            fprintf(stderr, "%s\n", msg); \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (0)
+
+void* funThread(void* arg) {
+    sleep(5);
+    printf("funThread sleep over\n");
+    // 线程正常退出
+    return NULL;
+}
+
+int main() {
+    pthread_t threadId;
+    int ret = pthread_create(&threadId, NULL, funThread, NULL);
+    THREAD_ERROR_CHECK(ret, "pthread_create");
+
+    // 等待线程结束
+    int ret_join = pthread_join(threadId, NULL);
+    THREAD_ERROR_CHECK(ret_join, "pthread_join");
+
+    // 此处ret_join应为0，表示成功
+    printf("child thread join status = %d\n", ret_join);
+    return 0;
+}
+```
+
+**示例 2：通过 `pthread_join` 捕获线程退出状态**
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#define THREAD_ERROR_CHECK(err, msg) \
+    do { \
+        if (err != 0) { \
+            fprintf(stderr, "%s\n", msg); \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (0)
+
+void* fun1(void* arg) {
+    sleep(5);
+    // 线程退出并返回一个值
+    return (void*)11;
+}
+
+int main() {
+    pthread_t pid;
+    int ret = pthread_create(&pid, NULL, fun1, NULL);
+    THREAD_ERROR_CHECK(ret, "pthread_create");
+
+    void* numP; // 用于接收线程返回值的指针
+    int ret_join = pthread_join(pid, &numP);
+    THREAD_ERROR_CHECK(ret_join, "pthread_join");
+
+    // 输出线程返回的值
+    printf("catch from child thread return value = %ld\n", (long)numP);
+    return 0;
+}
+```
+
+在第一个示例中，`funThread` 函数通过 `return NULL;` 正常退出，并通过 `pthread_join` 在主线程中等待其结束。在第二个示例中，`fun1` 函数通过 `return (void*)11;` 返回一个值，主线程通过 `pthread_join` 捕获这个返回值，并将其存储在 `numP` 指针指向的位置。
+
+请注意，`pthread_join` 的第二个参数是一个指向 `void*` 类型的指针，用于接收线程的返回值。如果不需要接收返回值，可以传递 `NULL`。此外，`THREAD_ERROR_CHECK` 宏用于检查 `pthread_create` 和 `pthread_join` 的返回状态，并在出现错误时打印错误信息并退出程序。
+
+### `pthread_exit` 退出当前线程
+
+`pthread_exit` 是 POSIX 线程库中的一个函数，用于退出当前线程并返回一个值。当一个线程执行完毕或者需要提前退出时，它可以调用 `pthread_exit` 函数来结束自己的执行流程，并且可以选择性地向等待它的线程返回一个值。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+void pthread_exit(void *retval);
+```
+
+参数说明：**void \*retval**：这是一个 `void*` 类型的指针，用于返回一个值给等待当前线程结束的线程。如果不需要返回值，可以传递 `NULL`。
+
+`pthread_exit` 的使用需要注意以下几点：
+
+- **线程退出**: 当线程调用 `pthread_exit` 时，它将立即停止执行，并开始进行清理工作，包括销毁线程的栈和关闭线程拥有的任何资源。
+- **返回值**: `retval` 参数允许线程向调用 `pthread_join` 等待它的线程返回一个值。这个返回值可以通过 `pthread_join` 的第二个参数获取。
+- **线程清理函数**: 在线程退出之前，注册的线程清理函数（通过 `pthread_cleanup_push` 注册）将被调用，以执行任何必要的清理工作。
+- **主线程退出**: 如果主线程（或任何线程）调用 `pthread_exit`，整个程序将不会立即退出，除非这是程序中最后一个活动的线程。如果还有其他活动线程，程序将继续运行，直到所有线程都退出。
+
+下面是一个简单的 `pthread_exit` 函数使用示例：
+
+```c
+#include <stdio.h>
+#include <pthread.h>
+
+void *thread_function(void *arg) {
+    printf("Thread is running with argument: %s\n", (char *)arg);
+    pthread_exit((void *)1); // 线程结束，并返回值1
+}
+
+int main() {
+    pthread_t tid;
+    void *retval;
+
+    // 创建线程
+    if (pthread_create(&tid, NULL, thread_function, "Hello, thread!") != 0) {
+        perror("Failed to create thread");
+        return 1;
+    }
+
+    // 等待线程结束，并尝试获取返回值
+    if (pthread_join(tid, &retval) == 0) {
+        printf("Thread finished with return value: %ld\n", (long)retval);
+    } else {
+        perror("Failed to join thread");
+    }
+
+    return 0;
+}
+```
+
+在这个示例中，我们创建了一个线程来执行 `thread_function` 函数。线程在打印传递给它的参数后，调用 `pthread_exit` 并返回一个整数值。在 `main` 函数中，我们使用 `pthread_join` 等待线程结束，并尝试获取线程的返回值。如果线程成功结束，我们打印出线程的返回值。如果 `pthread_join` 失败，我们打印出错误信息。
+
+**示例 1：使用 `pthread_exit` 函数主动退出线程**
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+void* funThread(void* arg) {
+    // 退出线程并返回一个值
+    pthread_exit((void*)11);
+    // 以下代码不会被执行
+    printf("this scene will not be printed\n");
+    return NULL; // 这行代码也不会被执行
+}
+
+int main() {
+    pthread_t threadId;
+    int ret = pthread_create(&threadId, NULL, funThread, NULL);
+    if (ret != 0) {
+        fprintf(stderr, "pthread_create failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    void* numP;
+    ret = pthread_join(threadId, &numP);
+    if (ret != 0) {
+        fprintf(stderr, "pthread_join failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("catch child thread by pthread_exit value = %ld\n", (long)numP);
+    return 0;
+}
+```
+
+**示例 2：`pthread_exit` 无论在何处调用都将退出线程**
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+void funThreadDeep() {
+    printf("this is deep function\n");
+    // 即使当前函数不是线程的入口函数，调用 pthread_exit 也会导致线程退出
+    pthread_exit(NULL);
+    // 以下代码不会被执行
+    printf("this scene will not be printed\n");
+}
+
+void* funThread(void* arg) {
+    funThreadDeep(); // 调用另一个函数
+    // 以下代码不会被执行
+    printf("this scene will not be printed\n");
+    return NULL;
+}
+
+int main() {
+    pthread_t threadId;
+    int ret = pthread_create(&threadId, NULL, funThread, NULL);
+    if (ret != 0) {
+        fprintf(stderr, "pthread_create failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // 主线程将睡眠一段时间，确保子线程有足够的时间执行
+    sleep(20);
+    return 0;
+}
+```
+
+**示例 3：`pthread_exit` 返回值与 `return` 结束线程的比较**
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+void* funThread(void* arg) {
+    // 线程通过 return 0 结束，与 pthread_exit(NULL) 或 pthread_exit(0) 效果相同
+    return 0;
+}
+
+int main() {
+    pthread_t threadId;
+    int ret = pthread_create(&threadId, NULL, funThread, NULL);
+    if (ret != 0) {
+        fprintf(stderr, "pthread_create failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    void* numP;
+    ret = pthread_join(threadId, &numP);
+    if (ret != 0) {
+        fprintf(stderr, "pthread_join failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // pthread_join 捕获的返回结果为0
+    printf("catch child thread by pthread_exit value = %ld\n", (long)numP);
+    return 0;
+}
+```
+
+请注意，`pthread_exit` 调用后，线程函数中的任何后续代码都不会被执行。此外，`pthread_join` 捕获的返回值是 `pthread_exit` 传递的值，如果 `pthread_exit` 没有传递值（例如 `pthread_exit(NULL)`），则 `pthread_join` 捕获的值将是 `NULL`。在 `printf` 函数中，我们使用强制类型转换 `(long)` 来确保输出的格式正确。
+
+在多线程程序中，标准输出（`stdout`）是共享的资源。这意味着，尽管每个线程有自己的栈空间，但它们都可以向同一个 `stdout` 流写入数据。然而，由于缓冲和操作系统调度的原因，输出可能不会立即显示在控制台上，这可能导致看起来像输出延迟的现象。
+
+下面是一个例子：
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#define THREAD_ERROR_CHECK(err, msg) \
+    do { \
+        if (err != 0) { \
+            fprintf(stderr, "%s\n", msg); \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (0)
+
+void* funThread(void* arg) {
+    printf("i am child thread"); // 此输出可能不会立即显示
+    pthread_exit((void*)11);
+    // 以下代码不会被执行
+    printf("this scene will not be printed\n");
+    return NULL;
+}
+
+int main() {
+    pthread_t threadId;
+    int ret = pthread_create(&threadId, NULL, funThread, NULL);
+    THREAD_ERROR_CHECK(ret, "pthread_create");
+
+    // 主线程睡眠，让子线程有机会执行
+    sleep(10);
+    printf("i am main thread\n");
+
+    return 0;
+}
+```
+
+在这个例子中，`funThread` 函数中的 `printf` 调用可能不会立即导致字符串显示在控制台上。这是因为 `stdout` 通常是行缓冲的，这意味着它在输出缓冲区满或者遇到换行符 `\n` 时才会刷新缓冲区。由于 `sleep` 调用之前没有换行符，所以 `stdout` 缓冲区可能在 `sleep` 之后才被刷新。
+
+此外，由于线程调度的不确定性，子线程可能在主线程调用 `sleep` 之后才运行，这也可能导致输出顺序与预期不同。为了确保输出的顺序性，可以使用互斥锁来同步对 `stdout` 的访问，但这通常不是必要的，除非有特定的同步需求。
+
+## 线程的被动退出
+
+与进程可能因信号而被迫终止的情况不同，多线程程序中的信号处理更为复杂。所有线程共享进程的代码段，这意味着信号处理函数也处于共享状态。当进程接收到信号时，操作系统随机选择一个线程来处理这个信号，这可能导致不稳定的行为。特别是如果主线程被选中来处理信号并因此终止，整个进程及其中的所有线程都可能随之异常退出。
+
+### 取消点
+
+在多线程程序设计中，`pthread_cancel()` 函数提供了一种机制，允许一个线程请求另一个线程终止其执行。这种取消操作不是立即生效的；被请求取消的线程需要到达一个“取消点”才会实际终止。
+
+**取消点** 是程序执行中的一个特定位置，当线程到达这里时，如果它已经被请求取消，它将响应取消请求并退出。取消点通常是线程执行中的自然停顿点，如等待操作或某些系统调用。
+
+![pthread_cancel.jpg](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhRHZabnpJc3p4R2xMVjItdFRmVS1FQjZsUF81NkZUejJtRXBMSDNSdUVFc1E_ZT03TXNJYkk.png)
+
+常见的取消点包括
+
+1. **阻塞函数**：几乎所有可能导致线程阻塞的函数，例如 `sleep()`, `select()`, `wait()` 等。
+2. **I/O 操作**：包括 `open()`, `close()`, `read()`, `write()`, `fopen()`, `fclose()`, `printf()` 等。
+
+### `pthread_cancel` 请求取消指定线程
+
+`pthread_cancel` 函数是 POSIX 线程库中用于请求取消（终止）一个指定线程的函数。这个函数可以被用来中断一个可能正在无限循环或者阻塞操作中的线程。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+int pthread_cancel(pthread_t thread);
+```
+
+参数说明：**pthread_t thread**: 这是要被取消的线程的标识符。
+
+返回值：
+
+- 如果 `pthread_cancel` 调用成功，返回 0。
+- 如果调用失败，返回一个错误码。例如，如果指定的线程标识符无效，将返回 `ESRCH`。
+
+使用 `pthread_cancel` 时，需要注意以下几点：
+
+1. **异步取消**: 取消请求是异步的，被请求取消的线程不一定会立即退出。线程可能会在执行到某个可取消点（cancellation point）时被取消。
+2. **清理动作**: 为了处理取消，线程应该定期执行可取消点的代码，例如检查某个条件或者执行 `pthread_testcancel` 函数来触发任何注册的取消处理程序（通过 `pthread_cleanup_push` 和 `pthread_cleanup_pop` 设置）。
+3. **线程状态**: 被取消的线程将以退出状态 `PTHREAD_CANCELED` 结束。如果需要检测线程是否因为取消而退出，可以在 `pthread_join` 的第二个参数中检查这个状态。
+4. **资源管理**: 取消一个线程不会自动释放该线程分配的资源。如果线程在被取消时持有互斥锁，这些锁需要在线程退出之前被释放，否则可能导致死锁。
+5. **信号处理**: `pthread_cancel` 通过向线程发送 `SIGCANCEL` 信号来请求取消，这个信号不能被捕获、阻塞或忽略。
+
+下面是一个简单的 `pthread_cancel` 函数使用示例：
+
+```c
+#include <stdio.h>
+#include <pthread.h>
+
+void *thread_function(void *arg) {
+    // 注册取消处理程序
+    pthread_cleanup_push(pthread_exit, PTHREAD_CANCELED);
+
+    while (1) {
+        // 执行线程任务...
+
+        // 定期检查取消请求
+        pthread_testcancel();
+    }
+
+    // 取消处理程序将在这里执行
+    pthread_cleanup_pop(1);
+    return NULL; // 这行代码不会被执行，因为线程已经被取消
+}
+
+int main() {
+    pthread_t tid;
+
+    // 创建线程
+    if (pthread_create(&tid, NULL, thread_function, NULL) != 0) {
+        perror("Failed to create thread");
+        return 1;
+    }
+
+    // 做一些其他工作...
+
+    // 请求取消线程
+    if (pthread_cancel(tid) != 0) {
+        perror("Failed to cancel thread");
+        return 1;
+    }
+
+    // 等待线程结束，可以检查线程是否因为取消而退出
+    void *status;
+    if (pthread_join(tid, &status) == 0) {
+        if (status == PTHREAD_CANCELED) {
+            printf("Thread was canceled.\n");
+        }
+    }
+
+    return 0;
+}
+```
+
+在这个示例中，我们创建了一个线程来执行 `thread_function` 函数。在该函数中，我们使用 `pthread_cleanup_push` 和 `pthread_cleanup_pop` 注册了一个取消处理程序，它会在线程被取消时调用 `pthread_exit` 并传递 `PTHREAD_CANCELED` 作为退出状态。我们还定期调用 `pthread_testcancel` 来检查是否有取消请求。在 `main` 函数中，我们使用 `pthread_cancel` 请求取消线程，并使用 `pthread_join` 等待线程结束，检查线程是否因为取消而退出。
+
+示例一：没有取消点无法取消
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define THREAD_ERROR_CHECK(err, msg) \
+    do { \
+        if (err != 0) { \
+            fprintf(stderr, "%s\n", msg); \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (0)
+
+void *func(void *arg) {
+    // 这个函数没有取消点，因此无法被取消
+    while (1) {
+    }
+    return NULL;
+}
+
+int main() {
+    pthread_t pid;
+    int res = pthread_create(&pid, NULL, func, NULL);
+    THREAD_ERROR_CHECK(res, "pthread_create");
+
+    // 尝试取消线程，但由于没有取消点，取消操作将不会成功
+    int res_cancel = pthread_cancel(pid);
+    THREAD_ERROR_CHECK(res_cancel, "pthread_cancel");
+
+    printf("main use cancel\n");
+
+    // 等待线程结束，由于线程没有取消点，这里会一直等待，直到程序终止或线程被其他方式终止
+    int res_join = pthread_join(pid, NULL);
+    THREAD_ERROR_CHECK(res_join, "pthread_join");
+
+    return 0;
+}
+```
+
+示例二：正常取消
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+// 定义错误检查宏
+#define THREAD_ERROR_CHECK(err, msg) \
+    do { \
+        if (err != 0) { \
+            fprintf(stderr, "%s\n", msg); \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (0)
+
+// 线程函数
+void *func(void *arg) {
+    while (1) {
+        printf("child thread printf \n");
+        // 这里没有取消点，但打印操作可能触发取消
+    }
+    return NULL;
+}
+
+// 主函数
+int main() {
+    pthread_t pid;
+    int res = pthread_create(&pid, NULL, func, NULL);
+    THREAD_ERROR_CHECK(res, "pthread_create");
+
+    // 让子线程运行一段时间
+    sleep(1);
+
+    // 主线程请求取消子线程
+    printf("main thread cancels child thread\n");
+    res = pthread_cancel(pid);
+    THREAD_ERROR_CHECK(res, "pthread_cancel");
+
+    // 等待子线程真正退出
+    res = pthread_join(pid, NULL);
+    THREAD_ERROR_CHECK(res, "pthread_join");
+
+    printf("main thread finished\n");
+    return 0;
+}
+```
+
+当一个线程被外部请求取消时，使用 `pthread_join` 函数可以捕获其结束状态，此时状态会是 `PTHREAD_CANCELED`，其数值本质上是-1。如果线程是主动通过调用 `pthread_exit(PTHREAD_CANCELED)` 来退出的，那么 `pthread_join` 同样会捕获到 `PTHREAD_CANCELED` 作为其结束状态。
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+// 定义错误检查宏
+#define THREAD_ERROR_CHECK(err, msg) \
+    do { \
+        if (err != 0) { \
+            fprintf(stderr, "%s\n", msg); \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (0)
+
+// 线程函数
+void *func(void *arg) {
+    while (1) {
+        sleep(1); // sleep 是一个取消点
+        printf("child thread printf \n");
+    }
+    return NULL;
+}
+
+// 主函数
+int main() {
+    pthread_t pid;
+    int res = pthread_create(&pid, NULL, func, NULL);
+    THREAD_ERROR_CHECK(res, "pthread_create");
+
+    // 让子线程运行一段时间
+    sleep(1); // 这里使用 sleep 来模拟等待一段时间
+
+    // 主线程请求取消子线程
+    printf("main thread cancels child thread\n");
+    res = pthread_cancel(pid);
+    THREAD_ERROR_CHECK(res, "pthread_cancel");
+
+    // 等待子线程真正退出
+    void *ret_catch;
+    res = pthread_join(pid, &ret_catch);
+    THREAD_ERROR_CHECK(res, "pthread_join");
+
+    // 检查线程退出状态
+    if (ret_catch == PTHREAD_CANCELED) {
+        printf("catch value = %ld \n", (long)ret_catch); // -1
+    } else {
+        printf("other value = %ld \n", (long)ret_catch);
+    }
+
+    return 0;
+}
+```
+
+### 线程取消的详细流程
+
+**发起取消请求**： 首先，在控制线程中调用 `pthread_cancel`，传入目标线程的 ID。系统将根据这个 ID 找到目标线程，并设置其内部取消标记。
+
+**检测取消标记**：目标线程在执行过程中，如果遇到取消点（例如 `pthread_testcancel` 调用或者某些系统调用），会检查自己的取消标记。
+
+**执行清理操作**：如果线程检测到自己被标记为取消状态，它会执行之前通过 `pthread_cleanup_push` 注册的清理函数，这些函数通常用于释放资源、解锁互斥锁等。
+
+**线程退出**：清理完成后，线程将调用 `pthread_exit`，通常传入 `PTHREAD_CANCELED` 作为退出状态，表示线程是因为取消而退出的。
+
+**等待线程结束**：发起取消请求的线程或者其它线程可以通过 `pthread_join` 等待被取消线程结束，并获取其退出状态，例如 `PTHREAD_CANCELED`。
+
+**资源清理**：在线程退出的过程中，操作系统和线程库会负责清理线程的局部数据，包括栈空间等资源。
+
+**错误处理**：在整个取消流程中，应当有适当的错误处理机制，以确保在取消失败或者资源清理失败时能够采取相应的措施。
+
+## 资源清理
+
+`pthread_cleanup_push` 和 `pthread_cleanup_pop` 是 POSIX 线程库中用于管理线程清理函数的一对宏。这两个宏通常成对使用，用于注册和注销一个或多个清理函数，这些清理函数将在线程退出时被调用。
+
+函数原型：
+
+```c
+void pthread_cleanup_push(void (*routine)(void *), void *arg);
+void pthread_cleanup_pop(int execute);
+```
+
+参数说明：
+
+1. **pthread_cleanup_push**:
+   - `routine`: 这是指向清理函数的指针，清理函数接受一个 `void*` 类型的参数，并且在退出时被调用。
+   - `arg`: 这是传递给清理函数的参数。
+2. **pthread_cleanup_pop**: `execute`: 一个布尔值，如果为非零（通常为 1），则调用注册的清理函数，然后注销该清理函数；如果为零（通常为 0），则仅注销该清理函数而不调用。
+
+使用场景：
+
+- 当线程需要在退出之前执行一些清理工作，如关闭文件描述符、释放分配的资源或重置状态信息时。
+- 当线程可能被取消，需要在取消时执行清理工作时。
+
+工作机制：
+
+- `pthread_cleanup_push` 用于注册一个清理函数。调用此宏会将指定的清理函数和参数压入线程的内部栈中。
+- 之后，当调用 `pthread_cleanup_pop` 时，内部栈顶的清理函数会被调用（如果 `execute` 非零），然后该清理函数从栈中弹出。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <pthread.h>
+
+void cleanup_function(void *arg) {
+    printf("Cleanup function called with argument: %s\n", (char *)arg);
+}
+
+void *thread_function(void *arg) {
+    pthread_cleanup_push(cleanup_function, "Arg1");
+
+    // 线程的主要工作...
+
+    // 当准备退出或可能被取消时，调用 pthread_cleanup_pop
+    pthread_cleanup_pop(1); // 执行清理函数并弹出
+
+    return NULL;
+}
+
+int main() {
+    pthread_t tid;
+
+    if (pthread_create(&tid, NULL, thread_function, NULL) != 0) {
+        perror("Failed to create thread");
+        return 1;
+    }
+
+    pthread_join(tid, NULL);
+    return 0;
+}
+```
+
+在这个示例中，`thread_function` 函数在执行主要任务之前通过 `pthread_cleanup_push` 注册了一个清理函数 `cleanup_function`。当线程完成工作或需要退出时，通过调用 `pthread_cleanup_pop(1)` 来执行清理函数并注销它。如果线程被取消，由于 `pthread_cancel` 会在取消点自动调用 `pthread_cleanup_pop(1)`，清理函数也会被执行。
+
+使用 `pthread_cleanup_push` 和 `pthread_cleanup_pop` 可以确保即使在发生异常或取消的情况下，重要的清理工作也能被正确执行。这是一种管理线程资源和保证线程安全退出的有效方式。
+
+**pthread_cleanup_push 和 pthread_cleanup_pop 的使用规则**：`pthread_cleanup_push` 和 `pthread_cleanup_pop` 必须在同一个作用域中成对出现。它们通常用于注册和注销清理函数，这些函数会在线程取消或退出时被调用。参考 `/usr/include/pthread.h` 中的宏定义，可以发现这两个函数必须配对使用，以确保花括号能够成功匹配。
+
+```c ~/usr/include/pthread.h command:("[Line 585]":1)
+/* Install a cleanup handler: ROUTINE will be called with arguments ARG
+   when the thread is canceled or calls pthread_exit.  ROUTINE will also
+   be called with arguments ARG when the matching pthread_cleanup_pop
+   is executed with non-zero EXECUTE argument.
+
+   pthread_cleanup_push and pthread_cleanup_pop are macros and must always
+   be used in matching pairs at the same nesting level of braces.  */
+#  define pthread_cleanup_push(routine, arg) \
+  do {									      \
+    __pthread_cleanup_class __clframe (routine, arg)
+
+/* Remove a cleanup handler installed by the matching pthread_cleanup_push.
+   If EXECUTE is non-zero, the handler function is called. */
+#  define pthread_cleanup_pop(execute) \
+    __clframe.__setdoit (execute);					      \
+  } while (0)
+```
+
+
+
+**pthread_cleanup_pop 的行为**： 当线程执行到 `pthread_cleanup_pop` 时，其 `execute` 参数决定了栈顶函数的行为。如果 `execute` 参数为 0，则弹出栈顶函数但不执行；如果 `execute` 参数非 0，则弹出并执行栈顶函数。
+
+**线程取消时的清理函数执行**： 通过 `pthread_cancel` 取消线程时，所有入栈的清理函数将按照它们入栈的逆序依次被弹栈并执行。这确保了在线程被取消之前，所有必要的资源都能得到适当的清理。
+
+**线程退出时的清理函数执行**：当线程通过调用 `pthread_exit` 主动退出时，同样会触发所有入栈的清理函数按照逆序依次被弹栈并执行，从而保证资源的正确释放。
+
+**线程正常返回时的清理函数行为**：如果线程因为在其入口函数 `start_routine` 中执行 `return` 语句而结束，清理函数栈的行为可能依赖于操作系统的具体实现。在某些系统中，这可能不会触发清理函数的执行。
+

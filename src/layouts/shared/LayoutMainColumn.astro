@@ -1,0 +1,37 @@
+---
+import type { WidgetPost } from "@/toolkit/posts/createWidgetPosts";
+import Widgets from "@/components/footer/Widgets";
+
+interface WidgetsConfig {
+  randomPosts?: boolean;
+  recentComments?: boolean;
+  recentCommentsLimit?: number;
+  recentCommentsServerURL?: string;
+}
+
+interface Props {
+  posts: WidgetPost[];
+  widgetsConfig?: WidgetsConfig;
+}
+
+const {
+  posts,
+  widgetsConfig = {},
+} = Astro.props;
+---
+
+<div id="main" class="pjax layout-main-column">
+  <slot />
+</div>
+<div class="layout-main-widgets">
+  <div class="widgets">
+    <Widgets
+      client:idle
+      posts={posts}
+      enableRandomPosts={widgetsConfig.randomPosts !== false}
+      enableRecentComments={widgetsConfig.recentComments === true}
+      recentCommentsLimit={widgetsConfig.recentCommentsLimit || 6}
+      walineServerURL={widgetsConfig.recentCommentsServerURL || ""}
+    />
+  </div>
+</div>

@@ -1,0 +1,76 @@
+---
+import { Image } from "astro:assets";
+import Sidebar from "./Sidebar";
+import { currentLocale, getT } from "@/i18n";
+import type { NavItemType } from "../navbar/NavTypes";
+import type {
+  TocItem,
+  RelatedPost,
+  QuickNavigation,
+  SidebarConfig,
+} from "./SidebarTypes";
+import { avatar } from "../Images.astro";
+
+interface Props {
+  config?: SidebarConfig;
+  navLinks?: NavItemType[];
+  toc?: TocItem[];
+  relatedPosts?: RelatedPost[];
+  currentSlug?: string;
+  navigation?: QuickNavigation;
+  siteState: {
+    categories: number;
+    posts: number;
+    tags: number;
+  };
+}
+
+const {
+  config = {
+    author: "",
+    description: "",
+    social: {},
+  },
+  navLinks = [],
+  toc = [],
+  relatedPosts = [],
+  currentSlug = "",
+  navigation = {},
+  siteState = {
+    categories: 0,
+    posts: 0,
+    tags: 0,
+  },
+} = Astro.props;
+
+const t = getT(currentLocale);
+const authorLabel = config.author || t("post.author");
+---
+
+<Sidebar
+  config={config}
+  navLinks={navLinks}
+  toc={toc}
+  relatedPosts={relatedPosts}
+  currentSlug={currentSlug}
+  navigation={navigation}
+  siteState={siteState}
+  client:load
+>
+  {
+    (
+      <Image
+        src={avatar}
+        alt={authorLabel}
+        priority
+        quality={65}
+        layout="constrained"
+        class="avatar-image"
+        format="avif"
+        widths={[160, 320]}
+        height={160}
+        width={160}
+      />
+    )
+  }
+</Sidebar>

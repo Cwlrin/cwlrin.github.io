@@ -1,0 +1,195 @@
+---
+title: "C 语言语句"
+date: 2020-02-12T21:37:07+08:00
+categories: ["C 与 C++", "C 语言基础"]
+tags: ["C"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VjWnVQbDdUZUV4SG1lQWZQUFFJbEc4QmJjc29aQi1sU3JhSVgzT0F0X3pDMlE_ZT1EYTNlTXo.png"
+---
+
+在 C 语言中，复合语句使用花括号 `{}` 来定义，它们允许 `if`、`for`、`while` 等控制结构控制多条语句。
+
+即使只有一条语句，最好也使用 `{}` 括起来
+
+## 条件分支语句
+
+### if 语句
+
+在使用 `if` 多分支时，应该将能够给出返回值的选择放在代码的上方，这样可以利用 `return` 提前结束函数，减少 `if` 分支的数量，提高代码的可读性。
+
+三目运算符是一种简洁的表达式，用于在两个值之间进行选择。它只适用于简单的条件选择。对于更复杂的情况，建议使用 `if` 多分支结构。
+
+```c
+void TestIfElse() {
+
+#define MAGIC_NUMBER 10
+
+  // if else 的例子
+  // 猜数字的小例子来一个, 只不过数字固定, 输入次数固定
+  int user_input;
+  printf("请输入要猜的数字：");
+  scanf("%d", &user_input);
+
+  if (user_input < MAGIC_NUMBER) {
+	printf("数字小了!\n");
+  } else if (user_input > MAGIC_NUMBER) {
+	printf("数字大了!\n");
+  } else {
+	printf("猜对了!\n");
+  }
+
+  // 三目运算符的使用 <expr> ? <expr1> : <expr2>
+  int a = (user_input < MAGIC_NUMBER) ? -5 : 5;
+  printf("a: %d\n", a);
+}
+```
+
+### switch 语句
+
+`switch` 语句用于基于常量值选择执行不同的代码块。每个 `case` 分支必须指定一个常量或宏常量，这些值在编译时就能确定。
+
+`switch` 语句的优点是执行效率高，但只适用于对离散的常量数值进行选择。
+
+```c
+void TestSwitchCase() {
+
+#define ADD '+'
+#define SUB '-'
+#define MULTIPLY '*'
+#define DIVIDE '/'
+#define REM '%'
+
+  int left;
+  char operator;
+  int right;
+  int result; // 计算结果
+
+  printf("请输入一个表达式:");
+  scanf("%d %c %d", &left, &operator, &right);
+
+  switch (operator) {
+	case ADD: result = left + right;
+	  break;
+	case SUB: result = left - right;
+	  break;
+	case MULTIPLY: result = left * right;
+	  break;
+	case DIVIDE: result = left / right;
+	  break;
+	case REM: result = left % right;
+	  break;
+	default: printf("输入的符号违法!");
+  }
+  printf("%d %c %d = %d\n", left, operator, right, result);
+}
+```
+
+## 循环语句
+
+### while 循环
+
+`for` 循环和 `while` 循环在功能上是等价的，但它们适用于不同的场景。
+
+`for` 循环更适合于循环次数已知的情况，如数组遍历时。`while` 循环更适合于循环次数不确定或只知道循环结束条件的情况，如清空 `stdin` 缓冲区或使用指针遍历数据结构时。
+
+```c
+#include <stdio.h>
+
+void TestWhile(){
+  int sum = 0;
+  int num = 1;
+
+  while(num <= 100){
+    sum = sum + num;
+    num++;
+  }
+
+  printf("sum: %d", sum);
+}
+```
+
+### do while 循环
+
+`do..while` 循环至少执行一次，这与 `for` 和 `while` 循环不同，后者在某些条件下可能一次都不执行。
+
+当使用 `do-while` 循环进行用户输入时，一个常见的问题是输入后按下的 Enter 键会在输入缓冲区留下一个换行符。这个换行符在下一次输入时可能会干扰程序的正常运行。为了避免这种情况，可以在使用 `scanf` 函数读取用户输入后，紧接着调用 `getchar()` 函数来读取并丢弃这个换行符。通过打印 `getchar()` 的返回值，可以确认其值为 10，这对应于 ASCII 码表中的换行符（`'\n'`）。
+
+```c
+void TestDoWhile() {
+#define ADD '+'
+#define SUB '-'
+#define MULTIPLY '*'
+#define DIVIDE '/'
+#define REM '%'
+
+  int left;
+  char operator;
+  int right;
+  int result; // 计算结果
+
+  char again; // 是否退出
+
+  do {
+	printf("请输入一个表达式:");
+	scanf("%d %c %d", &left, &operator, &right);
+	getchar();
+
+	switch (operator) {
+	  case ADD: result = left + right;
+		break;
+	  case SUB: result = left - right;
+		break;
+	  case MULTIPLY: result = left * right;
+		break;
+	  case DIVIDE: result = left / right;
+		break;
+	  case REM: result = left % right;
+		break;
+	  default: printf("输入的符号违法!");
+	}
+
+	printf("%d %c %d = %d\n", left, operator, right, result);
+
+	printf("是否继续?");
+	scanf("%c", &again);
+
+  } while (again == 'y');
+}
+```
+
+### for 循环
+
+在 C 语言的早期版本中，`for` 循环的初始化部分不能包含变量的定义。例如，使用 `for(int i = 0; i < 5; i++)` 这样的语法在 C99 标准之前是不被允许的。随着 C99 标准的发布，这种在循环条件中定义变量的语法变得合法。
+
+```c
+void TestFor(){
+
+    int sum = 0;
+
+    // C99 之后，可以在 for 条件处定义变量
+    for (int i = 0, j = 0; i <= 10, j < =10; i++, j++){
+        sum = sum + i + j;
+    }
+
+    printf("sum: %d", sum);
+}
+```
+
+## goto 语句
+
+不建议使用
+
+```c
+#include <stdio.h>
+
+int main() {
+
+  int i = 0;
+begin:
+  printf("%d\n", i); // 0 1 2 3 4 5
+  if (i++ < 5) { // 比较的时候使用 i，比较完毕 i 就自加
+	goto begin;
+  }
+  return 0;
+}
+```
+

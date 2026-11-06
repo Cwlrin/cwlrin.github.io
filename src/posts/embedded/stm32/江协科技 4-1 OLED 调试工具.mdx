@@ -1,0 +1,81 @@
+---
+title: "江协科技 STM32 4-1 OLED 调试工具"
+date: 2025-04-20T22:14:16+08:00
+categories: ["嵌入式开发", "STM32"]
+tags: ["嵌入式"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0lRQ0pCMkZQRlVheFI3UjJGTlRrYVprSEFXRFVwTTZra2t3N1RNbTJ3b19DMm5FP2U9TWg3bGJZ.jpg"
+---
+
+## 目前常用的程序调试方式
+
+串口调试：通过串口通信，将调试信息发送到电脑端，电脑使用串口助手显示调试信息
+
+显示屏调试：直接将显示屏连接到单片机，将调试信息打印在显示屏上
+
+Keil 调试模式：借助 Keil 软件的调试模式，可使用单步运行、设置断点、查看寄存器及变量等功能。
+
+点灯调试法：在位置放一个点灯代码，运行到了，灯就亮
+
+注释调试法：将新加入的程序全部注释，然后一次一行解除注释，直到错误出现
+
+对照法：找到一个没有问题的程序，对照程序逻辑
+
+总之，测试程序的基本思想就是：缩小范围、控制变量、对比测试等
+
+## OLED 简介
+
+OLED（Organic Light Emitting Diode）：有机发光二极管（每一个像素都是一个单独的发光二极管，每一个像素都可以自发光，不像 LCD 需要有背光）
+
+OLED 显示屏：性能优异的新型显示屏，具有功耗低、相应速度快、宽视角、轻薄柔韧等特点
+
+0.96 寸 OLED 模块：小巧玲珑、占用接口少、简单易用，是电子设计中非常常见的显示屏模块
+
+供电：3~5.5V，通信协议：I2C/SPI，分辨率：128\*64
+
+规格：4 针脚，像素为白色，一般 I2C 通信
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZYmlja0hGXzY5Q2hrN0VNMVVSTjM4QlpTU0MxR3A2aE1HSEkxZzJhWnRiRHc_ZT1OVWV4NGQ.jpg)
+
+规格：7 针脚，占用 IO 口多一些，一般 SPI 通信
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmZmJLdFZuWm50Q2lKamRmMk5mMTBFQkpPdkRTWGhCSk1yOEpnWUxURThaRFE_ZT1XTjMwVDI.jpg)
+
+蓝色像素版本
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSbkdkaTR4LU1SS3Y5MzFQU3l4ZExVQi1ocTNHb0ZmZmdDT1M3VnQ3TzJNR1E_ZT14NmF2T3E.jpg)
+
+黄蓝双色版本，上面 1/4 像素固定为黄色，其余固定为蓝色，适合做需要显示标题行的界面。无论哪个规格版本，驱动方式都是一样的。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWTzlPRk9aZWl4S3VnMnFXUkFuOFVvQjlha3FKNmgtbjloUGd1OE9uUnhXZUE_ZT1NQTVmYnE.jpg)
+
+## 硬件电路
+
+4 针脚版本：SCL 和 SDA 是 I2C 的通信引脚，需要接在 I2C 通信的引脚上；（当驱动函数模块用 GPIO 口的模拟的 I2C 通信时，这两个端口可以接在任意的 GPIO 口上）
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWdkJ1ZFIwdC1aTHRKQ1pHVFIzcEk0QmtYZzl6SDV1R1hBU3pNTm5uWE1DQlE_ZT1RSk51YVQ.jpg)
+
+7 针脚版本：除 GND 和 VCC 外的引脚是 SPI 通信协议的引脚，（如果是 GPIO 口模拟的通信协议，也是可以任意接 GPIO 口）
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZX0RLdzlEU01kQnNXMk5JdWt4bUFrQmtocjJ5QUh5ekVXZWRMeXM2S1c3RlE_ZT1oTkw3amI.png)
+
+## OLED 驱动函数模块
+
+OLED 实物图及对应的屏幕坐标图如下：将 OLED 分割成了 4 行 16 列的小区块
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlS0JiMWFOVHROTmt2S2dNUmUwaDlVQlNGQzFWMTVDaENFUVltSzZRWThVbkE_ZT1TUXZKNkU.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWV3M1UFltSmlKQW5ITFNuTXl2NkZZQkE4alVoV3l4dGd5TGZyM1lrN05RTmc_ZT1jSmZYSW0.png)
+
+OLED 驱动函数如下：
+
+| 函数                                  | 作用                 |
+| ------------------------------------- | -------------------- |
+| OLED_Init();                          | 初始化               |
+| OLED_Clear();                         | 清屏                 |
+| OLED_ShowChar(1, 1, 'A');             | 显示一个字符         |
+| OLED_ShowString(1, 3, "HelloWorld!"); | 显示字符串           |
+| OLED_ShowNum(2, 1, 12345, 5);         | 显示十进制数字       |
+| OLED_ShowSignedNum(2, 7, -66, 2);     | 显示有符号十进制数字 |
+| OLED_ShowHexNum(3, 1, 0xAA55, 4);     | 显示十六进制数字     |
+| OLED_ShowBinNum(4, 1, 0xAA55, 16);    | 显示二进制数字       |
+

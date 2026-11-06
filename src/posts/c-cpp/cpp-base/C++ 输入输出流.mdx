@@ -1,0 +1,761 @@
+---
+title: "C++ 输入输出流"
+date: 2020-11-10T15:36:11+08:00
+categories: ["C 与 C++", "C++ 基础"]
+tags: ["C++"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VjQWliT0ZzcTZwT2lLb0pSOEs0azFrQmZtRnZZNlNmd0g2cF9zUmNwMlRKVVE_ZT10bGZEaHg.png"
+---
+
+## 输入输出流
+
+### 输入输出的含义
+
+在计算机编程中，输入和输出（I/O）是程序与外部世界进行数据交换的基本方式。通常情况下，我们通过终端，也就是键盘和显示器，来进行数据的输入和输出。当我们从键盘键入数据或在屏幕上看到程序的运行结果时，这就是最直观的 I/O 操作。然而，从操作系统的角度来看，所有的输入输出设备，包括键盘、显示器、磁盘驱动器、甚至网络连接等，都可以被视为文件。这意味着，无论是从键盘输入数据还是将数据输出到显示器，或者从磁盘文件读取数据、将数据写入磁盘文件，这些操作都可以用类似的文件 I/O 方法来处理。
+
+在编程语言中，程序的输入指的是将数据从外部来源传送到程序的内存中。这可能意味着从文件中读取数据，从网络接收数据，或者从用户那里通过命令行或图形界面获取输入。相对地，程序的输出则是将数据从内存传送到外部目的地的过程，这可能包括将数据写入文件，发送到网络，或者在屏幕上显示结果。
+
+### C++ 输入输出流机制
+
+在 C++ 中，输入输出（I/O）操作是基于流的概念构建的。这些流本质上是字节序列，可以是输入流或输出流。输入流负责将数据从各种设备（如键盘、文件、网络）传输到程序的内存中，而输出流则负责将数据从内存传输到各种外部设备（如显示器、打印机、文件系统）。无论数据流如何，C++ 的 I/O 流库都提供了一种统一的接口来处理这些操作，使得程序员无需关心数据传输的具体细节。
+
+C++ 标准库中的 `istream` 类用于处理输入流，而 `ostream` 类用于处理输出流。对于标准输入和输出，C++ 提供了 `cin` 和 `cout` 这样的特殊对象，它们分别对应标准输入流和标准输出流。当涉及到文件 I/O 时，`fstream` 类被用来打开文件、读取文件内容以及向文件写入数据。此外，对于内存中的字符串处理，C++ 提供了基于 `string` 类的输入输出操作，这些操作可以视为一种特殊的流 I/O。
+
+### C++ 常用流类型
+
+1. **标准 I/O**： 标准输入输出是指与系统的标准输入输出设备（如键盘和显示器）进行交互的过程。在 C++ 中，标准输入通常由 `std::cin` 表示，用于从键盘读取数据；标准输出由 `std::cout` 表示，用于将数据发送到显示器。这些操作是通过流来处理的，流是字节序列的抽象，可以方便地处理不同类型的输入输出。
+2. **文件 I/O**： 文件输入输出涉及到从磁盘上的文件读取数据或将数据写入磁盘文件。在 C++ 中，文件 I/O 通常使用 `std::fstream` 类来实现，该类提供了打开文件、读取文件内容、写入文件以及关闭文件的操作。通过文件流，程序可以高效地处理持久化数据，实现数据的长期存储和读取。
+3. **串 I/O**： 字符串输入输出是指在程序内存中对字符串进行操作的过程。在 C++ 中，字符串通常由 `std::string` 类表示，提供了丰富的成员函数来支持字符串的创建、修改、访问和输出。通过字符串流（`std::istringstream` 和 `std::ostringstream`），程序可以像处理文件流一样处理字符串数据，实现高效的内存内数据交换。
+
+常用的输入输出流如下：
+
+| 类名              | 作用             | 头文件       |
+| ----------------- | ---------------- | ------------ |
+| **istream**       | **通用输入流**   | **iostream** |
+| **ostream**       | **通用输出流**   | **iostream** |
+| iostream          | 通用输入输出流   | iostream     |
+| **ifstream**      | **文件输入流**   | **fstream**  |
+| **oftream**       | **文件输出流**   | **fstream**  |
+| fstream           | 文件输入输出流   | fstream      |
+| **istringstream** | **字符串输入流** | **sstream**  |
+| **ostringstream** | **字符串输出流** | **sstream**  |
+| stringstream      | 字符串输入输出流 | sstream      |
+
+![undefined202403111440888.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWZzNKaFNoNFlsUGgyYmxCcFJTOURBQmdjNl91WVRrUEZDeGtSQjBpc2JrZFE_ZT1NZVV3NkI.png)
+
+## 流的四种状态
+
+C++ 标准库使用 `ios_base` 类来管理流的状态，该类定义了四种状态标志，分别对应流的不同状态：
+
+1. **badbit**：表示发生了严重的系统级错误，如内存分配失败、文件无法打开等不可恢复的错误。当 `badbit` 被设置时，流通常进入了一个无法继续使用的状态。
+2. **failbit**：表示发生了可以恢复的错误，如类型不匹配、格式错误等。例如，尝试从流中读取一个整数但实际读取到的是一个字符串。当 `failbit` 被设置时，流仍然可以继续使用，错误可以被处理或忽略。
+3. **eofbit**：表示已经到达了流的结尾。对于输入流，这通常意味着已经没有更多的数据可以读取。`eofbit` 被设置后，流仍然可以用于其他操作，如写入。
+4. **goodbit**：表示流处于良好状态，没有错误发生，可以正常使用。
+
+在 GNU GCC7.4 的源码中，流状态的实现如下：
+
+`/usr/include/c++/11/bits/ios_base.h`
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUNmlaNnU3UTFoT21LOU9sU29lbEpZQklYVGI5eFVPRGVZdE15ZnJYTGdmVnc_ZT1WV1ZBRnU.png)
+
+可以通过流的 `rdstate()` 成员函数来获取当前的状态字，然后使用 `ios_base::badbit`、`ios_base::failbit` 和 `ios_base::eofbit` 来检查特定的状态。
+
+```cpp
+bool good() const      //流是 goodbit 状态，返回 true，否则返回 false
+bool bad() const       //流是 badbit 状态，返回 true，否则返回 false
+bool fail() const      //流是 failbit 状态，返回 true，否则返回 false
+bool eof() const       //流是 eofbit 状态，返回 true，否则返回 false
+```
+
+## 标准输入输出流
+
+对系统指定的标准设备的输入和输出。即从键盘输入数据，输出到显示器屏幕。这种输入输出称为标准输入输出，简称 **标准** I/O。
+
+C++ 标准库为标准输入输出设备定义了三个特殊的流对象：`std::cin`、`std::cout` 和 `std::cerr`。这些对象分别用于从键盘读取数据、向屏幕输出数据和向屏幕输出错误信息。这些预定义的流对象包含在 `iostream` 头文件中。
+
+有时候会看到通用输入输出流的说法，这是一个更广泛的概念，可以与各种类型的输入输出设备进行交互，包括标准输入输出设备、文件、网络等。
+
+### 标准输入流
+
+`std::cin` 是 C++ 标准库中定义的 istream 类的对象，用于从标准输入设备（通常是键盘）获取数据。使用流提取符 `>>` 可以从 `std::cin` 中提取数据。
+
+流提取符 `>>` 在提取数据时通常会跳过空格、tab 键、换行符等空白字符。当用户输入数据并按下回车键后，该行数据被送入键盘缓冲区，形成输入流，之后提取运算符 `>>` 从中提取数据。
+
+以下是检查 `std::cin` 状态并从 `std::cin` 中获取数据的示例：
+
+```cpp
+#include <iostream>
+#include <limits>
+
+void printStreamStatus(std::istream & is) {
+  std::cout << "is's goodbit: " << is.good() << std::endl;
+  std::cout << "is's badbit: " << is.bad() << std::endl;
+  std::cout << "is's failbit: " << is.fail() << std::endl;
+  std::cout << "is's eofbit: " << is.eof() << std::endl;
+}
+
+int main() {
+  printStreamStatus(std::cin);  // 初始状态
+  int num = 0;
+  while (!(std::cin >> num)) {
+		std::cin.clear(); // 清除错误标志
+ 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // 忽略错误输入直到下一个换行符
+		std::cout << "Invalid input. Please enter an integer: ";
+		printStreamStatus(std::cin);
+  }
+  std::cout << "num: " << num << std::endl;
+  printStreamStatus(std::cin);  // 检查状态
+  return 0;
+}
+```
+
+如果用户输入的数据不合法（例如，期望整数却输入了字符），`std::cin` 将进入 `failbit` 状态。为了恢复流的状态，可以使用以下方法：
+
+1. **`clear` 方法**：清除所有错误标志。
+2. **`ignore` 方法**：忽略缓冲区中的错误输入直到遇到换行符。
+
+完成一个输入整型数据的实现（如果是非法输入则继续要求输入）的示例：
+
+```cpp
+void InputInt(int &number) {
+  cout << "请输入一个 int 型数据" << endl;
+  cin >> number;
+  while (!cin.eof()) {
+    if (cin.bad()) {
+      cout << "istream has broken" << endl;
+      return;
+    } else if (cin.fail()) {
+      cin.clear();
+      cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      cout << "输入一个 int 型数据！" << endl;
+      cin >> number;
+    } else {
+      // 合法输入的情况 */
+      cout << number << endl;
+      break;
+    }
+  }
+}
+```
+
+### 缓冲机制
+
+在 C++ 中，输入输出流库使用缓冲区来优化性能。缓冲区是内存中的一个区域，用于暂存即将进行输入或已进行输出的数据。这种机制可以显著提高数据处理的速度，因为它减少了实际的 I/O 操作次数，使得 CPU 可以更高效地工作。
+
+#### 为什么要引入缓冲区？
+
+引入缓冲区的主要原因是为了协调高速的 CPU 和低速的输入输出设备之间的速度差异。例如，当我们从磁盘读取数据时，数据首先被读取到缓冲区中，然后 CPU 从缓冲区中读取数据，而不是每次都直接从磁盘读取。这样减少了对磁盘的直接访问次数，从而提高了程序的运行速度。同样地，当我们打印文档时，文档数据首先被写入打印机的缓冲区，然后打印机会逐步从缓冲区中取出数据进行打印，这样 CPU 就可以去处理其他任务。
+
+#### 缓冲区要做哪些工作？
+
+缓冲区的工作机制包括接收程序的输入输出请求，并将数据暂存起来，然后在适当的时机将数据传输到实际的输入输出设备。这种机制在输入输出流中非常常见，例如，`std::cin` 使用行缓冲，它会在遇到换行符时刷新缓冲区，而 `std::cout` 默认是全缓冲，它会在缓冲区填满时刷新。
+
+**缓冲机制**
+
+1. **全缓冲**：数据在缓冲区填满之后才进行实际的 I/O 操作。这种方式常用于文件 I/O。
+2. **行缓冲**：当遇到换行符时，缓冲区的数据会被立即刷新，执行实际的 I/O 操作。`std::cin` 就是以行为缓冲的方式工作。
+3. **不带缓冲**：数据不经过缓冲区，直接进行 I/O 操作。这种方式常用于错误信息的输出，如 `std::cerr`。
+
+### 标准输出流
+
+在 C++ 中，`std::cout` 是 `ostream` 类的全局对象，它负责向标准输出设备（通常是屏幕）输出数据。`std::cout` 使用内部缓冲区来存储即将输出的数据，这种方式可以减少物理写操作的次数，因为批量写入通常比逐个字符写入要高效得多。然而，缓冲区的刷新时机对于程序的输出行为有着重要的影响。
+
+缓冲区会在以下几种情况下被刷新：
+
+1. **程序正常结束**：当程序运行完毕，操作系统会确保所有缓冲区的数据都被写出。
+
+   ```cpp
+   void test() {
+     for (int i = 0; i < 1025; i++) {
+       cout << 'a';
+     }
+   }
+   ```
+
+2. **缓冲区满**：例如，如果 `std::cout` 的缓冲区大小是 1024 个字节，当写入的数据达到这个大小，缓冲区会自动刷新，即将数据写入标准输出设备。
+
+   ```cpp
+   void test() {
+     for (int i = 0; i < 5; i++) {
+       cout << 'a';
+     }
+     sleep(2);
+   }
+   ```
+
+   
+
+3. **使用操纵符显式刷新**：可以通过操纵符如 `std::endl` 或 `std::flush` 来刷新输出缓冲区。`std::endl` 不仅刷新缓冲区，还会向输出流中添加一个换行符。而 `std::flush` 只刷新缓冲区，不添加任何额外的字符。
+
+   ![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZcmJEY1J2ekFwTXEzeTU2b213WDdNQlEyeF9YRUR2NDBwcld0MlozZndrOFE_ZT0zTHNEbDk.png)
+
+在使用 `cout` 时，如果在输出流语句末尾使用了 `endl` 函数，会进行换行，并刷新缓冲区。
+
+``` cpp
+void test(){
+  for(int i = 0; i < 1025; ++i){
+    cout << 'a' << endl; 
+  }
+}
+```
+
+如果在使用 `cout` 时，没有使用 `endl` 函数，键盘输入的内容会存在输出流对象的缓冲区中，当缓冲区满或遇到换行符时，将缓冲区刷新，内容传输到终端显示。可使用 `sleep` 函数查看缓冲的效果。
+
+``` cpp
+void test(){
+  for(int i = 0; i < 1024; ++i){
+    cout << 'a'; 
+  }
+  sleep(2);
+  cout << 'b';
+  sleep(2);
+}
+```
+
+GCC 中标准输出流的默认缓冲区大小就是 1024 个字节。
+
+如果不用 `sleep` 函数，即使没有 `endl` 或换行符，所有内容依然是直接输出，因为程序执行完时也会刷新缓冲区。
+
+`std::cerr` 是另一个全局的输出流对象，它通常用于输出错误信息。与 `std::cout` 不同，`std::cerr` 通常不使用缓冲或使用行缓冲，这意味着错误信息会立即输出，这对于调试和错误报告非常重要。
+
+## 文件输入输出流
+
+文件被用作存储数据的一种方式，操作系统以文件为单位进行数据管理。要将数据存储到外部介质，如硬盘、光盘或 U 盘，必须首先创建一个文件，并写入数据。文件流提供了一种机制，允许程序以流的方式从外部文件读取数据到内存，或从内存写入数据到外部文件。
+
+文件流是以外存文件为数据流对象的数据流。文件流分为两种：
+
+1. **文件输入流**：从外存文件流向内存的数据流。
+2. **文件输出流**：从内存流向外存文件的数据流。
+
+每个文件流都与一个内存缓冲区相关联，用于暂存数据。
+
+C++ 提供了三种主要的文件流类型来处理文件操作：
+
+1. **`ifstream`**：用于从文件读取数据。
+2. **`ofstream`**：用于将数据写入文件。
+3. **`fstream`**：可以同时用于文件的读写操作。
+
+这些流类的构造函数可以接受文件名和打开模式作为参数。如果未指定，构造函数默认为文件流对象分配一个空字符串作为文件名，此时文件流对象不与任何文件关联。
+
+他们的构造函数形式都很类似:
+
+```cpp
+ifstream();
+explicit ifstream(const char* filename, openmode mode = ios_base::in);
+explicit ifstream(const string & filename, openmode mode = ios_base::in);
+
+ofstream();
+explicit ofstream(const char* filename, openmode mode = ios_base::out);
+explicit ofstream(const string & filename, openmode mode = ios_base::out);
+
+fstream();
+explicit fstream(const char* filename, openmode mode = ios_base::in|out);
+explicit fstream(const string & filename, openmode mode = ios_base::in|out);
+```
+
+### 文件输入流
+
+#### 文件输入流对象的创建
+
+文件输入流的数据流向是：文件 -> 文件输入流对象的缓冲区 -> 程序中的数据结构。这意味着数据首先从文件读取到流的缓冲区，然后从缓冲区传输到程序的数据结构中。
+
+有两种方式创建 `ifstream` 对象并将其与文件绑定：
+
+1. **无参构造**：先创建一个 `ifstream` 对象，然后使用 `open` 函数将其与文件绑定。如果文件不存在，流将进入 `failbit` 状态。
+
+2. **有参构造**：在创建 `ifstream` 对象时直接将流对象与文件绑定。这样可以立即对文件进行操作。
+
+以下是创建和使用 `ifstream` 的示例：
+
+```cpp
+#include <fstream>
+#include <iostream>
+#include <string>
+
+void test0() {
+  std::ifstream ifs;
+  ifs.open("test1.cc");
+  if (!ifs) {
+    std::cerr << "Failed to open test1.cc" << std::endl;
+  }
+
+  std::ifstream ifs2("test2.cc");
+  if (!ifs2) {
+    std::cerr << "Failed to open test2.cc" << std::endl;
+  }
+
+  std::string filename = "test3.cc";
+  std::ifstream ifs3(filename);
+  if (!ifs3) {
+    std::cerr << "Failed to open " << filename << std::endl;
+  }
+}
+```
+
+文件打开模式决定了文件流的行为。这些模式包括：
+
+- **`in`**：输入模式，文件将允许读操作。如果文件不存在，打开失败。
+- **`out`**：输出模式，文件将允许写操作。如果文件不存在，则创建一个新文件。
+- **`app`**：追加模式，写操作将始终在文件末尾添加数据。
+- **`ate`**：末尾模式，写操作最初在文件末尾，但可以移动文件指针。
+- **`trunc`**：截断模式，如果文件存在，其内容将被清空。
+- **`binary`**：二进制模式，数据以二进制形式读写，不进行任何转换。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaNG5wSjlrVkE5RnZmUUppcFFnQk1vQjhHVjRnb0oyakRyRzJzbFoxUmk0R2c_ZT1aQVlnY1U.png)
+
+以下是使用不同文件打开模式的示例：
+
+```cpp
+#include <fstream>
+#include <iostream>
+
+int main() {
+  // 创建并打开一个文件用于追加
+  std::ofstream ofs("example.txt", std::ios::app);
+  if (ofs.is_open()) {
+    ofs << "This is appended text." << std::endl;
+    ofs.close();
+  } else {
+    std::cerr << "Failed to open file for appending." << std::endl;
+  }
+
+  // 打开文件用于写操作，会截断文件内容
+  std::ofstream ofs2("example.txt", std::ios::out | std::ios::trunc);
+  if (ofs2.is_open()) {
+    ofs2 << "This will overwrite existing content." << std::endl;
+    ofs2.close();
+  } else {
+    std::cerr << "Failed to open file for writing." << std::endl;
+  }
+
+  return 0;
+}
+```
+
+#### 按行读取
+
+##### 方法一：使用 `ifstream::getline`
+
+这是基于 C 语言风格的读取方式，使用 `ifstream` 类的 `getline` 成员函数。需要手动准备一个足够大的字符数组来存储每行的数据。
+
+`std::basic_istream<CharT, Traits>::getline` 是 C++ 标准库中模板类 `std::basic_istream` 的一个成员函数，用于从输入流中读取一行文本。这个函数模板是 `std::getline` 函数模板的基础，它支持从各种类型的输入流中读取数据，包括 `std::istream`、`std::ifstream`、`std::istringstream` 等。
+
+```cpp
+basic_istream<CharT, Traits>& getline(char_type* s, streamsize count);
+basic_istream<CharT, Traits>& getline(char_type* s, streamsize count, char_type delim);
+```
+
+- `s`：指向字符数组的指针，用于存储读取的行。
+- `count`：最大读取字符数，包括终止的空字符。
+- `delim`：分隔符，默认为换行符（`\n`）。
+
+这个函数有两个版本：
+
+1. **无分隔符版本**：读取直到遇到换行符或输入流结束。
+2. **有分隔符版本**：读取直到遇到指定的分隔符或输入流结束。
+
+**示例代码**：
+
+```cpp
+#include <iostream>
+#include <fstream>
+#include <cstring>
+
+int main() {
+  std::ifstream ifs("test.cc");
+  char buff[100] = {0};
+  while (ifs.getline(buff, sizeof(buff))) {
+    std::cout << buff << std::endl;
+    std::memset(buff, 0, sizeof(buff));
+  }
+  ifs.close();
+  return 0;
+}
+```
+
+**注意**：这种方法需要预估每行数据的最大长度。如果行长度超过缓冲区大小，可能会导致数据截断。
+
+##### 方法二：使用 `std::getline`
+
+这是 C++ 风格的读取方式，使用 `std::getline` 函数，它接受一个输入流和一个字符串引用作为参数，并从输入流中读取数据直到遇到换行符。
+
+`std::getline` 是 C++ 标准库中的一个函数模板，用于从输入流中读取一行文本。这个函数会读取输入流直到遇到换行符（`\n`），或者直到输入流结束，然后将读取的内容存储到一个字符串中。
+
+```cpp
+template <class CharT, class Traits = char_traits<CharT>, class Allocator = allocator<CharT>>
+  basic_istream<CharT, Traits>& getline(basic_istream<CharT, Traits>& is, basic_string<CharT, Traits, Allocator>& str);
+```
+
+- `is`：输入流对象，可以是 `istream`、`ifstream`、`istringstream` 等。
+- `str`：用于存储读取的行的字符串。
+
+当你使用 `std::getline` 时，你需要提供一个输入流对象和一个字符串对象。`std::getline` 会从输入流对象指定的流中读取一行，并将其存储到字符串对象中。
+
+**示例代码**：
+
+```cpp
+#include <iostream>
+#include <fstream>
+#include <string>
+
+int main() {
+  std::ifstream ifs("test.cc");
+  std::string line;
+  while (std::getline(ifs, line)) {
+    std::cout << line << std::endl;
+  }
+  ifs.close();
+  return 0;
+}
+```
+
+**优点**：使用 `std::getline` 函数更加方便，不需要预估行的长度，`std::string` 会自动根据需要扩展容量。
+
+#### 读取指定字节数的内容
+
+##### `read` 函数
+
+`std::basic_istream<CharT,Traits>::read` 是 C++ 标准库中模板类 `std::basic_istream` 的一个成员函数，用于从输入流中读取指定数量的字符。这个函数可以用于读取任意类型的输入流，如 `std::istream`、`std::ifstream`、`std::istringstream` 等。
+
+```cpp
+basic_istream<CharT, Traits>& read(char_type* s, streamsize count);
+```
+
+- `s`：指向字符数组的指针，用于存储读取的字符。
+- `count`：要读取的字符数。
+
+这个函数会从输入流中读取指定数量的字符，并将它们存储在提供的字符数组中。读取操作不会自动添加空字符（`\0`）来终止字符串，因此，如果你需要将字符数组作为字符串处理，需要手动添加空字符。
+
+##### `tellg` 函数
+
+`std::basic_istream<CharT,Traits>::tellg` 是 C++ 标准库中模板类 `std::basic_istream` 的一个成员函数，用于获取当前输入流的读取位置。这个函数返回一个指示当前读取位置的流偏移量，通常称为“文件游标”。
+
+```cpp
+pos_type tellg();
+```
+
+`pos_type`：是一个类型别名，代表用于表示流中位置的类型，通常是 `streampos`。
+
+当你从一个输入流中读取数据时，流会维护一个内部的读取位置指针，告诉你当前数据被读取到了哪里。使用 `tellg` 函数可以获取这个位置指针的当前值。
+
+##### `seekg` 函数
+
+`std::basic_istream<CharT,Traits>::seekg` 是 C++ 标准库中模板类 `std::basic_istream` 的一个成员函数，用于设置输入流的读取位置。这个函数允许你移动输入流的内部读取指针（游标）到指定的位置，从而实现在文件中随机访问数据。
+
+```cpp
+basic_istream<CharT, Traits>& seekg(pos_type pos);
+basic_istream<CharT, Traits>& seekg(off_type off, ios_base::seekdir dir);
+```
+
+- `pos`：是要移动到的位置，通常是一个 `streampos` 对象。
+- `off`：是要移动的偏移量。
+- `dir`：是偏移量的起始点，可以是 `std::ios::beg`（文件开始）、`std::ios::cur`（当前位置）、`std::ios::end`（文件结束）。
+
+你可以使用 `seekg` 来绝对定位（指定一个具体的位置）或相对定位（指定一个相对于当前位置、文件开始或文件结束的偏移量）。
+
+![undefined202403111742545.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVZkRRYjMwbkVkQ3ZDNHU5WnBmNGZjQjQ4QmhYQ1ZJaFp4Z1RxbkVxYmtPUEE_ZT0zR2VkMWc.png)
+
+##### 示例代码
+
+以下是读取一个文件的全部内容的示例：
+
+```cpp
+#include <iostream>
+#include <fstream>
+#include <string>
+
+int main() {
+  std::string filename = "test.cc";
+  std::ifstream ifs(filename);
+
+  if (!ifs) {
+    std::cerr << "Failed to open file!" << std::endl;
+    exit(1);
+  }
+
+  // 将游标放到了文件的最后（尾后）
+  ifs.seekg(0, std::ios::end);
+  long length = ifs.tellg(); // 获取尾后下标，实际就是总的字符数
+  std::cout << "File length: " << length << std::endl;
+
+  char *pdata = new char[length + 1];
+  pdata[length] = '\0'; // 确保最后一个字符是空字符
+
+  // 需要将游标再放置到文件开头
+  ifs.seekg(0, std::ios::beg);
+  ifs.read(pdata, length);
+
+  // content 包含了文件的所有内容，包括空格、换行
+  std::string content(pdata);
+  std::cout << "Content:\n" << content << std::endl;
+
+  delete[] pdata;
+  ifs.close();
+  return 0;
+}
+```
+
+还可以在创建输入流对象时指定 ate 模式，省去第一步将游标置流末尾处的操作。
+
+### 文件输出流
+
+`std::basic_ofstream<CharT, Traits>::basic_ofstream` 是 C++ 标准库中模板类 `std::basic_ofstream` 的构造函数。`std::basic_ofstream` 是用于写入数据到文件的输出文件流类，它继承自 `std::basic_ostream`。
+
+```cpp
+explicit basic_ofstream(ios_base::openmode mode = ios_base::out);
+basic_ofstream(const string& filename, ios_base::openmode mode = ios_base::out);
+```
+
+参数：
+
+- `ios_base::openmode mode`：文件打开模式，可以是 `ios_base::out`（默认值，写入模式），`ios_base::app`（追加模式），`ios_base::ate`（在文件末尾打开文件用于写入），或者与 `ios_base::binary`（二进制模式）结合使用。
+- `const string& filename`：要打开的文件的名称。
+
+你可以使用 `std::basic_ofstream` 来创建一个对象，该对象绑定到一个文件，用于写入操作。你可以指定文件名和打开模式。
+
+与 `ifstream` 类似，`ofstream` 对象可以通过无参构造函数创建，然后使用 `open` 方法与文件绑定，或者通过有参构造函数在创建时直接与文件绑定。
+
+**示例代码**：
+
+```cpp
+#include <fstream>
+#include <iostream>
+#include <string>
+
+void test0() {
+  std::ofstream ofs;
+  ofs.open("test1.cc");
+
+  std::ofstream ofs2("test2.cc");
+
+  std::string filename = "test3.cc";
+  std::ofstream ofs3(filename);
+}
+```
+
+如果 `ofstream` 对象绑定的文件不存在，会创建一个新的文件用于写入。
+
+可以通过输出流运算符 `<<` 将内容写入文件，也可以使用 `write` 函数。
+
+`std::basic_ostream<CharT,Traits>::write` 是 C++ 标准库中模板类 `std::basic_ostream` 的一个成员函数，用于将指定数量的字符写入到输出流中。这个函数提供了一种低级别的写入机制，允许直接写入原始数据。
+
+```cpp
+basic_ostream<CharT, Traits>& write(const char_type* s, streamsize count);
+```
+
+- `s`：指向要写入的字符数组的指针。
+- `count`：要写入的字符数量。
+
+这个函数会将 `count` 个字符从 `s` 指向的数组写入到输出流中。它不添加任何终止字符，如空字符（`\0`），并且不会执行任何字符转换。
+
+**使用 `<<` 运算符**：
+
+```cpp
+std::string filename = "test3.cc";
+std::ofstream ofs3(filename);
+
+std::string line("hello, world!\n");
+ofs3 << line; 
+```
+
+**使用 `write` 函数**：
+
+```cpp
+char buff[100] = "hello, world!";
+ofs3.write(buff, sizeof(buff));
+```
+
+默认情况下，`std::ios::out` 模式会清空现有文件内容。要追加内容到现有文件，可以使用 `std::ios::app` 模式。
+
+**示例代码**：
+
+```cpp
+std::string filename = "test3.cc";
+std::ofstream ofs3(filename, std::ios::app);
+```
+
+以下是使用 `ofstream` 写入文件的完整示例：
+
+```cpp
+#include <fstream>
+#include <iostream>
+#include <string>
+
+int main() {
+  // 创建并打开文件用于写入
+  std::ofstream ofs("example.txt");
+  if (!ofs) {
+    std::cerr << "Failed to open file for writing." << std::endl;
+    return 1;
+  }
+
+  // 写入字符串到文件
+  ofs << "Hello, world!" << std::endl;
+
+  // 使用 write 函数写入字符数组到文件
+  const char* greeting = "Hello again!";
+  ofs.write(greeting, strlen(greeting));
+  ofs << std::endl;
+
+  // 关闭文件
+  ofs.close();
+  return 0;
+}
+```
+
+## 字符串输入输出流
+
+字符串 I/O 在 C++ 中是通过对字符串进行格式化处理的流操作。这些操作通常用于在内存中的字符串对象和流对象之间进行数据传输和格式转换。
+
+C++ 标准库提供了三种主要的字符串流类型：
+
+1. **`istringstream`**：用于从字符串读取数据。
+2. **`ostringstream`**：用于向字符串写入数据。
+3. **`stringstream`**：可以同时用于字符串的读写操作。
+
+这些流类提供了一种方便的方式来处理字符串数据，就像处理文件流或标准输入输出流一样。
+
+这些字符串流类的构造函数可以接受一个字符串和一个打开模式：
+
+- **无参构造函数**：创建一个没有绑定到任何字符串的流对象。
+- **有参构造函数**：创建一个流对象，并可选地绑定一个字符串。
+- **模式**：指定流的打开模式，如只读、只写或读写。
+
+
+它们的构造函数形式都很类似:
+
+``` cpp
+istringstream(): istringstream(ios_base::in) { }
+explicit istringstream(openmode mode = ios_base::in);
+explicit istringstream(const string& str, openmode mode = ios_base::in);
+  
+ostringstream(): ostringstream(ios_base::out) { }
+explicit ostringstream(openmode mode = ios_base::out);
+explicit ostringstream(const string& str, openmode mode = ios_base::out);
+  
+stringstream(): stringstream(in|out) { }
+explicit stringstream(openmode mode = ios_base::in|ios_base::out);
+explicit stringstream(const string& str, openmode mode = ios_base::in|ios_base::out);
+```
+
+### 字符串输入流
+
+`istringstream` 是一种从字符串读取数据的流，可以将字符串内容解析为不同的数据类型。
+
+```cpp
+#include <iostream>
+#include <sstream>
+#include <string>
+
+void test0() {
+  std::string s("123 456");
+  int num = 0;
+  int num2 = 0;
+  // 将字符串内容传递给了字符串输入流对象
+  std::istringstream iss(s);
+  iss >> num >> num2;
+  std::cout << "num: " << num << std::endl;
+  std::cout << "num2: " << num2 << std::endl;
+}
+```
+
+**输出**：
+
+```
+num: 123
+num2: 456
+```
+
+因为输入流运算符会默认以空格符作为分隔符，字符串 123 456 中含有一个空格符，那么传输时会将空格前的 123 传给 `num`，空格后的 456 传给 `num2`，因为 `num` 和 `num2` 是 `int` 型数据，所以编译器会以 int 型数据来理解缓冲区释出的内容，将 `num` 和 `num2` 赋值为 123 和 456
+
+**字符串输入流通常用来处理字符串内容，比如读取配置文件。**
+
+**示例代码**：
+
+```cpp
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+
+// 习惯：当函数参数为对象时，首先考虑 const 引用的形式作为形参
+// 引用的意义在于避免实参初始化形参时发生复制
+// const 的意义在于避免函数体中通过引用修改实参，
+// 以及为了绑定右值属性的对象
+void readConfig(const std::string &filename) {
+  std::ifstream ifs(filename);
+  if (!ifs.good()) {
+    std::cout << "Open file fail!" << std::endl;
+    return;
+  }
+
+  std::string line;
+  std::string key, value;
+  while (std::getline(ifs, line)) {
+    // 字符串输入流相当于缓冲区，缓存了一行的内容
+    // 之后可以对这一行的内容进行解析
+    std::istringstream iss(line);
+    // 这里利用了输入流运算符默认以空格为分隔符的效果
+    iss >> key >> value;
+    std::cout << key << " -----> " << value << std::endl;
+  }
+}
+
+int main() {
+  readConfig("myserver.conf");
+  return 0;
+}
+```
+
+假设 `myserver.conf` 文件内容如下：
+
+```
+ip 192.168.0.1
+port 8888
+dir /usr/local/myapp
+```
+
+**输出**：
+
+```
+ip -----> 192.168.0.1
+port -----> 8888
+dir -----> /usr/local/myapp
+```
+
+### 字符串输出流
+
+
+
+`ostringstream` 是一种将数据输出到字符串的流，它可以将各种类型的数据转换成字符串并存储在内部缓冲区中。
+
+以下是使用 `ostringstream` 的示例：
+
+```cpp
+#include <iostream>
+#include <sstream>
+#include <string>
+
+void test() {
+  int num = 123, num2 = 456;
+  std::ostringstream oss;
+  // 把所有的内容都传给了字符串输出流对象
+  oss << "num = " << num << " , num2 = " << num2 << std::endl;
+  std::cout << oss.str() << std::endl; // 使用 str() 函数获取流的内容
+}
+```
+
+输出
+
+```
+num = 123 , num2 = 456
+```
+
+字符串流的用途：
+
+1. **格式化输出**：可以将不同类型的数据格式化后输出到字符串。
+2. **拼接字符串**：可以将多个字符串或数据拼接成一个字符串。
+3. **临时存储**：可以用作临时存储数据的缓冲区，之后再转换为字符串。
+
+
+
+

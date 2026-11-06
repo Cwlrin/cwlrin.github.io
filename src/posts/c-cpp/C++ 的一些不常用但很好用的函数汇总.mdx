@@ -1,0 +1,217 @@
+---
+title: "C++ 的一些不常用但很好用的函数汇总（长期更新）"
+date: 2025-03-08T16:10:50+08:00
+categories: ["C 与 C++"]
+tags: ["C++"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmYWtDUDQ1MXg1QnNCVTJSOG1sZGk4QmZUMDFTZExlU0s2N1N6c0FFYVF3dEE_ZT1WZzRHZVc.jpg"
+---
+
+本文章用于记录 C++ 中的一些平时不太常用，但在特定情况下很好用的函数。
+
+## 算法库 `algorithm`
+
+### 搜索操作
+
+#### `count` 和 `count_if`
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRRDFRQU5tLVA1SXVkN0l0SGRxdnFjQjk5NzljODhMNDZTT1pTZ2VvS3pfV0E_ZT16TG5uNW8.jpg)
+
+##### `count`
+
+**主要特点：**
+
+- 统计容器或数组中特定值出现的次数
+- 时间复杂度：$O(n)$
+- 支持所有标准容器和数组
+
+**使用示例：**
+
+```cpp
+vector<int> vec = {1, 2, 3, 4, 2, 2, 3, 1, 2};  
+
+// 统计 2 出现的次数  
+int count_2 = count(vec.begin(), vec.end(), 2);  
+cout << "2 出现的次数: " << count_2 << endl;  
+
+// 对于数组也同样适用  
+int arr[] = {1, 2, 3, 4, 2, 2, 3, 1, 2};  
+int count_2_arr = count(begin(arr), end(arr), 2);  
+cout << "数组中 2 出现的次数: " << count_2_arr << endl;  
+```
+
+##### `count_if`
+
+**主要特点：**
+
+- 使用谓词（predicate）统计满足特定条件的元素数量，谓词是一个返回 bool 的函数或函数对象
+- 时间复杂度：$O(n)$
+- 更加灵活，可以实现复杂的统计逻辑
+
+**使用示例：**
+
+[统计有序矩阵中的负数 - 力扣（LeetCode）](https://leetcode.cn/problems/count-negative-numbers-in-a-sorted-matrix/)
+
+```cpp
+class Solution {
+  public:
+  int countNegatives(vector<vector<int>>& grid) {
+    int res = 0;
+    for (int i = 0; i < grid.size(); i++) {
+      res += count_if(grid[i].begin(), grid[i].end(),
+                      [](int x) { return x < 0; });
+    }
+    return res;
+  }
+};
+```
+
+
+
+### 二分搜索操作
+
+#### `lower_bound`
+
+`lower_bound` 通常与有序容器（如 `vector`、`set`、`map`）一起使用。这个函数主要用于在有序范围内查找第一个不小于给定值的元素的位置。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRU3RrQ0hNQmJwUG93bVp3S3FhNC04QkRkYWFqUGZwaW05aVBGVE5XTTExS3c_ZT1ISGdvMWM.jpg)
+
+**查找机制：**
+
+- 在有序（升序）的范围内查找
+
+- 返回第一个大于等于 `value` 的元素的迭代器
+
+- 如果找不到这样的元素，则返回 `last`
+
+**时间复杂度：**
+
+- 对于随机访问迭代器（如 `vector`）：$O(\log n)$
+- 对于有序容器（如 `set`、`map`）：$O(\log n)$
+
+**使用示例：**
+
+```cpp
+// 以 vector 为例  
+vector<int> vec = {10, 20, 30, 30, 40, 50};  
+
+// 查找第一个不小于 30 的元素  
+auto it = lower_bound(vec.begin(), vec.end(), 30);  
+// it 将指向第一个 30 的位置（第 2 个元素）  
+
+// 查找第一个不小于 35 的元素  
+auto it2 = lower_bound(vec.begin(), vec.end(), 35);  
+// it2 将指向 40 的位置  
+```
+
+**与 `upper_bound` 的区别：**
+
+- `lower_bound`：返回第一个不小于 `value` 的元素
+- `upper_bound`：返回第一个大于 `value` 的元素
+
+#### `upper_bound`
+
+`lower_bound` 通常与有序容器（如 `vector`、`set`、`map`）一起使用。用于在有序范围内查找第一个大于给定值的元素。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUUEIzOVN2UnFORGttWEE0dHd5ckZnQnYwN2phVGplNC1GazJweDBZYVBBTUE_ZT0zaWlmSGI.jpg)
+
+**查找机制**：
+
+- 在有序（升序）的范围内查找
+- 返回第一个严格大于 `value` 的元素的迭代器
+- 如果找不到这样的元素，则返回 `last`
+
+**时间复杂度**：
+
+- 对于随机访问迭代器（如 `vector`）：$O(\log n)$
+- 对于有序容器（如 `set`、`map`）：$O(\log n)$
+
+**与 `lower_bound` 的区别：**
+
+- `lower_bound`：返回第一个不小于 `value` 的元素
+- `upper_bound`：返回第一个大于 `value` 的元素
+
+**使用示例：**
+
+```cpp
+vector<int> vec = {10, 20, 30, 30, 40, 50};  
+
+// 示例 1：查找第一个大于 30 的元素  
+auto it1 = upper_bound(vec.begin(), vec.end(), 30);  
+cout << "First element > 30: " << *it1 << endl;  // 输出 40  
+
+// 示例 2：查找第一个大于 25 的元素  
+auto it2 = upper_bound(vec.begin(), vec.end(), 25);  
+cout << "First element > 25: " << *it2 << endl;  // 输出 30  
+
+// 示例 3：查找大于最大元素的位置  
+auto it3 = upper_bound(vec.begin(), vec.end(), 50);  
+if (it3 == vec.end()) {  
+  cout << "No element greater than 50" << endl;  
+}  
+
+return 0;  
+```
+
+[正整数和负整数的最大计数 - 力扣（LeetCode）](https://leetcode.cn/problems/maximum-count-of-positive-integer-and-negative-integer/)
+
+```cpp
+class Solution {
+  public:
+  int maximumCount(vector<int>& nums) {
+    int neg = ranges::lower_bound(nums, 0) - nums.begin();
+    int pos = nums.end() - ranges::upper_bound(nums, 0);
+    return max(neg, pos);
+  }
+};
+```
+
+#### `equal_range`
+
+`equal_range` 返回一个包含两个迭代器的 `pair`，这两个迭代器分别是 `lower_bound` 和 `upper_bound`。换句话说，它可以一次性找到有序范围中等于给定值的所有元素的区间。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUd1Z3RlVJYzY1T2xRNV9RaTB6N184QnBiWVpzY05qQlkwOE5xeGpZT1JOYWc_ZT1welJHQkU.jpg)
+
+**查找机制**：
+
+- 在有序（升序）的范围内查找
+- 返回一个 `pair`，包含两个迭代器
+  - 第一个迭代器（`lower_bound`）：第一个不小于 `value` 的元素
+  - 第二个迭代器（`upper_bound`）：第一个大于 `value` 的元素
+
+**时间复杂度**：$O(\log n)$，通常使用二分查找实现
+
+使用示例：
+
+```cpp
+vector<int> vec = {10, 20, 30, 30, 30, 40, 50};  
+
+// 查找等于 30 的元素范围  
+auto range = equal_range(vec.begin(), vec.end(), 30);  
+
+// 打印范围内的元素  
+cout << "Elements equal to 30:" << endl;  
+for (auto it = range.first; it != range.second; ++it) {  
+  cout << *it << " ";  
+}  
+cout << endl;  
+
+// 计算等于 30 的元素数量  
+int count = range.second - range.first;  
+cout << "Count of 30: " << count << endl;
+```
+
+[正整数和负整数的最大计数 - 力扣（LeetCode）](https://leetcode.cn/problems/maximum-count-of-positive-integer-and-negative-integer/)
+
+```cpp
+class Solution {
+  public:
+  int maximumCount(vector<int> &nums) {
+    auto [left, right] = ranges::equal_range(nums, 0);
+    int neg = left - nums.begin();
+    int pos = nums.end() - right;
+    return max(neg, pos);
+  }
+};
+```
+
+

@@ -1,0 +1,546 @@
+---
+title: "C 语言数据结构——栈"
+date: 2020-03-05T16:53:22+08:00
+categories: ["C 与 C++", "C 语言基础"]
+tags: ["C", "数据结构"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaZG11aFh4a285SmhZWUhqUVNVWjVBQmNpMkZHbkI3MXBYQUVzcmttelItUUE_ZT1Vb2FoeU0.png"
+---
+
+## 栈的定义
+
+栈是一种操作受限的线性数据结构，它遵循后进先出（LIFO, Last In First Out）的原则。在栈中，所有新增、删除和访问操作都仅限于栈的一端，称为栈顶（Top）。
+
+**栈的基本操作**：
+
+1. **入栈/压栈（Push）**：在栈顶添加一个新元素。新元素成为新的栈顶元素，而原有的栈顶元素及其下面的元素被“压入”栈底。
+2. **出栈（Pop）**：从栈顶删除一个元素。删除操作后，原来的次栈顶元素成为新的栈顶元素。
+3. **访问栈顶元素（Peek/Top）**：返回栈顶元素的值，但不从栈中移除它。
+4. **判空（IsEmpty）**：判断栈是否为空，即栈顶是否有元素。
+5. **判满（IsFull）**：判断栈是否已满。注意，并非所有栈的实现都有判满操作，特别是链式栈，因为它可以动态增长。
+
+**时间复杂度要求**：为了确保栈的性能，所有基本操作都应以 O(1) 的时间复杂度完成。
+
+## 栈的实现方式
+
+**栈的实现方式**：
+
+1. **基于链表实现**：
+   - 使用链表实现的栈具有动态扩容的能力，不需要预先定义固定的大小。
+   - 链表实现的栈在插入和删除操作时不需要移动其他元素，因此这些操作的时间复杂度为 O(1)。
+2. **基于数组实现**：
+   - 数组实现的栈可以利用数组的随机访问特性，提供快速的访问性能。
+   - 但是，数组实现的栈大小固定，一旦定义就无法更改，除非使用动态数组。
+
+**优缺点分析**：
+
+- **固定长度数组实现**：
+  - 优点：实现简单，访问速度快，无需额外空间存储指针。
+  - 缺点：大小固定，无法动态调整。
+- **动态数组实现**：
+  - 优点：容量灵活，可以动态调整大小。
+  - 缺点：扩容时可能涉及内存重分配，影响性能。
+- **链表实现**：
+  - 优点：灵活性强，无需担心容量限制，性能稳定。
+  - 缺点：空间占用更多，需要存储额外的指针，实现相对复杂。
+
+**选择建议**：
+
+如果栈的大小可以预先确定，或者不需要频繁调整大小，推荐使用固定长度的数组实现，以获得更好的性能和简化实现。
+
+如果栈的大小未知或需要频繁调整大小，可以考虑使用动态数组或链表实现。选择动态数组实现时，需要注意扩容操作对性能的影响。链表实现在大小完全不可预测的情况下更为合适。
+
+## 二级指针链式栈
+
+### 链式栈的结点结构体定义
+
+在链式栈中，每个结点被定义为一个结构体，包含数据字段和指向下一个结点的指针。以下是结构体的定义：
+
+```c
+typedef struct nodes {
+    DataType data;      // 数据字段，用于存储栈中的数据
+    struct nodes *next; // 指针字段，指向链表中的下一个结点
+} StackFrame;
+```
+
+### 栈顶指针的初始化
+
+在函数中，可以定义一个栈顶指针来表示栈的当前状态。如果栈顶指针初始化为 `NULL`，则表示栈是空的：
+
+```c
+StackFrame *top = NULL; // 初始化栈顶指针为 NULL，表示空栈
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0ViYU9rNE9GUVdwR201YnlYZFdleENrQkR5RjJzTDVCaVUyaVY0LUtJUDg0bEE_ZT05V28wZUY.png)
+
+### 链式栈的入栈操作
+
+入栈操作是向栈中添加新元素的过程，对于链式栈而言，这相当于在链表的头部进行插入。
+
+1. **函数原型**：`stack_push` 函数接受两个参数：一个指向栈顶指针的指针 `top` 和要入栈的元素 `data`。
+2. **内存分配**：首先，为新元素分配内存，并初始化新结点。
+3. **头插法**：将新结点的数据域设置为 `data`，然后将新结点的 `next` 指针指向原来的栈顶结点，实现头插法。
+4. **更新栈顶指针**：更新栈顶指针 `top` 指向新的栈顶结点，即新分配的结点。
+5. **错误处理**：如果内存分配失败，打印错误信息并退出程序。
+
+```c
+void stack_push(StackFrame **top, ElementType data) {
+    // 分配一个新栈帧，并初始化它
+    StackFrame *new_frame = (StackFrame *)malloc(sizeof(StackFrame));
+    if (new_frame == NULL) {
+        fprintf(stderr, "error: malloc failed in stack_push.\n");
+        exit(EXIT_FAILURE);
+    }
+    new_frame->data = data;
+    // 让新栈帧指向原本的第一个栈帧
+    new_frame->next = *top;
+    // 更新栈顶指针
+    *top = new_frame;
+}
+```
+
+### 链式栈的出栈操作
+
+出栈操作是从栈中移除顶部元素的过程。对于链式栈而言，这相当于在链表的头部进行删除。
+
+1. **函数原型**：`stack_pop` 函数接受一个指向栈顶指针的指针 `top`，并返回被弹出的元素。
+2. **判空**：在执行出栈操作之前，首先判断栈是否为空。如果栈为空，则无法执行出栈操作。
+3. **保存栈顶元素**：保存栈顶元素的值，以便在删除结点后返回该值。
+4. **删除栈顶结点**：将栈顶指针 `top` 更新为指向下一个结点，从而删除当前栈顶结点。
+5. **释放内存**：释放原栈顶结点的内存。
+6. **返回值**：返回被弹出元素的值。
+
+```c
+ElementType stack_pop(StackFrame **top) {
+    // 判空
+    if (is_empty(top)) {
+        fprintf(stderr, "error: stack is empty, cannot pop!\n");
+        exit(EXIT_FAILURE);
+    }
+    // 保存栈顶结点和临时元素
+    ElementType ret = (*top)->data;
+    StackFrame *tmp = *top;
+    // 更新栈顶指针
+    *top = (*top)->next;
+    // 释放内存
+    free(tmp);
+    // 返回值
+    return ret;
+}
+```
+
+### 链式栈的访问栈顶元素操作
+
+访问栈顶元素是查看栈顶部元素的值而不移除它的过程。
+
+1. **函数原型**：`stack_peek` 函数接受一个指向栈顶结点的指针 `top`，并返回栈顶元素的值。
+2. **判空**：在访问栈顶元素之前，首先判断栈是否为空。如果栈为空，则无法执行访问操作。
+3. **访问元素**：如果栈不为空，直接访问并返回栈顶结点的数据域。
+
+```c
+ElementType stack_peek(const StackFrame *top) {
+    // 判空
+    if (is_empty(top)) {
+        fprintf(stderr, "error: stack is empty, cannot peek!\n");
+        exit(EXIT_FAILURE);
+    }
+    // 访问栈顶元素
+    return top->data;
+}
+```
+
+### 链式栈的判空操作
+
+判空操作是检查栈是否为空的过程，这对于避免在空栈上执行入栈、出栈或访问栈顶等操作至关重要。
+
+1. **函数原型**：`is_empty` 函数接受一个指向栈顶结点的指针 `top`，并返回一个布尔值。
+2. **判空逻辑**：如果栈顶指针 `top` 等于 `NULL`，则表示栈为空。
+3. **返回值**：返回 `true` 表示栈为空，返回 `false` 表示栈不为空。
+
+```c
+bool is_empty(const StackFrame *top) {
+    return top == NULL;  // 如果栈顶指针为NULL，表示栈为空
+}
+```
+
+## 链式栈
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VYalJtU0lnQndORW5rTW13S0huS1JJQlJuWHAxZ1o2QklWcEFVU0Z6NUlGaXc_ZT00WFRaYmU.png)
+
+```c
+LinkedStack *stack_create() {
+	return calloc(1, sizeof(LinkedStack));
+}
+
+void stack_destroy(LinkedStack *stack) {
+	StackFrame *curr = stack->top;
+	while (curr) {
+		StackFrame *tmp = curr->next;
+		free(tmp);
+		curr = tmp;
+	}
+	free(stack);
+}
+
+bool is_empty(LinkedStack *stack) {
+	return stack->top == NULL;
+}
+
+void stack_push(LinkedStack *stack, ElementType data) {
+	StackFrame *new_frame = malloc(sizeof(StackFrame));
+	if (new_frame == NULL) {
+		printf("malloc 在 stack_push 中创建失败！\n");
+		exit(1);
+	}
+
+	new_frame->data = data;
+	new_frame->next = stack->top;
+
+	stack->top = new_frame;
+}
+
+ElementType stack_pop(LinkedStack *stack) {
+	if (is_empty(stack)) {
+		printf("错误：stack 为空！\n");
+		exit(1);
+	}
+
+	StackFrame *tmp = stack->top;
+	ElementType data = tmp->data;
+	stack->top = tmp->next;
+	free(tmp);
+
+	return data;
+}
+
+ElementType stack_peek(LinkedStack *stack) {
+	if (is_empty(stack)) {
+		printf("错误：stack 为空！\n");
+		exit(1);
+	}
+
+	return stack->top->data;
+}
+```
+
+## 动态数组栈
+
+在动态数组栈中，使用一个结构体来管理栈的内部状态，包括存储元素的动态数组、当前栈的大小以及数组的容量。
+
+**结构体定义**：定义一个名为 `DynamicStack` 的结构体，包含三个成员：
+
+- `DataType* datas`：指向动态分配数组的指针，用于存储栈中的元素。
+- `int size`：当前栈中已存储元素的个数，即栈的深度。
+- `int capacity`：当前数组的容量，表示数组可以存储的最大元素个数。
+
+![](https://1drv.ms/i/c/bde51e625ef8fcc5/Efc0nC4EybFHsP6ZontPqUoBoB6iB_FSLSkKaj-_uQE8KQ?e=rWBAJX)
+
+```c
+typedef struct {
+    DataType* datas;  // 指向动态分配数组的指针
+    int size;         // 当前栈已存储栈帧的个数
+    int capacity;     // 当前数组栈的容量，也是实际数组的长度
+} DynamicStack;
+```
+
+动态数组栈使用结构体来封装栈的状态，允许在运行时动态调整大小。通过维护一个动态数组，可以有效地管理栈的存储需求，同时提供快速的访问和修改操作。
+
+```c
+#ifndef DYNAMIC_STACK_H
+#define DYNAMIC_STACK_H
+
+#include <stdbool.h>
+
+typedef int ElementType;
+
+typedef struct {
+	ElementType *elements; ///< 指向动态数组首元素的指针
+	int size;              ///< 元素的个数
+	int capacity;          ///< 数组的容量，也就是栈的容量
+} DynamicStack;
+
+/**
+ * @brief 创建动态数组栈
+ * @return void
+ */
+DynamicStack *stack_create();
+
+/**
+ * @brief 销毁动态数组栈
+ * @param s 动态数组栈
+ */
+void stack_destroy(DynamicStack *s);
+
+/**
+ * @brief 入栈
+ * @param s 动态数组栈
+ * @param val 入栈元素
+ */
+void stack_push(DynamicStack *s, ElementType val);
+
+/**
+ * @brief 出栈并返回栈顶元素
+ * @param s 动态数组栈
+ * @return ElementType 栈顶元素
+ */
+ElementType stack_pop(DynamicStack *s);
+
+/**
+ * @brief 访问栈顶元素
+ * @param s 动态数组栈
+ * @return ElementType 栈顶元素
+ */
+ElementType stack_peek(DynamicStack *s);
+
+/**
+ * @brief 判空
+ * @param s 动态数组栈
+ * @return bool
+ */
+bool is_empty(DynamicStack *s);
+
+#endif // !DYNAMIC_STACK_H
+
+```
+
+### 动态数组栈的扩容机制
+
+当动态数组栈中的元素数量达到其容量时，需要进行扩容以允许更多的元素被添加。以下是扩容机制的实现步骤：
+
+1. **定义默认容量和扩容阈值**：
+   - `DEFAULT_CAPACITY`：动态栈的初始容量。
+   - `THRESHOLD`：当当前容量超过这个阈值时，扩容策略将改变。
+2. **扩容策略**：
+   - 如果当前容量大于或等于 `THRESHOLD`，则新容量为当前容量的 1.5 倍。
+   - 如果当前容量小于 `THRESHOLD`，则新容量为当前容量的 2 倍。
+3. **内存重新分配**：使用 `realloc` 函数根据新容量重新分配内存。
+4. **错误处理**：如果 `realloc` 失败，打印错误信息并退出程序。
+5. **更新栈结构体**：将重新分配的内存地址赋值给栈结构体的 `elements` 成员，并更新 `capacity` 成员。
+
+```c
+static void grow_capacity(DynamicStack *s) {
+    int new_capacity = s->capacity * 2;
+
+    ElementType *new_elements = realloc(s->elements, new_capacity * sizeof(ElementType));
+    if (new_elements == NULL) {
+        fprintf(stderr, "错误：realloc 在 grow_capacity 中失败！\n");
+        exit(1);
+    }
+
+    s->elements = new_elements;
+    s->capacity = new_capacity;
+}
+```
+
+动态数组栈通过扩容机制来适应不断增长的存储需求，保持操作的高效性。扩容策略的选择可以根据实际应用场景和性能需求进行调整。
+
+### 创建动态数组栈
+
+创建动态数组栈涉及分配内存以存储栈结构体和初始化栈的内部数组。
+
+1. **分配栈结构体内存**：使用 `malloc` 为 `DynamicStack` 结构体分配内存。
+2. **错误处理**：如果 `malloc` 失败，打印错误信息并返回 `NULL`。
+3. **初始化栈结构体**：
+   - 初始化 `size` 成员为 0，表示栈为空。
+   - 初始化 `capacity` 成员为默认容量 `DEFAULT_CAPACITY`。
+4. **分配内部数组内存**：使用 `malloc` 为内部数组 `elements` 分配内存，大小为 `DEFAULT_CAPACITY * sizeof(ElementType)`。
+5. **错误处理**：如果内部数组的 `malloc` 失败，释放已分配的栈结构体内存，打印错误信息并返回 `NULL`。
+6. **返回新创建的栈**：成功创建并初始化栈后，返回新分配的 `DynamicStack` 指针。
+
+```c
+DynamicStack *stack_create() {
+	DynamicStack *s = malloc(sizeof(DynamicStack));
+	if (s == NULL) {
+		fprintf(stderr, "错误：malloc 在 stack_create 中失败！\n");
+		exit(1);
+	}
+
+	s->size = 0;
+	s->capacity = DEFAULT_CAPACITY;
+	s->elements = malloc(s->capacity * sizeof(ElementType));
+	if (s->elements == NULL) {
+		fprintf(stderr, "错误：malloc 在 stack_create 中失败！\n");
+		exit(1);
+	}
+
+	return s;
+}
+```
+
+创建动态数组栈需要正确地分配内存并初始化栈结构体和内部数组。
+
+### 销毁动态数组栈
+
+销毁动态数组栈涉及释放栈结构体和其内部动态分配的数组。
+
+1. **释放内部数组**：使用 `free` 函数释放 `DynamicStack` 结构体中的 `elements` 数组。
+2. **释放栈结构体**：使用 `free` 函数释放 `DynamicStack` 结构体本身。
+
+```c
+// 销毁动态数组栈
+void stack_destroy(DynamicStack *s) {
+    // 释放动态数组
+    free(s->elements);
+    // 释放栈结构体
+    free(s);
+}
+```
+
+销毁动态数组栈需要确保释放所有动态分配的内存资源，避免内存泄漏。
+
+正确的内存管理是使用动态数组栈时的重要部分。
+
+### 动态数组栈的入栈操作
+
+入栈操作是向栈中添加新元素的过程，对于动态数组栈而言，这涉及到在数组的末尾添加元素。
+
+1. **检查栈容量**：如果栈的当前大小 `size` 等于其容量 `capacity`，则需要先进行扩容。
+2. **扩容**：如果需要，调用 `grow_capacity` 函数来增加栈的容量。
+3. **添加元素**：将新元素 `val` 放入数组的当前 `size` 索引位置。
+4. **更新栈大小**：增加 `size` 的值，以反映栈中元素数量的增加。
+5. **代码优化**：入栈操作可以通过单行代码 `s->elements[s->size++] = val;` 来完成，这行代码同时更新了数组和 `size`。
+
+```c
+// 入栈操作
+void stack_push(DynamicStack *s, ElementType val) {
+    if (s->size == s->capacity) {
+        // 栈满了, 需要扩容
+        grow_capacity(s);
+    }
+    // 在数组末尾添加新元素，并更新栈大小
+    s->elements[s->size++] = val;
+}
+```
+
+### 动态数组栈的出栈操作
+
+出栈操作是从栈中移除顶部元素的过程，对于动态数组栈而言，这涉及到减少栈的大小并返回最后一个元素。
+
+1. **检查栈是否为空**：在执行出栈操作之前，首先使用 `is_empty` 函数判断栈是否为空。如果栈为空，则无法执行出栈操作。
+2. **减少栈大小**：减少 `size` 的值，将栈的大小减一。
+3. **返回顶部元素**：返回数组中索引为 `size` 的元素，即栈顶元素。
+4. **代码优化**：出栈操作可以通过单行代码 `return s->elements[--(s->size)];` 来完成，这行代码同时减少了 `size` 并返回了栈顶元素。
+
+```c
+// 出栈操作
+ElementType stack_pop(DynamicStack *s) {
+    if (is_empty(s)) {
+        fprintf(stderr, "错误：栈为空！\n");
+        exit(EXIT_FAILURE);
+    }
+    // 减少栈大小并返回栈顶元素
+    return s->elements[s->size--];
+}
+```
+
+### 动态数组栈的访问栈顶元素操作
+
+访问栈顶元素是查看栈顶部元素的值而不移除它的过程。
+
+1. **检查栈是否为空**：在执行访问操作之前，首先使用 `is_empty` 函数判断栈是否为空。如果栈为空，则无法执行访问操作。
+2. **返回顶部元素**：返回数组中索引为 `size - 1` 的元素，即栈顶元素。
+
+```c
+// 访问栈顶元素
+ElementType stack_peek(DynamicStack *s) {
+    if (is_empty(s)) {
+        fprintf(stderr, "错误：栈为空！\n");
+        exit(EXIT_FAILURE);
+    }
+    // 返回栈顶元素
+    return s->elements[s->size - 1];
+}
+```
+
+### 动态数组栈的判空操作
+
+判空操作是检查栈是否为空的过程，这对于避免在空栈上执行入栈、出栈或访问栈顶等操作至关重要。
+
+1. **函数原型**：`is_empty` 函数接受一个指向 `DynamicStack` 结构体的指针 `s`，并返回一个布尔值。
+2. **判空逻辑**：如果栈的大小 `size` 等于 0，则表示栈为空。
+3. **返回值**：返回 `true` 表示栈为空，返回 `false` 表示栈不为空。
+
+```c
+bool is_empty(DynamicStack *s) {
+	return s->size == 0;
+}
+```
+
+## 栈的应用
+
+栈作为一种基本的数据结构，因其后进先出（LIFO, Last In First Out）的特性，在许多场景中发挥着重要作用。以下是对栈应用领域的描述：
+
+1. **函数调用机制**：在编程中，函数调用通常使用栈来管理。每当一个函数被调用，其参数、局部变量和返回地址等信息被压入调用栈，待函数执行完毕后再弹出。
+2. **括号匹配问题**：栈常用于检查和匹配各种类型的括号，如圆括号、方括号和花括号。通过对应地压入和弹出括号，可以确保括号的匹配性。
+3. **表达式求值问题**：在计算中缀表达式时，栈可以用来处理操作数和操作符，进而转换为后缀表达式或直接计算结果。
+4. **浏览器历史记录前进后退功能**：浏览器使用栈来实现页面的前进和后退功能。当前页面压入栈中，访问新页面时再压入，后退时则从栈中弹出页面。
+5. **深度优先遍历算法**：在图和树的遍历中，深度优先搜索（DFS）通常使用栈来实现。通过递归或显式栈操作，可以逐层深入遍历。
+
+## 括号匹配问题
+
+**括号匹配问题的解决思路**：
+
+使用栈解决括号匹配问题是一种高效的方法，特别是当存在多种类型的括号时。
+
+1. **遍历字符串**：从左到右遍历输入的字符串。
+2. **处理左括号**：遇到左括号时，将其对应的右括号入栈。这是基于括号匹配的原则，即每个左括号必须与其对应的右括号匹配。
+3. **处理右括号**：
+   - 遇到右括号时，首先检查栈是否为空。如果栈为空，说明没有对应的左括号，匹配失败。
+   - 如果栈不为空，出栈一个元素，并检查是否与当前右括号匹配。如果不匹配，说明括号匹配失败。
+4. **完成遍历**：完成字符串遍历后，再次检查栈是否为空。如果栈为空，说明所有括号都已正确匹配；如果栈中还有元素，说明有未匹配的左括号，匹配失败。
+
+```c
+#include <stdio.h>
+
+#include "linked_stack.h"
+
+bool is_left_bracket(char c) {
+    return c == '(' || c == '[' || c == '{';
+}
+
+bool is_right_bracket(char c) {
+    return c == ')' || c == ']' || c == '}';
+}
+
+char get_matching_bracket(char c) {
+    switch (c) {
+        case '(':
+            return ')';
+        case '[':
+            return ']';
+        case '{':
+            return '}';
+        default:
+            return '\0';
+    }
+}
+
+bool is_matching(char *str, LinkedStack *stack) {
+    while (*str) {
+        if (is_left_bracket(*str)) {
+            char right_bracket = get_matching_bracket(*str);
+            stack_push(stack, right_bracket);
+        }
+        if (is_right_bracket(*str)) {
+            if (is_empty(stack) || stack_pop(stack) != *str) {
+                return false;
+            }
+        }
+        str++;
+    }
+    return is_empty(stack);
+}
+
+int main(void) {
+    LinkedStack *stack = stack_create();
+    char *str = "1()23{[}";
+    if (is_matching(str, stack)) {
+        printf("匹配成功!\n");
+    } else {
+        printf("匹配失败!\n");
+    }
+    stack_destroy(stack);
+    return 0;
+}
+
+```
+

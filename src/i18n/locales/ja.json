@@ -1,0 +1,244 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "posts": "記事",
+    "categories": "カテゴリ",
+    "tags": "タグ",
+    "archives": "アーカイブ",
+    "statistics": "統計"
+  },
+  "post": {
+    "wordCount": "文字数",
+    "readingTime": "読了時間",
+    "minutes": "分",
+    "words": "字",
+    "author": "著者",
+    "link": "記事リンク",
+    "copyright": "著作権",
+    "sticky": "固定記事",
+    "latest": "最新記事",
+    "noContent": "記事はまだありません",
+    "publishedAt": "公開日",
+    "createdAt": "作成日",
+    "updatedAt": "更新日",
+    "previousPost": "前の記事",
+    "nextPost": "次の記事",
+    "rewardSupport": "サポートする",
+    "rewardDescription": "ご支援が継続的な執筆の励みになります",
+    "readingNeed": "約",
+    "license": {
+      "text": "この記事は",
+      "suffix": "ライセンスの下で公開されています。転載時は出典を明記してください",
+      "noreprint": "この記事はあらゆる形式での転載を禁止しています",
+      "CC-BY-4.0": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "CC-BY-SA-4.0": "Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)",
+      "CC-BY-ND-4.0": "Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)",
+      "CC-BY-NC-4.0": "Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
+      "CC-BY-NC-SA-4.0": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)",
+      "CC-BY-NC-ND-4.0": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"
+    },
+    "encryptedExcerpt": "この記事は暗号化されているため、概要を表示できません"
+  },
+  "category": {
+    "title": "カテゴリ",
+    "all": "すべて",
+    "subcategories": "サブカテゴリ",
+    "posts": "件の記事",
+    "label": "カテゴリ",
+    "noContent": "このカテゴリには記事がありません",
+    "untitled": "無題"
+  },
+  "tag": {
+    "title": "タグ"
+  },
+  "archive": {
+    "title": "アーカイブ",
+    "all": "すべて",
+    "year": "年",
+    "month": "月",
+    "excellent": "最高です",
+    "great": "とても良いです",
+    "good": "良いです",
+    "nice": "なかなか良いです",
+    "ok": "まずまずです",
+    "emh": "うーん..",
+    "keepTrying": "この調子で続けましょう"
+  },
+  "statistics": {
+    "title": "記事統計",
+    "totalPosts": "記事数",
+    "totalCategories": "カテゴリ数",
+    "totalTags": "タグ数",
+    "topCategory": "最も使われたカテゴリ",
+    "postCount": "記事数",
+    "monthlyPosts": "月別投稿推移",
+    "categoryDistribution": "カテゴリ別記事分布（Top 10）",
+    "tagDistribution": "タグ別記事分布（Top 16）",
+    "latestMonthSummary": "{{month}} に {{count}} 件の記事が公開されました。"
+  },
+  "sidebar": {
+    "toc": "目次",
+    "overview": "サイト概要",
+    "author": "著者",
+    "scrollTop": "ページ上部へ",
+    "scrollBottom": "ページ下部へ",
+    "relatedPosts": "関連記事",
+    "state": {
+      "posts": "記事",
+      "categories": "カテゴリ",
+      "tags": "タグ"
+    },
+    "related": {
+      "noContent": "関連記事はありません"
+    },
+    "calendar": {
+      "title": "カレンダー",
+      "subtitle": "3カラムレイアウトのプレビュー",
+      "placeholder": "さらに多くのサイドバー項目を準備中です"
+    },
+    "search": {
+      "title": "サイト内検索",
+      "subtitle": "すばやく探す",
+      "action": "検索パネルを開く",
+      "helper": "既存の Pagefind 検索を使って、記事・タグ・キーワードをすばやく探せます。"
+    },
+    "moments": {
+      "title": "最近のモーメント",
+      "subtitle": "近況アップデート"
+    },
+    "randomPosts": {
+      "title": "ランダム記事",
+      "subtitle": "気分を変えて"
+    },
+    "tagCloud": {
+      "title": "タグクラウド",
+      "subtitle": "人気のトピック",
+      "browseAll": "すべてのタグを見る →"
+    },
+    "announcement": {
+      "title": "お知らせ",
+      "subtitle": "サイト掲示板"
+    },
+    "extra": {
+      "title": "右サイドバー",
+      "subtitle": "追加コンテンツ",
+      "empty": "現在、有効な右サイドバーコンテンツはありません"
+    },
+    "panels": {
+      "contents": "目次",
+      "related": "関連",
+      "overview": "サイト"
+    }
+  },
+  "footer": {
+    "poweredBy": "Powered by",
+    "and": "と",
+    "poweredSuffix": "テーマ",
+    "totalWordsTitle": "総文字数",
+    "estimatedReadingTimeTitle": "推定読了時間",
+    "randomPosts": "ランダム記事",
+    "recentComments": "最新コメント",
+    "noRecentComments": "まだコメントはありません。最初のひとことをどうぞ",
+    "recentCommentsLoadFailed": "最新コメントの読み込みに失敗しました。後でもう一度お試しください。",
+    "commentAnonymous": "匿名ユーザー",
+    "walineNotConfigured": "Waline のサーバー URL が設定されていません"
+  },
+  "pagination": {
+    "prev": "前へ",
+    "next": "次へ"
+  },
+  "button": {
+    "readMore": "続きを読む",
+    "more": "もっと見る"
+  },
+  "tags": {
+    "title": "タグ",
+    "allTags": "すべてのタグ",
+    "tagged": "タグ"
+  },
+  "common": {
+    "loading": "読み込み中",
+    "more": "もっと見る",
+    "total": "合計",
+    "home": "ホーム",
+    "in": "in"
+  },
+  "search": {
+    "devModeSkipped": "現在は開発モードのため、Pagefind の読み込みをスキップしました。",
+    "buildHint": "サイト内検索を確認するには、まず本番ビルド（インデックス生成を含む）を実行してください。"
+  },
+  "encrypted": {
+    "title": "暗号化された記事",
+    "description": "この記事を閲覧するにはパスワードが必要です",
+    "passwordPlaceholder": "パスワードを入力",
+    "submit": "復号する",
+    "decrypting": "内容を復号しています...",
+    "error": "パスワードが正しくありません。もう一度お試しください",
+    "passwordRequired": "パスワードを入力してください"
+  },
+  "moments": {
+    "title": "モーメント",
+    "noContent": "モーメントはまだありません",
+    "publishedAt": "公開日",
+    "imageAlt": "モーメント画像 {{index}}"
+  },
+  "imageZoom": {
+    "dialog": "画像プレビュー",
+    "close": "画像プレビューを閉じる",
+    "previous": "前の画像を表示",
+    "next": "次の画像を表示"
+  },
+  "random": {
+    "title": "ランダム記事",
+    "redirecting": "ランダム記事へ移動しています...",
+    "noPost": "移動できる記事がありません",
+    "retry": "もう一度ランダム",
+    "noScript": "このブラウザでは JavaScript が無効です。ホームに戻って手動で記事を選んでください。"
+  },
+  "aboutDialog": {
+    "defaults": {
+      "title": "クイックチャット",
+      "intro": "選択肢を選んで会話を続けてください。コンポーネント内で分岐や返答を事前定義できます。",
+      "authorName": "著者",
+      "authorInitial": "著",
+      "endHint": "この会話は終了しました。「再開」をクリックするともう一度始められます。"
+    },
+    "defaultNodes": {
+      "intro": {
+        "text": "こんにちは。これは設定可能な会話コンポーネントのサンプルです。返信を選んで続けてください。",
+        "optionA": {
+          "label": "サンプル質問 A",
+          "reply": "サンプル質問 A の返答を見たいです。"
+        },
+        "optionB": {
+          "label": "サンプル質問 B",
+          "reply": "サンプル質問 B の返答を見たいです。"
+        }
+      },
+      "answerA": {
+        "text": "これはサンプル回答 A です。ノードの文章や選択肢を自分の内容に置き換えられます。"
+      },
+      "answerB": {
+        "text": "これはサンプル回答 B です。nodes プロパティでページ側から既定の会話を上書きすることもできます。"
+      },
+      "backToMenu": {
+        "label": "メニューへ戻る",
+        "reply": "メニューに戻ります。"
+      }
+    },
+    "runtime": {
+      "noNodesConfigured": "会話ノードがまだ設定されていません。",
+      "branchNotConfigured": "この分岐はまだ設定されていません。別の選択肢を選んでください。",
+      "noDialogContent": "会話内容がありません。先にノードを設定してください。"
+    },
+    "typing": {
+      "ariaLabel": "入力中",
+      "peerTyping": "相手が入力中…",
+      "inputPlaceholder": "ここにメッセージを入力（デモ用入力欄）"
+    },
+    "actions": {
+      "send": "送信",
+      "restart": "再開"
+    }
+  }
+}

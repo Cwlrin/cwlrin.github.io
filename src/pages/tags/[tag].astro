@@ -1,0 +1,114 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import { toCategoryHref, toPostHref, toTagSlug } from "@/toolkit/posts/url";
+import { t } from "@/i18n";
+import "../../styles/collapse.css";
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection("posts");
+  const publishedPosts = allPosts.filter((post) => !post.data.draft);
+
+  // Collect all unique tags
+  const tagSet = new Set<string>();
+  publishedPosts.forEach((post) => {
+    const tags = post.data.tags || [];
+    tags.forEach((tag) => tagSet.add(tag));
+  });
+
+  // Generate paths for each tag
+  return Array.from(tagSet).map((tag) => ({
+    params: { tag: toTagSlug(tag) },
+    props: { tag },
+  }));
+}
+
+interface Props {
+  tag: string;
+}
+
+const { tag } = Astro.props;
+
+// Get all published posts
+const allPosts = await getCollection("posts");
+const publishedPosts = allPosts.filter((post) => !post.data.draft);
+
+// Filter posts that have this tag
+const postsWithTag = publishedPosts.filter((post) => {
+  const tags = post.data.tags || [];
+  return tags.includes(tag);
+});
+
+// Sort posts by date descending (newest first)
+const sortedPosts = postsWithTag.toSorted(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+// Helper to format date
+function formatDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+// Get last category name for display
+function getLastCategory(categories: string[]): string | undefined {
+  return categories.length > 0 ? categories.at(-1) : undefined;
+}
+---
+
+<Layout pageTitle={tag}>
+  <div class="wrap">
+    <div class="timeline">
+      <h2 class="item header">
+        <a href="/tags/">{t("tags.allTags")}</a>
+        <small>/</small>
+        {tag}
+        <small>{t("tags.tagged")}</small>
+      </h2>
+
+      {
+        sortedPosts.map((post) => {
+          const lastCategory = getLastCategory(post.data.categories || []);
+
+          return (
+            <article
+              class="item normal"
+              itemscope
+              itemtype="http://schema.org/Article"
+            >
+              <div class="meta">
+                <time
+                  itemprop="dateCreated"
+                  datetime={post.data.date.toISOString()}
+                >
+                  {formatDate(post.data.date)}
+                </time>
+              </div>
+
+              {lastCategory && (
+                <div class="meta">
+                  <span>
+                    <a href={toCategoryHref(lastCategory)}>{lastCategory}</a>
+                  </span>
+                </div>
+              )}
+
+              <div class="title">
+                <a
+                  href={toPostHref(post.id)}
+                  itemprop="url"
+                >
+                  <span itemprop="name">
+                    {post.data.title || t("post.noContent")}
+                  </span>
+                </a>
+              </div>
+            </article>
+          );
+        })
+      }
+    </div>
+  </div>
+</Layout>

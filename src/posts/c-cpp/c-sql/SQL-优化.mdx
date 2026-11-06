@@ -1,0 +1,229 @@
+---
+title: "SQL 优化"
+date: 2024-10-10T22:34:25+08:00
+categories: ["C 与 C++", "数据库"]
+tags: ["SQL"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0Vmekh5WDk3NDJSRHJleXJZcnctaHhjQjhtWmFQNUpOUWpIdDRqeGJ0alZEaUE_ZT05TUV3N20.jpg"
+---
+
+## 慢查询
+
+MySQL 的慢查询日志是一个用于记录执行时间超过特定阈值的 SQL 查询的工具，它能帮助快速定位和优化这些查询。
+
+启用慢查询日志需要修改 MySQL 配置文件，并设置执行时间阈值。启用后，所有超过这个时间的查询都会被记录到指定的日志文件中。
+
+通过分析这些日志，可以采取多种措施来优化 SQL 查询，包括改进索引、重写查询或调整数据库配置。
+
+### 设置
+
+#### 默认设置
+
+慢查询日志的位置:  慢查询日志默认处于未开启状态。
+
+```mysql
+show variables like '%slow%'; # 获取慢查询日志的相关信息
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VjRDVvUUF5Y1BKSHN1UEYwRTg2LXVjQmdaWkxXWHcyaVhCZ1dnZld5d29SYlE_ZT1OWEFnWWU.jpg)
+
+慢查询 SQL 的时间阈值:  默认阈值为 10 s。
+
+```sql
+show variables like '%long_query%'
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZSUJFYk1ZWndOUHJRSWxuTThZemF3QnZXcVM3bk5VSy1IaUdlR200dTlSOGc_ZT1zakVMR3E.jpg)
+
+#### 修改配置
+
+开启慢查询文件
+
+```sql
+set global slow_query_log = on;
+-- show variables like '%slow%';
+```
+
+更改耗时 SQL 阈值
+
+```sql
+set global long_query_time = 0.1; 
+-- show variables like '%long_query%';
+```
+
+修改回默认设置 (测试完成之后, 改回来)
+
+```sql
+set global slow_query_log = off;
+set global long_query_time = 10; 
+```
+
+### 使用
+
+```bash
+cat /www/server/data/mysql-slow.log
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0Vlb29LOFZONnh4S3JDR1BrWFV0WmlvQkhuQkhQVVNLODhjeS1FaUtvMEdoV0E_ZT1vV1pOcEw.jpg)
+
+日志的内容:
+
+```
+SQL 执行的时间
+用户名 、用户的IP信息、线程ID号
+执行花费的时间  执行获得锁的时间  获得的结果行数 扫描的数据行数
+这 SQL 执行的具体时间
+具体的 SQL 语句
+```
+
+## EXPLAIN
+
+MySQL 中的 `EXPLAIN` 是一个用于分析查询语句执行计划的工具。它提供了关于查询如何执行的详细信息，包括数据如何被检索、使用的索引、表连接方式以及数据过滤过程等。通过分析 `EXPLAIN` 的输出，用户可以识别查询性能的瓶颈，比如全表扫描或未使用索引，并据此采取优化措施，如调整索引策略或重写查询逻辑。此外，`EXPLAIN` 也用于验证优化效果，通过比较优化前后的执行计划来确保优化措施的有效性。
+
+简而言之，`EXPLAIN` 以可视化的方式帮助我们理解 SQL 查询的执行状态和计划。
+
+而我们使用 `EXPLAIN` 只需要在待查询语句前面加上 explain 关键字，就可以了。
+
+```sql
+SELECT c.class_name, st.student_name
+FROM class c
+         INNER JOIN student st ON c.id = st.class_id;
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWMldZY29QamVCUGhiQVFCZWlicWVjQjRuMlNmQWphVFkxTkNQSDRFeFQzNkE_ZT11YVlDTGg.jpg)
+
+```sql
+EXPLAIN SELECT c.class_name, st.student_name
+FROM class c
+         INNER JOIN student st ON c.id = st.class_id;
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlbFgwdHVXSG54RGdyRFRtc2M1aW93QnZGZXNhOVd5cF9wT2YwandBSzJFSnc_ZT1RbVdvNVM.jpg)
+
+### id
+
+`EXPLAIN` 语句的输出结果中，`id` 列是一个重要的标识符，它为每个 `SELECT` 语句分配一个唯一的序列号。这个序列号可以帮助我们理解查询的逻辑执行顺序，即查询中各个部分的执行顺序。
+
+`id` 值通常反映了查询的逻辑顺序，即查询的不同部分是如何组合在一起的。例如，如果一个查询包含多个表连接操作，`id` 值可以帮助我们理解这些连接操作是如何按顺序执行的。
+
+需要注意的是，`id` 值并不总是代表实际的物理执行顺序。在某些特殊情况下，如子查询、复杂表达式或特定类型的表连接（如嵌套循环连接），实际的执行顺序可能会与 `id` 值所指示的逻辑顺序不同。
+
+`id` 相同，执行顺序由上至下。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUQmtQdE0wNGpCR3FJZG96OTFKcDl3QnF6QTBKQzFPbUdoM2ZNd2J3enZwSVE_ZT12Q3hTZUY.jpg)
+
+`id` 不同, `id` 值越大，优先级越高，越先被执行。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRMlZiMkpkdG9WTW1rNnZ1ekZCejVBQkJYeGN3ZDVZa01tS0oyRjhwbmxqa2c_ZT1iQ2VYT1Y.jpg)
+
+`id` 既有相同又有不同，不同的 `id` 值，`id` 值越大，优先级越高，越先被执行;  相同的 `id` 值，按照从上到下的顺序执行。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUcXhLNUJuOWNwTnNQVVExTnlwM3M0QlotcW5IVzgyY1VYZlcyekFOSm1DM1E_ZT1oYjhDeTM.jpg)
+
+### select_type
+
+`select_type` 表示 `select` 的查询类型，主要用于区分各种复杂的查询，例如普通查询、联合查询、子查询等。
+
+`select_type` 的常见类型:
+
+| 类型         | 描述                                                    |
+| ------------ | ------------------------------------------------------- |
+| SIMPLE       | 简单的查询   (查询中不包含子查询或者 UNION)              |
+| PRIMARY      | 外层查询 (查询中若包含任何复杂的子部分)                 |
+| SUBQUERY     | 子查询                                                  |
+| DERIVED      | 派生表                                                  |
+| UNION        | 一般属于第二个 SELECT,  出现在 UNION 之后，则被标记为 UNION |
+| UNION RESULT | 从 UNION 表获取结果的 SELECT                               |
+| ...          | ...                                                     |
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSWnEwVGRNb2FKUGdITUpvSzJ2QXJZQmhUaWZjYWxjOFZtTE5VWTVzMkgtY3c_ZT1lUHprMGo.jpg)
+
+### table
+
+`table` 表示表名。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSWnEwVGRNb2FKUGdITUpvSzJ2QXJZQmhUaWZjYWxjOFZtTE5VWTVzMkgtY3c_ZT1lUHprMGo.jpg)
+
+### partitions
+
+`partitions` 分区: 只对设置了分区的表有意义, 暂时忽略。
+
+### type
+
+`type`:  `type` 字段的作用, 用以显示 MySQL 决定使用哪种方式来访问表。
+
+对于 `type` 字段, 从性能的好坏划分, 可以分为:
+
+```sql
+-- system > const > eq_ref > ref > fulltext > ref_or_null > index_merge > unique_subquery > index_subquery > range > index > ALL 
+```
+
+| 常见字段   | 表示含义                                                   |
+| ---------- | :--------------------------------------------------------- |
+| **system** | 系统表，或者极少量数据，往往不需要进行磁盘 IO               |
+| **const**  | 常量连接(常数级时间复杂度, 基本上是命中主键)               |
+| **eq_ref** | 多表关联查询时，主键索引或唯一索引作为关联条件进行等值扫描 |
+| **re f**   | 非主键或者非唯一索引等值扫描                               |
+| **range**  | 范围扫描                                                   |
+| **index**  | 全索引扫描 (比如修改表中数据, 导致所有索引结构变化)        |
+| **ALL**    | 全表扫描                                                   |
+| ...        | ...                                                        |
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VkTkt4clRIUG5KUGdXY1FNWTg3ZHJ3QkE5Nk1vUlhSTFNGSjYxaUtIUkRNZlE_ZT1uZ2k1M3E.jpg)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUX3pkRF9URHpkRGdSTkJWN1djUlhRQlF0cmswcDI0Y05WeFR5RHNBLXA1akE_ZT1yVmZKekM.jpg)
+
+### possible_keys
+
+`possible_keys` 列在 `EXPLAIN` 的输出中显示了 MySQL 优化器在查询过程中可能考虑使用的索引。这些索引是优化器在初步解析查询时认为可能有助于执行查询的索引。
+
+`possible_keys` 列出了所有可能被用来优化查询的索引。这包括了查询中涉及的字段上定义的索引，以及复合索引中包含的索引。
+
+在查询优化的早期阶段，优化器会考虑所有可能的索引。然而，在优化过程的后期，优化器可能会基于统计信息和成本估算来决定哪些索引实际上是不需要的，因此有些索引可能不会被实际使用。
+
+最终是否使用这些索引取决于优化器的决策，优化器会根据查询的成本和效益来选择最佳的执行计划。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VkdUFoRGQ0RGtOSHBMSE42Z2JXN3U0QlFOWnlKYmJZRkotLXFHWGFrd0Z1UlE_ZT14b3FoWVE.jpg)
+
+### key
+
+`key`: SQL 执行中实际使用到的索引，如果为 `NULL` ，则没有使用索引。
+
+### key_len
+
+`key_len` 是 `EXPLAIN` 输出中的一个列，它表示查询中实际使用到的索引的长度（以字节为单位）。这个长度是根据索引中使用的字段类型和大小计算得出的。
+
+不同的数据类型有不同的长度，例如 `int` 类型通常是 4 字节，`long` 类型通常是 8 字节，`float` 类型通常是 4 字节。
+
+### ref
+
+`ref`: 表示将哪个字段或常量和 `key` 列所使用的字段进行比较。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTemlJcmpXYlpWTHRxdTB0WFpBQTNzQjJGTkFDc3VZSC1YRkRUalVWVXlDVXc_ZT1VWGQ2NVE.jpg)
+
+### filtered
+
+`filtered` 表示数据库估计在应用查询条件后，表中剩余行数的百分比。
+
+如果 `rows` 为 1000，`filtered` 为 50%，则预计有 500 行满足查询条件。`filtered` 值越大，说明索引过滤效果越好；值越小，说明索引过滤效果越差，甚至可能未利用索引。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaRVROVTVzSk1aS29WekNZcW9HRnRjQkkxamw5THNfdFJaT0VydVpPSlZOREE_ZT1pZEY2dk8.jpg)
+
+### Extra
+
+`Extra`: 包含不适合在其他列中显示但十分重要的额外信息(附加信息) , 该列显示了 MySQL 在查询过程中的一些详细信息。
+
+| **值**           | **描述**                                                     |
+| ---------------- | :----------------------------------------------------------- |
+| Using filesort   | 说明mysql会对数据使用一个外部的索引排序，而不是按照表内的索引顺序进行读取, 也称为文件排序. |
+| Using temporary  | 使了用临时表保存中间结果,MySQL在对查询结果排序时使用临时表。 |
+| USING index      | 是否用了覆盖索引                                             |
+| Using where      | 表明使用了where过滤                                          |
+| Impossible where | where子句的值总是false，不能用来获取任何元组                 |
+| ...              | ...                                                          |
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUalJ2VDViV1ZKR2tBRnpWT0hrSm1BQkJadl9xZTJPTFZHakx1R09KS0RvUWc_ZT1WdUFnNnQ.jpg)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVb3JiRDZaX1FGRG1Hc1lVVldpLW1zQm1jUUJXME5BalNZa1pUazVnVzNtcnc_ZT1qcEdJaW0.jpg)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmUTdXbHI2dVdsTnNBYlQ3N3hkTUZZQkNWbW5nUXNPdmtXVjUyekZlNGsxNmc_ZT12czZxTVE.jpg)
+

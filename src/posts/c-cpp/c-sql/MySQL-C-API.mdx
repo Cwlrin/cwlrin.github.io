@@ -1,0 +1,526 @@
+---
+title: "MySQL C API"
+date: 2023-06-20T11:12:06+08:00
+categories: ["C 与 C++", "数据库"]
+tags: ["C", "SQL"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhbVI2Y3ZaWmVORW4zNmNianJzS3drQmRrM0dNMW12cjU4cGYzd19TNjFKa1E_ZT1IdTNTTkk.png"
+---
+
+## 安装库
+
+### Linux
+
+```shell
+sudo apt install libmysqlclient-dev
+```
+
+在调用函数之前，需要包含头文件 `<mysql/mysql.h>`
+
+在生成可执行程序的链接阶段时，需要加入链接选项 `-lmysqlclient`
+
+### Windows
+
+https://dev.mysql.com/downloads/
+
+## 使用流程
+
+### `mysql_init()` 初始化结构体
+
+`mysql_init()` 是 MySQL C API 中的一个函数，用于初始化一个 `MYSQL` 结构体，这个结构体代表了与 MySQL 数据库的连接。在尝试与 MySQL 数据库建立连接之前，你需要先调用这个函数。
+
+函数原型如下：
+
+```c
+MYSQL *mysql_init(MYSQL *mysql);
+```
+
+参数说明：`mysql`：指向 `MYSQL` 结构体的指针，这个结构体在调用 `mysql_init()` 之前应该已经被声明和分配了内存。
+
+返回值：
+
+- 成功时，返回指向初始化后的 `MYSQL` 结构体的指针。
+- 失败时，返回 `NULL`。
+
+使用 `mysql_init()` 的典型步骤如下：
+
+1. 声明一个 `MYSQL` 类型的指针。
+2. 调用 `mysql_init()` 并传递这个指针。
+3. 使用返回的指针来调用其他函数，如 `mysql_real_connect()` 来建立数据库连接。
+4. 完成数据库操作后，使用 `mysql_close()` 来关闭连接。
+
+`mysql_init` 函数用于初始化一个 MySQL 连接，但这个函数在某些版本的 MySQL 中可能不是线程安全的。这意味着如果多个线程尝试同时调用 `mysql_init` 来创建数据库连接，可能会导致不可预测的行为或错误。
+
+为了确保在多线程环境中安全地初始化数据库连接，可以采用以下策略：
+
+1. **使用互斥锁**：在调用 `mysql_init` 之前获取一个互斥锁，完成初始化后再释放锁。这样可以确保同一时间只有一个线程能够初始化数据库连接。
+2. **连接池**：另一种更高效的方法是使用数据库连接池。连接池可以预先创建和管理一组数据库连接，线程可以直接从池中获取和返回连接，而不需要每次都调用 `mysql_init`。
+
+### `mysql_real_connect()`  与 MySQL 数据库服务器建立实际连接
+
+`mysql_real_connect()` 是 MySQL C API 中用于与 MySQL 数据库服务器建立实际连接的函数。这个函数尝试使用提供的参数连接到 MySQL 服务器，并返回一个指向 `MYSQL` 结构体的指针，该结构体包含了连接的状态和信息。
+
+函数原型如下：
+
+```c
+MYSQL *mysql_real_connect(
+   MYSQL *mysql,                // 指向MYSQL结构的指针
+   const char *host,            // 数据库服务器的主机名或IP地址
+   const char *user,            // MySQL 用户名
+   const char *passwd,          // 用户密码
+   const char *db,              // 数据库名称
+   unsigned int port,          // 端口号，MySQL默认端口号是3306
+   const char *unix_socket,    // Unix套接字文件的路径
+   unsigned long client_flag   // 客户端标志选项
+);
+```
+
+参数说明：
+
+- `mysql`：指向 `MYSQL` 结构体的指针，这个结构体必须由 `mysql_init()` 函数初始化。
+
+- `host`：数据库服务器的主机名或 IP 地址。如果传递 `NULL` 或 `"localhost"`，将尝试连接到本地机器上的服务器。
+
+- `user`：用于连接数据库的用户名。
+
+- `passwd`：用户的密码。
+
+- `db`：要连接的数据库名称。如果传递 `NULL`，则不会尝试连接到任何特定的数据库。
+
+- `port`：MySQL 服务器监听的端口号，默认为 3306。
+
+- `unix_socket`：Unix 套接字文件的路径，用于在 Unix/Linux 系统上连接到 MySQL 服务器。在 Windows 上通常不需要，可以传递 `NULL`。
+
+- `client_flag`：客户端选项的标志，可以是以下值的组合：
+  - `0`：无特殊选项。
+  - `CLIENT_MULTI_STATEMENTS`：允许发送多条语句。
+  - `CLIENT_MULTI_RESULTS`：允许服务器发送多个结果集。
+
+返回值：
+
+- 成功时，返回指向初始化后的 `MYSQL` 结构体的指针。
+- 失败时，返回 `NULL`。
+
+使用 `mysql_real_connect()` 的典型步骤如下：
+
+1. 使用 `mysql_init()` 初始化 `MYSQL` 结构体。
+2. 调用 `mysql_real_connect()` 并传递必要的连接参数。
+3. 检查返回值是否为 `NULL`，如果是，则连接失败，可以使用 `mysql_error()` 函数获取错误信息。
+4. 如果连接成功，可以进行数据库操作。
+5. 完成操作后，使用 `mysql_close()` 函数关闭连接。
+
+### `mysql_query()` 执行 SQL 语句
+
+`mysql_query()` 是 MySQL C API 中用于执行 SQL 语句的函数。这个函数接受一个 `MYSQL` 结构体的指针和一个 SQL 语句作为参数，用于在与 MySQL 数据库的连接上执行该 SQL 语句。
+
+函数原型如下：
+
+```c
+int mysql_query(
+   MYSQL *mysql, // 建立连接的 MYSQL 结构的指针
+   const char *query // 要执行的 SQL 语句的字符串
+);
+```
+
+参数说明：
+
+- `mysql`：指向已经通过 `mysql_real_connect()` 函数成功建立连接的 `MYSQL` 结构体的指针。
+- `query`：指向包含要执行的 SQL 语句的字符串的指针。这个字符串应该是以空字符（`'\0'`）结尾的，并且不应该以分号（`';'`）结尾，因为分号在 C 字符串中表示字符串的结束。
+
+返回值：
+
+- 成功时，返回 `0`。
+- 失败时，返回非零值。可以使用 `mysql_error()` 函数获取错误信息。
+
+使用 `mysql_query()` 的典型步骤如下：
+
+1. 确保已经通过 `mysql_real_connect()` 成功建立了数据库连接。
+2. 调用 `mysql_query()` 并传递连接指针和 SQL 语句。
+3. 检查返回值，如果返回值不为 `0`，则表示执行失败，可以使用 `mysql_error()` 获取错误信息。
+4. 如果 SQL 语句是查询（SELECT）类型的，需要使用 `mysql_store_result()` 或 `mysql_use_result()` 来获取结果集。
+5. 如果 SQL 语句是更新（INSERT、UPDATE、DELETE）类型的，可以使用 `mysql_affected_rows()` 来获取受影响的行数。
+
+### 处理结果
+
+#### `mysql_store_result()`  存储查询结果
+
+`mysql_store_result()` 函数是 MySQL C API 中用于存储查询结果的函数。当你执行一个查询（如 `SELECT` 语句）后，这个函数可以用来获取并存储查询结果，以便后续处理。
+
+函数原型如下：
+
+```c
+MYSQL_RES *mysql_store_result(MYSQL *mysql);
+```
+
+参数说明：`mysql`：指向已经通过 `mysql_real_connect()` 函数成功建立连接的 `MYSQL` 结构体的指针。
+
+返回值：
+
+- 成功时，返回一个指向 `MYSQL_RES` 结构体的指针，该结构体包含了查询结果的元数据和数据。
+- 失败时，返回 `NULL`。可以使用 `mysql_error()` 函数获取错误信息。
+
+使用 `mysql_store_result()` 的典型步骤如下：
+
+1. 确保已经通过 `mysql_real_connect()` 成功建立了数据库连接。
+2. 使用 `mysql_query()` 执行一个查询语句。
+3. 调用 `mysql_store_result()` 来获取查询结果。
+4. 检查返回值，如果返回值不为 `NULL`，则表示成功获取了结果集。
+5. 使用 `mysql_fetch_row()` 函数遍历结果集，获取每一行的数据。
+6. 处理完结果集后，使用 `mysql_free_result()` 释放内存。
+
+`mysql_store_result()` 函数会将整个结果集加载到客户端的内存中，如果查询结果非常大，这可能会导致内存问题。对于大型结果集，可以考虑使用 `mysql_use_result()` 函数，它提供了一种逐行获取结果的方式，可以减少内存的使用。
+
+`mysql_store_result()` 函数在某些情况下可能不是必需的，例如，如果只需要遍历一次结果集，可以直接使用 `mysql_use_result()` 来获取结果集，然后使用 `mysql_fetch_row()` 来逐行处理数据。这样可以避免额外的内存分配和复制。
+
+#### `mysql_free_result()` 释放内存
+
+`mysql_free_result()` 函数是 MySQL C API 中用于释放由 `mysql_store_result()` 函数获取的结果集所占用的内存的函数。当你完成对结果集的处理后，应该调用这个函数来释放与结果集相关的内存资源。
+
+函数原型如下：
+
+```c
+void mysql_free_result(MYSQL_RES *result);
+```
+
+参数说明：`result`：指向 `MYSQL_RES` 结构体的指针，该结构体包含了通过 `mysql_store_result()` 获取的查询结果。
+
+返回值：无。
+
+使用 `mysql_free_result()` 的典型步骤如下：
+
+1. 执行一个查询语句，例如使用 `mysql_query()`。
+2. 使用 `mysql_store_result()` 获取查询结果。
+3. 遍历结果集，使用 `mysql_fetch_row()` 逐行获取数据。
+4. 处理完结果集后，调用 `mysql_free_result()` 释放内存。
+5. 确保在调用 `mysql_free_result()` 后不再访问结果集，因为此时结果集已经被释放。
+
+如果使用的是 `mysql_use_result()` 来获取结果集，那么在遍历完结果集后，也应该调用 `mysql_free_result()` 来释放内存。这是因为 `mysql_use_result()` 同样会分配内存来存储结果集，即使它是逐行返回数据的。
+
+此外，`mysql_free_result()` 函数在释放内存后不会改变 `result` 指针的值，因此，如果需要再次使用 `result` 指针，需要重新通过 `mysql_store_result()` 或 `mysql_use_result()` 获取新的 `MYSQL_RES` 结构体。
+
+#### `mysql_num_rows()` 获取结果集行数
+
+`mysql_num_rows()` 函数是 MySQL C API 中用于获取结果集中行数的函数。这个函数返回指定结果集中的行数，通常用于了解查询返回了多少行数据。
+
+函数原型如下：
+
+```c
+my_ulonglong mysql_num_rows(MYSQL_RES *result);
+```
+
+参数说明：`result`：指向 `MYSQL_RES` 结构体的指针，该结构体包含了通过 `mysql_store_result()` 或 `mysql_use_result()` 获取的查询结果。
+
+返回值：
+
+- 成功时，返回结果集中的行数，类型为 `my_ulonglong`，这是一个无符号长整型，能够表示非常大的数值。
+- 如果结果集为空或函数调用失败，返回 `(unsigned long long) -1`。
+
+使用 `mysql_num_rows()` 的典型步骤如下：
+
+1. 执行一个查询语句，例如使用 `mysql_query()`。
+2. 使用 `mysql_store_result()` 或 `mysql_use_result()` 获取查询结果。
+3. 调用 `mysql_num_rows()` 来获取结果集中的行数。
+4. 根据返回的行数，可以决定是否需要遍历结果集或进行其他操作。
+
+`mysql_num_rows()` 函数在调用时会阻塞直到所有行都被计数完成，这可能会对性能产生影响，特别是在处理大量数据时。因此，如果不需要在处理结果集之前知道行数，可以考虑在处理完所有行后再调用此函数，或者根本不调用它。
+
+此外，`mysql_num_rows()` 函数只适用于 `mysql_store_result()` 获取的结果集，因为 `mysql_use_result()` 获取的结果集是逐行处理的，行数可能在处理过程中动态变化。
+
+#### `mysql_num_fields()` 获取结果集列数
+
+`mysql_num_fields()` 函数是 MySQL C API 中用于获取结果集中字段（列）数量的函数。这个函数返回指定结果集中的字段数，通常用于了解查询返回了多少列数据。
+
+函数原型如下：
+
+```c
+unsigned int mysql_num_fields(MYSQL_RES *result);
+```
+
+参数说明：`result`：指向 `MYSQL_RES` 结构体的指针，该结构体包含了通过 `mysql_store_result()` 或 `mysql_use_result()` 获取的查询结果。
+
+返回值：
+
+- 成功时，返回结果集中的字段数，类型为 `unsigned int`。
+- 如果结果集为空或函数调用失败，返回 `0`。
+
+使用 `mysql_num_fields()` 的典型步骤如下：
+
+1. 执行一个查询语句，例如使用 `mysql_query()`。
+2. 使用 `mysql_store_result()` 或 `mysql_use_result()` 获取查询结果。
+3. 调用 `mysql_num_fields()` 来获取结果集中的字段数。
+4. 根据返回的字段数，可以决定如何遍历结果集或进行其他操作。
+
+`mysql_num_fields()` 函数返回的字段数是指查询结果集中的列数，而不是行数。这个函数通常在遍历结果集之前调用，以便知道如何处理每一行中的数据。例如，可以使用 `mysql_fetch_row()` 函数获取一行数据，然后根据字段数来访问每一列的值。
+
+此外，`mysql_num_fields()` 函数在获取结果集后任何时间都可以调用，它不会影响结果集的其他操作。
+
+#### `mysql_fetch_row()` 从结果当中取出一行
+
+`mysql_fetch_row()` 函数是 MySQL C API 中用于从结果集中逐行获取数据的函数。当你执行一个查询语句后，这个函数可以用来逐行读取结果集中的数据。
+
+函数原型如下：
+
+```c
+MYSQL_ROW mysql_fetch_ROW(MYSQL_RES *result);
+```
+
+参数说明：`result`：指向 `MYSQL_RES` 结构体的指针，该结构体包含了通过 `mysql_store_result()` 或 `mysql_use_result()` 获取的查询结果。
+
+返回值：
+
+- 成功时，返回一个指向 `MYSQL_ROW` 结构体的指针，该结构体包含了一行数据的所有字段值。
+- 当没有更多行可获取时，返回 `NULL`。
+- 如果发生错误，也返回 `NULL`。可以使用 `mysql_error()` 函数获取错误信息。
+
+`MYSQL_ROW` 是一个数组，其中包含了一行中每个字段的值，类型为 `char *`。每个字段的值可以是 `NULL`（如果该字段的值为 SQL `NULL`），或者是一个指向实际数据的指针。
+
+使用 `mysql_fetch_row()` 的典型步骤如下：
+
+1. 执行一个查询语句，例如使用 `mysql_query()`。
+2. 使用 `mysql_store_result()` 或 `mysql_use_result()` 获取查询结果。
+3. 在一个循环中调用 `mysql_fetch_row()` 来逐行获取数据，直到返回 `NULL` 为止。
+4. 在循环中处理每一行的数据。
+5. 处理完结果集后，使用 `mysql_free_result()` 释放内存。
+
+在使用 `mysql_fetch_row()` 时，应确保在处理完所有行之后释放结果集的内存，以避免内存泄漏。此外，`mysql_fetch_row()` 通常与 `mysql_num_fields()` 结合使用，以便知道每一行中有多少列数据，从而正确地处理每一列的值。
+
+### `mysql_close()` 关闭数据库连接
+
+`mysql_close()` 函数是 MySQL C API 中用于关闭与 MySQL 数据库的连接的函数。当你完成所有的数据库操作后，应该调用这个函数来关闭连接并释放与连接相关的资源。
+
+函数原型如下：
+
+```c
+void mysql_close(MYSQL *mysql);
+```
+
+参数说明：`mysql`：指向 `MYSQL` 结构体的指针，该结构体代表了与 MySQL 数据库的连接。
+
+返回值：无。
+
+使用 `mysql_close()` 的典型步骤如下：
+
+1. 初始化 `MYSQL` 结构体并建立连接，通常使用 `mysql_init()` 和 `mysql_real_connect()`。
+2. 执行数据库操作，如查询或更新。
+3. 处理完所有操作后，调用 `mysql_free_result()` 释放任何已获取的结果集的内存（如果有）。
+4. 最后，调用 `mysql_close()` 来关闭连接。
+
+一旦调用了 `mysql_close()`，`MYSQL` 结构体不再代表一个有效的数据库连接，并且应该避免在此之后使用该结构体进行任何数据库操作
+
+`mysql_close()` 函数在关闭连接后不会自动释放 `MYSQL` 结构体本身所占用的内存；如果需要，可以在关闭连接后手动释放它，通常是通过 `mysql_init()` 分配的。
+
+### `mysql_error()` 获取最近一次 MySQL 操作错误描述
+
+`mysql_error()` 函数是 MySQL C API 中用于获取最近一次 MySQL 操作错误描述的函数。当你的数据库操作（如连接、查询、更新等）失败时，可以使用这个函数来获取错误信息，这对于调试和错误处理非常有用。
+
+函数原型如下：
+
+```c
+const char *mysql_error(MYSQL *mysql);
+```
+
+参数说明：`mysql`：指向 `MYSQL` 结构体的指针，该结构体代表了与 MySQL 数据库的连接。
+
+返回值：
+
+- 成功时，返回一个指向错误描述字符串的指针。这个字符串是只读的，描述了最近一次 MySQL 操作失败的原因。
+- 如果没有错误发生，或者 `mysql` 指针是 `NULL`，返回 `NULL`。
+
+使用 `mysql_error()` 的典型步骤如下：
+
+1. 执行数据库操作，如 `mysql_real_connect()`、`mysql_query()` 等。
+2. 如果操作返回错误（通常是通过返回值或特定的错误代码），立即调用 `mysql_error()` 来获取错误描述。
+3. 使用返回的错误描述字符串来记录日志、显示错误信息或进行错误处理。
+
+`mysql_error()` 函数返回的错误描述字符串只在下一次调用 `mysql_real_connect()`、`mysql_query()` 或其他可能产生新错误的 MySQL 函数之前有效。一旦进行了新的数据库操作，之前的错误描述可能会被覆盖。因此，当捕获到一个错误时，应该立即处理或记录错误描述。
+
+### SELECT
+
+```c
+#include <mysql/mysql.h>
+#include <stdc.h>
+
+int main() {
+  MYSQL *conn;
+  MYSQL_RES *result;
+  MYSQL_ROW row;
+
+  conn = mysql_init(NULL);
+  if (!mysql_real_connect(conn, "localhost", "root", "123456", "wd", 0, NULL,
+                          0)) {
+    printf("Error: %s\n", mysql_error(conn));
+    return 1;
+  }
+
+  mysql_set_character_set(conn, "utf8mb4");
+
+  if (mysql_query(conn, "SELECT * FROM student")) {
+    printf("%s\n", mysql_error(conn));
+    return 1;
+  }
+
+  result = mysql_store_result(conn);
+
+  while ((row = mysql_fetch_row(result))) {
+    for (int i = 0; i < mysql_num_fields(result); i++) {
+      printf("%s \t", row[i]);
+    }
+    printf(" \n");
+  }
+
+  mysql_free_result(result);
+  mysql_close(conn);
+
+  return 0;
+}
+```
+
+### UPDATE
+
+```c
+#include <mysql/mysql.h>
+#include <stdc.h>
+
+int main() {
+  MYSQL *conn;
+  conn = mysql_init(NULL);
+  if (!mysql_real_connect(conn, "localhost", "root", "123456", "wd", 0, NULL,
+                          0)) {
+    printf("Error: %s\n", mysql_error(conn));
+    return 1;
+  }
+
+  if (mysql_query(conn,
+                  "update wd.student set student_name='张三' where id = 1")) {
+    printf("Error: %s\n", mysql_error(conn));
+    return 1;
+  }
+
+  mysql_close(conn);
+
+  return 0;
+}
+```
+
+## 事务 API
+
+### `mysql_autocommit() ` 控制自动提交
+
+`mysql_autocommit()` 函数是 MySQL C API 中用于控制自动提交模式的函数。在 MySQL 中，当一个事务中的所有操作都成功执行后，可以通过自动提交模式来自动提交这些操作，或者手动提交。
+
+函数原型如下：
+
+```c
+bool mysql_autocommit(MYSQL *mysql, bool mode);
+```
+
+参数说明：
+
+- `mysql`：指向 `MYSQL` 结构体的指针，该结构体代表了与 MySQL 数据库的连接。
+- `mode`：布尔值，用于设置自动提交模式的状态。
+  - `true`：启用自动提交模式。在这种模式下，每个单独的 SQL 语句执行后会自动提交，不需要显式调用提交命令。
+  - `false`：禁用自动提交模式。在这种模式下，需要手动调用 `mysql_commit()` 来提交事务，或者调用 `mysql_rollback()` 来回滚事务。
+
+返回值：
+
+- 成功时，返回 `true`。
+- 失败时，返回 `false`。可以使用 `mysql_error()` 函数获取错误信息。
+
+使用 `mysql_autocommit()` 的典型步骤如下：
+
+1. 确保已经通过 `mysql_real_connect()` 成功建立了数据库连接。
+2. 根据需要调用 `mysql_autocommit()` 来启用或禁用自动提交模式。
+3. 执行一系列的数据库操作，如果禁用了自动提交，需要在所有操作成功后调用 `mysql_commit()` 提交事务，或者在操作失败时调用 `mysql_rollback()` 回滚事务。
+4. 完成操作后，关闭数据库连接。
+
+自动提交模式的设置会影响当前连接的所有后续操作。如果在一个连接上禁用了自动提交，那么在该连接上执行的所有 SQL 语句都不会自动提交，直到显式地提交或回滚事务，或者重新启用自动提交模式。
+
+### `mysql_commit()` 提交当前事务
+
+`mysql_commit()` 函数是 MySQL C API 中用于提交当前事务的函数。在数据库操作中，事务是一个重要的概念，它确保了一系列数据库操作要么全部成功，要么全部失败，这是通过提交（Commit）或回滚（Rollback）来实现的。
+
+函数原型如下：
+
+```c
+bool mysql_commit(MYSQL *mysql);
+```
+
+参数说明：`mysql`：指向 `MYSQL` 结构体的指针，该结构体代表了与 MySQL 数据库的连接。
+
+返回值：
+
+- 成功时，返回 `true`。
+- 失败时，返回 `false`。可以使用 `mysql_error()` 函数获取错误信息。
+
+使用 `mysql_commit()` 的典型步骤如下：
+
+1. 确保已经通过 `mysql_real_connect()` 成功建立了数据库连接。
+2. 执行一系列的数据库操作，这些操作应该在一个事务中。
+3. 在所有操作成功后，调用 `mysql_commit()` 来提交事务，使所有更改永久生效。
+4. 如果在事务中的任何操作失败，可以选择调用 `mysql_rollback()` 来回滚事务，撤销所有更改。
+5. 完成操作后，关闭数据库连接。
+
+提交事务是一个不可逆的操作，一旦提交，事务中的所有更改都将永久生效。因此，在调用 `mysql_commit()` 之前，确保所有的数据库操作都已经成功执行，并且符合业务逻辑的要求。
+
+### `mysql_rollback()` 回滚当前事务
+
+`mysql_rollback()` 函数是 MySQL C API 中用于回滚当前事务的函数。在数据库操作中，事务是一组原子性的 SQL 操作，它们要么全部成功，要么全部失败。如果在事务中的某个操作失败，或者你决定不继续执行剩余的操作，可以使用 `mysql_rollback()` 来回滚事务，撤销所有已经执行的操作，确保数据库状态的一致性。
+
+函数原型如下：
+
+```c
+bool mysql_rollback(MYSQL *mysql);
+```
+
+参数说明：`mysql`：指向 `MYSQL` 结构体的指针，该结构体代表了与 MySQL 数据库的连接。
+
+返回值：
+
+- 成功时，返回 `true`。
+- 失败时，返回 `false`。可以使用 `mysql_error()` 函数获取错误信息。
+
+使用 `mysql_rollback()` 的典型步骤如下：
+
+1. 确保已经通过 `mysql_real_connect()` 成功建立了数据库连接。
+2. 执行一系列的数据库操作，这些操作应该在一个事务中。
+3. 如果在事务中的任何操作失败，或者你决定不继续执行剩余的操作，调用 `mysql_rollback()` 来回滚事务，撤销所有更改。
+4. 完成操作后，关闭数据库连接。
+
+回滚事务是一个重要的错误处理机制，它确保了数据库的完整性和一致性。在事务中的所有操作都将被视为一个整体，如果任何一个操作失败，整个事务都将被撤销。
+
+此外，回滚操作通常在检测到错误或异常时立即执行，以避免不一致的数据状态。
+
+### COMMIT
+
+```c
+#include <mysql/mysql.h>
+#include <stdc.h>
+
+int main() {
+  MYSQL *conn;
+
+  conn = mysql_init(NULL);
+  if (!mysql_real_connect(conn, "localhost", "root", "123456", "wd", 0, NULL,
+                          0)) {
+    printf("Error: %s\n", mysql_error(conn));
+    return 1;
+  }
+
+  mysql_autocommit(conn, 0);
+
+  mysql_query(conn, "INSERT INTO class VALUES (4, '四班')");
+  int ret = mysql_query(conn, "INSERT INTO class VALUES (NULL, '五班')");
+
+  if (ret != 0) {
+    mysql_rollback(conn);
+  } else {
+    mysql_rollback(conn);
+  }
+
+  mysql_autocommit(conn, 1);
+
+  mysql_close(conn);
+  return 0;
+}
+```
+
+

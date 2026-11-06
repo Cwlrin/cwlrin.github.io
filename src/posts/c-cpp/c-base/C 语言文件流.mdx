@@ -1,0 +1,1428 @@
+---
+title: "C 语言文件流"
+date: 2020-03-20T11:52:38+08:00
+categories: ["C 与 C++", "C 语言基础"]
+tags: ["C"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VjSjZkRkVEVDFkSmtaVFFYWThxWHpjQjFlZzRBNkFxcG1Jb2pLeldLVUVoNlE_ZT1zcmhPOW0.png"
+---
+
+## 输入输出流
+
+### 文件打开方式
+
+在处理文件操作时，我们可以通过指定不同的模式来打开文件，主要的模式有：
+
+1. **'r' 只读模式**：此模式下，文件将被打开用于读取，不允许写入或修改文件内容。
+2. **'w' 只写模式**：此模式下，文件将被打开用于写入。如果文件已存在，其内容将被截断，即原有内容将被删除。
+3. **'a' 附加模式**：此模式下，文件将被打开用于追加数据到文件末尾。如果文件不存在，将创建新文件。
+
+这些模式可以与以下选项结合使用：
+
+- **'t' 文本模式**：指示以文本文件形式打开文件。在文本模式下，系统会自动处理换行符，根据不同操作系统的规则转换为相应的换行表示。
+- **'b' 二进制模式**：指示以二进制文件形式打开文件。在二进制模式下，数据将被按原样读写，不进行任何转换。
+
+如果不指定模式，默认情况下文件将以文本形式打开。
+
+**二进制文件与文本文件的区别**：
+
+1. 在 **Windows 系统** 中，文本文件使用 `"\r\n"` 表示换行。如果以文本模式打开文件并写入换行符 `"\n"`，系统会自动将其转换为 `"\r\n"`。而在二进制文件中，`"\n"` 被直接视为换行。
+2. 在 **类 Unix/Linux 系统** 中，文本文件使用 `"\n"` 表示换行，因此在这些系统中，文本文件和二进制文件在换行处理上没有区别。
+
+此外，模式末尾的 **'+'** 表示附加功能，例如'r+'**读写模式**：允许同时进行读写操作，而不是仅读。
+
+| 打开方式 | 说明                                                                                                                                                     |
+| -------- | :------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| r        | 以只读方式打开文件，该文件必须存在。                                                                                                                     |
+| r+       | 以读/写方式打开文件，该文件必须存在。                                                                                                                    |
+| rb+      | 以读/写方式打开一个二进制文件，只允许读/写数据。                                                                                                         |
+| rt+      | 以读/写方式打开一个文本文件，允许读和写。                                                                                                                |
+| w        | 打开只写文件，若文件存在则长度清为 0，即该文件内容消失。                                                                                                 |
+| w+       | 打开可读/写文件，若文件存在则文件长度清零，即该文件内容会消失。                                                                                          |
+| a        | 以附加的方式打开只写文件。若文件不存在，则会建立该文件，如果文件存在，写入的数据会被加到文件末尾，即文件原先的内容会被保留（EOF 符保留）。               |
+| a+       | 以附加方式打开可读/写的文件。若文件不存在，则会建立该文件，如果文件存在，则写入的数据会被加到文件尾后，即文件原先的内容会被保留（原来的 EOF 符不保留）。 |
+| wb       | 以只写方式打开或新建一个二进制文件，只允许写数据。                                                                                                       |
+| wb+      | 以读/写方式打开或建立一个二进制文件，允许读和写。                                                                                                        |
+| wt+      | 以读/写方式打开或建立一个文本文件，允许读写。                                                                                                            |
+| at+      | 以读/写方式打开一个文本文件，允许读或在文本末追加数据。                                                                                                  |
+| ab+      | 以读/写方式打开一个二进制文件，允许读或在文件末追加数据。                                                                                                |
+
+### 文件打开失败
+
+在文件操作过程中，如果遇到文件打开失败的情况，我们可以通过以下几种方式来获取错误信息：
+
+1. **使用 `perror()` 函数**：这个函数可以直接将错误信息输出到标准错误（stderr）。它根据全局变量 `errno` 的当前值，输出对应的错误描述。
+2. **获取 `errno` 错误码**：`errno` 是一个全局变量，它存储了最近一次系统调用或库函数失败的错误码。通过检查 `errno` 的值，可以确定错误的具体原因。
+3. **使用 `strerror()` 函数**：这个函数接受一个错误码作为参数，并返回对应的错误信息字符串。与 `perror()` 不同的是，`strerror()` 允许你自定义错误信息的输出方式和格式。
+
+```c
+void TestFileError() {
+    FILE *file = fopen("CMakeLists.txt", "r");
+
+    if (file) {
+        puts("Open successfully");
+        fclose(file); // 文件打开后，必须关闭
+    } else {
+        printf("error: %d\n", errno); // 获取错误码
+        puts(strerror(errno));        // 获取错误码对应的提示信息
+        perror("fopen");              // 打印自带的提示错误信息
+    }
+}
+```
+
+### 文件打开成功
+
+若需打开项目目录中的 "CMakeLists.txt" 文件，应先通过相应的命令更改工作目录。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VjOVkzbDJzdEd4RWxhbHBLb0lEanZFQk1aWEdjb0lBcTFqOXhmNGVxTVh4bWc_ZT1SaTRoeDI.png)
+
+文件成功打开后，读取操作仍可能遇到错误。此时可以使用 `ferror()` 函数来判断是否存在错误。该函数返回非零值时，指示在上一次文件操作中发生了错误。
+
+同时，为了确定文件读取是否结束，可以使用 `feof()` 函数。该函数在文件读取未结束时返回零（false），一旦到达文件末尾则返回非零值（true）。
+
+```c
+void TestFileError() {
+	FILE *file = fopen("CMakeLists.txt", "r");
+
+	if (file) {
+		puts("Open successfully");
+
+		int err = ferror(file); // 文件读取是否出错
+		int eof = feof(file);   // 文件读取是否结束
+
+		printf("err: %d\n", err); // 0，说明没有出错
+		printf("eof: %d\n", eof); // 0，说明没有结束
+
+		fclose(file); // 文件打开后，必须关闭
+	} else {
+		perror("fopen"); // 打印自带的提示错误信息
+	}
+}
+```
+
+## 文件流的缓冲
+
+### 缓冲的来源
+
+文件数据的读写操作通常比内存读写效率要低得多。如果没有缓冲机制，CPU 在处理文件数据时，需要不断地发送指令给 DMA（Direct Memory Access，一种专门负责 IO 数据读写的硬件）。DMA 随后从文件中读取数据到内存，然后 CPU 再进行处理。在这个过程中，CPU 需要全程参与，这极大地浪费了 CPU 资源。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0ViZnVURUlBeWhCQ25HMHg0cHVMMDhBQnEtNXUtbXJJRG1fNHl1Z3g1VDFld0E_ZT1RUGlEOHg.png)
+
+为了解决这个问题，引入了文件流缓冲机制。通过在 DMA 和 CPU 之间添加一个缓冲区，DMA 可以将文件数据首先读取到缓冲区中。当缓冲区满了之后，DMA 再通知 CPU 进行处理。此时，CPU 一次性读取整个缓冲区的数据并进行处理，而不是对每一个数据项单独处理。
+
+这种缓冲机制有效地降低了 IO 操作对 CPU 的占用，提高了系统的效率。它允许 DMA 和 CPU 以不同的速度独立工作，减少了 CPU 等待 IO 操作完成的时间，从而可以处理其他任务。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTaUJJcEoyVkNsRGlWcnVYWEhlcm8wQkd5Tlo5MnpIeDB6aGRUOWVXdEkyMFE_ZT01TjBqZXA.png)
+
+### 设置缓冲区大小
+
+在文件 I/O 操作中，可以通过 `setbuf()` 和 `setvbuf()` 函数来设置缓冲区，以优化数据的读写效率。
+
+1. **`setbuf()` 函数**：此函数接受两个参数，即文件指针和缓冲区的指针。使用 `setbuf()` 时，无法直接指定缓冲区的大小，因为该函数仅知道缓冲区的起始地址，而不了解其大小。编译器通常将 `setbuf()` 的缓冲区大小默认为 `BUFSIZ`。
+
+   ```c
+   char buf[BUFSIZ];
+   setbuf(file, buf);
+   ```
+
+2. **`setvbuf()` 函数**：与 `setbuf()` 相比，`setvbuf()` 提供了更多的灵活性，允许设置缓冲区的大小和缓冲方式。它接受四个参数：文件指针、缓冲区指针、缓冲方式和缓冲区大小。
+
+   - 缓冲方式可以是 `_IOFBF`（全量缓冲），`_IOLBF`（按行缓冲），或 `_IONBF`（禁用缓冲）。
+   - 缓冲区大小可以自定义，以字节为单位。
+
+   ```c
+   char buf[8192];
+   setvbuf(file, buf, _IOFBF, 8192);
+   ```
+
+​ 通过 `setvbuf()` 函数，开发者可以根据应用程序的需求，自定义缓冲区的大小和缓冲策略，从而提高文件操作的性能。
+
+### 缓冲区的生命周期和清空
+
+为了确保文件流操作的效率，缓冲区的生命周期应该覆盖或者长于文件流的生命周期。通常，可以通过 `malloc()` 函数分配一块内存作为缓冲区。一旦文件流关闭，就应该释放这块内存，以避免内存泄漏。
+
+清空缓冲区，即强制将缓冲区中的数据写入文件，可以使用 `fflush()` 函数。这个函数可以立即将缓冲区的内容输出，而不需要等待缓冲区满。这对于控制台输出（例如 `stdout`）尤其有用，因为在调试过程中，控制台可能不会自动显示缓冲区的内容。
+
+添加 `fflush()` 函数后，可以确保控制台立即输出缓冲区中的所有内容，这对于实时监控程序的输出非常有用。
+
+```c
+void TestFflush() {
+	FILE *file = fopen("CMakeLists.txt", "r");
+
+	if (file) {
+		char buf[8192];
+		setvbuf(file, buf, _IOFBF, 8192);
+
+		puts("Open successfully");
+
+		int err = ferror(file); // 文件读取是否出错
+		int eof = feof(file);   // 文件读取是否结束
+
+		printf("err: %d\n", err); // 0，说明没有出错
+		printf("eof: %d\n", eof); // 0，说明没有结束
+
+		fflush(stdout); // 清空缓冲区
+
+		fclose(file); // 文件打开后，必须关闭
+	} else {
+		perror("fopen"); // 打印自带的提示错误信息
+	}
+}
+```
+
+## 读写一个字符
+
+### 读一个字符
+
+在 C 语言中，有三种常用的函数用于读取单个字符：`getchar()`、`getc()` 和 `fgetc()`。
+
+1. **`getchar()`**：这是一个宏，用于从标准输入（`stdin`）读取一个字符。它与 `getc(stdin)` 等价。
+2. **`getc()`**：这也是一个宏，可以用于读取指定文件流的一个字符。
+3. **`fgetc()`**：与 `getc()` 功能相同，但是以函数形式实现。
+
+所有这些函数的返回值都是一个整数，当文件流结束时，它们会返回特定的宏 `EOF`（End Of File）。
+
+在循环读取字符时，需要检查 `EOF` 标识以确定是否到达输入的末尾。
+
+```c
+void TestEof() {
+	while (1) {
+		int next_input = getchar();
+
+		if (next_input == EOF) {
+			// 如果是结束标识
+			break;
+		} else if (next_input == '\n') {
+			// 不打印换行
+			continue;
+		}
+
+		// 没结束，不换行的情况下，打印用户输入
+		printf("%c\n", next_input);
+	}
+}
+```
+
+要结束控制台输入并触发 `EOF`，不同操作系统有不同的快捷键：
+
+- 在 **Linux** 系统中，使用 `Ctrl + D`。
+- 在 **Windows** 系统中，使用 `Ctrl + Z`，这在某些环境中可能需要额外的步骤来识别为 `EOF`。
+
+需要注意的是，某些开发环境（如 CLion 的控制台）可能不支持这些快捷键来触发 `EOF`，因此需要在系统的命令行界面（如 Windows 的 CMD）中进行测试。
+
+### 写一个字符
+
+与读取字符相对应的，写入字符也可以使用三个函数：`putchar()`、`putc()` 和 `fputc()`。
+
+1. **`putchar()`**：这是一个宏，用于向标准输出（`stdout`）写入一个字符。
+2. **`putc()`**：这也是一个宏，可以用于向指定的文件流写入一个字符。
+3. **`fputc()`**：与 `putc()` 功能相同，但是以函数形式实现。
+
+这些函数通常用于向控制台或其他文件流输出单个字符。
+
+```c
+void TestEof() {
+	while (1) {
+		int next_input = getchar();
+
+		if (next_input == EOF) {
+			// 如果是结束标识
+			break;
+		} else if (next_input == '\n') {
+			continue;
+		}
+
+		// 没结束，不换行的情况下，打印用户输入
+		// 输出单个字符
+		putchar(next_input);
+	}
+}
+```
+
+### 读取一个文件将其打印至控制台
+
+```c
+void ReadFile(){
+    // 打开文件
+    FILE *file = fopen("CMakeLists.txt", "r");
+
+    // 检查文件是否成功打开
+    if (file != NULL){
+        // 循环读取文件直到文件结束
+        while (1){
+            int next_input = getc(file);  // 从文件中读取一个字符
+
+            // 检查是否到达文件末尾
+            if (next_input == EOF){
+                break;
+            }
+
+            // 将读取的字符输出到控制台
+            fputc(next_input, stdout);  // 向控制台写入一个字符
+        }
+
+        // 关闭文件
+        fclose(file);
+    } else {
+        // 如果文件打开失败，打印错误信息
+        perror("Error opening file");
+    }
+}
+```
+
+## 读写一行字符
+
+### 读一行字符
+
+读取控制台输入的一行字符可以使用以下几种函数：
+
+1. **`gets_s()`**：这是一个安全的函数，用于读取控制台输入的一行字符，直到遇到换行符 `\n`。它接收两个参数：一个字符数组 `buffer` 和一个表示最大字符数的 `size`。`gets_s()` 函数在读取成功时返回 `buffer`，读取失败时返回 `NULL`。需要注意的是，`size` 参数应该比实际需要的字符数多一个，以保留空间给字符串结束符 `\0`。
+
+   ```c
+   char buffer[1024];
+   gets_s(buffer, sizeof(buffer) / sizeof(buffer[0]));
+   ```
+
+2. **`fgets()`**：这个函数用于从指定的文件流中读取一行字符。它接收三个参数：一个字符数组 `buffer`，一个表示最大字符数的 `size`，以及一个文件流 `stream`。`fgets()` 会读取最多 `size - 1` 个字符，并将最后一个位置留给 `\0`。如果遇到换行符，`fgets()` 会将其一同读入 `buffer`，然后存储 `\0` 结束符。
+
+   ```c
+   char buffer[1024];
+   fgets(buffer, sizeof(buffer), stdin);
+   ```
+
+`gets()` 函数由于其不安全性，已经被废弃，不应在新的代码中使用。相比之下，`gets_s()` 和 `fgets()` 提供了更好的安全性和灵活性。
+
+### 写一行字符
+
+1. **`puts()`**：这是一个简单的函数，用于向标准输出（`stdout`）写入一行字符。它接收一个参数，即要输出的字符串（以空字符 `\0` 结尾）。`puts()` 会在字符串的末尾自动添加换行符 `\n`。
+
+   ```c
+   puts("Hello, World!");
+   ```
+
+2. **`fputs()`**：与 `puts()` 类似，`fputs()` 也用于写入字符串，但它允许指定输出的文件流。它接收两个参数：要写入的字符串和目标文件流。与 `puts()` 不同，`fputs()` 不会自动添加换行符，因此，如果需要换行，必须手动在字符串中包含 `\n`。
+
+   ```c
+   fputs("Hello, World!\n", stdout);
+   ```
+
+`fputs()` 函数的灵活性使其可以用于除了标准输出之外的其他文件流，例如文件或管道。这使得它在需要将数据写入不同目的地时非常有用。
+
+需注意，**这些函数不能用于二进制文件，只能用作文本文件**。
+
+## 读写指定大小的字节
+
+### 字节
+
+在计算机科学中，字节（Byte）是信息的基本单位，每个字节由 8 位（bit）组成。位是计算机处理和存储数据的最小单位，代表一个二进制数字，即 0 或 1。因此，一个字节可以表示 2828 或 256 种不同的状态。
+
+在 ASCII 码表中，每种字符都被分配了一个特定的数字编码。例如，换行符（Line Feed, LF）的 ASCII 码是 10，用二进制表示为 `0000 1010`。若从十六进制角度看，这个编码对应的是 `0a`。
+
+ASCII 码表是一种字符编码标准，用于将数字值映射到特定的字符上，从而允许计算机存储和交换文本数据。ASCII 码表中的每个字符都用一个字节来表示，这使得它能够容纳 128 个不同的字符（0-127 的值），包括字母、数字、标点符号和控制字符。
+
+### 读字节
+
+**`fread()` 函数用于从文件流中读取指定数量的字节。** 它是一个多功能的函数，可以读取任何类型的数据，只要指定了正确的数据大小和数量。该函数具有以下参数：
+
+1. **`void \*ptr`**：一个通用指针，指向用于存储读取数据的内存块。
+2. **`size_t size`**：每个数据项的大小（以字节为单位）。
+3. **`size_t count`**：要读取的数据项数量。
+4. **`FILE \*stream`**：指向 `FILE` 结构的指针，表示要读取数据的文件流。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlSkE3MTNoRy01UGdWLUhpZlBhZGE4QmU5b1VxYTB0Uk1Zb1p6cWsxUlJVV1E_ZT1VcE1EYVE.png)
+
+**返回值**： `fread()` 函数返回实际读取的字节数。如果返回的字节数小于请求读取的总字节数（即 `size * count`），这可能意味着已经到达文件末尾或发生了错误。在这种情况下，可以进一步检查 `feof()` 或 `ferror()` 来确定读取结束的原因。
+
+```c
+void Echo() {
+    char buffer[BUFFER_SIZE];
+    while (1) {
+        // 读字节
+        size_t bytes_read = fread(buffer, sizeof(char), BUFFER_SIZE, stdin);
+        if (bytes_read < BUFFER_SIZE) {
+            if (ferror(stdin)) {
+                perror("Error read from stdin");
+            } else if (feof(stdin)) {
+                puts("EOF");
+                fwrite(buffer, sizeof(char), bytes_read, stdout); // 还剩些字节打印出来
+            }
+            break;
+        }
+
+        // 写字节
+        fwrite(buffer, sizeof(char), BUFFER_SIZE, stdout);
+    }
+}
+```
+
+当使用标准输入 `stdin` 进行测试时，按下换行键实际上会将换行符作为输入的一部分传递给 `fread()` 函数。这意味着换行符会被当作 `0a` 字节读入到提供的缓冲区 `buffer` 中。这与前面讨论的字符读写函数的行为不同，因为那些函数通常在遇到换行符时停止读取。
+
+例如，如果用户输入数字 `1234567` 并按下换行键，`fread()` 会将这些数字和换行符一起读入缓冲区。在小端序系统中，这意味着缓冲区的低地址处将首先存储数值的高位。换行符作为输入流的一部分，也会被存储在缓冲区中，紧跟在输入数字之后。
+
+需要注意的是，`fread()` 函数本身并不处理换行符，它只是简单地从文件流中读取指定数量的字节。因此，在使用 `fread()` 从 `stdin` 读取数据时，开发者需要自行处理缓冲区中可能包含的换行符。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmTHoycjllVnRWR2h5dUE4LWpNcHV3QkloV2libGt6MzJKN2RwNEc3SHpuRnc_ZT10dlQzaWc.png)
+
+### 写字节
+
+`fwrite()` 函数与 `fread()` 相对应，用于向文件流写入数据。`fwrite()` 的第一个参数是指向要写入的数据的指针，并且添加了 `const` 限定符，这表明在写入过程中数据不会被修改，这与 `fread()` 的用法是一致的。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlVHVPMzU0R181RXJWT3I5RnMxZ2g4QjFyUVFTX0s5ZWVCRVlhakRWQlhhMWc_ZT03VGVjd2Y.png)
+
+```c
+void Echo() {
+	int buffer[BUFFER_SIZE];
+	while (1) {
+		// 读字节
+		size_t bytes_read = fread(buffer, sizeof(buffer[0]), BUFFER_SIZE, stdin);
+
+		for (int i = 0; i < BUFFER_SIZE; ++i) {
+			printf("%d, ", buffer[i]);
+		}
+
+		if (bytes_read < BUFFER_SIZE) {
+			if (ferror(stdin)) {
+				perror("Error read from stdin");
+			} else if (feof(stdin)) {
+				puts("EOF");
+				fwrite(buffer, sizeof(char), bytes_read, stdout); // 还剩些字节打印出来
+			}
+			break;
+		}
+
+		// 写字节
+		fwrite(buffer, sizeof(buffer[0]), BUFFER_SIZE, stdout);
+	}
+}
+```
+
+在小端序系统中，多字节数据的字节序是低位在前，高位在后。例如，如果输入是 `1234567890abcdef`，并且只考虑前四个字节 `1234`，在小端序系统中，这些字节将被存储和读取为 `31,32,33,34`（在 ASCII 码表中，字符 `'1'` 对应的十六进制是 `31`）。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXQTdjRk5iT1J0QnU4MkVlZXgtcHRRQmNvcmpsRVpHdFcxcmR0bTN2OWhYekE_ZT1UeXN0MmE.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlNnhhbS1oanU1SmhGYl83LTQxWGRnQnJQc0RCeEw2TnZsblpaYmI0SGNOa0E_ZT1ETU9RMXI.png)
+
+## 序列化和反序列化的基本实现
+
+Java 中，序列化是把对象转换为字节序列，存到磁盘中。而反序列化是从磁盘中读取字节序列将它们反序列化成对象读出来。对应到 C 中，实际上便是将结构体和二进制文件互相转化。
+
+在 C 语言中，使用 `fread()` 和 `fwrite()` 函数可以实现结构体数据的序列化和反序列化。以下是实现这一过程的步骤：
+
+1. **定义结构体**：首先定义一个结构体，它将被用来存储需要序列化的数据。
+2. **读取结构体**：使用 `fread()` 函数从二进制文件中读取数据到结构体中。
+3. **打印结构体内容**：输出当前结构体的内容，以验证读取操作。
+4. **修改结构体属性**：修改结构体中的部分属性值。
+5. **保存结构体**：使用 `fwrite()` 函数将修改后的结构体数据写回二进制文件。
+
+```c
+#include <stdio.h>
+
+#define ERROR 0
+#define OK 1
+
+typedef struct {
+    int visibility;
+    int region;
+    int font_size;
+} Settings;
+
+void PrintSettings(Settings *settings) {
+    printf("settings->visibility: %d\n", settings->visibility);
+    printf("settings->region: %d\n", settings->region);
+    printf("settings->font_size: %d\n", settings->font_size);
+}
+
+// 序列化, 将结构体转为二进制文件
+int SaveSettings(Settings *settings, char *settings_file) {
+    FILE *file = fopen(settings_file, "wb"); // 注意是二进制
+
+    if (file) {
+        fwrite(&settings->visibility, sizeof(settings->visibility), 1, file);
+        fwrite(&settings->region, sizeof(settings->region), 1, file);
+        fwrite(&settings->font_size, sizeof(settings->font_size), 1, file);
+        fclose(file);
+        return OK;
+    } else {
+        perror("Failed to save settings.");
+        return ERROR;
+    }
+}
+
+// 将二进制文件读取为结构体，如果打开失败，返回默认值
+void LoadSettings(Settings *settings, char *settings_file) {
+    FILE *file = fopen(settings_file, "rb");
+
+    if (file) {
+        fread(&settings->visibility, sizeof(settings->visibility), 1, file);
+        fread(&settings->region, sizeof(settings->region), 1, file);
+        fread(&settings->font_size, sizeof(settings->font_size), 1, file);
+        fclose(file);
+    } else {
+        // 文件读取失败时，自动为结构体赋默认值
+        settings->visibility = 0;
+        settings->region = 86;
+        settings->font_size = 18;
+    }
+}
+
+int main() {
+    Settings settings;
+
+    // 读取二进制文件
+    LoadSettings(&settings, "settings.bin");
+    PrintSettings(&settings);
+
+    // 修改settings
+    settings.visibility = 2;
+    settings.font_size = 40;
+
+    // 保存到二进制文件中
+    SaveSettings(&settings, "settings.bin");
+
+    return 0;
+}
+```
+
+**序列化结构体到二进制文件**：
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int visibility;
+    int region;
+    int font_size;
+} Settings;
+
+// 定义状态码
+#define OK 0
+#define ERROR -1
+
+// 将结构体序列化到二进制文件
+int SaveSettings(Settings *settings, const char *settings_file) {
+    FILE *file = fopen(settings_file, "wb");  // 以二进制写入模式打开文件
+
+    if (file) {
+        fwrite(settings, sizeof(Settings), 1, file);  // 写入整个结构体
+        fclose(file);
+        return OK;
+    } else {
+        perror("Failed to save settings.");
+        return ERROR;
+    }
+}
+```
+
+**从二进制文件反序列化为结构体**：
+
+```c
+// 从二进制文件读取并反序列化为结构体
+void LoadSettings(Settings *settings, const char *settings_file) {
+    FILE *file = fopen(settings_file, "rb");  // 以二进制读取模式打开文件
+
+    if (file) {
+        fread(settings, sizeof(Settings), 1, file);  // 读取整个结构体
+        fclose(file);
+    } else {  // 如果文件读取失败，设置默认值
+        settings->visibility = 0;
+        settings->region = 86;
+        settings->font_size = 18;
+    }
+}
+```
+
+在这些函数中，`fwrite()` 用于将 `Settings` 结构体实例的字节写入到二进制文件中，而 `fread()` 用于从二进制文件中读取字节到 `Settings` 结构体实例中。如果文件操作失败，`SaveSettings` 函数返回错误码，而 `LoadSettings` 函数则为结构体设置默认值。
+
+## 复制一个文件
+
+### 方法一
+
+要复制一个文件，可以逐字符地从源文件读取内容并写入到目标文件中。
+
+```c
+#include <stdio.h>
+
+// 定义复制文件的状态码
+#define COPY_SUCCESS 0
+#define COPY_ILLEGAL_ARGUMENTS -1
+#define COPY_SRC_OPEN_ERROR -2
+#define COPY_SRC_READ_ERROR -3
+#define COPY_DEST_OPEN_ERROR -4
+#define COPY_DEST_WRITE_ERROR -5
+#define COPY_UNKNOWN_ERROR -100
+
+int CopyFile(const char *src, const char *dest) {
+	// 检查参数是否合法
+	if (src == NULL || dest == NULL) {
+		return COPY_ILLEGAL_ARGUMENTS;
+	}
+
+	// 打开源文件
+	FILE *src_file = fopen(src, "r");
+	if (src_file == NULL) {
+		return COPY_SRC_OPEN_ERROR;
+	}
+
+	// 打开目标文件
+	FILE *dest_file = fopen(dest, "w");
+	if (dest_file == NULL) {
+		fclose(src_file); // 关闭源文件
+		return COPY_DEST_OPEN_ERROR;
+	}
+
+	// 进行文件复制操作
+	int result = COPY_SUCCESS;
+	int src_input;
+	while ((src_input = getc(src_file)) != EOF) {
+		if (putc(src_input, dest_file) == EOF) {
+			result = COPY_DEST_WRITE_ERROR;
+			break;
+		}
+	}
+
+	// 检查源文件读取是否失败
+	if (ferror(src_file) != 0) {
+		result = COPY_SRC_READ_ERROR;
+	}
+
+	// 关闭文件流
+	fclose(src_file);
+	fclose(dest_file);
+
+	return result;
+}
+
+int main() {
+	int result = CopyFile("main.c", "01.c");
+	printf("result: %d\n", result);
+
+	return 0;
+}
+```
+
+在这个示例中，首先检查传入的参数是否合法，然后尝试打开源文件和目标文件。如果任一文件打开失败，将返回相应的错误码。在文件复制过程中，使用 `getc()` 函数从源文件读取字符，并使用 `putc()` 函数将字符写入目标文件。如果在写入过程中遇到错误，返回写入错误码。复制完成后检查源文件的读取是否存在错误，并关闭两个文件流。
+
+### 方法二
+
+使用 `fgets()` 和 `fputs()` 函数可以高效地复制文件内容。这个过程需要注意几个关键点：
+
+- `fopen()` 打开文件流失败时会返回 `NULL`。
+- `ferror()` 用于判断文件读取是否失败。
+- `feof()` 用于判断文件读取是否结束。
+
+```c
+#include <stdio.h>
+#include <sys/timeb.h>
+#include <locale.h>
+
+// 定义七种情况
+#define COPY_SUCCESS 0
+#define COPY_ILLEGAL_ARGUMENTS -1  // 参数非法
+#define COPY_SRC_OPEN_ERROR -2     // 源文件打开失败
+#define COPY_SRC_READ_ERROR -3     // 源文件读取失败
+#define COPY_DEST_OPEN_ERROR -4    // 目标文件打开失败
+#define COPY_DEST_WRITE_ERROR -5   // 目标文件写入失败
+#define COPY_UNKNOWN_ERROR -100    // 未知错误
+
+#define BUFFER_SIZE 512
+typedef long long long_time_t;
+
+int CopyFile2(char const *src, char const *dest){
+
+  if(src == NULL || dest == NULL){
+    return COPY_ILLEGAL_ARGUMENTS;
+  }
+
+  FILE *src_file = fopen(src, "r");
+  if(src_file == NULL){    // 文件流打开失败
+    return COPY_SRC_OPEN_ERROR;
+  }
+
+  FILE *dest_file = fopen(dest, "w");
+  if(dest_file == NULL){
+    fclose(src_file);     // 注意关闭已经打开的文件流
+    return COPY_DEST_OPEN_ERROR;
+  }
+
+  char buffer[BUFFER_SIZE];  // 读取最大字符数为 BUFFER_SIZE - 1，留一个给 '\0'
+  int result;
+  while (1){
+
+    // 读
+    char* src_input = fgets(buffer, BUFFER_SIZE, src_file);
+
+    if(src_input == NULL){  // 读取不到字符时，判断原因
+
+      if(feof(src_file)){   // 读取结束
+        result = COPY_SUCCESS;
+      }else if(ferror(src_file)){  // 读取失败
+        result = COPY_SRC_READ_ERROR;
+      }else{  // 未知错误
+        result = COPY_UNKNOWN_ERROR;
+      }
+      break;
+    }
+
+    // 写
+    if(fputs(src_input, dest_file) == EOF){  // 写入失败
+      result = COPY_DEST_WRITE_ERROR;
+      break;
+    }
+  }
+
+  fclose(src_file);
+  fclose(dest_file);
+
+  return result;
+}
+```
+
+### 方法三
+
+**文件复制方法：**
+
+1. **方法一**：使用逐字符读取和写入函数（如 `fgetc()` 和 `fputc()`）进行文件复制。这种方法速度较慢，但适用于文本和二进制文件。
+2. **方法二**：使用逐行读取和写入函数（如 `fgets()` 和 `fputs()`）进行文件复制。这种方法速度较快，但仅限于文本文件。
+3. **方法三**：使用 `fread()` 和 `fwrite()` 函数进行文件复制。这种方法速度最快，同时适用于文本和二进制文件。
+
+**原因分析**：
+
+- 在前两种方法中，读取和写入操作是分开的，需要分别检查读取和写入的结果。
+- 使用 `fread()` 和 `fwrite()` 函数时，读取结束后不是通过检查读取内容是否为 `NULL` 来判断，而是通过检查读取的字节数是否小于设定的缓冲区大小 `BUFFER_SIZE`。因此，需要在读写操作之后判断读取的字节数，以确定是否需要采取其他措施。
+
+```c
+int CopyFile3(char const *src, char const *dest) {
+	if (src == NULL || dest == NULL) {
+		return COPY_ILLEGAL_ARGUMENTS;
+	}
+
+	FILE *src_file = fopen(src, "rb");
+	if (src_file == NULL) {
+		// 文件流打开失败
+		return COPY_SRC_OPEN_ERROR;
+	}
+
+	FILE *dest_file = fopen(dest, "wb");
+	if (dest_file == NULL) {
+		fclose(src_file); // 注意关闭已经打开的文件流
+		return COPY_DEST_OPEN_ERROR;
+	}
+
+	char buffer[BUFFER_SIZE]; // 读取最大字符数为 BUFFER_SIZE - 1，留一个给 '\0'
+	int result;
+	while (1) {
+		// 读
+		size_t bytes_read = fread(buffer, sizeof(buffer[0]), BUFFER_SIZE, src_file);
+
+		// 读多少字节，写多少字节
+		size_t bytes_write = fwrite(buffer, sizeof(buffer[0]), bytes_read, dest_file);
+
+		if (bytes_write < bytes_read) {
+			// 如果写比读的少，一定写入错误
+			result = COPY_DEST_WRITE_ERROR;
+			break;
+		}
+
+		// 如果读不满数组，判断原因
+		if (bytes_read < BUFFER_SIZE) {
+			if (ferror(src_file)) {
+				// 文件读取失败
+				result = COPY_SRC_READ_ERROR;
+			} else if (feof(src_file)) {
+				// 文件读取结束
+				result = COPY_SUCCESS;
+			} else {
+				// 发生未知错误
+				result = COPY_UNKNOWN_ERROR;
+			}
+			break;
+		}
+	}
+
+	fclose(src_file);
+	fclose(dest_file);
+
+	return result;
+}
+```
+
+### 三种方法的时间对比
+
+在处理大文件复制任务时，使用 `fgets()` 和 `fputs()` 函数的方法通常比使用 `fgetc()` 和 `fputc()` 函数更为高效。这种效率提升的主要原因在于文件操作中的锁机制。
+
+- 当使用 `fgetc()` 逐个字符读取时，每读取一个字符，系统可能需要加一次锁来确保数据的一致性。这种频繁的锁操作会增加额外的时间开销。
+- 相比之下，`fgets()` 函数一次读取一整行，只要求一次锁，这样就减少了锁的频率，从而减少了时间消耗。
+
+因此，在复制文件时，如果可能的话，优先选择使用 `fgets()` 和 `fputs()` 函数进行批量读写，而不是逐个字符地使用 `fgetc()` 和 `fputc()`。这样可以显著提高大文件复制的效率。
+
+`fwrite()` 的复制速度远快于上两种。
+
+## 格式化文本的输入输出
+
+### `sscanf()` 和 `sprintf()`
+
+**`sscanf()` 函数**：
+
+- 类似于 `scanf()`，但 `sscanf()` 从指定的字符串而不是标准输入读取数据。
+- 它根据提供的格式字符串解析输入字符串，并将解析出的数据存储在指定的变量中。
+- 例如，`sscanf("10-5", "%d", &number)` 会从字符串 "10-5" 中读取整数值 10 并存储在变量 `number` 中。
+
+```c
+// int sscanf(const char *str, const char *format, ...)
+void TestSscanf(){
+
+    char *src = "12.123";
+    int a;
+    int b;
+
+    sscanf(src, "%2d.%3d", &a, &b);
+    printf("a: %d\n", a);   // a: 12
+    printf("b: %d\n", b);   // b: 123
+}
+```
+
+**`sprintf()` 函数**：
+
+- 用于将格式化的数据写入一个字符串。
+- 它类似于 `printf()`，但输出目标是一个字符数组而不是标准输出。
+- `sprintf()` 的第一个参数是目标字符串，后续参数是按照格式字符串格式化的数据。
+- 例如，`sprintf(output, "%d", number)` 会将变量 `number` 的值格式化为字符串，并存储在 `output` 字符串中。
+
+```c
+// int sprintf(char *str, const char *format, ...)
+void TestSprintf(){
+
+    char *dest = "hello";
+    char *src = "hi";
+
+    sprintf(dest, "%s", src);  // hi
+    puts(dest);
+
+    dest = "hello";
+    sprintf(dest + 1, "%s", src);  // hhi
+    puts(dest);
+
+    dest = "hello";
+    sprintf(dest + 5, "%s", src);  // hellohi
+    puts(dest);
+}
+```
+
+### `vscanf()` 和 `vprintf()`
+
+**`vprintf()` 函数**：
+
+- `vprintf()` 函数与 `printf()` 类似，但可以接受变长参数列表 `va_list`，这意味着它可以处理任意数量的参数。
+- 它通常与 `va_start`、`va_arg` 和 `va_end` 宏一起使用，这些宏用于访问变长参数列表中的参数。
+
+```c
+#include <stdarg.h>
+
+void TestVprintf(char *format, ...) {
+	va_list args;           // 1. 获取第二个参数里所有的变量
+	va_start(args, format); // 2. 每个变量对应自己的格式
+	vprintf(format, args);  // 3. 打印各变量，类比于 printf() 函数
+	va_end(args);
+}
+
+int main() {
+	TestVprintf("%d, %s\n", 2, "arguments"); // 2, arguments
+	return 0;
+}
+```
+
+**`vscanf()` 函数**：
+
+- `vscanf()` 函数与 `scanf()` 类似，也接受变长参数列表 `va_list`，允许从输入中读取任意数量和类型的数据。
+- 同样，它需要与 `va_start`、`va_arg` 和 `va_end` 宏配合使用，以遍历和读取变长参数列表中的参数。
+
+```c
+void TestVscanf(char *format, ...) {
+	va_list args; // 1. 获取第二个参数里所有的变量
+	va_start(args, format); // 2. 每个变量对应自己的格式
+	vscanf(format, args);
+	va_end(args);
+}
+
+int main() {
+	int a;
+	char b[4];
+	TestVscanf("%d %s", &a, b); // b最多输入三个字符
+	TestVprintf("a: %d\nb: %s", a, b);
+	// printf("a: %d\nb: %s", a, b);
+
+	return 0;
+}
+```
+
+## 重定向标准输入输出流
+
+### `freopen()` 将 `stdout` 重定向到其他文件流
+
+`freopen()` 函数是 C 语言标准库中用于重定向文件流的函数。以下是对 `freopen()` 函数的简要介绍和使用示例：
+
+函数原型：
+
+```c
+FILE *freopen(const char *path, const char *mode, FILE *stream);
+```
+
+参数说明：
+
+- `path`：新文件的路径，可以是文件名或设备名称。
+- `mode`：打开文件的模式，如 `"w"`（写入）、`"a"`（追加）等。
+- `stream`：要重定向的文件流，如 `stdout`。
+
+返回值：
+
+- 成功时返回指向新文件流的指针。
+- 失败时返回 `NULL`。
+
+功能描述：`freopen()` 函数可以用于将一个已经打开的文件流重定向到另一个文件。这在需要将标准输出（`stdout`）或标准错误（`stderr`）重定向到文件而不是控制台时非常有用。
+
+```c
+void TestFreopen(){
+
+    // attention: Chinese cannot be written here!
+    freopen("output.txt", "a", stdout); // 将 stdout 文件流重定向到 output.log 文件中
+
+    puts("hello world");
+    fclose(stdout);
+}
+```
+
+`freopen()` 函数确实能够将 `stdout` 重定向到文件，但它通常不会用来将 `stdout` 从文件重定向回控制台。这是因为 `freopen()` 的设计是用来打开或重新打开文件的，而不是用来重新绑定到标准输出流。
+
+### `dup()`，`dup2()` 将 `stdout` 重定向到其他文件流
+
+`dup()` 函数：`dup()` 函数复制一个文件描述符，返回新的文件描述符。如果原文件描述符是标准输出（`stdout`），`dup()` 可以复制它并保存，以便后续使用。
+
+`dup2()` 函数：`dup2()` 函数接受两个参数：要复制的文件描述符和目标文件描述符。它将第一个文件描述符指向的文件重定向到第二个文件描述符。
+
+使用场景：当需要将 `stdout` 重定向到文件，并且之后可能需要恢复 `stdout` 到控制台输出时，可以使用 `dup()` 和 `dup2()` 函数。
+
+每个文件流都与一个文件描述符相关联，而每个文件描述符都指向一个文件。例如，标准输出流 `stdout` 通常与控制台输出文件关联，我们可以将其视为 `stdout_A`。当使用 `freopen()` 函数时，可以将 `stdout` 流重定向到另一个文件 `file_B`。要将 `stdout` 流从 `file_B` 恢复到原始的控制台输出 `stdout_A`，可以使用 `dup2()` 函数。`dup2()` 函数通过复制一个现有的文件描述符到另一个文件描述符来实现重定向。在这个过程中，实际上是在修改 `stdout` 的底层文件描述符，使其重新指向原始的控制台输出。
+
+```c
+// dup() 函数在不同系统下的头文件名
+#if defined(__APPLE__) || defined(__linux__)
+# include <unistd.h>
+#elif defined(_WIN32)
+# include <io.h>
+#endif
+#include <stdio.h>
+
+// 1. 是否要转化为文件流
+// 2. 转化之前是否是控制台输出的文件流
+void TestDup(char const *filename) {
+	static int save_stdout_no = -1; // 定义一个文件描述符，-1 为控制台输出
+
+	if (filename) {
+		// 将 stdout 重定向至 其他文件流
+
+		if (save_stdout_no == -1) {
+			// 如果此时为控制台输出
+			// 保存 stdout 控制台输出的文件描述符
+			save_stdout_no = dup(fileno(stdout));
+		}
+
+		fflush(stdout);                 // 将控制台缓存全部清除
+		freopen(filename, "a", stdout); // 文件流之间的相互转化可借助文件名进行，stdout没有对应文件名，所以麻烦了点
+	} else {
+		// 如果文件名为 NULL，说明想恢复至原有的 stdout 文件流
+
+		if (save_stdout_no != -1) {
+			// 不在控制台输出，需要转换为控制台输出; 否则就是在控制台输出，不需要转换
+			fflush(stdout);
+			dup2(save_stdout_no, fileno(stdout));
+			close(save_stdout_no);
+			save_stdout_no = -1; // 在控制台输出就是 -1
+		}
+	}
+}
+
+int main() {
+	puts("1");             // 控制台
+	TestDup("output.log"); // 转为 output.log
+	puts("2");
+	TestDup(NULL); // 转为控制台
+	puts("3");
+	TestDup("output.log"); // 转为 output.log
+	puts("4");
+	TestDup(NULL); // 转为控制台
+	puts("end");
+
+	return 0;
+}
+```
+
+程序运行结果为 1 3 end 输出在控制台，而 2 4 输出在 output.log 文件中。但 msvc 编译器下运行结果有误，mingw 编译器下运行结果无误。原因暂且未知。
+
+## 统计文件字符个数
+
+### 统计中文文本字符个数
+
+1. **使用宽字符函数**：可以使用 `wcslen()` 函数来获取宽字符串（通常用于表示 Unicode 或其他多字节字符集）的长度。`fgetws()` 函数用于从文件中读取宽字符串。
+
+2. **设置编码**：在不同操作系统中设置特定编码的方法有所不同：
+
+   - 在 **Windows** 系统下，设置 GBK 编码使用 `setlocale(LC_ALL, "chs")`。
+   - 在 **Linux** 和 **Mac** 系统下，设置 GBK 编码使用 `setlocale(LC_ALL, "zh_CN.gbk")`。
+
+   对于 UTF-8 编码，设置方法在不同系统中是一致的，使用 `setlocale(LC_ALL, "zh_CN.utf-8")`。
+
+3. **文件读取**：在设置了正确的编码之后，使用 `fopen()` 函数以读取模式打开文件。不同系统下打开文件的代码略有差异：
+
+   - 在 **Windows** 系统下，读取 UTF-8 编码的文件需要指定编码，例如 `fopen(filename, "r, ccs=utf-8")`。
+   - 在 **Linux** 和 **Mac** 系统下，打开文件的代码为 `fopen(filename, "r")`。
+
+```c
+#include <stdio.h>
+#include <locale.h>
+#include <wchar.h>
+
+// 设定错误类型
+#define ERROR_ILLEGAL_FILENAME -1
+#define ERROR_CANNOT_OPEN_FILE -2
+#define ERROR_READ_FILE -3
+#define ERROR_UNSUPPORTED_CHARSET -99
+
+#define CHARSET_UTF8 0
+#define CHARSET_GBK 1
+
+#define BUFFER_SIZE 512
+
+int CountCharactersInFile(char const *filename, int charset) {
+	if (filename == NULL) return ERROR_ILLEGAL_FILENAME;
+
+	FILE *file;
+
+	// 不同编码格式，执行不同操作
+	switch (charset) {
+		case CHARSET_GBK:
+
+#ifdef _WIN32  // 设定不同系统对应的 GBK 编码
+			setlocale(LC_ALL, "chs");
+#else
+			setlocale(LC_ALL, "zh_CN.gbk");
+#endif
+
+			file = fopen(filename, "r");
+			break;
+
+		case CHARSET_UTF8:
+			setlocale(LC_ALL, "zh_CN.utf-8"); // 不同系统下设定 utf-8 方法相同
+
+#ifdef _WIN32 // 不同系统使用 utf-8 格式，读取的方法有差别
+		file = fopen(filename, "r, ccs=utf-8");
+#else
+			file = fopen(filename, "r");
+#endif
+			break;
+
+		default: return ERROR_UNSUPPORTED_CHARSET;
+	}
+
+	// 文件打开失败
+	if (file == NULL) return ERROR_CANNOT_OPEN_FILE;
+
+	// 文件打开成功
+	wchar_t wcs[BUFFER_SIZE];
+	int count = 0;
+	while (fgetws(wcs, BUFFER_SIZE, file) != NULL) {
+		// 文件没读完
+		count += wcslen(wcs); // 读取的字符个数加和
+	}
+	// 文件读完，判断读完的原因
+	if (ferror(file)) {
+		perror("method error!");
+		fclose(file); // 文件打开就要关闭，注意！！
+		return ERROR_READ_FILE;
+	}
+
+	fclose(file);
+	return count;
+}
+
+int main() {
+	TestWchar();
+
+	printf("data/sanguo_gbk.txt: %d\n", CountCharactersInFile("data/sanguo_gbk.txt", CHARSET_GBK));
+	printf("data/sanguo_utf8.txt: %d\n", CountCharactersInFile("data/sanguo_utf8.txt", CHARSET_UTF8));
+
+	printf("data/CMakeLists_gbk.txt: %d\n", CountCharactersInFile("data/CMakeLists_gbk.txt", CHARSET_GBK));
+	printf("data/CMakeLists_utf8.txt: %d\n", CountCharactersInFile("data/CMakeLists_utf8.txt", CHARSET_UTF8));
+
+	return 0;
+}
+
+```
+
+### 统计英文文本字符个数
+
+统计英文字符个数通常使用窄字符（单字节字符）相关的函数，如 `strlen()` 和 `fgets()`。这些函数适用于处理英文字符，因为英文字符通常只占用一个字符宽度。然而，也可以使用宽字符函数来统计字符个数，尤其是当涉及到多字节字符集或需要与宽字符函数兼容时。
+
+以下是统计英文字符个数的方法：
+
+1. **使用窄字符函数**：
+   - `strlen()` 函数返回字符串中窄字符的数量，不包括结尾的空字符。
+   - `fgets()` 函数从文件中读取一行文本到缓冲区，可以结合 `strlen()` 使用。
+2. **使用宽字符函数**：
+   - `wcslen()` 函数返回宽字符串中宽字符的数量，不包括结尾的空宽字符。
+   - `fgetws()` 函数从文件中读取一行宽字符到宽字符缓冲区。
+
+**注意**：
+
+- 当使用宽字符函数统计字符个数时，需要确保文件的编码格式与程序中设置的编码格式一致。如果不一致，可能会导致统计结果不准确。
+- 在 Windows 平台上，使用 MinGW 或 MSVC 编译器时，需要注意编译器的默认编码格式。如果文件编码格式与编译器默认编码格式不一致，可能会导致程序错误或不正确的输出。
+
+**编译器和文件编码一致性**：
+
+- 确保文件本身的编码格式与编译器使用的编码格式一致。
+- 如果使用宽字符函数，还需要确保程序代码中设置的编码格式与文件编码格式一致。
+
+## 输入输出流的位置
+
+### 获取文件流的读取位置
+
+`ftell()` 函数返回当前文件流的读取位置，即从文件开头到当前读取点的字节偏移量
+
+```c
+#include <stdio.h>
+
+void TestFtell() {
+    FILE *file = fopen("CMakeLists.txt", "rb"); // 以二进制读取模式打开文件
+
+    if (file == NULL) {
+        perror("Error opening file");
+        return;
+    }
+
+    // 在读取任何内容之前，读取位置应该是 0
+    long position = ftell(file);
+    printf("Initial position: %ld\n", position); // Initial position: 0
+
+    // 定义缓冲区大小
+    const size_t BUFFER_SIZE = 128;
+    char buffer[BUFFER_SIZE];
+
+    // 读取一定数量的字节到缓冲区
+    fread(buffer, sizeof(char), BUFFER_SIZE, file);
+    position = ftell(file);
+    printf("Position after first read: %ld\n", position); // Position after first read: 128
+
+    // 继续读取更多字节
+    fread(buffer, sizeof(char), BUFFER_SIZE, file);
+    position = ftell(file);
+    printf("Position after second read: %ld\n", position); // Position after second read: 256
+
+    // 关闭文件
+    fclose(file);
+}
+
+int main() {
+    TestFtell();
+    return 0;
+}
+```
+
+首先以二进制模式打开了一个文件。然后使用 `ftell()` 函数来打印文件流的初始读取位置，这应该是 0。接着读取 128 字节到缓冲区，再次使用 `ftell()` 来打印新的读取位置，这将是 128。再次读取 128 字节，并打印当前的读取位置，它将是 256。
+
+注意，`ftell()` 函数返回的是一个 `long` 类型的值，它表示从文件开头到当前读取点的字节偏移量。
+
+### 设定窄字符下的文件流读取位置
+
+`fseek()` 函数可以改变文件流的当前位置，其使用方式如下：
+
+1. **从文件开头偏移**：使用 `SEEK_SET` 标志，从文件开头开始偏移。
+2. **从当前位置偏移**：使用 `SEEK_CUR` 标志，从当前文件流的位置开始偏移。
+3. **从文件末尾偏移**：使用 `SEEK_END` 标志，从文件末尾开始偏移。
+
+```c
+#include <stdio.h>
+
+void TestfSeek() {
+    FILE *file = fopen("CMakeLists.txt", "rb"); // 以二进制模式打开文件
+
+    if (file == NULL) {
+        perror("Error opening file");
+        return;
+    }
+
+    // 从文件开头偏移 10 个字节
+    fseek(file, 10, SEEK_SET);
+    long position = ftell(file);
+    printf("position: %ld\n", position); // 预期位置: 10
+
+    // 从当前位置再偏移 15 个字节
+    fseek(file, 15, SEEK_CUR);
+    position = ftell(file);
+    printf("position: %ld\n", position); // 预期位置: 25
+
+    // 从文件末尾偏移 -10 个字节
+    fseek(file, -10, SEEK_END);
+    position = ftell(file);
+    printf("position: %ld\n", position); // 根据文件实际大小，预期位置可能会变化
+}
+
+int main() {
+    TestfSeek();
+    return 0;
+}
+```
+
+**注意**：
+
+- `ftell()` 和 `fseek()` 函数通常用于二进制文件流，因为它们基于字节进行操作。
+- 在文本文件中，由于可能涉及字符编码转换，`ftell()` 可能不会返回实际读取的字节数。
+- 宽字符和多字节字符编码可能导致 `fseek()` 在设置偏移量时出现问题，因为它可能将指针设置在字符的中间。
+
+### 读取和设定宽字符下的文件流位置
+
+`fgetpos()` 函数用于获取当前文件流的位置，并将其存储在 `fpos_t` 类型的变量中。`fsetpos()` 函数则用于将文件流的位置设置为之前使用 `fgetpos()` 获取的位置。
+
+```c
+#include <stdio.h>
+
+void TestFsetpos() {
+    FILE *file = fopen("file.txt", "w+"); // 以读写模式打开文件
+
+    if (file == NULL) {
+        perror("Error opening file");
+        return;
+    }
+    fpos_t position;
+    // 获取当前文件流位置
+    fgetpos(file, &position);
+    // 写入一些数据
+    fputs("hello", file);
+    // 再次获取文件流位置
+    fgetpos(file, &position);
+    // 将文件流位置设置回之前的位置
+    fsetpos(file, &position);
+    // 打印当前位置，应该是写入 "hello" 前的位置加上 "hello" 的长度
+    printf("position: %lld\n", position);
+}
+
+int main() {
+    TestFsetpos();
+    return 0;
+}
+```
+
+**注意**：
+
+- `fgetpos()` 和 `fsetpos()` 函数的返回类型是 `int`，而不是 `fpos_t`。成功时返回 0，失败时返回非零值。
+- 并非所有文件流都支持 `fsetpos()` 函数。例如，标准输出 `stdout` 不支持随机访问。
+- 在某些系统或编译器中，`stdout` 的文件位置可能被设置为 0 或其他值，这取决于实现。
+
+## 其他常见的文件操作
+
+### 删除文件
+
+`remove()` 函数尝试删除指定路径的文件。如果文件成功删除，函数返回 0；如果发生错误，如文件不存在或权限不足，函数返回 -1。
+
+```c
+#include <stdio.h>
+
+void TestRemove() {
+    // 尝试删除 "data/main.c" 文件
+    int result = remove("data/main.c");
+    printf("Deletion result of 'data/main.c': %d\n", result);	 // 如果文件存在并被删除，输出 0
+
+    // 尝试删除 "data/main2.c" 文件
+    int result2 = remove("data/main2.c");
+    printf("Deletion result of 'data/main2.c': %d\n", result2);  // 如果文件不存在或无法删除，输出 -1
+}
+
+int main() {
+    TestRemove();
+    return 0;
+}
+```
+
+**注意**：
+
+- 使用 `remove()` 函数时，需要确保程序有足够的权限来删除指定的文件。
+- 如果文件正在被使用或程序没有足够的权限，删除操作可能会失败。
+- 在调用 `remove()` 之前，最好检查文件是否存在，以避免不必要的错误。
+
+### 重命名
+
+`rename()` 函数尝试将指定的文件或目录重命名。如果重命名成功，函数返回 0；如果发生错误，如源文件不存在或权限不足，函数返回 -1。
+
+在使用 `rename()` 函数处理包含中文字符的文件名时，确保环境正确设置为支持 UTF-8 编码是必要的。
+
+```c
+#include <stdio.h>
+#include <locale.h>
+
+void TestRename() {
+    // 设置 locale 以支持 UTF-8 编码的文件名
+    setlocale(LC_ALL, "zh_CN.utf-8");
+
+    // 尝试重命名文件
+    int result = rename("data/三国演义.txt", "data/sanguo.txt");
+    if (result == 0) {
+        printf("Renaming 'data/三国演义.txt' to 'data/sanguo.txt' succeeded.\n");
+    } else {
+        perror("Failed to rename 'data/三国演义.txt'");
+    }
+    printf("result: %d\n", result); // result: 0
+
+    // 尝试重命名另一个文件
+    int result2 = rename("data/main2.c", "data/main.txt");
+    if (result2 == 0) {
+        printf("Renaming 'data/main2.c' to 'data/main.txt' succeeded.\n");
+    } else {
+        perror("Failed to rename 'data/main2.c'");
+    }
+    printf("result: %d\n", result2); // result: -1 或其他值，取决于操作是否成功
+}
+
+int main() {
+    TestRename();
+    return 0;
+}
+```
+
+**注意**：
+
+- 在调用 `rename()` 之前，使用 `setlocale()` 设置适当的区域设置，以确保程序可以正确处理 UTF-8 编码的文件名。
+- 如果 `rename()` 调用失败，`perror()` 函数可以用来输出错误信息。
+- 确保源文件和目标文件名在文件系统中不会导致冲突或权限问题。
+
+### 创建临时文件
+
+**创建临时文件**：
+
+1. **使用 `tmpfile()` 函数**：此函数创建一个临时文件，该文件在程序退出时自动删除。它返回一个指向新创建的文件流的指针。
+2. **获取临时文件路径**：在某些编译器（如 MSVC）中，可以通过类型转换和结构体来获取临时文件的路径和文件名。`WinFile` 结构体中的 `_tmpfname` 成员存储了文件的路径。
+3. **使用 `tmpnam()` 函数**：此函数生成一个唯一的文件名，存储在提供的缓冲区中。确保缓冲区的大小至少为 `L_tmpnam`，以避免溢出。
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+void TestTmpfile() {
+    // 创建临时文件
+    FILE *file = tmpfile();
+    if (file == NULL) {
+        perror("Failed to create temporary file");
+        return;
+    }
+
+    // 在 MSVC 编译器中，可以通过特定方式获取临时文件的路径
+    #ifdef _MSC_VER
+    typedef struct {
+        union {
+            FILE _public_file;
+            char *ptr;
+        };
+        char *_base;
+        int _cnt;
+        int _flags;
+        int _file;
+        int _charbuf;
+        int _bufsiz;
+        char *_tmpfname;
+    } WinFile;
+
+    WinFile *win_file = (WinFile *)file;
+    puts(win_file->_tmpfname); // 显示临时文件的路径 C:\Users\用户名\AppData\Local\Temp\tzg.0
+
+    #endif
+
+    // 使用 tmpnam() 获取临时文件名及路径
+    char buffer[L_tmpnam];
+    tmpnam(buffer);
+    puts(buffer); // 显示由 tmpnam() 生成的临时文件路径
+
+    // 关闭临时文件
+    fclose(file);
+}
+
+int main() {
+    TestTmpfile();
+    return 0;
+}
+```
+
+**注意**：
+
+- `tmpfile()` 函数创建的临时文件仅用于二进制写入和读取，不支持追加或文本模式。
+- 使用 `tmpnam()` 函数时，每次调用都会生成一个新的唯一文件名。
+
+### 获取文件大小
+
+要获取文件的大小，可以使用 `struct stat` 结构体和 `stat()` 函数。`stat()` 函数获取文件信息并填充 `struct stat` 结构体，其中 `st_size` 成员包含了文件的大小。
+
+此代码在 msvc 编译器（无中文注释）的情况下成功运行，一旦加入中文注释，运行结果便会出错。在 mingw 编译器下可成功运行，结果与 msvc 编译器（无中文注释）的结果相同。
+
+```c
+#include <sys/stat.h>
+#include <stdio.h>
+
+long GetFileSize(const char *filename) {
+    struct stat st;
+    if (stat(filename, &st) == 0) {  // 成功获取文件状态
+        return st.st_size;  // 返回文件大小
+    } else {
+        perror("Failed to get file size");
+        return -1;  // 发生错误时返回 -1
+    }
+}
+
+int main() {
+    char *filename = "example.txt";
+    long size = GetFileSize(filename);
+    if (size != -1) {
+        printf("The size of '%s' is: %ld bytes\n", filename, size);
+    }
+    return 0;
+}
+```
+
+**注意**：
+
+- `stat()` 函数的第二个参数需要一个 `struct stat` 类型的指针。
+- `st.st_size` 成员是一个 `long` 类型的值，它仅支持返回最大 4GB 的文件大小。
+- 如果需要支持更大的文件，可以使用 `_stat64i32` 或 `_stat64`（取决于平台和编译器）。
+
+### 判断是否为目录
+
+要判断一个给定的文件名是否指向一个目录，可以使用 `struct stat` 结构体和 `stat()` 函数。`st_mode` 成员包含了文件的类型和权限模式，通过与 `S_IFDIR` 宏进行位运算，可以检查文件是否为目录。
+
+```c
+#include <sys/stat.h>
+#include <stdio.h>
+
+int IsDirectory(const char *filename) {
+    struct stat st;
+    if (stat(filename, &st) == 0) {  // 成功获取文件状态
+        return S_ISDIR(st.st_mode);  // 使用 S_ISDIR 宏判断是否为目录
+    } else {
+        perror("Failed to get file status");
+        return -1;  // 发生错误时返回 -1
+    }
+}
+
+int main() {
+    char *path = "example_directory";
+    if (IsDirectory(path) != -1) {
+        if (IsDirectory(path)) {
+            printf("'%s' is a directory.\n", path);
+        } else {
+            printf("'%s' is not a directory.\n", path);
+        }
+    }
+    return 0;
+}
+```
+
+**注意**：
+
+- `S_ISDIR()` 是一个宏，用于检查 `st_mode` 是否表示目录。
+- `stat()` 函数的第二个参数需要一个 `struct stat` 类型的指针。
+- 如果 `stat()` 调用失败，会打印错误信息并返回 `-1`。
+

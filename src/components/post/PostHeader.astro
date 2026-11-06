@@ -1,0 +1,79 @@
+---
+import { currentLocale, t } from "@/i18n";
+
+interface Props {
+  title: string;
+  date: Date;
+  updated?: Date;
+  wordCount?: number;
+  readingTime?: number;
+}
+
+const { title, date, wordCount, readingTime } = Astro.props;
+
+// Format date helper
+function formatDate(d: Date): string {
+  return d.toLocaleDateString(currentLocale, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+}
+
+// Format full date helper
+function formatFullDate(d: Date): string {
+  return d.toLocaleString(currentLocale, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+}
+
+// Calculate reading time (assuming 200 words per minute)
+const estimatedReadingTime = wordCount
+  ? Math.ceil(wordCount / 200)
+  : readingTime || 1;
+---
+
+<header>
+  <h1 class="title" itemprop="name headline">{title}</h1>
+
+  <div class="meta">
+    <span
+      class="item"
+      title={`${t("post.createdAt")}: ${formatFullDate(date)}`}
+    >
+      <span class="icon">
+        <i class="ic i-ri-calendar-line"></i>
+      </span>
+      <span class="text">{t("post.publishedAt")} </span>
+      <time itemprop="dateCreated datePublished" datetime={date.toISOString()}>
+        {formatDate(date)}
+      </time>
+    </span>
+
+    {
+      wordCount && (
+        <span class="item" title={t("post.wordCount")}>
+          <span class="icon">
+            <i class="ic i-ri-edit-2-line" />
+          </span>
+          <span class="text">{t("post.wordCount")} </span>
+          <span>{wordCount.toLocaleString()}</span>
+          <span class="text"> {t("post.words")}</span>
+        </span>
+      )
+    }
+
+    <span class="item" title={t("post.readingTime")}>
+      <span class="icon">
+        <i class="ic i-ri-time-line"></i>
+      </span>
+      <span class="text">{t("post.readingTime")} </span>
+      <span>{estimatedReadingTime} {t("post.minutes")}</span>
+    </span>
+  </div>
+</header>

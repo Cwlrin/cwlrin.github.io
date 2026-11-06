@@ -1,0 +1,77 @@
+.layout-three-column {
+  gap: 0.875rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.layout-three-column > #main {
+  grid-column: 1;
+}
+
+.layout-three-column > .layout-main-widgets {
+  grid-column: 1;
+}
+
+.layout-three-column > astro-island {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .layout-three-column {
+    grid-template-columns: 15rem minmax(0, 1fr);
+  }
+
+  .layout-three-column > .layout-sidebar-column {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .layout-three-column > #main {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .layout-three-column > .layout-main-widgets {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
+@media (min-width: 1440px) {
+  .layout-three-column {
+    width: min(calc(100% - 1.5rem), 92rem);
+    gap: 1.125rem;
+    grid-template-columns: 15rem minmax(0, 1fr) 15rem;
+  }
+
+  .layout-three-column > astro-island {
+    display: block;
+    grid-column: 3;
+    grid-row: 1 / 3;
+    align-self: stretch;
+    min-width: 0;
+  }
+
+  .layout-three-column > astro-island > .layout-extra-column {
+    height: 100%;
+    width: 100%;
+  }
+
+  .layout-three-column > astro-island > .layout-extra-column > .layout-extra-column__inner {
+    margin-top: 3.5rem;
+    padding-top: 3.5rem;
+    -ms-overflow-style: none;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    position: sticky;
+    scrollbar-width: none;
+    top: 1rem;
+    transition: top 0.3s ease;
+  }
+
+  .layout-three-column
+    > astro-island
+    > .layout-extra-column
+    > .layout-extra-column__inner::-webkit-scrollbar {
+    display: none;
+  }
+}

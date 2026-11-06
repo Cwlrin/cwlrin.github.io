@@ -1,0 +1,137 @@
+/* ============================================================
+   navbar 组件族全局样式（自 svelte scoped <style> 迁移）
+   ============================================================ */
+
+/* NavBar */
+#nav {
+  transition: transform 0.4s ease;
+}
+
+.nav-bg {
+  background-image: var(--nav-bg);
+  box-shadow: 0.1rem 0.1rem 0.2rem var(--grey-9-a1);
+  text-shadow: 0 0 0.0625rem var(--grey-9-a1);
+  color: var(--text-color);
+}
+
+.nav-top {
+  color: var(--header-text-color);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--grey-9) 45%, transparent) 0%,
+    var(--grey-9-a2) 45%,
+    var(--grey-1-a0) 100%
+  );
+  text-shadow: 0 0.125rem 0.25rem var(--grey-9-a5);
+}
+
+.nav-action {
+  padding: 0.625rem 0.5rem 0.625rem;
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* MenuBar */
+.menu-title {
+  display: block;
+}
+
+.desktop-only {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .menu-title {
+    display: inline-block;
+  }
+
+  .desktop-only {
+    display: inline-block;
+  }
+}
+
+/* LeftNavBtn 汉堡动画 */
+.line-1 {
+  top: 0.3125rem;
+  transform: rotate(-45deg);
+}
+
+.line-2 {
+  opacity: 0;
+}
+
+.line-3 {
+  top: -0.3125rem;
+  transform: rotate(45deg);
+  margin-top: 0.1875rem;
+}
+
+.line-menu {
+  background-color: var(--header-text-color);
+  vertical-align: top;
+  border-radius: 0.0625rem;
+  width: 100%;
+  height: 0.125rem;
+  transition: all 0.4s;
+  display: inline-block;
+  position: relative;
+  left: 0;
+  box-shadow: var(--shadow-float-soft);
+}
+
+@media (min-width: 1024px) {
+  .left-nav-btn {
+    /* !important：`.flex` 等 uno 工具类会在多个样式 chunk 重复出现，后加载者会覆盖
+       媒体查询里的 display:none（特异性同为单类）→ 宽屏汉堡不隐藏。显式提权。 */
+    display: none !important;
+  }
+}
+
+/* DropBox */
+.dropbox-root-btn {
+  padding: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* 原 svelte fly transition 的等效 CSS 动画 */
+.nav-dropbox {
+  animation: nav-dropbox-in 0.3s ease;
+}
+
+@keyframes nav-dropbox-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* DropBoxItem */
+.box-shadow {
+  box-shadow: 0 0.3125rem 1.25rem -0.25rem var(--grey-9-a1);
+}
+
+.dropbox-menu {
+  color: var(--text-color);
+  background-color: var(--grey-1);
+}
+
+.dropbox-menu a {
+  color: inherit;
+}
+
+.color-btn:hover {
+  z-index: var(--z-base);
+  color: var(--grey-0);
+  background-image: linear-gradient(to right, var(--color-pink) 0, var(--color-orange) 100%);
+  box-shadow: 0 0 0.75rem var(--color-pink-a3);
+}

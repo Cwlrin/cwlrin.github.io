@@ -1,0 +1,3 @@
+import { defineConfig } from "./toolkit/themeConfig";
+
+export default defineConfig(${{themeConfig}});

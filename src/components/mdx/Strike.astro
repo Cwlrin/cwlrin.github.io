@@ -1,0 +1,11 @@
+---
+interface Props {
+  type?: "primary" | "info" | "success" | "warning" | "danger" | "default";
+}
+
+const { type = "primary" }: Props = Astro.props;
+---
+
+<s class={`strike ${type}`.trim()}>
+  <slot />
+</s>

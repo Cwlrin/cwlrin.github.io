@@ -1,0 +1,1240 @@
+---
+title: "Linux 线程的同步和互斥.md"
+date: 2020-09-15T10:17:58+08:00
+categories: ["C 与 C++", "Linux C"]
+tags: ["C", "Linux"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlNDNmRnlmRl9wRXUwV2xyUXVoOXlNQlZSSVZzMHNNLVVkX196SVdkeE1pRGc_ZT1zUXhPMGk.png"
+---
+
+## 线程的同步和互斥
+
+在多线程编程中，共享资源的使用是提高程序运行效率的关键，但同时也带来了一系列挑战。由于线程间缺乏隔离机制，共享同一内存地址的操作可能导致所谓的“竞争条件”，这是指多个线程同时访问并试图修改同一资源时可能发生的问题。这种情况会导致程序的执行结果与预期出现显著偏差。
+
+例如，在以下代码示例中，两个线程被设计为对一个共享变量进行递增操作，每个线程执行一百万次。然而，实际执行结果往往与预期的两百万次递增不符。
+
+```c
+#include <pthread.h>
+
+#define TIMES 1000000
+int global = 0;
+
+void *increment(void *arg){
+   printf("Child thread is running.\n");
+   for(int i = 0; i < TIMES; i++){
+       global++;
+   }
+   printf("Child thread has finished.\n");
+   return NULL;
+}
+
+int main(int argc, char *argv[]){
+   pthread_t tid;
+   pthread_create(&tid, NULL, increment, NULL);
+
+   printf("Main thread is running.\n");
+   for(int i = 0; i < TIMES; i++){
+       global++;
+   }
+   printf("Main thread has finished.\n");
+
+   pthread_join(tid, NULL);
+   printf("Final result: global = %d\n", global);
+   return 0;
+}
+```
+
+结果的偏差源于线程间对共享变量的非原子性访问。例如，当主线程读取共享变量的值时，它可能会将该值从内存加载到寄存器，增加 1 后再尝试写回内存。然而，在写回过程中，如果子线程也读取了该变量的值（此时尚未更新），并执行了相同的增加操作，最终的结果就是两个线程的操作相互覆盖，导致共享变量的值只增加了 1，而非预期的两百万。
+
+为了确保程序的正确性，即使在高效率的并发环境下，也需要使用线程库提供的同步机制，如锁，来正确地管理对共享资源的访问。通过使用锁，可以保证在任何时刻只有一个线程能够访问共享资源，从而避免了竞争条件的发生，确保了程序结果的准确性和可靠性。
+
+## 互斥锁
+
+在多线程编程实践中，互斥锁（MUTual EXclusion，简称 mutex）是一种基础且广泛使用的同步机制。它是一种用于管理共享资源访问的机制，通过一个全局的布尔标志位来实现。线程能够对这一标志位进行原子性的加锁和解锁操作。当一个线程成功加锁时，任何其他线程的加锁尝试都将导致它们进入阻塞状态，直到锁被当前持有者解锁。解锁后，其他线程便有机会获得这把锁，并从等待状态中恢复执行。这种机制确保了在任何给定时间点，锁不会被两个线程同时持有，从而避免了资源的并发访问冲突。
+
+### 锁的基本情况
+
+#### 互斥锁（Mutex）
+
+互斥锁是一种关键的同步工具，用于在多线程环境中协调对共享资源的访问。它的核心作用是保证在任何给定时刻，只有一个线程能够执行对共享资源的操作，从而避免了并发访问带来的问题。
+
+#### 锁的状态
+
+**未锁定**：在这种状态下，没有线程持有锁，任何线程都可以尝试获取锁。
+
+**锁定**：当一个线程成功获取锁后，其他线程的获取尝试将导致它们进入等待状态，直到锁被释放。
+
+#### 锁的行为
+
+**加锁**：这是一个原子操作，检查锁的状态。如果锁未被锁定，线程将获取锁；如果锁已被锁定，线程将被阻塞。
+
+**解锁**：这个操作将锁设置为未锁定状态，允许其他等待的线程尝试获取锁。
+
+#### 锁的要求
+
+1. 确保在任何时刻只有一个线程能够获取锁。
+2. 遵循“谁加锁，谁解锁”的原则，以避免潜在的错误和代码的不可读性。
+
+#### 临界区
+
+临界区是指在加锁和解锁之间的代码段，这段代码可以安全地访问共享资源。由于互斥锁的互斥性，可以确保在临界区内只有一个线程能够执行。
+
+#### 饥饿
+
+饥饿是指线程由于无法获得所需的锁而长时间处于等待状态。这可能是由于锁的竞争，或者临界区过大导致的。饥饿可能会影响程序的性能和稳定性。
+
+#### 死锁
+
+死锁是一种严重的同步问题，发生在线程由于不当的资源竞争而永久阻塞。在使用互斥锁时，必须小心避免死锁，特别是当需要获取多个锁时，应保持一致的加锁顺序。
+
+#### 常见的死锁情况
+
+1. **循环等待**：两个或多个线程分别持有对方需要的锁，导致无法进一步执行。
+2. **锁的非释放**：持有锁的线程在未释放锁的情况下终止，导致其他线程无法获取该锁。
+3. **重复加锁**：一个线程在持有锁的情况下，尝试再次获取同一把锁，这可能导致死锁。
+
+### 锁的基本使用
+
+#### 定义锁
+
+首先，需要定义一个互斥锁（mutex），通常使用 `pthread_mutex_t` 类型。例如：
+
+```c
+pthread_mutex_t mLock;
+```
+
+#### 初始化锁
+
+锁的初始化是使用前的必要步骤，可以通过以下两种方式之一进行：
+
+1. **使用 `pthread_mutex_init` 函数**： 调用此函数可以初始化锁，并可选地指定锁的属性。
+
+   `pthread_mutex_init` 是 POSIX 线程库中用于初始化互斥锁（mutex）的函数。互斥锁是一种同步机制，用于保护共享资源不被多个线程同时访问，从而避免竞态条件和数据不一致的问题。
+
+   函数原型如下：
+
+   ```c
+   #include <pthread.h>
+   int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr);
+   ```
+
+   参数说明：
+
+   1. **pthread_mutex_t \*mutex**: 这是一个指向 `pthread_mutex_t` 类型的指针，用于存储互斥锁的标识符。成功初始化后，这个标识符将被用来在后续操作中引用这个互斥锁。
+   2. **const pthread_mutexattr_t \*attr**: 这是一个指向 `pthread_mutexattr_t` 类型的指针，它指定了互斥锁的属性。如果这个参数是 `NULL`，互斥锁将被初始化为默认属性。
+
+   返回值：
+
+   - 如果 `pthread_mutex_init` 调用成功，返回 0。
+   - 如果调用失败，返回一个错误码。例如，如果内存分配失败，将返回 `ENOMEM`。
+
+   使用场景：
+
+   - 当需要在多线程程序中保护共享数据或资源时。
+   - 当需要确保某个操作或代码段在同一时间只被一个线程执行时。
+
+   工作机制：
+
+   - 通过调用 `pthread_mutex_init`，操作系统会分配必要的资源来创建一个互斥锁，并根据提供的属性（如果有）初始化它。
+   - 初始化后，互斥锁处于未锁定状态。
+
+1. **使用宏 `PTHREAD_MUTEX_INITIALIZER`**： 这是一种简便的初始化方式，适用于静态初始化。
+
+   ```c
+   pthread_mutex_t mLock = PTHREAD_MUTEX_INITIALIZER;
+   ```
+
+#### 加锁
+
+在进入临界区之前，使用 `pthread_mutex_lock` 函数来获取锁。如果锁已经被其他线程持有，当前线程将被阻塞，直到锁被释放。
+
+`pthread_mutex_lock` 是 POSIX 线程库中用于请求互斥锁的函数。当一个线程需要访问共享资源时，它会首先尝试锁定互斥锁，以确保在访问期间资源不会被其他线程修改。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+int pthread_mutex_lock(pthread_mutex_t *mutex);
+```
+
+参数说明：
+
+- **pthread_mutex_t \*mutex**: 这是一个指向 `pthread_mutex_t` 类型的指针，它标识了要锁定的互斥锁。这个互斥锁必须已经通过 `pthread_mutex_init` 函数初始化。
+
+返回值：
+
+- 如果 `pthread_mutex_lock` 调用成功，返回 0。
+- 如果调用失败，返回一个错误码。例如：
+  - `EBUSY`: 互斥锁已经被其他线程锁定。
+  - `EDEADLK`: 死锁被避免，因为线程试图锁定一个它已经持有的互斥锁（这取决于互斥锁的属性）。
+
+使用场景：
+
+- 当需要保护共享资源，确保同一时间只有一个线程可以访问这些资源。
+- 在进入临界区（critical section）之前，线程需要调用 `pthread_mutex_lock` 来锁定互斥锁。
+
+工作机制：
+
+- 当一个线程调用 `pthread_mutex_lock` 时，如果互斥锁未被其他线程锁定，该函数会立即锁定互斥锁并返回。
+- 如果互斥锁已经被其他线程锁定，调用 `pthread_mutex_lock` 的线程将阻塞，直到互斥锁被释放。
+
+#### 解锁
+
+在临界区的代码执行完毕后，使用 `pthread_mutex_unlock` 函数释放锁，允许其他线程进入临界区。
+
+`pthread_mutex_unlock` 是 POSIX 线程库中用于释放互斥锁的函数。当一个线程完成了对共享资源的访问后，它会调用这个函数来解锁互斥锁，允许其他正在等待这个锁的线程访问资源。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+int pthread_mutex_unlock(pthread_mutex_t *mutex);
+```
+
+参数说明：**pthread_mutex_t \*mutex**: 这是一个指向 `pthread_mutex_t` 类型的指针，它标识了要释放的互斥锁。这个互斥锁必须已经通过 `pthread_mutex_init` 函数初始化，并且当前线程必须已经拥有这个锁。
+
+返回值：
+
+- 如果 `pthread_mutex_unlock` 调用成功，返回 0。
+- 如果调用失败，返回一个错误码。例如：
+  - `EINVAL`: 传入的互斥锁参数无效或未初始化。
+  - `EPERM`: 调用线程不拥有互斥锁的所有权，或者互斥锁被设为了错误检测状态。
+
+使用场景：
+
+- 当线程完成了对共享资源的访问，需要释放互斥锁以允许其他线程访问资源。
+- 在临界区代码执行完毕后，线程需要调用 `pthread_mutex_unlock` 来释放互斥锁。
+
+工作机制：
+
+- 当一个线程调用 `pthread_mutex_unlock` 时，它将减少互斥锁的锁定计数。如果锁定计数达到零，互斥锁将变为未锁定状态，其他等待这个锁的线程将有机会获取它。
+- 如果互斥锁的属性设置为错误检测，并且当前线程不拥有互斥锁，调用 `pthread_mutex_unlock` 将失败并返回 `EPERM` 错误。
+
+#### 销毁锁
+
+在不再需要锁时，使用 `pthread_mutex_destroy` 函数销毁它，以释放系统资源。
+
+`pthread_mutex_destroy` 是 POSIX 线程库中用于销毁互斥锁的函数。互斥锁（mutex）是用来协调对共享资源访问的同步机制，确保在同一时刻只有一个线程可以访问特定的资源。当互斥锁不再需要时，比如在程序结束或某个模块卸载时，应该使用 `pthread_mutex_destroy` 来释放与互斥锁关联的资源。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+int pthread_mutex_destroy(pthread_mutex_t *mutex);
+```
+
+参数说明：
+
+- **pthread_mutex_t \*mutex**: 这是一个指向 `pthread_mutex_t` 类型的指针，它标识了要销毁的互斥锁。这个互斥锁必须已经通过 `pthread_mutex_init` 函数初始化。
+
+返回值：
+
+- 如果 `pthread_mutex_destroy` 调用成功，返回 0。
+- 如果调用失败，返回一个错误码。例如：
+  - `EBUSY`: 互斥锁仍然被锁定，或者有其他线程正在等待这个锁。
+  - `EINVAL`: 传入的互斥锁参数无效或未初始化。
+
+使用场景：
+
+- 当互斥锁不再被使用，需要释放相关资源时。
+- 在程序模块卸载或线程结束前，确保所有互斥锁都被销毁。
+
+工作机制：
+
+- 当调用 `pthread_mutex_destroy` 时，操作系统会检查互斥锁是否处于未锁定状态。如果互斥锁被锁定或有线程正在等待它，销毁操作将失败。
+- 成功销毁互斥锁后，与该互斥锁关联的所有资源将被释放。
+
+### 使用案例
+
+案例一：基本用法
+
+```c
+#include <pthread.h>
+#define TIMES 1000000
+int global = 0;
+
+// 子线程函数
+void *increment(void *arg){
+    pthread_mutex_t *pmLock = (pthread_mutex_t *)arg; // 从主线程接收锁
+    printf("Child thread is running.\n");
+    for(int i = 0; i < TIMES; i++){
+        pthread_mutex_lock(pmLock); // 加锁
+        global++;
+        pthread_mutex_unlock(pmLock); // 解锁
+    }
+    printf("Child thread has finished.\n");
+    return NULL;
+}
+
+int main(int argc, char *argv[]){
+    pthread_mutex_t mLock; // 定义互斥锁
+    pthread_mutex_init(&mLock, NULL); // 初始化互斥锁
+
+    pthread_t pid;
+    pthread_create(&pid, NULL, increment, &mLock); // 将互斥锁传递给子线程
+
+    printf("Main thread is running.\n");
+    for(int i = 0; i < TIMES; i++){
+        pthread_mutex_lock(&mLock); // 加锁
+        global++;
+        pthread_mutex_unlock(&mLock); // 解锁
+    }
+    printf("Main thread has finished.\n");
+
+    pthread_join(pid, NULL); // 等待子线程结束
+    printf("All operations completed, global = %d\n", global);
+
+    pthread_mutex_destroy(&mLock); // 销毁互斥锁
+    return 0;
+}
+```
+
+1. **定义和初始化互斥锁**：在 `main` 函数中，首先定义了一个 `pthread_mutex_t` 类型的互斥锁，并使用 `pthread_mutex_init` 函数对其进行初始化。
+2. **创建子线程**：使用 `pthread_create` 函数创建了一个子线程，并将互斥锁的地址作为参数传递给子线程的函数 `increment`。
+3. **加锁和解锁**：在 `increment` 函数和 `main` 函数中，每次对共享变量 `global` 进行操作之前，都会先通过 `pthread_mutex_lock` 函数加锁，操作完成后通过 `pthread_mutex_unlock` 函数解锁。这样可以确保在对共享资源进行修改时，只有一个线程能够执行该操作，从而避免了竞争条件。
+4. **等待子线程结束**：使用 `pthread_join` 函数等待子线程结束，确保在主线程继续执行之前子线程已经完成所有操作。
+5. **销毁互斥锁**：在程序结束前，使用 `pthread_mutex_destroy` 函数销毁互斥锁，释放系统资源。
+
+示例二：使用 2 个线程对同一个全局变量各加 2000 万
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <sys/time.h>
+
+#define TIMES 10000000
+
+// 定义共享数据结构
+typedef struct {
+    int sum;
+    pthread_mutex_t mLock;
+} share_value_t;
+
+// 子线程函数
+void *increment(void *arg) {
+    share_value_t *pshareValue = (share_value_t *)arg;
+    printf("Child thread is running.\n");
+    for (int i = 0; i < TIMES; i++) {
+        pthread_mutex_lock(&pshareValue->mLock);
+        pshareValue->sum++;
+        pthread_mutex_unlock(&pshareValue->mLock);
+    }
+    printf("Child thread has finished.\n");
+    return NULL;
+}
+
+int main(int argc, char *argv[]) {
+    struct timeval beginTime, endTime;
+    gettimeofday(&beginTime, NULL);  // 获取开始时间
+
+    share_value_t shareValue;
+    shareValue.sum = 0;
+    pthread_mutex_init(&shareValue.mLock, NULL);  // 初始化互斥锁
+
+    pthread_t pid;
+    pthread_create(&pid, NULL, increment, &shareValue);  // 创建子线程
+
+    printf("Main thread is running.\n");
+    for (int i = 0; i < TIMES; i++) {
+        pthread_mutex_lock(&shareValue.mLock);
+        shareValue.sum++;
+        pthread_mutex_unlock(&shareValue.mLock);
+    }
+    printf("Main thread has finished.\n");
+
+    pthread_join(pid, NULL);  // 等待子线程结束
+    printf("All operations completed, sum = %d\n", shareValue.sum);
+
+    pthread_mutex_destroy(&shareValue.mLock);  // 销毁互斥锁
+    gettimeofday(&endTime, NULL);              // 获取结束时间
+
+    // 计算并打印执行时间
+    long duration = (endTime.tv_sec - beginTime.tv_sec) * 1000000 +
+        (endTime.tv_usec - beginTime.tv_usec);
+    printf("Execution time: %ld us\n", duration);
+
+    return 0;
+}
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZSDlCZ1h2MUloR25ZQmFUNTc0WEwwQjllNFk5NVRBVHBnd2k3aVd0N1dhMEE_ZT1ySk5qbkU.png)
+
+### `pthread_mutex_trylock`  锁定互斥锁
+
+`pthread_mutex_trylock` 是 POSIX 线程库中提供的一个非阻塞函数，用于尝试锁定一个互斥锁（mutex）。与 `pthread_mutex_lock` 不同，`pthread_mutex_trylock` 函数不会使调用线程挂起等待互斥锁，如果互斥锁已经被其他线程锁定，它会立即返回一个错误码。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+int pthread_mutex_trylock(pthread_mutex_t *mutex);
+```
+
+参数说明：**pthread_mutex_t \*mutex**: 这是一个指向 `pthread_mutex_t` 类型的指针，它标识了要尝试锁定的互斥锁。这个互斥锁必须已经通过 `pthread_mutex_init` 函数初始化。
+
+返回值：
+
+- 如果互斥锁被成功锁定，返回 0。
+- 如果互斥锁已经被其他线程锁定，返回 `EBUSY` 错误码。
+- 如果调用失败，返回其他错误码。例如：
+  - `EINVAL`: 传入的互斥锁参数无效或未初始化。
+
+使用场景：
+
+- 当线程需要尝试访问共享资源，但不想在互斥锁已被锁定时等待。
+- 在需要快速响应锁状态变化的场景中，`pthread_mutex_trylock` 提供了一种快速失败的机制。
+
+工作机制：
+
+- 当一个线程调用 `pthread_mutex_trylock` 时，如果互斥锁是未锁定状态，该函数会锁定互斥锁并返回 0，此时调用线程拥有互斥锁。
+- 如果互斥锁已经被其他线程锁定，`pthread_mutex_trylock` 会立即返回 `EBUSY`，而不会使调用线程挂起。
+
+代码一：死锁示例
+
+在第一个示例中，线程 A 和线程 B 以不同的顺序尝试获取两个锁，这可能导致死锁。如果线程 A 持有锁 1 并等待锁 2，而线程 B 持有锁 2 并等待锁 1，它们将永远等待对方释放锁，从而导致死锁。
+
+```c
+#include <pthread.h>
+#include <unistd.h>
+
+#define TIMES 10000000
+typedef struct share_value{
+    int sum;
+    pthread_mutex_t mLock1;
+    pthread_mutex_t mLock2;
+} share_value_t;
+
+void * func(void *arg){
+    share_value_t *pshareValue = (share_value_t *)arg;
+
+    pthread_mutex_lock(&pshareValue->mLock2);
+    sleep(1);
+    pthread_mutex_lock(&pshareValue->mLock1);
+
+    printf("child thread runing \n");
+
+    pthread_mutex_unlock(&pshareValue->mLock1);
+    pthread_mutex_unlock(&pshareValue->mLock2);
+
+    return NULL;
+}
+int main(int argc,char*argv[])
+{
+    share_value_t shareValue;
+    shareValue.sum = 0;
+    pthread_mutex_init(&shareValue.mLock1, NULL);
+    pthread_mutex_init(&shareValue.mLock2, NULL);
+
+    pthread_t pid;
+    pthread_create(&pid,NULL,func, &shareValue);
+
+    pthread_mutex_lock(&shareValue.mLock1);
+    sleep(1);
+    pthread_mutex_lock(&shareValue.mLock2);
+
+    printf("main thread runing \n");
+
+    pthread_mutex_unlock(&shareValue.mLock2);
+    pthread_mutex_unlock(&shareValue.mLock1);
+
+    pthread_join(pid, NULL);
+    pthread_mutex_destroy(&shareValue.mLock1);
+    pthread_mutex_destroy(&shareValue.mLock2);
+    return 0;
+}
+```
+
+代码二：使用 `pthread_mutex_trylock` 避免死锁
+
+在第二个示例中，我们使用 `pthread_mutex_trylock` 函数来尝试获取锁，如果获取失败，线程将释放已持有的锁并重试。这种方法可以避免死锁，因为线程不会在持有一个锁的同时无限期地等待另一个锁。
+
+```c
+#include <pthread.h>
+#include <unistd.h>
+
+#define TIMES 10000000
+
+typedef struct {
+    int sum;
+    pthread_mutex_t mLock1;
+    pthread_mutex_t mLock2;
+} share_value_t;
+
+void *func(void *arg){
+    share_value_t *pshareValue = (share_value_t *)arg;
+
+    while(1){
+        pthread_mutex_lock(&pshareValue->mLock2);
+        sleep(1);
+        if(pthread_mutex_trylock(&pshareValue->mLock1) == 0){
+            printf("Child thread is running.\n");
+            pthread_mutex_unlock(&pshareValue->mLock1);
+            pthread_mutex_unlock(&pshareValue->mLock2);
+            break;
+        } else {
+            pthread_mutex_unlock(&pshareValue->mLock2);
+        }
+    }
+    return NULL;
+}
+
+int main(int argc, char *argv[]){
+    share_value_t shareValue;
+    shareValue.sum = 0;
+    pthread_mutex_init(&shareValue.mLock1, NULL);
+    pthread_mutex_init(&shareValue.mLock2, NULL);
+
+    pthread_t pid;
+    pthread_create(&pid, NULL, func, &shareValue);
+
+    pthread_mutex_lock(&shareValue.mLock1);
+    sleep(1);
+    pthread_mutex_lock(&shareValue.mLock2);
+    printf("Main thread is running.\n");
+    pthread_mutex_unlock(&shareValue.mLock2);
+    pthread_mutex_unlock(&shareValue.mLock1);
+
+    pthread_join(pid, NULL);
+    pthread_mutex_destroy(&shareValue.mLock1);
+    pthread_mutex_destroy(&shareValue.mLock2);
+    return 0;
+}
+```
+
+### 自旋锁
+
+自旋锁是一种特殊的锁机制，它与互斥锁（`pthread_mutex_*`）不同，主要区别在于线程在尝试获取锁时的行为。互斥锁会导致不满足条件的线程进入睡眠状态，从而不会占用 CPU 资源。而自旋锁则会让线程在当前位置不断循环，检查锁是否已被释放，这会导致线程一直占用 CPU 资源，直到获取锁。
+
+使用 `pthread_mutex_trylock` 结合 `while` 循环确实可以实现自旋锁的思想，但这种方式并不是真正的自旋锁。真正的自旋锁是由 `pthread_spinlock_*` 函数族提供的，它包括初始化、锁定、尝试锁定、解锁和销毁等操作。
+
+```c
+#include <pthread.h>
+// spin lock:  spin->旋转
+
+pthread_spinlock_t  mLock; // 锁类型
+int pthread_spin_init(pthread_spinlock_t *lock int pshared);// 初始化锁
+// PTHREAD_PROCESS_PRIVATE: 表示自旋锁仅用于同一进程的不同线程之间的同步。
+// PTHREAD_PROCESS_SHARED: 表示自旋锁可以用于不同进程之间的同步(前提是这个锁变量位于某种共享内存区域中)
+
+int pthread_spin_lock(pthread_spinlock_t *lock);	// 自旋获取锁
+int pthread_spin_trylock(pthread_spinlock_t *lock); // 无法获得锁直接返回
+int pthread_spin_unlock(pthread_spinlock_t *lock);  // 解锁
+
+int pthread_spin_destroy(pthread_spinlock_t *lock); // 销毁锁
+```
+
+1. **定义自旋锁**：使用 `pthread_spinlock_t` 类型定义自旋锁变量。
+2. **初始化自旋锁**：使用 `pthread_spin_init` 函数初始化自旋锁，`PTHREAD_PROCESS_PRIVATE` 表示自旋锁仅用于同一进程的不同线程之间的同步。
+3. **自旋获取锁**：使用 `pthread_spin_lock` 函数尝试获取自旋锁，如果无法立即获取，线程将在当前位置循环，直到能够获取锁。
+4. **尝试自旋获取锁**：使用 `pthread_spin_trylock` 函数尝试获取自旋锁，如果无法获取，函数会立即返回，而不会进入自旋状态。
+5. **解锁**：使用 `pthread_spin_unlock` 函数释放自旋锁，允许其他线程获取该锁。
+6. **销毁自旋锁**：在不再需要自旋锁时，使用 `pthread_spin_destroy` 函数销毁它，释放系统资源。
+
+示例：
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <unistd.h>
+
+pthread_spinlock_t mSpinLock;
+
+void *func(void *arg){
+    // 子线程睡眠较短时间，模拟工作
+    sleep(1);
+    if (pthread_spin_trylock(&mSpinLock) == 0) {
+        printf("Child thread gets the lock.\n");
+        pthread_spin_unlock(&mSpinLock);
+    } else {
+        printf("Child thread failed to get the lock.\n");
+    }
+    return NULL;
+}
+
+int main(int argc, char *argv[]) {
+    // 初始化自旋锁
+    if (pthread_spin_init(&mSpinLock, PTHREAD_PROCESS_PRIVATE) != 0) {
+        perror("Failed to initialize spinlock");
+        return 1;
+    }
+
+    pthread_t pid;
+    if (pthread_create(&pid, NULL, func, NULL) != 0) {
+        perror("Failed to create thread");
+        pthread_spin_destroy(&mSpinLock);
+        return 1;
+    }
+
+    // 主线程获取自旋锁
+    if (pthread_spin_trylock(&mSpinLock) == 0) {
+        printf("Main thread gets the lock.\n");
+        // 模拟长时间工作
+        sleep(10);
+        pthread_spin_unlock(&mSpinLock);
+        printf("Main thread releases the lock.\n");
+    } else {
+        printf("Main thread failed to get the lock.\n");
+    }
+
+    // 等待子线程结束
+    pthread_join(pid, NULL);
+
+    // 销毁自旋锁
+    if (pthread_spin_destroy(&mSpinLock) != 0) {
+        perror("Failed to destroy spinlock");
+        return 1;
+    }
+
+    return 0;
+}
+```
+
+### 读写锁
+
+**读锁特性**：
+
+- 读锁支持多个线程 **并行访问** 共享资源，只要没有线程请求写锁。
+- 当一个或多个线程持有读锁时，其他线程可以继续获取读锁进行读取操作，但写锁请求将被 **阻塞**。
+
+**写锁特性**：
+
+- 写锁要求 **独占访问** 共享资源，即在任何时刻只能有一个线程持有写锁。
+- 当线程请求写锁时，所有其他读锁和写锁的请求都将被 **挂起**，直到写锁被释放。
+
+这种锁的设计允许在没有写操作时提高资源的并发访问能力，同时确保写操作的安全性。读写锁在数据库、文件系统和多线程应用程序中非常常见，特别是在读取操作远多于写入操作的场景中。
+
+### 读写锁的使用示例
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <unistd.h>
+
+// 定义读写锁
+pthread_rwlock_t rLock = PTHREAD_RWLOCK_INITIALIZER;
+
+// 子线程函数
+void *func(void *arg){
+   // 获取读锁
+   pthread_rwlock_rdlock(&rLock);
+   printf("Child thread %ld is reading, num = %d\n", pthread_self(), num);
+   sleep(1); // 模拟读取操作
+   printf("Child thread %ld finished reading\n", pthread_self());
+   // 释放读锁
+   pthread_rwlock_unlock(&rLock);
+
+   return NULL;
+}
+
+int main(int argc, char *argv[]) {
+   int num = 10; // 共享资源
+
+   pthread_t pid1, pid2, pid3;
+
+   // 创建三个线程
+   if (pthread_create(&pid1, NULL, func, NULL) != 0) {
+      perror("Failed to create thread 1");
+      return 1;
+   }
+   if (pthread_create(&pid2, NULL, func, NULL) != 0) {
+      perror("Failed to create thread 2");
+      return 1;
+   }
+   if (pthread_create(&pid3, NULL, func, NULL) != 0) {
+      perror("Failed to create thread 3");
+      return 1;
+   }
+
+   // 等待所有线程完成
+   pthread_join(pid1, NULL);
+   pthread_join(pid2, NULL);
+   pthread_join(pid3, NULL);
+
+   // 销毁读写锁
+   pthread_rwlock_destroy(&rLock);
+
+   return 0;
+}
+```
+
+解释：
+
+1. **定义读写锁**：使用 `PTHREAD_RWLOCK_INITIALIZER` 宏初始化读写锁。
+2. **子线程函数**：子线程尝试获取读锁，然后读取共享资源 `num`，模拟读取操作，然后释放读锁。
+3. **创建线程**：在 `main` 函数中创建三个线程，每个线程都执行 `func` 函数。
+4. **等待线程完成**：使用 `pthread_join` 等待所有线程完成。
+5. **销毁读写锁**：在所有线程完成后，使用 `pthread_rwlock_destroy` 销毁读写锁。
+
+注意事项：
+
+- 读写锁适用于读多写少的场景，可以提高并发性能。
+- 当一个线程持有写锁时，其他线程的读锁和写锁请求都将被阻塞。
+- 在使用读写锁时，应该确保锁的初始化和销毁在适当的时候进行，避免资源泄露。
+- 读写锁的粒度比互斥锁更细，可以提供更好的并发性，但同时也增加了编程的复杂性。
+
+##  条件变量
+
+在多线程环境中，共享资源的同步是一个常见问题。虽然互斥锁理论上可以解决所有同步问题，但在实际应用中，如果线程的执行依赖于共享资源的动态数值，单纯使用互斥锁可能会导致效率问题。线程可能需要不断地尝试获取锁，检查条件是否满足，然后释放锁，这种行为会导致 CPU 资源的浪费和频繁的上下文切换。
+
+为了解决这种依赖于共享资源条件的同步问题，条件变量提供了一种无竞争的解决方案。它们允许线程在条件不满足时挂起，而不是持续占用 CPU 资源。当条件满足时，线程会被唤醒并继续执行。这种方式减少了不必要的 CPU 占用和上下文切换，提高了程序的效率和响应性。
+
+使用条件变量时，通常需要与互斥锁结合使用，以保护共享资源的访问。线程在进入临界区之前获取互斥锁，然后检查条件是否满足。如果不满足，线程可以释放互斥锁并等待条件变量。当其他线程改变了条件并通知条件变量时，等待的线程会被唤醒，重新获取互斥锁，并再次检查条件。如果条件满足，线程可以继续执行；如果不满足，线程可以再次等待或退出。
+
+### 条件变量的基本原理
+
+条件变量提供了一种机制，允许线程在共享资源的某个条件不满足时挂起。这种挂起是等待状态，直到另一个线程发出通知，告知条件已经满足，从而唤醒等待的线程。
+
+**示例场景** ：
+
+例如，线程 A 在持有互斥锁的情况下，发现执行所需的条件尚未成熟。在这种情况下，线程 A 可以选择主动进入阻塞状态，并释放持有的锁。这一过程是原子操作，即挂起和解锁是不可分割的步骤。
+
+一旦锁被释放，其他线程，比如线程 B，有机会获取该锁并进行必要的操作。在某些情况下，线程 B 可能不需要持有锁就可以修改条件。
+
+在线程 B 执行其逻辑操作的过程中，如果它判断当前是合适的时机来唤醒线程 A，它可以执行唤醒操作。这个操作会通知等待中的线程 A。
+
+线程 A 在接收到唤醒通知后，会首先恢复运行，并尝试重新获取之前释放的互斥锁。一旦重新获得锁，线程 A 将继续执行它的后续指令。
+
+这个过程中涉及到两个关键动作：一是线程 A 的主动阻塞，二是线程 B 的唤醒操作。
+
+通过条件变量，多线程程序可以更加高效地处理线程间的协作问题，避免了不必要的 CPU 资源浪费，并减少了线程间的冲突。
+
+### `pthread_cond_init`  **条件变量的定义与初始化** 
+
+在多线程编程中，条件变量是一种同步机制，允许线程在不满足特定条件时挂起。首先，需要定义一个条件变量，并使用 `pthread_cond_init` 函数进行初始化。此函数接受条件变量的指针和一个可选的条件变量属性对象，通常设置为 NULL。
+
+`pthread_cond_init` 是 POSIX 线程库中用于初始化条件变量的函数。条件变量是一种同步机制，它允许线程在某些条件不满足时挂起（等待），直到其他线程发出信号表明条件已经满足。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr);
+```
+
+参数说明：
+
+1. **pthread_cond_t \*cond**: 这是一个指向 `pthread_cond_t` 类型的指针，用于存储新创建的条件变量的标识符。成功初始化后，这个标识符将被用来在后续操作中引用这个条件变量。
+2. **const pthread_condattr_t \*attr**: 这是一个指向 `pthread_condattr_t` 类型的指针，它指定了条件变量的属性。如果这个参数是 `NULL`，条件变量将被初始化为默认属性。
+
+返回值：
+
+- 如果 `pthread_cond_init` 调用成功，返回 0。
+- 如果调用失败，返回一个错误码。例如，如果内存分配失败，将返回 `ENOMEM`。
+
+使用场景：
+
+- 当需要在多线程程序中同步线程，基于某些条件进行挂起和唤醒操作时。
+- 当一个或多个线程需要等待某个事件的发生，而其他线程负责在适当的时候发出信号。
+
+工作机制：
+
+- 通过调用 `pthread_cond_init`，操作系统会分配必要的资源来创建一个条件变量，并根据提供的属性（如果有）初始化它。
+- 初始化后，条件变量可以用来与互斥锁配合使用，以实现线程间的协调。
+
+### `pthread_cond_wait` **线程的阻塞与等待** 
+
+当线程需要等待某个条件成立时，可以使用 `pthread_cond_wait` 函数主动进入阻塞状态。此函数会释放与之关联的互斥锁，并使线程进入等待状态，直到被其他线程唤醒。
+
+`pthread_cond_wait` 是 POSIX 线程库中用于等待（挂起）一个条件变量的函数。当线程执行到这个函数时，它会释放与之配合使用的互斥锁，并进入等待状态，直到另一个线程发出信号或广播唤醒它。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mut);
+```
+
+参数说明：
+
+1. **pthread_cond_t \*cond**: 这是一个指向 `pthread_cond_t` 类型的指针，它标识了等待的条件变量。这个条件变量必须已经通过 `pthread_cond_init` 函数初始化。
+2. **pthread_mutex_t \*mut**: 这是一个指向 `pthread_mutex_t` 类型的指针，它标识了与条件变量配合使用的互斥锁。互斥锁必须已经通过 `pthread_mutex_init` 函数初始化，并且在调用 `pthread_cond_wait` 之前被锁定。
+
+返回值：
+
+- 如果条件变量被信号唤醒并且调用成功，返回 0。
+- 如果调用失败，返回一个错误码。例如：
+  - `EINVAL`: 传入的条件变量或互斥锁参数无效或未初始化。
+  - `EINTR`: 等待被中断，例如，由于一个信号的传递。
+
+使用场景：
+
+- 当线程需要等待某个条件变为真，而这个条件目前还不满足时。
+- 当需要同步线程之间的操作，确保它们在正确的顺序执行。
+
+工作机制：
+
+- 调用 `pthread_cond_wait` 时，线程首先会释放它所持有的互斥锁，然后进入等待状态。
+- 此时，线程会被挂起，不会消耗 CPU 资源。
+- 当其他线程调用 `pthread_cond_signal` 或 `pthread_cond_broadcast` 并释放了至少一个等待该条件变量的线程时，等待的线程会被唤醒。
+- 被唤醒的线程将重新尝试获取互斥锁，并在成功获取互斥锁后继续执行。
+
+### `pthread_cond_signal`  **唤醒等待的线程** 
+
+一旦条件成立，其他线程可以使用 `pthread_cond_signal` 函数来唤醒等待条件变量的线程。此函数会将一个等待的线程从阻塞状态移至就绪状态，使其能够重新获取锁并继续执行。
+
+`pthread_cond_signal` 是 POSIX 线程库中用于唤醒等待某个条件变量的一个或多个线程的函数。当使用条件变量进行线程同步时，这个函数允许一个线程向其他线程发出信号，表明它们所等待的条件已经满足。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+int pthread_cond_signal(pthread_cond_t *cond);
+```
+
+参数说明：
+
+- **pthread_cond_t \*cond**: 这是一个指向 `pthread_cond_t` 类型的指针，它标识了要触发的条件变量。这个条件变量必须已经通过 `pthread_cond_init` 函数初始化。
+
+返回值：
+
+- 如果条件变量成功触发，返回 0。
+- 如果调用失败，返回一个错误码。例如：
+  - `EINVAL`: 传入的条件变量参数无效或未初始化。
+
+使用场景：
+
+- 当一个线程完成了某些工作，并且这项工作是其他线程继续执行所依赖的条件时。
+- 当需要唤醒等待条件变量的线程，以便它们可以检查条件并继续执行。
+
+工作机制：
+
+- 当一个线程调用 `pthread_cond_signal` 时，如果有一个或多个线程正在等待指定的条件变量，操作系统会选择其中一个线程（通常是 FIFO 顺序，但具体取决于实现），使其从 `pthread_cond_wait` 或 `pthread_cond_timedwait` 调用中唤醒。
+- 被唤醒的线程将重新尝试获取之前与之配合使用的互斥锁，并在成功获取互斥锁后继续执行。
+
+值得注意的是，`pthread_cond_signal` 一次只能唤醒一个等待的线程。如果该线程无法立即获取锁，它将再次进入阻塞状态，直到锁被释放。
+
+### `pthread_cond_destroy` **条件变量的销毁** 
+
+在条件变量不再需要时，应使用 `pthread_cond_destroy` 函数将其销毁。这有助于释放与条件变量关联的资源。
+
+`pthread_cond_destroy` 是 POSIX 线程库中用于销毁条件变量的函数。当条件变量不再被需要时，例如在程序结束或某个模块卸载时，应当使用此函数来释放与条件变量关联的资源。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+int pthread_cond_destroy(pthread_cond_t *cond);
+```
+
+参数说明：
+
+- **pthread_cond_t \*cond**: 这是一个指向 `pthread_cond_t` 类型的指针，它标识了要销毁的条件变量。这个条件变量必须已经通过 `pthread_cond_init` 函数初始化。
+
+返回值：
+
+- 如果 `pthread_cond_destroy` 调用成功，返回 0。
+- 如果调用失败，返回一个错误码。例如：
+  - `EINVAL`: 传入的条件变量参数无效或未正确初始化。
+  - `EBUSY`: 条件变量仍然有线程在等待，不能被销毁。
+
+使用场景：
+
+- 在条件变量生命周期结束时，需要确保释放与之相关的系统资源。
+- 在动态创建条件变量的场合，如程序模块初始化时创建，在模块卸载时应当销毁。
+
+工作机制：
+
+- 当调用 `pthread_cond_destroy` 时，操作系统会检查条件变量的状态。如果条件变量处于无线程等待的安全状态，它将被销毁，相关资源将被释放。
+- 如果有线程正在等待该条件变量，销毁操作将失败，并返回 `EBUSY` 错误。
+
+### 卖票示例
+
+以一个卖票的逻辑为例:     
+
+一个人卖票：票未必每一次都能卖掉，每一次买票的人在随机的状态下选择是否买票 。
+
+另一个人加票：在初始 20 张票的情况下，每次卖一张，当第一次票小于 5 张的时候再追加 10 张票。
+
+```c
+typedef struct share_state {
+  int ticketNum;
+  int flag;  // 0未加票, 1已经加票
+  pthread_mutex_t mLock;
+  pthread_cond_t cond;
+} share_state_t;
+
+void *sellFun(void *arg) {
+  share_state_t *pShareState = (share_state_t *)arg;
+
+  while (1) {
+    pthread_mutex_lock(&pShareState->mLock);
+
+    if (pShareState->ticketNum <= 0 && pShareState->flag != 0) {
+      pthread_mutex_unlock(&pShareState->mLock);
+      break;
+    }
+
+    struct timeval nowTime;
+    gettimeofday(&nowTime, NULL);
+    srand((unsigned int)nowTime.tv_usec);
+    double rand_num = (double)rand() / RAND_MAX;
+
+    if (pShareState->ticketNum > 0 && rand_num < 0.1) {
+      pShareState->ticketNum--;
+      printf("ticketNum = %d \n", pShareState->ticketNum);
+    }
+
+    if (pShareState->ticketNum <= 5 && pShareState->flag == 0) {
+      pthread_cond_signal(&pShareState->cond);
+      pthread_cond_wait(&pShareState->cond, &pShareState->mLock);
+    }
+
+    pthread_mutex_unlock(&pShareState->mLock);
+  }
+  return NULL;
+}
+void *purchaseFun(void *arg) {
+  share_state_t *pShareState = (share_state_t *)arg;
+
+  pthread_mutex_lock(&pShareState->mLock);
+
+  if (pShareState->ticketNum > 5) {
+    pthread_cond_wait(&pShareState->cond, &pShareState->mLock);
+    pShareState->ticketNum = pShareState->ticketNum + 10;
+    pShareState->flag = 1;
+  } else {
+    pShareState->ticketNum = pShareState->ticketNum + 10;
+    pShareState->flag = 1;
+  }
+  pthread_cond_signal(&pShareState->cond);
+  pthread_mutex_unlock(&pShareState->mLock);
+  return NULL;
+}
+int main(int argc, char *argv[]) {
+  share_state_t shareState;
+  shareState.ticketNum = 20;
+  shareState.flag = 0;
+  pthread_mutex_init(&shareState.mLock, NULL);
+  pthread_cond_init(&shareState.cond, NULL);
+
+  pthread_t pid1, pid2;
+  pthread_create(&pid2, NULL, purchaseFun, &shareState);
+  pthread_create(&pid1, NULL, sellFun, &shareState);
+
+  pthread_join(pid1, NULL);
+  pthread_join(pid2, NULL);
+  return 0;
+}
+```
+
+### `pthread_cond_timedwait` 带有超时限制的条件变量等待
+
+`pthread_cond_timedwait` 是 POSIX 线程库中的一个函数，它用于实现带有超时限制的条件变量等待。与 `pthread_cond_wait` 类似，`pthread_cond_timedwait` 允许线程在等待某个条件变量时挂起，直到被另一个线程通过 `pthread_cond_signal` 或 `pthread_cond_broadcast` 唤醒，或者直到超时时间到达。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+int pthread_cond_timedwait(pthread_cond_t *cond,
+                           pthread_mutex_t *mut,
+                           const struct timespec *abstime);
+```
+
+参数说明：
+
+1. **pthread_cond_t \*cond**: 这是一个指向 `pthread_cond_t` 类型的指针，标识了要等待的条件变量。
+2. **pthread_mutex_t \*mut**: 这是一个指向 `pthread_mutex_t` 类型的指针，标识了与条件变量配合使用的互斥锁。
+3. **const struct timespec \*abstime**: 这是一个指向 `timespec` 结构的指针，`timespec` 结构指定了超时时间。这个时间是绝对的，表示从某个固定的时间点（如历元或系统启动时间）起的时长。
+
+返回值：
+
+- 如果条件变量被信号唤醒并且调用成功，返回 0。
+- 如果超时时间到达并且没有收到信号，返回 `ETIMEDOUT`。
+- 如果调用失败，返回其他错误码。例如：
+  - `EINVAL`: 传入的条件变量或互斥锁参数无效或未初始化。
+  - `EINTR`: 等待被中断，例如，由于一个信号的传递。
+
+使用场景：
+
+- 当线程需要等待某个条件变量，但不想无限期地等待时。
+- 当需要在某个特定时间点放弃等待并继续执行其他任务时。
+
+工作机制：
+
+- 调用 `pthread_cond_timedwait` 时，线程首先会释放它所持有的互斥锁。
+- 然后，线程进入等待状态，直到以下任一情况发生：
+  - 接收到条件变量的信号或广播，并被唤醒。
+  - 超时时间到达，仍未收到信号。
+- 如果线程被唤醒，它将重新尝试获取互斥锁，并在成功获取互斥锁后继续执行。
+
+示例：
+
+```c
+int main(int argc,char*argv[])
+{
+    pthread_mutex_t mLock;
+    pthread_cond_t cond;
+    pthread_mutex_init(&mLock, NULL);
+    pthread_cond_init(&cond, NULL);
+
+    pthread_mutex_lock(&mLock);
+
+    time_t now = time(NULL);
+    struct timespec end;
+    end.tv_sec = now+10;
+    end.tv_nsec = 0;
+
+    int res = pthread_cond_timedwait(&cond, &mLock, &end);
+    THREAD_ERROR_CHECK(res, "timedwait");
+
+    pthread_mutex_unlock(&mLock);
+
+    return 0;
+}
+```
+
+### `pthread_cond_broadcast` 唤醒所有等待指定条件变量的线程
+
+`pthread_cond_broadcast` 是 POSIX 线程库中的一个函数，它用于唤醒所有等待指定条件变量的线程。与 `pthread_cond_signal` 函数不同，后者只唤醒一个等待的线程（如果有多个线程在等待的话），而 `pthread_cond_broadcast` 会唤醒所有等待该条件变量的线程。
+
+函数原型如下：
+
+```c
+#include <pthread.h>
+int pthread_cond_broadcast(pthread_cond_t *cond);
+```
+
+参数说明：
+
+- **pthread_cond_t \*cond**: 这是一个指向 `pthread_cond_t` 类型的指针，标识了要广播的条件变量。这个条件变量必须已经通过 `pthread_cond_init` 函数初始化。
+
+返回值：
+
+- 如果所有等待的线程都被成功唤醒，返回 0。
+- 如果调用失败，返回一个错误码。例如：
+  - `EINVAL`: 传入的条件变量参数无效或未初始化。
+
+使用场景：
+
+- 当有多个线程都在等待同一个条件变量，并且需要同时唤醒它们以进行某些操作时。
+- 当条件变量满足时，所有等待的线程都需要立即检查条件并继续执行。
+
+工作机制：
+
+- 当调用 `pthread_cond_broadcast` 时，所有因 `pthread_cond_wait` 或 `pthread_cond_timedwait` 调用而等待该条件变量的线程都会被唤醒。
+- 被唤醒的线程将重新尝试获取之前与之配合使用的互斥锁，并在成功获取互斥锁后继续执行。
+
+```c
+typedef struct share_value{
+   int num;
+   pthread_mutex_t mLock;
+   pthread_cond_t cond;
+} share_value_t;
+
+void *fun(void *arg){
+   share_value_t *pShareValue = (share_value_t *)arg;
+
+   pthread_mutex_lock(&pShareValue->mLock);
+   pShareValue->num++;
+   int childNum = pShareValue->num;
+   pthread_mutex_unlock(&pShareValue->mLock);
+
+   sleep(childNum);
+   printf("i am %d child thread \n", childNum);
+
+
+   pthread_mutex_lock(&pShareValue->mLock);
+   printf("i am %d child thread before \n", childNum);
+   pthread_cond_wait(&pShareValue->cond,&pShareValue->mLock);
+   printf("i am %d child thread after \n", childNum);
+   pthread_mutex_unlock(&pShareValue->mLock);
+
+}
+int main(int argc,char*argv[])
+{
+   share_value_t shareValue;
+   shareValue.num = 0;
+   pthread_mutex_init(&shareValue.mLock, NULL);
+   pthread_cond_init(&shareValue.cond, NULL);
+
+   pthread_t pid1, pid2;
+   pthread_create(&pid1, NULL, fun, &shareValue);
+   pthread_create(&pid2, NULL, fun, &shareValue);
+
+   sleep(5);
+   pthread_mutex_lock(&shareValue.mLock);
+   pthread_cond_broadcast(&shareValue.cond);
+   // pthread_cond_signal(&shareValue.cond);
+   pthread_mutex_unlock(&shareValue.mLock);
+
+   pthread_join(pid1, NULL);
+   pthread_join(pid2, NULL);
+
+   pthread_mutex_destroy(&shareValue.mLock);
+   pthread_cond_destroy(&shareValue.cond);
+
+   return 0;
+}
+```
+
+## 线程属性
+
+当创建线程时，可以通过 `pthread_attr_t` 类型的变量来指定线程的多种属性，这些属性包括但不限于线程的调度情况、CPU 绑定、内存分配、栈大小和线程的分离状态。以
+
+1. **设置线程的 CPU 亲和性**： 使用 `pthread_attr_setaffinity_np` 可以设置线程的 CPU 亲和性，这允许线程只在特定的 CPU 或 CPU 集合上运行。
+2. **设置线程的脱离状态**： 通过 `pthread_attr_setdetachstate`，可以设置线程的脱离状态，决定线程是可加入的还是分离的。
+3. **设置线程的保护区域大小**： `pthread_attr_setguardsize` 允许设置线程栈的保护区域大小，这有助于防止栈溢出。
+4. **设置线程的调度属性继承方式**： 使用 `pthread_attr_setinheritsched` 可以设置线程创建时是否继承其父线程的调度属性。
+5. **设置线程的调度参数**： `pthread_attr_setschedparam` 用于设置线程的调度参数，包括优先级。
+6. **设置线程的调度策略**： `pthread_attr_setschedpolicy` 允许设置线程的调度策略，如先进先出（SCHED_FIFO）、轮转法（SCHED_RR）或标准（SCHED_OTHER）。
+7. **设置线程的优先级范围**： 通过 `pthread_attr_setscope` 可以设置线程优先级的有效范围，影响线程的调度。
+8. **设置线程栈的地址和大小**： 使用 `pthread_attr_setstack` 可以同时设置线程栈的地址和大小。
+9. **设置线程的堆栈地址**： `pthread_attr_setstackaddr` 允许指定线程栈的内存地址，确保线程栈在特定区域创建。
+10. **设置线程的堆栈大小**： `pthread_attr_setstacksize` 用于设置线程栈的大小。
+
+这些属性的设置可以通过相应的 `pthread_attr_set*` 函数完成，并将设置好的属性对象传递给 `pthread_create` 函数，以控制新创建线程的行为。
+
+示例：设置线程的分离状态属性
+
+分离状态属性决定了线程终止后是否可以被其他线程通过 `pthread_join` 捕获其终止状态。如果线程被设置为分离（detached）状态，它将在终止时自动释放其资源，而其他线程调用 `pthread_join` 将返回错误。
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define THREAD_ERROR_CHECK(res, msg) \
+   if (res != 0) { \
+      fprintf(stderr, "%s failed with error %d\n", msg, res); \
+      exit(EXIT_FAILURE); \
+   }
+
+void *func(void *arg) {
+   // 线程函数的实现
+   return NULL;
+}
+
+int main(int argc, char* argv[]) {
+   pthread_attr_t attr;
+   pthread_t tid;
+
+   // 初始化线程属性对象
+   pthread_attr_init(&attr);
+
+   // 设置线程为分离状态
+   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+   // 创建线程
+   pthread_create(&tid, &attr, func, NULL);
+
+   // 等待线程终止，由于线程是分离状态，这里将返回错误
+   int res = pthread_join(tid, NULL);
+   THREAD_ERROR_CHECK(res, "join");
+
+   // 销毁线程属性对象
+   pthread_attr_destroy(&attr);
+
+   return 0;
+}
+```
+
+## 线程安全问题
+
+多线程共享同一进程的地址空间，因此在访问共享数据时可能会遇到竞争条件。这种问题不仅可能发生在自定义函数中，也可能出现在库函数的使用中。例如，`ctime` 函数会将转换后的日期时间字符串存储在静态缓冲区中，这可能导致线程间的不安全行为。
+
+*以下是使用 `ctime` 函数的示例代码，它展示了线程安全问题：
+
+```c
+#include <stdio.h>
+#include <time.h>
+#include <pthread.h>
+
+void *func(void *arg) {
+    time_t childTime;
+    time(&childTime);
+    char *str = ctime(&childTime);
+    printf("child time = %s\n", str);
+    sleep(5);
+    printf("child time = %s\n", str); // 这里可能会看到与第一次不同的输出
+    return NULL;
+}
+
+int main(int argc, char* argv[]) {
+    pthread_t tid;
+    pthread_create(&tid, NULL, func, NULL);
+    sleep(3);
+    time_t mainTime;
+    time(&mainTime);
+    printf("main time = %s\n", ctime(&mainTime));
+    pthread_join(tid, NULL);
+    return 0;
+}
+```
+
+为了解决这个问题，可以使用 `ctime_r` 函数，它允许指定一个用户定义的缓冲区来存储结果，从而避免了线程间的共享数据问题。
+
+```c
+#include <stdio.h>
+#include <time.h>
+#include <pthread.h>
+
+void *func(void *arg) {
+    time_t childTime;
+    time(&childTime);
+    char buff[100];
+    char *str = ctime_r(&childTime, buff);
+    printf("child time = %s\n", str);
+    sleep(5);
+    printf("child time = %s\n", str); // 使用缓冲区，输出将是一致的
+    return NULL;
+}
+
+int main(int argc, char* argv[]) {
+    pthread_t tid;
+    pthread_create(&tid, NULL, func, NULL);
+    sleep(3);
+    time_t mainTime;
+    time(&mainTime);
+    char buff[100];
+    printf("main time = %s\n", ctime_r(&mainTime, buff));
+    pthread_join(tid, NULL);
+    return 0;
+}
+```
+
+在帮助手册或文档中，库函数的作者通常会说明其线程安全属性。开发者应当注意这些属性，并在必要时选择线程安全的替代函数。
+
+## 可重入性
+
+在多线程编程中，可重入性（reentrancy）是一个重要的概念。一个函数是可重入的，如果它在被一个线程执行的过程中，可以再次被同一个线程或另一个线程调用，而不会导致任何错误或不一致的问题。可重入函数通常不依赖于全局或静态数据，或者在访问这些数据时使用适当的同步机制。
+
+下面示例代码中，`fun` 函数是不可重入的，因为它使用了一个静态数组 `p` 来存储结果。如果 `fun` 函数在第一次调用时被中断，并且再次被调用，它可能会返回一个未完成的字符串，或者覆盖之前的结果。这是因为静态数组 `p` 在函数调用之间保持其状态，而没有适当的同步机制来保护对它的访问。
+
+```c
+#include <testfun.h>
+char *fun(){
+    static char p[20] = {0};
+    for(int i=0; i<20; i++){
+        if(p[i] == 0){
+            p[i] = 'a';
+            break;
+        }
+    }
+    return p;
+}
+int main(int argc, char* argv[]){
+    char *p1 = fun();
+    printf("p = %s \n", p1);
+
+    char *p2 = fun();
+    printf("p = %s \n", p2);
+    return 0;
+}
+```
+
+要使 `fun` 函数可重入，可以采取以下措施：
+
+1. 移除静态存储类，使用局部变量或传入的参数来代替。
+2. 如果必须使用静态或全局数据，确保使用互斥锁或其他同步机制来保护对它们的访问。
+
+实现可重入函数的关键点包括：
+
+- 避免使用静态或全局变量，除非可以通过加锁来保护它们。
+- 不要调用非可重入的库函数，除非在调用它们时使用适当的同步。
+- 避免在函数中分配或释放内存，这通常涉及到非可重入的函数，如 `malloc` 和 `free`。
+- 确保函数在被中断时能够安全地恢复执行，不会导致数据损坏或不一致。
+
+关于 `malloc` 函数的不可重入性。`malloc` 可能会修改其内部状态，如内存池或分配的内存块计数器。在多线程环境中，如果一个线程在 `malloc` 被调用后和完成前被阻塞，而另一个线程尝试调用 `malloc`，可能会导致死锁或不一致的问题。为了安全地在多线程程序中使用动态内存分配，可以使用线程安全的内存分配函数，或者在分配内存时使用互斥锁来同步访问。
+
+在信号处理中，如果信号处理函数调用了不可重入的函数，如 `malloc`，并且此时发生了线程切换，切换到的线程也调用了 `malloc`，就可能发生死锁。为了避免这种情况，应该确保信号处理函数尽可能简洁，只执行必要的操作，并且避免调用不可重入的函数。如果需要在信号处理函数中进行复杂的操作，可以考虑使用 `sigsetjmp` 和 `siglongjmp` 来保存和恢复程序的状态，或者使用其他同步机制来确保安全。
+
+

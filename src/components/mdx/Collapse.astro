@@ -1,0 +1,21 @@
+---
+interface Props {
+  title?: string;
+  open?: boolean;
+  type?: "primary" | "info" | "success" | "warning" | "danger" | "default";
+}
+
+const {
+  title = "折叠内容",
+  open = false,
+  type = "default",
+}: Props = Astro.props;
+const typeClass = type === "default" ? "" : type;
+---
+
+<details class={`mdx-collapse ${typeClass}`.trim()} open={open}>
+  <summary class="mdx-collapse__summary">{title}</summary>
+  <div class="mdx-collapse__content">
+    <slot />
+  </div>
+</details>

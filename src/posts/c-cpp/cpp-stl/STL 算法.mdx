@@ -1,0 +1,625 @@
+---
+title: "STL 算法"
+date: 2021-05-10T10:10:37+08:00
+categories: ["C 与 C++", "STL 基础"]
+tags: ["C++", "STL"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0ViR2VZalBaNjRWSGxzQlAydkxjck80QlRmWF9vOFZhWi12Y2NMR0FmVFJrdUE_ZT1tckxtaWg.png"
+---
+
+## 概述
+
+算法中包含很多对容器进行处理的算法，使用迭代器来标识要处理的数据或数据段、以及结果的存放位 置，有的函数还作为对象参数传递给另一个函数，实现数据的处理。这些算法可以操作在多种容器类型 上, 所以称为“泛型”，泛型算法不是针对容器编写，而只是单独依赖迭代器和迭代器操作实现。而且算法 库中的算法都是普通函数（自由函数）。
+
+## 算法的分类
+
+- 非修改式的算法：**`for_each`**、`count`、`find`
+- 修改式的算法：  `copy`、`remove`、**`remove_if`**、`replace`
+- 排序算法： **`sort`**
+- 二分搜索算法： `lower_bound`
+- 集合操作： **`set_intersection`**
+- 堆操作： `make_heap`、`push_heap`、`pop_heap`
+- 取最大值最小值： `max`、`min`
+- 数值操作：  `accumulate`
+- 未初始化的内存操作：  **`uninitialized_copy`**
+
+## 一元函数以及一元断言/一元谓词
+
+- 一元函数：函数的参数只有一个；
+- 一元断言/一元谓词：函数的参数只有一个，并且返回类型是 `bool` 类型。
+- 二元函数：函数的参数有两个；
+- 二元断言/二元谓词：函数的参数两个，并且返回类型是 `bool` 类型。
+
+## 非修改式算法 `for_each`
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXRXVkNmNJc2pwTWpmNWZZS0pNcDJrQjBZV0xoTkZPOXB5TFpuZTZ1V0gxaWc_ZT0wMVphY0k.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlM01xc2tYbWc1T2x2ZVVZeUhkbkxrQjBxNDlfN01XUWNvTnZKWHFacTlWSUE_ZT1HOXZiUGw.png)
+
+```cpp
+// # if __cplusplus > 201703L
+// #  define _GLIBCXX20_CONSTEXPR constexpr
+
+/**
+   *  @brief Apply a function to every element of a sequence.
+   *  @ingroup non_mutating_algorithms
+   *  @param  __first  An input iterator.
+   *  @param  __last   An input iterator.
+   *  @param  __f      A unary function object.
+   *  @return   @p __f
+   *
+   *  Applies the function object @p __f to each element in the range
+   *  @p [first,last).  @p __f must not modify the order of the sequence.
+   *  If @p __f has a return value it is ignored.
+  */
+template<typename _InputIterator, typename _Function>
+_GLIBCXX20_CONSTEXPR
+_Function
+for_each(_InputIterator __first, _InputIterator __last, _Function __f)
+{
+  // concept requirements
+  __glibcxx_function_requires(_InputIteratorConcept<_InputIterator>)
+    __glibcxx_requires_valid_range(__first, __last);
+  for (; __first != __last; ++__first)
+    __f(*__first);
+  return __f; // N.B. [alg.foreach] says std::move(f) but it's redundant.
+}
+```
+
+```cpp
+for_each(vec.begin(), vec.end(), [](int &value) -> void {
+  ++value;
+  cout << value << "  ";
+});
+```
+
+## 修改式算法 `remove_if`
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSc1UtUXd6X3VoQmdoOFV3VGdjVF80QkZ2bW1kLWFEYVZRN0V1VlBiX3ZNYUE_ZT1yVnEyOHI.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWdDNuRE41WThwTHNPcXBkXzdudlpZQkcwVVZQbXdNYVp1cTI1X2tpeGFWdEE_ZT0zcGtxb1I.png)
+
+```cpp
+bool func(int value) {
+  return value > 6;
+}
+
+int main() {
+  vector<int> vec = {1, 3, 5, 8, 6, 4, 7, 9};
+  for_each(vec.begin(), vec.end(), [](int &value) {
+    cout << value << "  ";
+  });
+  cout << endl;
+
+  // 将所有大于 6 的元素删除
+  cout << endl << "执行remove_if操作之后" << endl;
+  // remove_if 不能将满足条件的元素直接删除，但是会返回待删除元素的首迭代器
+  // 然后再配合容器的 erase 操作，才可以达到删除的满足条件的效果
+  auto it = remove_if(vec.begin(), vec.end(), func);
+  vec.erase(it, vec.end());
+  for_each(vec.begin(), vec.end(), [](int &value) {
+    cout << value << "  ";
+  });
+  cout << endl;
+  return 0;
+}
+```
+
+```cpp
+/**
+   *  @brief Remove elements from a sequence using a predicate.
+   *  @ingroup mutating_algorithms
+   *  @param  __first  A forward iterator.
+   *  @param  __last   A forward iterator.
+   *  @param  __pred   A predicate.
+   *  @return   An iterator designating the end of the resulting sequence.
+   *
+   *  All elements for which @p __pred returns true are removed from the range
+   *  @p [__first,__last).
+   *
+   *  remove_if() is stable, so the relative order of elements that are
+   *  not removed is unchanged.
+   *
+   *  Elements between the end of the resulting sequence and @p __last
+   *  are still present, but their value is unspecified.
+  */
+template<typename _ForwardIterator, typename _Predicate>
+_GLIBCXX20_CONSTEXPR
+inline _ForwardIterator
+remove_if(_ForwardIterator __first, _ForwardIterator __last,
+          _Predicate __pred)
+{
+  // concept requirements
+  __glibcxx_function_requires(_Mutable_ForwardIteratorConcept<_ForwardIterator>)
+    __glibcxx_function_requires(_UnaryPredicateConcept<_Predicate, typename iterator_traits<_ForwardIterator>::value_type>)
+    __glibcxx_requires_valid_range(__first, __last);
+
+  return std::__remove_if(__first, __last,
+                          __gnu_cxx::__ops::__pred_iter(__pred));
+}
+
+template<typename _ForwardIterator, typename _Predicate>
+_GLIBCXX20_CONSTEXPR
+_ForwardIterator
+__remove_if(_ForwardIterator __first, _ForwardIterator __last _Predicate __pred)
+{
+  __first = std::__find_if(__first, __last, __pred);
+  if (__first == __last)
+    return __first;
+  _ForwardIterator __result = __first;
+  ++__first;
+  for (; __first != __last; ++__first)
+    if (!__pred(__first))
+    {
+      *__result = _GLIBCXX_MOVE(*__first);
+      ++__result;
+    }
+  return __result;
+}
+```
+
+## `vector` 的 `push_back` 操作导致迭代器失效
+
+```cpp
+vector<int> vec;
+vec.push_back(100);
+
+bool flag = true;
+for (auto it = vec.begin(); it != vec.end(); ++it) {
+  cout << *it << "  ";// 读
+  if (flag) {
+    // 在执行 push_back 的时候，底层已经发生了扩容，导致迭代器
+    // it 指向的还是老的空间，所以此时迭代器已经失效了
+    // 解决方案：重置迭代器的位置（更新迭代器）
+    vec.push_back(200);// 写
+    it = vec.begin();// 更新迭代器
+    flag = false;
+  }
+}
+cout << endl;
+```
+
+## `bind1st` 与 `bind2nd`
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRRTlUX01fTDc1TWdoSzJCN3NwUzdvQlR1Wkl6Q3E5ZFNOMXI4dkF6SV8tdlE_ZT1KUEc3N0o.png)
+
+对于二元断言 `Func` 而言如果现在可以固定第过个参数 `Args2`，将其固定为 6，那么此处要想删除大于 6 的元素，那么 `Func` 的实现就是 `Args1 > 6`，也就表明 `Func` 具备大于符号的含义，也就是 `std:: greater`;
+
+如果现在可以固定第一个参数 `Args1`，将其固定为 6，那么此处要想删除大于 6 的元素，那么 `Func` 的实现就是 `6 > Args2`, 也就表明 `Func` 具备小于符号的含义，也就是 `std:: less`;
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VROHVoUW9rQUJWTHZIVFB6aWZ0RU04QkRJLW1hcU5relFWRXR5aHR1R3pXVHc_ZT1uaDVjZjM.png)
+
+`bind1st` 可以固定二元函数对象 `f` 的第一个参数，将其固定为 `x`
+
+`bind2nd` 可以固定二元函数对象 `f` 的第二个参数，将其固定为 `x`
+
+```cpp
+// 将所有大于 6 的元素删除
+cout << endl << "执行 remove_if 操作之后" << endl;
+auto it = remove_if(vec.begin(), vec.end(), bind2nd(std::greater<int>(), 6));
+```
+
+`bind2nd` 绑定了二元函数对象 `std::greater` 的右操作数 `rhs = 6`， 而 `greater` 的实现是 `return lhs > rhs = 6`，也就是将大于 6 的删除。
+
+
+
+## `bind`
+
+### 模板形式
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUenZ3SDZqenpwTWdOQThTdUxGOVdRQndLZ3hPYU11RWM4bEdscnNHdmo1S1E_ZT1CcWRxdG0.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZUGRoRWx5UVFkTm5CTGRPUUZLV0lJQlZrenBtb1NKaEVwZzJLTzAta1YtLWc_ZT1jeDFlbWY.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VkaWdvbmc1a1JoQnNZaEc0SkxKbkU4QmdFenpBU1pMMjE4eWZ0b0JzWFNxZWc_ZT13dDlzR0E.png)
+
+### 绑定函数的类型
+
+```cpp
+int add(int x, int y) {
+  cout << "int add(int, int)" << endl;
+  return x + y;
+}
+
+int multiply(int x, int y, int z) {
+  cout << "int multiply(int, int, int)" << endl;
+  return x * y * z;
+}
+
+class Example {
+ public:
+  // Example * const this
+  int add(/* this */int x, int y) {
+    cout << "int Example::add(int, int)" << endl;
+    return x + y;
+  }
+};
+
+
+int main(int argc, char *argv[]) {
+  // 绑定普通的二元函数
+  auto f = bind(&add, 1, 2);
+  cout << "f() = " << f() << endl;
+  // f() = int add(int, int) 3
+
+  cout << endl << endl;
+  // 绑定普通的三元函数
+  auto f2 = bind(&multiply, 3, 4, 5);
+  cout << "f2() = " << f2() << endl;
+  // f2() = int multiply(int, int, int) 60
+
+  cout << endl << endl;
+  Example ex;
+  // 绑定成员函数，但是非静态成员
+  // 函数的 this 指针不要忘了
+  auto f3 = bind(&Example::add, &ex, 10, 30);
+  cout << "f3() = " << f3() << endl;
+  // f3() = int Example::add(int, int) 40
+
+  return 0;
+}
+
+```
+
+### 引用折叠
+
+引用折叠（reference collapsing）是指在模板编程中，编译器如何处理嵌套的模板参数引用的情况。引用折叠允许通过一系列引用来访问模板参数的类型，即使这些引用是嵌套的。
+
+在 C++11 及以后的版本中，引入了引用折叠的规则，以便在模板参数中使用引用时，能够简化类型表达式。引用折叠主要发生在以下几种情况：
+
+1. `T&` 和 `T&`：如果两个引用类型相同，它们会折叠成单个引用。 `T& & -> T&`
+2. `T&` 和 `T&&`：左值引用和右值引用相遇时，右值引用会被转换为左值引用。 `T& && -> T&`
+3. `T&&` 和 `T&`：右值引用和左值引用相遇时，左值引用会被忽略。 `T& && -> T&`
+4. `T&&` 和 `T&&`：两个右值引用相遇时，它们会折叠成单个右值引用。 `T&& && -> T&&`
+
+这些规则在模板参数推导时非常有用，因为它们允许编译器正确地推导出模板参数的类型，即使这些类型是通过引用传递的。
+
+### 函数指针
+
+```cpp
+/* func1(); */
+// 函数指针的定义形式
+// typedef int(*)() pFunc; // error, 语法是错的
+typedef int(*pFunc)(); // ok，C 语言的写法
+// using pFunc = int(*)(); // ok，C++11 的
+
+// typedef int A;
+// using A = int;
+
+// 回调函数是被动调用的，会先注册给函数指针，然后由函数指针进行调用
+// 函数指针可以将指向的回调函数延迟调用
+pFunc f = &func1; // 回调函数的注册
+cout << "111-11" << endl;
+cout << "f() = " << f() << endl; // 回调函数的执行
+
+cout << endl;
+pFunc f2 = func2;
+cout << "f2() = " << f2() << endl;
+
+cout << endl;
+// 函数的指针的类型不匹配，所以就不能这么使用
+// pFunc f3 = func3; // error
+return 0;
+```
+
+### 占位符
+
+```cpp
+void func(int x1, int x2, int x3, const int &x4, int x5) {
+  cout << "x1 = " << x1 << endl
+       << "x2 = " << x2 << endl
+       << "x3 = " << x3 << endl
+       << "x4 = " << x4 << endl
+       << "x5 = " << x5 << endl;
+}
+
+int main(int argc, char *argv[]) {
+  int number = 100;
+  // 占位符整体代表的是形参的位置
+  // 占位符中的数字代表的是实参的位置
+  // 实参的个数一定要大于等于占位符中数字的最大值
+  // bind 的默认采用值传递
+  // 引用的包装器 std::ref = reference
+  // 引用的包装器 std::cref = const reference
+  using namespace std::placeholders;
+  auto f = bind(func, 1, _4, _3, std::cref(number), number);
+  number = 200;
+  f(2, 30, 400, 5000, 6666);// 多余的参数直接丢掉
+  return 0;
+}
+```
+
+### `function`
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmTkRJNHJINlpsS3FFVENhTnZxLVZNQkRMSThyN19UTnhrMjVlX3FrWEpFOFE_ZT1hSUN3VlY.png)
+
+```cpp
+// 函数形态（类型、标签）: 函数的返回类型 + 参数列表
+// add 的类型：int(int, int)
+// f 的类型: int()
+/* auto f = bind(&add, 1, 2); */
+function<int()> f = bind(&add, 1, 2);
+cout << "f() = " << f() << endl;
+// f() = int add(int, int) 3
+
+cout << endl << endl;
+// multiply 的类型：int(int, int, int)
+// f2 的类型:int()
+function<int()> f2 = bind(&multiply, 3, 4, 5);
+cout << "f2() = " << f2() << endl;
+// f2() = int multiply(int, int, int) 60
+/* f = bind(&multiply, 3, 4, 5); */
+/* cout << "f() = " << f() << endl; */
+```
+
+### 绑定数据成员
+
+```cpp
+class Example {
+ public:
+  int add(/* this */int x, int y) {
+    cout << "int Example::add(int, int)" << endl;
+    return x + y;
+  }
+
+  int data = 222;
+};
+```
+
+`data` 是 `Example` 中的数据成员，`bind` 还可以绑定数据成员。
+
+将成员的名字看成是函数的名字，数据成员的类型就是函数的返回类型，参数列表就是空（隐含的 `this` 还是有的）。
+
+```cpp
+cout << endl << "bind 绑定数据成员" << endl;
+Example ex2;
+function<int()> f5 = bind(&Example::data, &ex2);
+cout << "f5() = " << f5() << endl;
+```
+
+### `bind` 绑定成员函数传参方式
+
+```cpp
+class Example {
+ public:
+  int add(/* this */int x, int y) {
+    cout << "int Example::add(int, int)" << endl;
+    return x + y;
+  }
+};
+
+int main() {
+  Example ex;
+  auto f = bind(&Example::add, &ex, 10, 30); // 传地址
+  cout << "f(&ex) = " << f(&ex) << endl;
+
+  cout << endl;
+  auto f2 = bind(&Example::add, ex, 100, 300); // 传对象
+  cout << "f2(ex) = " << f2(ex) << endl;
+}
+```
+
+传地址与传对象的区别：对象地址的传递就是一个指针的传递，不会出现拷 贝操作，但是使用对象传递，会存在拷贝对象操作，对象如果占用内存较大，会浪费空间。
+
+使用对象地址，如果在使用的时候，对象已经销毁了，就有空指针的问题，但是拷贝一份对象，那原对象销毁了，这里采用的是拷贝操作，就不会有影响。
+
+### `bind` 与 `function` 的结合使用
+
+```cpp
+class Figure {
+ public:
+  //纯虚函数
+  virtual void display() const = 0;
+
+  virtual double area() const = 0;
+};
+
+class Rectangle: public Figure {
+ public:
+  explicit Rectangle(double length = 0, double width = 0)
+      : _length(length), _width(width) {
+    cout << "Rectangle(double = 0, double = 0)" << endl;
+  }
+
+  void display() const override {
+    cout << "Rectangle";
+  }
+
+  double area() const override {
+    return _length * _width;
+  }
+
+  ~Rectangle() {
+    cout << "~Rectangle()" << endl;
+  }
+
+ private:
+  double _length;
+  double _width;
+};
+```
+
+面向对象的写法：继承 + 虚函数（纯虚函数），运行时，灵活性强。
+
+基于对象的写法：`std:: bind` + `std:: function`, 编译时, 效率高。
+
+C 语言中使用函数指针进行注册回调函数与执行回调函数。
+
+C++ 中使用 `std:: bind` + `std:: function` 进行注册与执行回调函数。
+
+```cpp
+class Figure {
+ public:
+  // 定义出来了两种类型别名
+  using DisplayCallback = function<void()>;
+  using AreaCallback = function<double()>;
+  /**
+   * void()
+   * virtual void display() const = 0;
+   * double()
+   * virtual double area() const = 0;
+   * void setDisplayCallback(const DisplayCallback &cb) {
+   *   _displayCallback = cb;
+   * }
+   */
+
+  // 回调函数的注册
+  void setDisplayCallback(DisplayCallback &&cb) {
+    _displayCallback = std::move(cb);
+  }
+
+  void setAreaCallback(AreaCallback &&cb) {
+    _areaCallback = std::move(cb);
+  }
+
+  // 回调函数的执行
+  void handleDisplayCallback() const {
+    if (_displayCallback) {
+      _displayCallback();
+    }
+  }
+
+  double handleAreaCallback() const {
+    if (_areaCallback) {
+      return _areaCallback();
+    } else {
+      return 0.0;
+    }
+  }
+
+  DisplayCallback _displayCallback;
+  AreaCallback _areaCallback;
+};
+```
+
+```cpp
+class Rectangle: public Figure {
+ public:
+  explicit Rectangle(double length = 0, double width = 0)
+      : _length(length), _width(width) {
+    cout << "Rectangle(double = 0, double = 0)" << endl;
+  }
+
+  void display() const override {
+    cout << "Rectangle";
+  }
+
+  double area() const override {
+    return _length * _width;
+  }
+
+  ~Rectangle() {
+    cout << "~Rectangle()" << endl;
+  }
+
+ private:
+  double _length;
+  double _width;
+};
+```
+
+```cpp
+class Rectangle {
+ public:
+  explicit Rectangle(double length = 0, double width = 0) : _length(length), _width(width) {
+    cout << "Rectangle(double = 0, double = 0)" << endl;
+  }
+
+  void display(int x, int y) const {
+    cout << "Rectangle";
+  }
+
+  double area() const {
+    return _length * _width;
+  }
+
+  ~Rectangle() {
+    cout << "~Rectangle()" << endl;
+  }
+
+ private:
+  double _length;
+  double _width;
+};
+```
+
+基于对象的使用：
+
+```cpp
+Rectangle rectangle(10, 20);
+
+cout << endl;
+Figure fig;
+/* function<void()> f = bind(&Rectangle::display, &rectangle, 1, 2); */
+/* fig.setDisplayCallback(std::move(f)); */
+fig.setDisplayCallback(bind(&Rectangle::display, &rectangle, 1, 2)); // bind 改变 display 的状态
+fig.setAreaCallback(bind(&Rectangle::area, &rectangle));
+func(fig);
+```
+
+## `mem_fn` 成员函数适配器
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXRWVlN1VCY0VOSmstTzRmSEk4bDNNQjhWdTRSNFFnQm94N1k3ZnA0ZnFsbEE_ZT1hZjBwNTU.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUM3haRHFHWEFwRW50dGZGVTU3UDg0QjFpbGNkOWN5UV85YTJuQzZldG5iMlE_ZT1QZ2JnV3Q.png)
+
+```cpp
+class Number {
+ public:
+  Number(size_t data = 0): _data(data) {}
+
+  void print() const {
+    cout << _data << "  ";
+  }
+
+  //判断是不是偶数
+  bool isEven() const {
+    return (0 == _data % 2);
+  }
+
+  //判断是不是质数
+  bool isPrime() const {
+    if (1 == _data) {
+      return false;
+    }
+
+    for (size_t idx = 2; idx <= _data / 2; ++idx) {
+      if (0 == _data % idx) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  ~Number() = default;
+
+ private:
+  size_t _data;
+};
+
+int main(int argc, char *argv[]) {
+  vector<Number> vec;
+  for (size_t idx = 1; idx != 30; ++idx) {
+    vec.push_back(Number(idx));
+  }
+
+  // for_each 与成员函数 print 并不能很好的适配，需要使用 mem_fn 进行适配
+  for_each(vec.begin(), vec.end(), mem_fn(&Number::print));
+
+  cout << endl << endl;
+  auto it = remove_if(vec.begin(), vec.end(), mem_fn(&Number::isEven));
+  vec.erase(it, vec.end());
+  for_each(vec.begin(), vec.end(), mem_fn(&Number::print));
+  cout << endl;
+
+  //删除所有的质数
+  cout << endl << endl;
+  it = remove_if(vec.begin(), vec.end(), mem_fn(&Number::isPrime));
+  vec.erase(it, vec.end());
+  for_each(vec.begin(), vec.end(), mem_fn(&Number::print));
+  cout << endl;
+  return 0;
+}
+```
+
+

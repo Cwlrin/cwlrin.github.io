@@ -1,0 +1,116 @@
+.calendar-card {
+  position: relative;
+  background: var(--grey-0);
+  border: 0.0625rem solid var(--grey-3);
+  border-radius: 0.875rem;
+  box-shadow: var(--shadow-card-base);
+  overflow: hidden;
+  padding: 0.95rem 0.95rem 1rem;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.calendar-card:hover {
+  border-color: color-mix(in srgb, var(--color-pink) 24%, var(--grey-3));
+  box-shadow: 0 0 2rem var(--box-bg-shadow);
+  transform: translateY(-0.1875rem);
+}
+
+.card-head {
+  position: relative;
+  z-index: var(--z-content);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+h3 {
+  color: var(--primary-color, var(--color-pink));
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.badge {
+  background: color-mix(in srgb, var(--color-pink) 10%, var(--grey-1));
+  border: 0.0625rem solid color-mix(in srgb, var(--color-pink) 18%, var(--grey-3));
+  border-radius: 999px;
+  color: var(--grey-7);
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.45rem 0.7rem;
+  white-space: nowrap;
+}
+
+.calendar-grid {
+  position: relative;
+  z-index: var(--z-content);
+  display: grid;
+  gap: 0.25rem;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  margin-bottom: 0.75rem;
+}
+
+.weekday,
+.date {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.weekday {
+  color: var(--grey-5);
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-height: 1.45rem;
+}
+
+.date {
+  background: color-mix(in srgb, var(--grey-1) 92%, transparent);
+  border: 0.0625rem solid var(--grey-3);
+  border-radius: 0.65rem;
+  color: var(--grey-6);
+  font-size: 0.8125rem;
+  min-height: 1.9rem;
+  transition:
+    border-color 0.3s ease,
+    background-color 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.date:not(.empty):hover {
+  border-color: color-mix(in srgb, var(--color-pink) 26%, var(--grey-3));
+  color: var(--grey-8);
+  transform: translateY(-0.0625rem);
+}
+
+.date.today {
+  background: linear-gradient(to right, var(--color-pink) 0, var(--color-orange) 100%);
+  border-color: transparent;
+  color: var(--grey-0);
+  font-weight: 700;
+}
+
+.date.empty {
+  border-style: dashed;
+  opacity: 0.35;
+}
+
+:root[data-theme="dark"] .calendar-card {
+  box-shadow: var(--shadow-card-base);
+}
+
+:root[data-theme="dark"] .date.today,
+:root[data-theme="dark"] .badge {
+  color: var(--grey-7);
+}
+
+:root[data-theme="dark"] .date.today {
+  color: var(--grey-0);
+}

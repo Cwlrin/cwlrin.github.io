@@ -1,0 +1,620 @@
+---
+title: "C 语言结构体"
+date: 2020-02-27T17:45:33+08:00
+categories: ["C 与 C++", "C 语言基础"]
+tags: ["C"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlMjJDbnRVcVM1Sm5aT25Pb19NT05VQjBTblY0ODFvZ2N5eVJfWnBBRzQtaWc_ZT1BZldERFQ.png"
+---
+
+## 结构体
+
+### 结构体基本的定义形式
+
+结构体的基本定义形式如下：
+
+```c
+struct <结构体名> {
+    <成员类型> <成员名>;
+    ...
+} <结构体变量>;
+```
+
+这种格式定义了一个新的数据类型，称为 `结构体名`，并同时可以定义一个或多个该类型的变量。
+
+以下是一个名为 `Person` 的结构体类型定义示例：
+
+```c
+struct Person {
+    char *name;
+    int age;
+    char *id;
+};
+```
+
+在定义结构体类型的同时，可以定义该类型的变量。例如：
+
+```c
+struct Person{
+    char *name;
+    int age;
+    char *id;
+} person;    // 这样是在定义新类型 Person 的同时，又用这个类型定义了一个新的变量 person;
+
+struct Person preson;  // 也可以这样单独拿出来定义，此时已经开辟了这块内存
+```
+
+如果结构体仅使用一次，可以不定义结构体的名称，直接定义其对应的变量。这种方式称为匿名结构体：
+
+```c
+struct {
+    char *name;
+    int age;
+    char *id;
+} anonymous_person;
+```
+
+### 结构体的初始化
+
+在 C 语言中，初始化结构体可以采用类似于数组初始化的方式。
+
+1. **完整初始化**：
+
+   - 可以使用花括号 `{}` 包围初始化值，按照结构体成员的顺序提供值。
+
+   - 例如，初始化 `person` 结构体的代码如下：
+
+     ```c
+     struct Person person = {"abc", 200, "123456"};
+     ```
+
+2. **指定成员初始化**：
+
+   - 如果只想初始化结构体的部分成员，可以使用指定成员初始化语法。
+
+   - 通过在成员名前面加上点号 `.`，可以指定要初始化的成员。
+
+   - 例如，只初始化 `name` 和 `id` 属性的代码如下：
+
+     ```c
+     struct Person person = {.name = "abc", .id = "123456"};
+     ```
+
+3. 对于未在初始化列表中指定的成员，它们的值将被初始化为零或空指针，具体取决于成员的类型。
+
+### 获取结构体内部的属性值
+
+```c
+struct Person person;
+person.name = "a";
+person.age = 10;
+person.id = "1123123";
+
+printf("name: %s, age: %d, id: %s", person.name, person.age, person.id); // name: a, age: 10, id: 1123123
+```
+
+### 结构体和内部成员的地址
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVU21nX2dWQ21aSGhXY2hrV01BYjd3QnRkTUlueXhfUGttSG96T2hpNXBvUGc_ZT1nbkNnelA.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmUG05VGNvNzVoQ21QWk5iNUpuelYwQkxfbU9ZVGdLbUdEVDlkc2wzLXFTdHc_ZT1pcUExcmI.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSVDFGRmpPLUd0QWgxQkgzYXhrcG9BQnVPeTJiY3ZIQ1NtY1JMNmFOckpTWlE_ZT1MZ0VMNWs.png)
+
+1. **定义结构体指针**：
+
+   - 结构体指针的声明与普通指针类似，但需要指定它指向的结构体类型。
+
+   - 例如，声明一个指向 `person` 类型的指针：
+
+     ```c
+     struct Person *person_ptr;
+     ```
+
+2. **初始化结构体指针**：
+
+   - 可以将结构体指针初始化为指向一个已存在的结构体实例的地址。
+
+   - 例如：
+
+     ```c
+     struct Person person = {"initial", 0, "000"};
+     person_ptr = &person;
+     ```
+
+3. **使用结构体指针访问成员**：
+
+   - 使用 `->` 运算符来访问结构体指针指向的成员。
+
+   - 例如，使用 `person_ptr` 来设置和读取 `person`
+
+     结构体的成员：
+
+     ```c
+     person_ptr->name = "aaa";
+     person_ptr->age = 11;
+     person_ptr->id = "112";
+     printf("\nname: %s, age: %d, id: %s", person_ptr->name, person_ptr->age, person_ptr->id); // name: aaa, age: 11, id: 112
+     ```
+
+### 结构体类型的一些特点
+
+1. **使用 `typedef` 关键字**：建议在定义结构体类型时，使用 `typedef` 关键字给类型起别名。这使得声明结构体变量时更加方便，无需重复使用 `struct` 关键字。
+2. **结构体对象的初始化**：结构体对象的初始化类似于数组的初始化，可以使用花括号 `{}` 逐一给成员赋值。未手动赋值的成员将具有默认的零值。
+3. **结构体类型的理解**：在理解结构体类型时，可以将其视为“自己定义的 `int` 类型”，而不是类比数组。这意味着结构体对象之间可以使用 `=` 进行赋值操作，类似于基本数据类型的赋值。
+4. **结构体对象的赋值**：使用 `=` 连接结构体对象时，其效果与连接 `int` 类型相同。这仅仅是将一个结构体对象的成员值复制到另一个结构体对象中，执行结束后，两个结构体对象的成员值完全一致。
+5. **结构体类型的指针类型**：结构体类型的指针类型声明方式与基本数据类型指针的声明方式相同。例如，声明一个指向 `int` 的指针为 `int* p;`，声明一个指向 `Student` 结构体的指针为 `Student* p;`。
+6. **结构体作为参数传递**：把结构体对象作为参数传递时，效果与传递 `int` 类型相同，都是传递了副本（值传递）。这意味着函数内部对结构体参数的修改不会影响到原始结构体对象。
+7. **通过函数修改结构体**：如果希望在函数中修改原始结构体对象的成员值，应该传递结构体的指针而不是副本。
+8. **结构体类型作为返回值**：结构体类型作为函数的返回值时，其行为类似于基本数据类型 `int`。函数返回的是一个结构体对象的副本。
+
+### 结构体和数组的区别
+
+1. **数组参数传递**：数组在作为参数传递给函数时，会自动退化为指向数组首元素的指针。这意味着传递给函数的是数组首元素的地址，而不是整个数组的副本。
+2. **数组的优点**：
+   - **传递效率高**：由于传递的是指针，所以不会占用额外的空间来复制整个数组。
+   - **可修改性**：函数内部可以通过指针修改原始数组的内容。
+3. **数组的缺点**：
+   - **丢失信息**：数组的长度信息在传递过程中丢失，函数内部无法直接获取数组的长度。
+4. **结构体参数传递**：结构体作为参数传递时，不会自动退化为指针。它的行为类似于传递一个 `int` 类型的值，即传递的是结构体对象的副本。
+5. **结构体的优点**：
+   - **数据安全**：传递的是结构体对象的副本，函数内部的修改不会影响到原始结构体。
+   - **信息完整性**：结构体的所有成员和信息都会完整地传递给函数，不会丢失。
+6. **结构体的缺点**：
+   - **效率问题**：如果结构体很大，复制整个结构体可能会占用较多的时间和空间。
+   - **不可修改性**：函数内部得到的是结构体的副本，无法直接修改原始结构体。
+7. **传递结构体指针**：如果需要在函数内部修改原始结构体，可以通过传递结构体指针来实现。这样，函数就可以通过指针直接访问和修改原始结构体。
+
+### 结构体内存
+
+```c
+// 两种方式查看结构体的大小
+printf("\nsizeof(struct Person): %d", sizeof(struct Person));  // sizeof(struct Person): 24
+printf("\nsizeof(person): %d", sizeof(person));                // sizeof(person): 24
+```
+
+在查看结构体大小时，不能省略 `struct` 关键字。要不使用 `struct` 关键字，可以使用 `typedef` 关键字。
+
+### 利用 typedef 隐藏 struct 关键字
+
+```c
+typedef struct Person Person;  // Person 有了两重含义
+Person person1 = { .name = "andy", .age = 20 };
+printf("\nname: %s, age: %d", person1.name, person1.age);  // name: andy, age: 20
+```
+
+还有另一种实现方式。在定义结构体的同时，利用 `typedef` 进行名称的改写。
+
+注意，此时结构体后面的 `Student` 是 `typedef` 定义的别名，不是结构体变量，是个类型。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmUVJ0aGliaUxwQ3RwNVpSVi11ZTgwQk5BOVlMTlFyeTBsUjdjbGZPZHN1YlE_ZT15aE03THk.png)
+
+### 结构体嵌套
+
+若要向 `Student` 结构体添加额外的属性，如公司名、公司 ID 和公司位置，可以选择直接添加这些属性，或者嵌套一个新定义的 `Company` 结构体。
+
+```c
+typedef struct Company{
+    char *name;
+    char *id;
+    char *location;
+}Company;
+
+typedef struct Student{
+    char *name;
+    int age;
+    int class;
+    Company *company; // 嵌套了一个公司的结构体，只不过这里添加的是结构体指针了
+}Student;
+```
+
+结构体里面有多个嵌套的结构体调用其中的值：
+
+```c
+typedef struct Student {
+    char *name;
+    int age;
+    int class;
+    Company *company; // 嵌套了一个公司的结构体，只不过这里添加的是结构体指针了
+    struct {
+        int extra;
+        char *extra_str;
+    } extra_value;
+} Student;
+
+Student student;
+student.extra_value.extra = 1;
+student.company->name = "Ali";
+```
+
+嵌套的结构体的初始化：
+
+```c
+typedef struct Company {
+    char *name;
+    char *id;
+    char *location;
+} Company;
+
+typedef struct Student {
+    char *name;
+    int age;
+    int class;
+    Company *company; // 嵌套了一个公司的结构体，只不过这里添加的是结构体指针了
+    Company company1;
+
+    struct {
+        int extra;
+        char *extra_str;
+    } extra_value; // 定义一个匿名结构体
+
+    struct Person *person_ptr; // 定义一个指向Person结构体类型的指针, 注意这里是要加 struct 关键字的，因为这里别名还没生效
+} Student;
+
+// 结构体初始化
+Company company = {.name = "ali", .id = "123"};
+Student student = {
+    .name = "andy", .company = &company,
+    .company1 = {.name = "ten", .id = "22"}
+};
+```
+
+## 结构体的内存对齐
+
+### 结构体对齐
+
+```c
+#include <stdio.h>
+
+int main() {
+    typedef struct Person {
+        char *name;
+        int age;
+        char *id;
+    } Person;
+
+    printf("sizeof(Person): %d\n", sizeof(Person)); // sizeof(Person): 24
+    printf("sizeof(char *): %d\n", sizeof(char *)); // sizeof(char *): 8
+    printf("sizeof(int): %d\n", sizeof(int));       // sizeof(int): 4
+
+    return 0;
+}
+```
+
+结构体中的每个成员通常都会根据其类型的大小和编译器的内存对齐规则进行地址对齐。这意味着成员的地址是其大小的倍数，以确保数据访问的效率。
+
+```c
+typedef struct {
+    char a;   // 1
+    char b;   // 1
+    int c;    // 4
+    short d;  // 2
+    double e; // 8
+} Align;
+
+Align align = {.a = 'a', .b = 'b', .c = 3, .d = 4, .e = 5};
+printf("sizeof(align): %d\n", sizeof(align)); // sizeof(align): 24
+```
+
+根据成员的声明顺序和大小，编译器可能会在成员之间插入填充字节，以满足对齐要求。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlendIQWFINXB4RXJCZ0dWTjN2XzFZQlJ5S3VOaXljWUdPckdwUmRPR3RXLWc_ZT1WR21lVGo.png)
+
+`c` 后面填充了字节以确保 `d` 是按照 `short` 类型对齐的，`d` 后面也有填充字节以确保 `e` 是按照 `double` 类型对齐的。不合理的结构体布局可能会导致空间浪费。在上述示例中，如果填充字节过多，可能会导致结构体的大小大于实际数据所需。
+
+优化后代码如下：
+
+```c
+typedef struct {
+    char a;   // 1
+    char b;   // 1
+    short d;  // 2
+    int c;    // 4
+    double e; // 8
+} Align;
+
+Align align = {.a = 'a', .b = 'b', .c = 3, .d = 4, .e = 5};
+printf("sizeof(align): %d\n", sizeof(align)); // 16
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0Vhelo2RXl1TkRKS3JnaUJkenhDWmVnQlZLRGNmeVg3U2ZNc3JESlktZEsycGc_ZT1xREFWUTk.png)
+
+调整代码顺序后，节省了 8 个字节。
+
+除了改变结构体内部的属性顺序，编译器也允许改变结构体储存方式，不会让结构体按照上面的方式进行对齐。
+
+```c
+#pragma pack(2)  // 编译器默认以 2 的倍数进行对齐，不再按照类型的大小
+
+typedef struct {
+    char a;   // 1
+    char b;   // 1
+    int c;    // 4
+    short d;  // 2
+    double e; // 8
+} Align;
+Align align = {.a = 'a', .b = 'b', .c = 3, .d = 4, .e = 5};
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUd2FuelNwbU81TmpvbmlsWkEzVlVFQmp1S1BuM1RrMWktR1pvYlFFWTdvSlE_ZT1kMEx0cHk.png)
+
+注意 `&align.c` 的值从 0x5ffe52 开始。
+
+### C11 关键字
+
+#### \_Alignas
+
+C11 标准提供了 `_Alignas` 关键字，允许开发者指定结构体成员的对齐要求。通过 `_Alignas` 关键字，可以指定成员的对齐字节数。例如，`_Alignas(8) int c;` 表示 `c` 成员应该按照 8 字节对齐。
+
+`_Alignas` 关键字的使用可能会因编译器而异。在某些编译器中，如 GCC，它是可用的，而在 MSVC 中可能不被支持。
+
+`_Alignas` 的值不能小于对应数据类型的大小。例如，对于 `int` 类型，不能使用 `_Alignas(3)`，因为它的自然对齐大小至少是 4。
+
+```c
+typedef struct {
+    char a; // 1
+    char b; // 1
+    _Alignas(8) int c;    // 4，按照 8 字节对齐
+    short d;  // 2
+    double e; // 8
+} Align;
+
+Align align = {.a = 'a', .b = 'b', .c = 3, .d = 4, .e = 5};
+printf("sizeof(align): %d\n", sizeof(align)); // sizeof(align): 24
+```
+
+#### \_Alignof
+
+在 C11 标准中，`_Alignof` 是一个编译器提供的特性，用于查询数据类型或对象的对齐要求。它返回一个值，表示该类型或对象的最小对齐倍数。
+
+对于上述例子，有：
+
+```c
+printf("_Alignof(align.c): %zu\n", _Alignof((align.c))); // _Alignof(align.c): 8
+```
+
+`_Alignof` 是编译器特定的，可能不是所有编译器都支持。在 GCC 中可用，但在 MSVC 中可能不可用。
+
+`_Alignof` 返回的对齐倍数是类型或对象的最小对齐要求，实际对齐可能会更高，取决于编译器和平台。
+
+#### offsetof
+
+`offsetof` 是标准库中的一个宏，用于确定结构体成员在结构体中的偏移量，即成员相对于结构体起始地址的字节数。
+
+`offsetof` 宏接受两个参数：结构体类型和结构体的成员名称。
+
+`offsetof` 宏返回的偏移量是成员相对于结构体起始地址的偏移量，它不包括任何填充字节。
+
+`offsetof` 宏的使用不依赖于编译器，是标准库的一部分，因此在大多数编译器中都是可用的。
+
+```c
+#include <stdio.h>
+#include <stddef.h>
+
+int main() {
+    typedef struct {
+        char a;   // 1
+        char b;   // 1
+        int c;    // 4
+        short d;  // 2
+        double e; // 8
+    } Align;
+
+    Align align = {.a = 'a', .b = 'b', .c = 3, .d = 4, .e = 5};
+
+    printf("%d", offsetof(Align, e)); // 16
+    return 0;
+}
+```
+
+```cpp ~\Windows Kits\10\Include\10.0.22621.0\ucrt\stddef.h command:("[Line 45]":1)
+#if defined _MSC_VER && !defined _CRT_USE_BUILTIN_OFFSETOF
+    #ifdef __cplusplus
+        #define offsetof(s,m) ((::size_t)&reinterpret_cast<char const volatile&>((((s*)0)->m)))
+    #else
+        #define offsetof(s,m) ((size_t)&(((s*)0)->m))
+    #endif
+#else
+    #define offsetof(s,m) __builtin_offsetof(s,m)
+#endif
+```
+
+对于 `offsetof` 宏的实现，有：
+
+- `(s *)0` 将 `0` 地址转换为指向结构体类型 `s` 的指针。这是一种编译时的转换，不涉及实际的内存分配。
+- `((s *)0)->m` 通过上述转换得到的指针访问结构体的成员 `m`。
+- `&((s *)0)->m` 获取成员 `m` 的地址。由于基址为 `0`，这个地址就是成员 `m` 在结构体中的偏移量。
+- `(size_t)&((s *)0)->m` 将成员 `m` 的地址转换为 `size_t` 类型，这是 `offsetof` 宏的返回类型。
+- 在 GCC 中，`__builtin_offsetof` 内建函数用于实现相同的功能。
+
+- 在 MSVC 中，如果没有定义 `_CRT_USE_BUILTIN_OFFSETOF`，则使用宏定义来实现 `offsetof`。
+- MSVC 在这个宏中利用了 C++ 的 `reinterpret_cast` 来避免对成员访问权限的限制
+
+## 联合体
+
+### 联合体的定义
+
+联合体特点：
+
+1. **内存共享**：联合体的所有成员都共享相同的内存空间。这意味着，无论何时，联合体只能存储一个成员的值。
+2. **大小确定**：联合体的大小取决于其最大成员的大小。在这个例子中，`double_operand` 是最大的成员，因此 `union Operand` 的大小为 8 个字节。
+3. **使用场景**：联合体常用于需要根据不同情况存储不同类型的数据的场景。例如，一个变量可能在某些情况下需要作为整数使用，在其他情况下需要作为双精度浮点数使用。
+
+```c
+#include <stdio.h>
+
+union Operand {
+	// 定义联合体
+	int int_operand;       // 4
+	double double_operand; // 8
+	char *string_operand;  // 8
+};
+
+int main() {
+	printf("sizeof(union Operand): %d", sizeof(union Operand)); // sizeof(union Operand): 8
+	return 0;
+}
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaVktBb3Y0cURKQmh5Qko3NEJkMzF3QlNzTWRRdTZPY2ZBZTZuQkJSN1hRNEE_ZT1RQlpqWFY.png)
+
+同样，联合体也可以使用 `typedef` 起别名，使用起来也和结构体一样
+
+```c
+typedef union Operand {
+    int int_operand;
+    double double_operand;
+    char *string_operand;
+} Operand;
+
+printf("sizeof(union Operand): %d", sizeof(Operand)); // sizeof(Operand): 8
+```
+
+在初始化联合体时，只能初始化第一个成员，后续成员的值会被自动覆盖。这是因为所有成员共享相同的内存空间。
+
+```c
+union Operand operand = {.int_operand = 5, .double_operand = 2.0};
+
+printf("operand.int_operand: %d\n", operand.int_operand);       // operand.int_operand: 0
+printf("operand.double_operand: %f\n", operand.double_operand); // operand.double_operand: 2.000000
+```
+
+这里，`.int_operand` 被初始化为 `5`，然后 `.double_operand` 被初始化为 `2.0`。由于 `.double_operand` 是一个 `double` 类型，它覆盖了 `.int_operand` 的值。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSZnRIQVhSb3RGRWtUeGVhSjF6YXpnQk9iUld6cXc0V05FSWRQQzBfY3BKMEE_ZT04a2NjeHU.png)
+
+这里有一个注意点，为什么联合体内存上显示的是 00 00 00 00 00 00 00 40，实际上是 `2.0` 的二进制表示的一部分。这里的 `40` 表示 `2.0` 的指数部分。`2.0` 在内存中的二进制表示为 `0011111111 10000000000000000000000000`。转换为 16 进制，前导的零可以省略，因此可以表示为 `4000000000000000`。
+
+## 枚举
+
+枚举是定义一个有限元素的集合，定义形式如下：
+
+```c
+#include <stdio.h>
+
+typedef enum FileFormat {
+    PNG, JPEG, BMP, UNKNOWN
+} FileFormat;
+
+int main() {
+    FileFormat file_format = PNG; // 变量是枚举类型
+
+    return 0;
+}
+```
+
+枚举可以当做函数的返回类型，下面的 demo 涉及到了文件操作部分知识，判断一个图片是什么类型：
+
+```c
+// 看一个图片是什么类型
+// file_path: 图片所在的路径
+FileFormat GuessFormat(char *file_path) {
+	// 创建指向文件内容的指针
+	// _iobuf *fopen(const char *_FileName, const char *_Mode)
+	FILE *file = fopen(file_path, "rb"); // 按二进制读取文件
+
+	// 创建 FileFormat 返回值, 默认为 UNKNOWN
+	FileFormat file_format = UNKNOWN;
+
+	// 如果指向文件内容的指针存在，代表文件成功打开
+	if (file) {
+		// 判断文件是什么类型图片，这里有个基础的知识需要补充一下，每种类型图片都有自己的签名，可以通过签名判断图片类型，这个签名就是文件开头的几个字节
+		// Tips: 约定俗成的东西，不一定每个图片都这样，所以函数名 GuessFormat，可能会出错
+		// bmp: 42 4D
+		// png: 89 50 4E 47 0D 0A 1A 0A
+		// jpeg: FF D8 FF E0
+
+		// 读取文件内容：
+		// 1. 创建字节数组，即一次性读取文件字节的数量
+		char buffer[8] = {0}; // 初始化不要忘记
+
+		// 2. 开始实际读取，定义 bytes_count，接收实际读取到的字节数（最多接收 8 个字节）
+		// size_t fread(void *_Buffer, size_t _ElementSize, size_t _ElementCount, _iobuf *_Stream)
+		size_t bytes_count = fread(buffer, 1, 8, file);
+
+		// 根据读取的字节数量进行图片的判断
+		// 如果图片读取出来的字节数小于 8 个字节，那肯定不是一张图片，后续返回默认值就好 UNKNOWN
+		// 由于这里最多只能读取 8 个字节，所以总共就这两种情况，一种小于 8，一种等于 8
+		if (bytes_count == 8) {
+			// 根据签名，判断是哪种类型图片
+			// *((short *)buffer) 是一种小技巧，将 buffer 强转为 short 类型指针，这样直接对指针取值是取两个字节的值
+			// 0x4D42 是因为电脑采用小端序，签名是大端序，注意这里的地址不加双引号！！
+			if (*((short *)buffer)== 0x4D42) {
+				file_format = BMP;
+			} else if (*((long long *)buffer)== 0x0A1A0A0D474E5089) {
+				// long long 类型 8 个字节
+				file_format = PNG;
+			} else if (*((int *)buffer)== 0xE0FFD8FF) {
+				file_format = JPEG;
+			}
+		}
+		fclose(file);
+	}
+
+	return file_format;
+}
+```
+
+使用 int 类型打印函数返回值：
+
+```c
+printf("images/c.png: %d\n", GuessFormat("images/c.png"));   // images/c.png: 0
+printf("images/c.jpeg: %d\n", GuessFormat("images/c.jpeg")); // images/c.jpeg: 1
+printf("images/c.bmp: %d\n", GuessFormat("images/c.bmp"));   // images/c.bmp: 2
+printf("images/c.webp: %d\n", GuessFormat("images/c.webp")); // images/c.webp: 3
+```
+
+```c
+typedef enum FileFormat{
+  PNG, JPEG, BMP, UNKNOWN
+}FileFormat;
+
+// images/c.png: 0
+// images/c.jpeg: 1
+// images/c.bmp: 2
+// images/c.webp: 3
+```
+
+其实，C 语言中的枚举就是整数，枚举从第一个数字开始，分别对应 0 1 2 3 ... ，所以枚举类型的变量可以直接接收 int 类型值，比如
+
+```c
+typedef enum TestEnum {
+	a, b = 10, c, d
+} TestEnum;
+
+int main() {
+	TestEnum test_enum0 = a;
+	TestEnum test_enum1 = b;
+	TestEnum test_enum2 = c;
+	TestEnum test_enum3 = d;
+
+	printf("test_enum0: %d\n", test_enum0); // test_enum0: 0
+	printf("test_enum1: %d\n", test_enum1); // test_enum1: 10
+	printf("test_enum2: %d\n", test_enum2); // test_enum2: 11
+	printf("test_enum3: %d\n", test_enum3); // test_enum3: 12
+
+	return 0;
+}
+```
+
+但是需要注意的是，这里枚举在定义的时候进行初始化和数组初始化情况相同，一旦其中一个元素进行初始化，这个初始化元素后的其他元素默认值会发生改变
+
+```c
+typedef enum TestEnum {
+    a, b = 10, c = 20, d
+} TestEnum;
+
+int main() {
+    TestEnum test_enum0 = a;
+    TestEnum test_enum1 = b;
+    TestEnum test_enum2 = c;
+    TestEnum test_enum3 = d;
+
+    printf("test_enum0: %d\n", test_enum0); // test_enum0: 0
+    printf("test_enum1: %d\n", test_enum1); // test_enum1: 10
+    printf("test_enum2: %d\n", test_enum2); // test_enum2: 20
+    printf("test_enum3: %d\n", test_enum3); // test_enum3: 21
+
+    return 0;
+}
+```
+

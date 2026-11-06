@@ -1,0 +1,737 @@
+---
+title: "Linux C 基础"
+date: 2020-08-04T12:36:26+08:00
+categories: ["C 与 C++", "Linux C"]
+tags: ["C", "Linux"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0ViTnpZVllhOWFKSmhOV0tIV3BLMDlZQjk5RnVYeXNDRTJ2XzE0dXo0S0dQb0E_ZT1JTUM3SE8.png"
+---
+
+## C 语言标准
+
+**ISO C 标准**（International Standardization Organization C）是一套确保 C 语言函数在不同平台上具有一致行为的标准。这些标准定义了语言的语法、库函数以及它们的行为，从而为开发者提供了跨平台开发的便利。
+
+例如，一些常见的 C 语言函数如 `printf`、`scanf`、`malloc` 和 `fopen` 等，都遵循 ISO C 标准，这意味着在兼容 ISO C 标准的编译平台上，它们的行为是一致的。
+
+**POSIX 标准**（Portable Operating System Interface）是一套更为广泛的标准，它不仅包括语言规范，还包括操作系统的接口标准。POSIX 标准确保了在类 Unix 系统（如 Unix、Linux、MacOS 等）上的应用程序能够在遵循该标准的其他系统上运行。
+
+如果一个函数遵循 POSIX 标准，理论上它在所有类 Unix 平台上的行为应该是统一和一致的。然而，尽管 POSIX 标准旨在提高可移植性，但它并不像 ISO C 标准那样严格。因此，在实践中，直接将 Linux 平台上的代码移植到其他类 Unix 系统可能需要额外的考虑和调整。
+
+## 重定向
+
+![202402252009283.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VjT1dRSVo4Z1JGRmxMQldYMjktcW00QmYxSndkNHdfbTlrZ2lsY0piRi15Y0E_ZT16SldUWHQ.png)
+
+### C 语言中的重定向
+
+**重定向的概念**： 重定向涉及改变标准输入（`stdin`）、标准输出（`stdout`）和标准错误（`stderr`）的默认行为。通常，这些流分别关联到键盘、终端显示器和终端显示器。
+
+**重定向到文件**：重定向最常用的场景是将输入或输出导向文件。这允许程序读取文件内容或将输出结果保存到文件中。
+
+**标准输入重定向**：使用 `<` 符号将标准输入重定向到文件。例如，`wc < file` 会从文件 `file` 中读取数据，而不是从键盘。
+
+**标准输出重定向**：
+
+- 使用 `>` 符号将标准输出重定向到文件，并且会截断文件（如果文件已存在）。例如，`wc > file` 会将 `wc` 命令的输出写入 `file`，覆盖原有内容。
+- 使用 `>>` 符号将标准输出追加到文件末尾，而不是截断。例如，`wc >> file` 会将输出添加到 `file` 的末尾。
+
+**标准错误重定向**：
+
+- 使用 `2>` 符号将标准错误重定向到文件，并截断文件。例如，`program 2> error.log` 会将程序的错误输出写入 `error.log`。
+- 使用 `2>>` 符号将标准错误追加到文件末尾。例如，`program 2>> error.log` 会将错误输出追加到 `error.log`。
+
+**实现重定向**： 在 shell 脚本或命令行中，重定向通过特定的符号实现，这些符号告诉 shell 将命令的输入或输出与文件关联。
+
+**示例**：
+
+- 重定向标准输入：`wc < input.txt`
+- 重定向标准输出并截断：`wc > output.txt`
+- 重定向标准输出并追加：`wc >> output.txt`
+- 重定向标准错误并截断：`program 2> error.log`
+- 重定向标准错误并追加：`program 2>> error.log`
+
+### 重定向标准输入和直接从文件读数据
+
+**标准输入重定向**： 当进程的标准输入被重定向到文件时，进程的数据输入源虽然变成了文件，但进程读取数据的方式并没有改变。进程仍然通过标准输入缓冲区（`stdin`）读取数据。
+
+**进程的感知**： 进程本身不会意识到数据来源的变化，因为它仍然通过 `stdin` 接收输入。这意味着，从进程的角度看，输入数据就像是来自键盘一样。
+
+**输出内容**： 由于进程通过标准输入缓冲区读取数据，输出的结果中不会包含任何关于输入文件的信息。如果需要在输出中包含文件信息，需要在程序中显式地处理。
+
+**与直接读取文件的比较**： 直接从文件中读取数据通常涉及到文件流操作，这允许程序访问文件的特定属性，如文件名或文件状态。而重定向标准输入则没有这些额外的信息。
+
+**使用场景**： 重定向标准输入在某些特定场景下可能有用，例如，当需要将程序的标准输入与文件内容关联，同时保留程序对输入的原有处理逻辑时。然而，大多数情况下，直接使用文件流来读取文件数据更为简单和直接。
+
+![202402252055581.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlMDE5LUo3M1NoRnBRc2ZudzJOTy1ZQlR0dmI3OW1XUENsdWVVcW5SanQ1cWc_ZT1QVE14OHY.png)
+
+![202402252100944.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmbDVHUVRfR3lCRW5IeWtjQ0xoc0hzQnFobVcxT250Sm1GczA5MG1QRFhfTmc_ZT1oS2hhQVE.png)
+
+## 编译和链接
+
+### 编译和链接的过程
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUQ2VSN0FtYXBWRnB3eFI4ZEJTdXRFQk83cHF4bjNSdkJDWlJQUlNfRmx2dUE_ZT1mczNSMWE.png)
+
+```bash command:("[root@localhost] $":1)
+gcc -E test.c -o test.i           # -E 选项，表示激活预处理过程，生成预处理后的文件
+```
+
+
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTMkpINkc5UXV4Qm5NSnBzYWFJbkNNQlFtM3RMZExwUXdZVDhFVjZ6M3E3eXc_ZT1Va09mRUc.png)
+
+```bash command:("[root@localhost] $":1)
+gcc -S test.i -o test.s           # —S 选项，表示激活预处理和编译两个过程，会生成汇编代码文件
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VjSWtRUEMxNm1CQXVHZWJnby1ZTDVJQkJlYjFzSDdvT3pRRW9IVmZNM2NZTkE_ZT15WkZjYlg.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmNFlSU1VueXNGR21BaXVtN0RTbHJZQm5EN3ZjWGtoR0JZb1VTdHVQRnRSS1E_ZT14ZGl6Y0k.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXWnlzVndWR0RsTHFVUDZTYV9pUmVBQng1WXd0TFV5dGQ0czYteU5MczR3RkE_ZT1GbVBjS3I.png)
+
+`nm` 命令用于显示目标文件或可执行程序中的符号信息表。符号信息表包含了程序中定义和引用的符号列表，这些信息对于程序员了解程序的实现和链接状态非常有用。
+
+- **T (Text)**：表示符号是一个在代码段（text segment）中的代码，通常是函数的入口点。
+- **D (Data)**：表示符号是一个在已初始化的数据段（initialized data segment）中的全局变量或静态变量。
+- **B (BSS)**：表示符号是一个在未初始化的数据段（uninitialized data segment，也称为 BSS 段）中的全局变量或静态变量。BSS 段不占用实际的磁盘空间，因为它只包含初始化为零的数据。
+- **R (Read-Only Data)**：表示符号是一个在只读数据段中的常量或只读变量。
+- **U (Undefined)**：表示符号在当前文件中被引用，但没有定义。这通常意味着符号需要在其他文件或库中定义，并在链接时解析。
+- **W (Weak)**：表示符号是一个弱引用。弱引用的符号可以在其他文件中被覆盖。
+- **A (Absolute)**：表示符号是一个绝对值，不依赖于程序的地址空间。
+- **I (Indirect)**：表示符号是一个间接引用，它指向另一个符号。
+- **C (Common)**：表示符号是一个公共符号，通常用于在多个编译单元中共享全局变量的声明。
+
+通过分析 `nm` 命令的输出，程序员可以确定哪些函数和全局变量已经在程序中实现，以及哪些符号需要通过链接从外部库或对象文件中获取。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZU05xa21CMm9oSnUzM2pvQ1JxT05vQnhNLWFZODFiUFIxYlRha2tpUmtnVkE_ZT15QklpcVk.png)
+
+**目标文件（`.o` 文件）**：`.o` 文件是编译源代码后生成的中间产物，它包含了编译器生成的机器代码和一些尚未定义的符号信息。
+
+**链接的必要性**：由于目标文件中可能存在未定义的符号，需要通过链接操作来解析这些符号，将它们与相应的定义关联起来，从而生成一个完整的可执行程序。
+
+**标准库函数的链接**：对于标准库函数，如 `puts` 和 `printf`，编译器在链接过程中会自动搜索标准库文件，并完成这些函数的链接。这一过程对程序员来说是透明的，不需要手动干预。
+
+**自定义外部函数和全局变量的链接**：如果程序中使用了程序员自定义的外部函数或全局变量，它们的实现必须由程序员提供，并在链接过程中明确指定。这通常通过在链接命令中包含相应的目标文件或库文件来实现。
+
+**链接过程**：链接过程是编译流程的最后一步，它确保了所有未定义的符号都得到了正确的解析，并将多个目标文件以及它们依赖的库文件合并成一个可执行文件。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlVEMyMW5rQ0ExSG5Ea1ZLWm1LU0k4QndSMzVRWGNidVYyekpoZUNVSGFGVWc_ZT1SYWhSbUI.png)
+
+### GCC 的使用
+
+1. **预处理阶段**:
+   - 指令：`gcc -E main.c -o main.i`
+   - `-E` 选项指示 GCC 执行预处理阶段，这个阶段会处理宏定义、文件包含指令等，输出预处理后的 C 代码到 `main.i`。
+2. **编译阶段**:
+   - 指令：`gcc -S main.c -o main.s`
+   - `-S` 选项指示 GCC 执行编译阶段，这个阶段将 C 代码转换为汇编代码，输出为 `main.s` 汇编文件。
+3. **汇编阶段**:
+   - 指令：`gcc -c main.s -o main.o`
+   - `-c` 选项指示 GCC 执行汇编阶段，将汇编代码转换为机器码，生成目标文件 `main.o`。
+4. **链接阶段**:
+   - 指令：`gcc main.o -o main`
+   - 没有特定的选项来单独激活链接阶段，`gcc` 默认在没有 `-c`、`-S` 或 `-E` 时执行链接。这个阶段将一个或多个目标文件与库链接在一起，生成可执行文件 `main`。
+5. **一步到位的编译和链接**:
+   - 指令：`gcc main.c -o main`
+   - 这个指令会同时执行预处理、编译、汇编和链接，最终生成可执行文件 `main`。
+
+对于下列代码：
+
+```c
+#include <stdio.h>
+
+int test(void) {}  // 忘记写 return 表示函数返回值
+int main(void) {
+  int a = 10;  // a 局部变量定义了但没有使用
+  int b = 20;
+  if (b = 0) {
+  }              // 赋值号作为判等号使用
+  int c = test;  // 忘记写函数调用的 () 运算符
+  return 0;
+}
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VjTmZRcno1TDVoT3VkSkVQR2NVTXVBQlZoZmlNOVMta3lTV0JUMGhYZFpRYUE_ZT13ZWVvZGI.png)
+
+`-Wall` 是 GCC 编译器的一个选项，用于在编译时打开几乎所有的警告信息。默认情况下，GCC 可能不会显示所有警告，或者只显示部分警告。使用 `-Wall` 可以帮助开发者发现潜在的问题，提高代码质量。
+
+在 Linux 环境下使用 GCC 开发时，重视警告信息是一个好习惯，因为 GCC 的警告通常具有较高的准确性和实用性。一些对代码质量要求较高的公司会要求开发者将警告视为错误，并解决它们。
+
+**编译器优化级别**：
+
+- `-O0` 表示不进行优化，这在调试阶段很有用，因为它可以保持代码的原始结构，便于调试。
+- `-O1` 是默认的优化级别，它提供了一系列优化措施，旨在提高程序的执行效率，同时保持较好的调试体验。
+- `-O2` 是生产环境中常用的优化级别，它在 `-O1` 的基础上进一步优化，以提高程序的性能。
+- `-O3` 表示最高级别的优化，它采用了更激进的优化手段，可能会改变程序的算法和数据结构，以获得更高的性能。但这种优化可能会使调试变得更加困难。
+
+**调试信息**： 使用 `-g` 选项可以指示编译器在编译过程中生成调试信息。这包括变量名、函数名等，这些信息对于调试程序至关重要。即使在生成可执行文件时，调试信息也不会被丢弃，而是被保留在可执行文件中，使得开发者可以使用调试器（如 gdb）进行程序调试。
+
+对于以下代码：
+
+```c
+#include <stdio.h>
+
+int main(void){
+    printf("N = %d\n", N);
+    return 0;
+}
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VScWx2MEViaVpGTW56TEVqLTNwa1ZZQi1BSFBUYmRPYkJnYVh4M1B6Zkx4UVE_ZT1zd2xIc0g.png)
+
+条件编译的作用：
+
+1. **多行注释**： 条件编译可以用来创建多行注释，这些注释在编译时会被编译器忽略。
+2. **代码开关**： 通过条件编译，可以定义代码开关，控制代码的包含或排除，从而实现不同版本的代码或功能的快速切换。
+3. **可移植程序**： 条件编译有助于编写可移植的程序，通过检测不同的平台或环境特征，包含适合特定平台的代码实现。
+4. **头文件保护**： 条件编译常用于防止头文件被多次包含，这是一种常见的编程实践，有助于避免编译错误和重定义问题。
+
+对于以下代码：
+
+```c
+#include <stdio.h>
+// #define DEBUG
+
+int main(void) {
+  // 在vim编辑器中实现多行注释,可以采用下列条件编译的方式
+#if 0    
+    printf("hello world!\n");
+    printf("hello world!\n");
+    printf("hello world!\n");
+    printf("hello world!\n");
+    printf("hello world!\n");
+    printf("hello world!\n");
+    printf("hello world!\n");
+    printf("hello world!\n");
+    printf("hello world!\n");
+    printf("hello world!\n");
+    printf("hello world!\n");
+    printf("hello world!\n");
+#endif
+
+  // 条件编译还可以作为一段代码的开关
+
+#ifdef DEBUG
+  printf("今天中午去吃黄焖鸡米饭!\n");
+  printf("今天中午去吃黄焖鸡米饭!\n");
+  printf("今天中午去吃黄焖鸡米饭!\n");
+#endif
+
+  return 0;
+}
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhNmRwdVRvQXRkTHY2REI3S3Y3SnhJQnZjTkZGamxuYmxpa0QxWG5nNmEtWUE_ZT1BUHNMYXU.png)
+
+### 头文件
+
+1. **尖括号 `<>` 包含方式**：
+   - 使用尖括号包含头文件时，编译器会在操作系统的标准头文件目录中搜索头文件。这种方式通常用于包含语言标准库的头文件。
+   - 在 Linux 系统中，默认的搜索路径通常是 `/usr/include`。
+   - 尖括号包含不适用于自定义头文件，因为它们不会被搜索在用户目录下的文件。
+2. **双引号 `"` 包含方式**：
+   - 使用双引号包含头文件时，编译器首先会在当前目录中搜索头文件，如果找不到，然后才会在操作系统的标准头文件目录中搜索。
+   - 这种方式通常用于包含用户自定义的头文件。
+   - 虽然也可以使用双引号包含标准库头文件，但这不是推荐的做法。
+3. **搜索目录优先级**：
+   - 包含指令的搜索路径可以通过特定的选项来改变，例如使用 `-I` 选项指定额外的搜索目录。
+   - 使用尖括号时，如果指定了 `-I` 选项，编译器会先在这些目录中搜索头文件，然后再搜索操作系统的标准头文件目录。
+   - 使用双引号时，编译器会先在当前目录搜索，然后是 `-I` 指定的目录，最后是操作系统的标准头文件目录。
+
+## GDB
+
+在 GCC 编译器平台中，访问随机或未定义的值通常会得到真正的随机值，这与 MSVC 平台相比，随机性更大。
+
+1. **未初始化的变量**：MSVC 平台倾向于为未初始化的变量和被释放的内存空间赋予一个特定的值。这种做法可以帮助程序员更容易地发现和诊断错误。
+2. **野指针行为**：GCC 对野指针的宽容性较高，即使存在野指针，程序仍可能继续执行，甚至看似正常运行。相比之下，MSVC 在遇到野指针时可能完全无法执行或立即崩溃。
+3. **程序员的注意事项**：使用 GCC 编译器时，程序员需要更加细心和谨慎，以避免因随机性和对野指针的宽容性带来的潜在问题。
+
+### GDB 常用指令
+
+要使用 GDB（GNU Debugger）进行程序调试，首先需要使用 `-g` 选项编译程序，以便在可执行文件中包含调试信息。
+
+在 GDB 中设置断点与 Visual Studio (VS) 类似，可以使用以下命令：
+
+- `break/b [文件名:][行号|函数名]`：在指定位置设置一个普通断点。
+- `tbreak/tb [文件名:][行号|函数名]`：设置一个临时断点。
+
+```bash command:("(gdb)":1-4)
+b 20                          # 在第 20 行设置断点
+b main                        # 在 main 函数的开头设置断点
+b main.c:20                   # main.c 文件的第 20 行设置断点
+b main.c:main                 # 在 main.c 文件的 main 函数开头设置断点
+```
+
+查看源代码：
+
+- `list/l  [文件名:][行号|函数名]`
+
+```bash command:("(gdb)":1-6)
+l                             # 下翻源代码
+l -                           # 上翻源代码
+l 20                          # 查看启动程序 20 行附近的源代码
+l main                        # 查看启动程序 main 函数附近的源代码
+l main.c:20                   # main.c 文件第 20 行附近的源代码
+l main.c:main                 # main.c 文件 main 函数附近的源代码
+```
+
+查看断点信息：
+
+- `info break/i b`：列出所有断点，可以省略到只剩下 i b，但空格不能省略，不能使用 ib
+
+删除断点：
+
+- `delete/d [n]`：删除所有断点或指定编号的断点。
+
+```bash command:("(gdb)":1-2)
+d 2               # 删除2号断点
+d                 # 如果不加断点编号，则表示删除所有断点
+```
+
+禁用和启用断点：
+
+- `disable/dis [n]`：禁用所有断点或指定编号的断点。
+- `enable/en [n]`：启用所有断点或指定编号的断点。
+
+启动调试：
+
+- `run/r`：启动或重启调试程序。
+- `kill/k`：停止调试程序。
+- `quit/q`：退出 GDB。
+
+单步调试和函数执行：
+
+- `step/s`：单步进入函数内部。
+- `finish/fin`：执行完当前函数并返回到调用处。
+
+逐过程执行：
+
+- `next/n`：逐过程执行，不进入函数内部。
+
+监视变量：
+
+- `print/p express`：打印表达式的值。
+- `display/disp express`：持续显示表达式的值。
+- `undisplay/undisp [n]`：停止显示指定编号的表达式。
+- `info display/i disp`：显示所有持续显示的表达式信息。
+
+查看局部变量和参数：
+
+- `info/i args`：查看函数参数。
+- `info/i locals`：查看局部变量。
+
+跳过断点：
+
+- `ignore N COUNT`：忽略指定断点编号 N 的 COUNT 次。
+
+查看堆栈信息：
+
+- `bt/backtrace`：查看当前调用堆栈。
+
+查看内存：
+
+```bash
+x/(内存单元的个数)(内存数据的输出格式)(一个内存单元的大小) 数组名/指针/地址值...
+
+# 该指令会从数组名/指针/地址值..开始，向后以(内存数据的输出格式)，展示(内存单元的个数) * (一个内存单元的大小)的内存数据。
+
+# 内存单元的个数，直接输入一个整数即可。
+
+# 内存数据的输出格式有：
+# 1. o(octal)，八进制整数
+# 2. x(hex)，十六进制整数
+# 3. d(decimal)，十进制整数
+# 4. u(unsigned decimal)，无符号整数
+# 5. t(binary)，二进制整数
+# 6. f(float)，浮点数
+# 7. c(char)，字符
+# 8. a(address)，地址值
+# 9. c(character)：字符
+# 10. s(string)，字符串
+
+# 一个内存单元的大小的表示，有以下格式：
+# 1. b(byte)，一个字节
+# 2. h(halfword,  2 bytes)，二个字节
+# 3. w(word, 4 bytes)，四个字节
+# 4. g(giant, 8 bytes)，八个字节
+```
+
+### 代码示例
+
+```c
+#include <stdio.h>
+#define ARR_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+
+int main(void) {
+    int nums[] = {10, 20, 30, 40, 50};
+    char* strs[] = {"abc", "123", "hello", "777", "666"};
+    int nums_len = ARR_SIZE(nums); 
+    int strs_len = ARR_SIZE(strs);
+
+    // 断点可以打在这里下面然后用于查看内存
+    return 0;
+}
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0ViOWxNQjNISF90RG9nYmlZY2tXLWJrQndRaVhYakFJa0hnemRKZDUtUmc2aUE_ZT1GV2x0cW4.png)
+
+## 库文件
+
+对于以下代码，有：
+
+```c
+#include <stdio.h>
+
+int main(void){
+    printf("hello world!\n");
+    return 0;
+}
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0ViVHFVZjJ2YmZoSmdUMHpVQWVRcUE4QklTYVY2cVRUNHQyakdzZFktWnFPT2c_ZT0xWUtka0I.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhNkExQTdOTVVCSHB0MkxGLWdiUnk0QjhHcUZHX0tHdlJHNlNhNVNDV0VxaUE_ZT1hMHNnYWo.png)
+
+**静态库文件**：
+
+- 优点：可执行文件包含所有必需的库代码，无需额外依赖即可运行，提高了程序的自给自足性和环境独立性。
+- 缺点：
+  1. 增加可执行文件的大小，占用更多磁盘空间，同时可能导致内存使用增加。
+  2. 静态库更新需要重新编译和分发可执行文件，增加了开发者的维护成本和用户的更新成本。
+
+**动态库文件**：
+
+- 优点：
+  1. 减少可执行文件的大小，节省磁盘空间。
+  2. 允许多个程序共享同一个库文件，减少内存占用，提高资源利用率。
+  3. 库文件更新时，通常不需要重新编译可执行文件，简化了开发者的维护工作和用户的使用体验。
+- 缺点：
+  1. 如果缺少必要的动态库，程序可能无法运行，影响程序的移植性。
+  2. 运行时需要进行动态链接，可能会引入额外的性能开销。
+
+## Makefile
+
+**`Makefile` 的作用**： `Makefile` 是一种脚本文件，它主要用于解决以下两个问题：
+
+1. **增量编译**：仅重新编译那些自上次构建以来已经发生变化的部分，从而提高构建效率。
+2. **自动化构建规则**：定义一套规则来自动化编译和链接过程，减少程序员的重复劳动。
+
+**`Makefile` 的本质**：`Makefile` 本质上是一个包含编译指令的脚本文件，它规定了如何构建整个工程的可执行文件。
+
+**`make` 指令**：使用 `make` 指令可以触发 `Makefile` 中定义的构建规则，类似于 Visual Studio 中的启动按钮，但它不会自动执行，需要用户显式调用。
+
+**`Makefile` 的优势**：通过定义良好的 `Makefile`，`make` 指令可以极大地简化构建过程，提高开发效率，同时确保构建的一致性和可重复性。
+
+`Makefile` 基础语法的概述：
+
+规则（Rule）是 `Makefile` 的基本组成单位，每个规则定义了如何构建一个或多个目标。
+
+规则的组成部分：
+
+1. **目标（Target）**：规则要生成的文件或目标，通常是最终的可执行文件或中间对象文件。
+2. **依赖（Dependencies）**：目标文件依赖的源文件或其他目标，当依赖文件发生变化时，目标将被重新构建。
+3. **指令（Commands）**：实现规则的命令序列，通常是编译或链接命令。
+
+规则的基本格式：
+
+```makefile
+目标：依赖
+    指令1
+    指令2
+    ...
+```
+
+执行原理：
+
+- `Makefile` 定义了构建可执行程序的规则和依赖关系。
+- 在项目的工作目录中创建名为 "makefile" 或 "Makefile" 的文件。
+- 使用 `make` 命令来执行 `Makefile` 中定义的规则，`make` 会根据依赖关系和规则来决定是否需要重新构建目标。
+
+基本工作原理：
+
+- `Makefile` 中的每个规则都包含一个目标（通常是最终生成的文件）和一系列依赖。
+- `make` 命令会检查目标文件是否存在，以及是否比其依赖项更新。
+
+最终目标的确定：`Makefile` 中的第一个目标通常被视为最终目标。
+
+目标的更新：
+
+- 如果目标文件存在且是最新的（即其依赖项没有更新），`make` 命令将不会执行任何操作。
+- 如果目标文件不存在或其依赖项之一已更新，`make` 将递归地检查所有依赖项，并执行必要的命令来更新这些依赖项，最终更新目标文件。
+
+时间戳检查：`make` 命令通过比较目标文件和依赖文件的时间戳来确定目标是否过时。
+
+处理不相关目标：如果 `Makefile` 中存在与最终目标无关的其他目标，`make` 将忽略它们，除非显式指定要构建这些目标。
+
+使用 `make` 命令：执行 `make` 命令时，可以指定特定的目标来构建，或者不指定目标以构建最终目标。
+
+对于以下 `Makefile`，有：
+
+```makefile
+main : main.o add.o
+	gcc main.o	add.o -o main
+main.o : main.c compute.h
+	gcc -c main.c -o main.o -Wall -g -O0
+add.o : add.c compute.h
+	gcc -c add.c -o add.o -Wall -g -O0
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXamdPVmVUSGhGTmtRZlVvVUhrQVJVQlVGMTdmWkNPRzlnX0ZFWUpTdXZnOWc_ZT1hSW1NQmk.png)
+
+在手动编译链接生成可执行程序的过程中，通常不会将头文件显式地写入编译命令中，因为编译器在处理源文件时会自动包含所需的头文件。然而，在编写 `Makefile` 时，需要将头文件作为最终可执行程序的依赖项之一。这是因为头文件的更新可能会改变程序的行为，如果头文件发生变化，显然需要重新编译生成最新的可执行程序。
+
+![Code_vLGz40Tyqg.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXQ0tiOWVtekR0R2t1MDNWTDd5MlRnQk9JTkNjdmtkYUNhMmRQRnBoUl9neEE_ZT1IcHFHTHo.png)
+
+若 `main` 最终目标存在且所有的依赖都没有被更新，那么 `main` 就已经是最新的了，不需要更新，`Makefile` 不会执行任何操作。
+
+对于下面的 `Makefile` ，使用 `make` 命令时会将所有的 .c 文件编译生成一个可执行文件 main
+
+```makefile
+# 定义编译器
+CC=gcc
+
+# 定义编译选项
+CFLAGS=-Wall -g -O0
+
+# 定义链接选项
+LDFLAGS=
+
+# 定义目标文件
+TARGET=main
+
+# 定义源文件列表
+SRCS=main.c add.c subtract.c
+
+# 从源文件列表生成对象文件列表
+OBJS=$(SRCS:.c=.o)
+
+# 默认目标
+all: $(TARGET)
+
+# 可执行文件依赖于所有的目标文件
+$(TARGET): $(OBJS)
+    $(CC) $(LDFLAGS) $^ -o $@
+
+# 从.c文件生成.o文件
+%.o: %.c
+    $(CC) $(CFLAGS) -c $< -o $@
+
+# 清理编译生成的文件
+clean:
+    $(RM) $(OBJS) $(TARGET)
+
+# 重建项目，先清理再重新构建
+rebuild: clean all
+
+# 声明伪目标
+.PHONY: all clean rebuild
+```
+
+该 `Makefile` 说明如下：
+
+1. **编译器定义** (`CC`):
+   
+   ```makefile
+   CC=gcc
+   ```
+   
+   这行定义了默认使用的编译器为 `gcc`，你可以根据需要更换为其他编译器。
+2. **编译选项** (`CFLAGS`):
+
+   ```makefile
+   CFLAGS=-Wall -g -O0
+   ```
+
+   这里定义了编译时使用的选项。`-Wall` 打开所有警告信息，`-g` 生成调试信息，`-O0` 表示不进行优化。
+
+3. **链接选项** (`LDFLAGS`):
+
+   ```makefile
+   LDFLAGS=
+   ```
+
+   这里定义了链接时使用的选项，当前为空，但可以添加如库链接等选项。
+
+4. **目标文件** (`TARGET`):
+
+   ```makefile
+   TARGET=main
+   ```
+
+   定义了最终生成的可执行文件的名称。
+
+5. **源文件列表** (`SRCS`):
+
+   ```makefile
+   SRCS=main.c add.c subtract.c
+   ```
+
+   列出了所有需要编译的源文件。
+
+6. **对象文件列表** (`OBJS`):
+
+   ```makefile
+   OBJS=$(SRCS:.c=.o)
+   ```
+
+   使用模式替换规则，将 `SRCS` 列表中的 `.c` 扩展名替换为 `.o`，生成目标文件（`.o` 文件）的列表。
+
+7. **默认目标** (`all`):
+
+   ```makefile
+   all: $(TARGET)
+   ```
+
+   定义了默认目标 `all`，当执行 `make` 命令时，如果没有指定目标，将执行这个目标。
+
+8. **可执行文件依赖规则** (`$(TARGET): $(OBJS)`):
+
+   ```makefile
+   $(TARGET): $(OBJS)
+   	$(CC) $(LDFLAGS) $^ -o $@
+   ```
+
+   定义了如何构建可执行文件 `$(TARGET)`，它依赖于所有的 `.o` 文件。`$^` 代表所有依赖项（这里是 `OBJS` 中的所有 `.o` 文件），`-o $@` 指定输出文件的名称。
+
+9. **从.c 文件生成.o 文件的规则** (`%.o: %.c`):
+
+   ```makefile
+   %.o: %.c
+   	$(CC) $(CFLAGS) -c $< -o $@
+   ```
+
+   这是一个模式规则，用于从每个 `.c` 文件生成对应的 `.o` 文件。`$<` 代表第一个依赖项，即对应的 `.c` 文件，`$@` 代表目标文件。
+
+10. **清理规则** (`clean`):
+
+    ```makefile
+    clean:
+    	$(RM) $(OBJS) $(TARGET)
+    ```
+
+    `clean` 是一个伪目标，用于清理编译生成的所有 `.o` 文件和可执行文件。`$(RM)` 是删除命令，这里假设为 `rm`，`$(OBJS)` 和 `$(TARGET)` 是要被删除的文件列表。
+
+11. **重建规则** (`rebuild`):
+
+    ```makefile
+    rebuild: clean all
+    ```
+
+    `rebuild` 是一个伪目标，它首先调用 `clean` 目标清理所有生成的文件，然后调用 `all` 目标重新构建整个项目。
+
+12. **伪目标声明** (`.PHONY`):
+
+    ```makefile
+    .PHONY: all clean rebuild
+    ```
+
+    声明了 `all`、`clean` 和 `rebuild` 为伪目标，即使存在同名的文件，也不会影响 Makefile 的行为。
+
+而对于以下  `Makefile` ，使用 `make` 命令时会将所有的 .c 文件分别编译生成各自的可执行文件
+
+```makefile
+# 定义编译器
+CC=gcc
+
+# 定义编译选项
+CFLAGS=-Wall -g
+
+# 定义源文件列表
+SRCS=test.c test2.c test3.c
+
+# 从源文件列表生成可执行文件列表
+PROGS=\$(SRCS:.c=)
+
+# 默认目标
+all: \$(PROGS)
+
+# 规则：每个可执行文件都依赖于同名的.c文件
+%: %.c
+	\$(CC) \$(CFLAGS) \$< -o \$@
+
+# 清理编译生成的文件
+clean:
+	rm -f \$(PROGS)
+
+# 重建项目，先清理再重新构建
+rebuild: clean all
+
+# 声明伪目标
+.PHONY: all clean rebuild
+```
+
+该 `Makefile` 说明如下：
+
+1. **编译器定义** (`CC`):
+
+   ```makefile
+   CC=gcc
+   ```
+
+   这行定义了默认的编译器为 `gcc`，你可以替换为其他编译器，如 `clang`。
+
+2. **编译选项** (`CFLAGS`):
+
+   ```makefile
+   CFLAGS=-Wall -g
+   ```
+
+   这里定义了编译时使用的选项。`-Wall` 表示打开所有警告信息，`-g` 表示生成调试信息。
+
+3. **源文件列表** (`SRCS`):
+
+   ```makefile
+   SRCS=test.c test2.c test3.c
+   ```
+
+   定义了所有源文件的列表，这些文件将被编译成独立的可执行程序。
+
+4. **可执行文件列表** (`PROGS`):
+
+   ```makefile
+   PROGS=$(SRCS:.c=)
+   ```
+
+   使用模式替换规则，将 `SRCS` 列表中的 `.c` 扩展名替换为空（即去掉扩展名），生成可执行文件的列表。这将生成 `test`、`test2` 和 `test3`。
+
+5. **默认目标** (`all`):
+
+   ```makefile
+   all: \$(PROGS)
+   ```
+
+   定义了默认目标 `all`，当执行 `make` 命令时，如果没有指定目标，将执行这个目标。这里它依赖于 `$(PROGS)`，即所有可执行文件。
+
+6. **编译规则** (`%: %.c`):
+
+   ```makefile
+   %: %.c
+   \$(CC) $(CFLAGS) $< -o $@
+   ```
+
+   这是一个模式规则，`%` 是一个通配符，可以匹配任何字符串。这里它匹配任何没有扩展名的文件名（因为我们在 `PROGS` 中去掉了 `.c` 扩展名）。`$<` 是自动变量，代表第一个依赖项，即对应的 `.c` 文件。`$@` 是自动变量，代表目标文件。这行命令将编译器、编译选项、源文件和输出目标串联起来，生成可执行文件。
+
+7. **清理规则** (`clean`):
+
+   ```makefile
+   clean:
+   	rm -f $(PROGS)
+   ```
+
+   `clean` 是一个伪目标，用于清理生成的所有可执行文件。`rm -f` 命令用于删除文件，`-f` 选项表示即使文件不存在也不会显示错误信息。
+
+8. **重建规则** (`rebuild`):
+
+   ```makefile
+   rebuild: clean all
+   ```
+
+   `rebuild` 也是一个伪目标，它首先调用 `clean` 目标清理所有生成的文件，然后调用 `all` 目标重新构建所有可执行文件。
+
+9. **伪目标声明** (`.PHONY`):
+
+   ```makefile
+   .PHONY: all clean rebuild
+   ```
+
+   这行声明了 `all`、`clean` 和 `rebuild` 为目标，即使存在同名的文件，也不会影响 Makefile 的行为。
+

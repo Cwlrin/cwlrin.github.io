@@ -1,0 +1,467 @@
+---
+title: "软考中级——SQL语言（下）"
+date: 2024-04-30T19:10:54+08:00
+categories: ["软考"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0Vkd2JPcEptSUNKR2tJRGY1X1VvMzBJQlpubjJ2YTE0MHFTdVplMklQLWFDY2c_ZT1zRGhZek0.png"
+---
+
+# 授权与触发器
+
+## 授权 (GRANT)
+
+语句格式
+
+```sql
+GRANT 权限 ON TABLE / DATABASE 表名 / 数据库名 
+TO 用户1, 用户2 … / PUBLIC 
+[WITH GRANT OPTION];
+```
+
+`PUBLIC`：表示将权限授予所有人
+
+`WITH GRANT OPTION`：表示获得了这个权限的用户还可以将权限赋给其他用户。
+
+|  对象  |  对象类型  |                           操作权限                           |
+| :----: | :--------: | :----------------------------------------------------------: |
+| 属性列 |  `TABLE`   | `SELECT`，`INSERT`，`UPDATE`，`DELETE`， `ALL PRIVILEGES`（4 种权限的总和） |
+|  视图  |  `TABLE`   | `SELECT`，`INSERT`，`UPDATE`，`DELETE`， `ALL PRIVILEGES`（4 种权限的总和） |
+| 基本表 |  `TABLE`   | `SELECT`，`INSERT`，`UPDATE`，`DELETE`， `ALTER`，`INDEX`，`ALL PRIVILEGES`（4 种权限的总和） |
+| 数据库 | `DATABASE` |      `CREATETAB` 建立表的权限，可由 `DBA` 授予普通用户       |
+
+例：用户要求把数据库 SPJ 中供应商 S、零件 P、项目 J 表赋予各种权限。各种授权要求如下：
+
+1. 将对供应商 S、零件 P、项目 J 的所有操作权限赋给用户 User1 及 User2。
+
+```sql
+GRANT ALL PRIVILEGES ON TABLE S,
+    P,
+    J TO USER1,
+    USER2;
+```
+2. 将对供应商 S 的插入权限赋给用户 User1，并允许将此权限赋给其他用户。
+   ```sql
+   GRANT INSERT ON TABLE S TO USER1 WITH
+   GRANT OPTION;
+   ```
+3. DBA 把数据库 SPJ 中建立表的权限赋给用户 User1。
+   ```sql
+   GRANT CREATETAB ON DATABASE SPJ TO User1;
+   ```
+
+## 收回权限 (REVOKE)
+
+语句格式
+
+```sql
+REVOKE 权限 ON TABLE / DATABASE 表名 / 数据库名
+FROM 用户1, 用户2 … / PUBLIC [RESTRICT | CASCADE];
+```
+
+`RESTRICT`：表示只收回语句中指定的用户的权限
+
+`CASCADE`：表示除了收回指定用户的权限外，还收回该用户赋予的其他用户的权限。
+
+将用户 User1 及 User2 对供应商 S、零件 P、项目 J 的所有操作权限收回：
+
+```sql
+REVOKE ALL PRIVILEGES ON TABLE S,
+P,
+J
+FROM User1,
+    User2;
+```
+
+将所有用户对供应商 S 的所有查询权限收回：
+
+```sql
+REVOKE
+SELECT ON TABLE S
+FROM PUBLIC;
+```
+
+将 User1 用户对供应商S的供应商编号 Sno 的修改权限收回。
+
+```sql
+REVOKE
+UPDATE(Sno) ON TABLE S
+FROM User1;
+```
+
+## 触发器概述
+
+触发器主要有以下三方面的特点
+
+1. 当数据库程序员声明的事件发生时，触发器被激活。声明的事件可以是对某个特定关系的插入、删除或更新。
+
+2. 当触发器被事件激活时，不是立即执行，而是首先由触发器测试触发条件，如果事件不成立，响应该事件 的触发器什么都不做。
+
+3. 如果触发器声明的条件满足，则与该触发器相连的动作由DBMS执行。动作可以阻止事件发生，可以撤销事件。
+
+创建触发器时需指定： 
+
+1. 触发器名称 
+
+2. 在其上定义触发器的表
+
+3. 触发事件：触发器将何时激发
+
+4. 触发条件：满足什么条件时执行触发动作 
+
+5. 触发动作：指明触发器执行时应做的动作 
+
+- 触发器可以引用当前数据库以外的对象，但只能在当前数据库中创建触发器。 
+- 不能在临时表或系统表上创建触发器，但触发器可以引用临时表
+
+## 创建触发器
+
+```sql
+CREATE TRIGGER 触发器名称 [BEFORE | AFTER] [DELETE | INSERT | UPDATE OF 列名] // 触发事件 
+ON 表名 [REFERENCING <临时视图名>] [FOR EACH ROW | FOR EACH STATEMENT] [WHEN <触发条件>] // WHEN 后面跟触发条件 ， 指明当什么条件满足时 ， 执行下面的触发动作 
+BEGIN < 触发动作 > // BEGIN... END 中定义触发动作 ， 即当触发条件满足时 ， 需要数据库做什么
+END [触发器名称]
+```
+
+`BEFORE` / `AFTER`：指明是在执行触发语句之前激发触发器还是执行触发语句之后激发触发器。
+
+`DELETE`：当一个 `DELETE` 语句从表中删除行时激发触发器。 
+
+`INSERT`：当一个 `INSERT` 语句向表中插入行时激发触发器。 
+
+`UPDATE` / `UPDATE OF`（列名）：当 `UPDATE` 修改表中的值时，激发触发器，也可加（`OF` 列名）指定是某一列的值被修改时激发触发器。 
+
+`REFERENCING`：触发器运行过程中，系统会生成两个临时视图，分别存放更新前和更新后的值，对于行级触发器，为 `OLD ROW` 和 `NEW ROW`，对于语句级触发器，为 `OLD TABLE` 和 `NEW TABLE`。 
+
+```sql
+REFERENCING new row AS / nrow REFERENCING old row AS orow
+```
+
+`FOR EACH ROW`：表示为行级触发器，对每一个被影响的元组（即每一行）执行一次触发过程。
+
+`FOR EACH STATEMENT`：表示为语句级触发器，对整个事件只执行一次触发过程，为默认方式。
+
+:::primary
+银行数据库关系模式如下：
+
+$\text{Account(Account-no, branch-name, balance)}$ 账户(账号，支行名称，余额) 
+
+$\text{Loan(Loan-no,branch-name,amount)}$ 贷款(贷款号，支行名称，金额) 
+
+$\text{Depositor(customer-name,Account-no)}$ 存款(存款人姓名，账号) 
+
+假设银行处理透支时，不是将账户的余额设为负值，而是将账户余额设置为 0，并且建立一笔贷款，其金额为透支金额。 这笔贷款的贷款号等于该透支账户的账。
+:::
+
+<Collapse title="答案" type="primary">
+
+```sql
+CREATE TRIGGER overdraft_trigger
+AFTER
+UPDATE ON Account -- 在 Account 表上建立触发器 ， 触发事件是 “ 修改后 ” 
+    REFERENCING new row as nrow -- 引用修改后的 “ 行 ” 为临时视图 ， 命名为 nrow 
+    For each row -- 表示其为行级触发器 ， 即对每一行都执行一次触发
+    WHEN nrow.balance < 0 -- 触发条件是修改后的行的 balance 属性值小于0 ， 即账户余额为负 。 
+    BEGIN ATOMIC -- ATOMIC关键字表示下面的语句为原子性的 ， 即 ： 要么都做 ， 要么都不做 。
+INSERT INTO borrower (
+        Select customer - name,
+            Account - no
+        From depositor
+        Where nrow.account - no = depositor.account - no
+    );
+-- 将透支客户的信息单独存储在borrower表中
+INSERT INTO loan
+values (
+        nrow.account - no,
+        nrow.branch - name,
+        － nrow.balance
+    );
+-- 建立一笔贷款 ， 将该笔记录插入到贷款表loan中
+UPDATE account
+set balance = 0
+Where account.account - no = nrow.account - no;
+-- 将Account表中的余额设为0
+END
+```
+
+</Collapse>
+
+
+某航空公司要开发一个订票信息处理系统，该系统的部分关系模式如下： 
+
+航班（++航班编号++，航空公司，起飞地，起飞时间，目的地，到达时间，票价） 
+
+折扣（++航班编号，开始日期，结束日期++，折扣） 
+
+旅客（++身份证号++，姓名，性别，出生日期，电话，VIP折扣） 
+
+购票（++购票单号，身份证号，航班编号++，搭乘日期，购票金额） 
+
+有关关系模式的属性及相关说明如下： 
+
+1. 航班表中的起飞时间和到达时间不包含日期，同一航班不会在一天出现两次及两次以上；
+2. 各航空公司会根据旅客出行淡旺季适时调整机票的折扣，旅客购买机票的购票金额计算公式为：票价 × 折扣 × VIP折扣， 其中旅客的 VIP 折扣与该旅客已购买过的机票的购票金额总和相关，在旅客每次购票后被修改。VIP 折扣值的计算由函数 `float vip_value (char[18]身份证号)`完成。 根据以上描述，回答下列问题：
+
+【问题1】 
+
+请将如下创建购票关系的 SQL 语句的空缺部分补充完整，要求指定关系的主键、外键，以及购票金额大于零的约束。
+
+```sql
+CREATE TABLE 购票 (
+    购票单号 CHAR(15) ___(a)___,
+    身份证号 CHAR(18),
+    航班编号 CHAR(6),
+    搭乘日期 DATE,
+    购票金额 FLOAT ___(b)___,
+    ___(c)___,
+    ___(d)___,
+)
+```
+
+【问题2】
+
+1. 身份证号为 210000196006189999 的客户购买了 2013 年 2 月 18 日 CA5302 航班的机票，购票单号由系统自动生成。下面的 SQL 语句将上述购票信息加入系统中，请将空缺部分补充完整。
+
+```sql
+INSERT INTO 购票 (购票单号, 身份证号, 航班编号, 搭乘日期, 购票金额)
+SELECT ' 201303105555 ',
+    ' 210000196006189999 ',
+    ' CA5302 ',
+    ' 2013 / 2 / 18 ',
+    ___(e)___
+FROM 航班,
+    折扣,
+    旅客
+WHERE ___(f)___
+    AND 航班.航班编号 = ' CA5302 '
+    AND ' 2013 / 2 / 18 ' BETWEEN 折扣.开始日期 AND 折扣.结束日期
+    AND 旅客.身份证号 = ' 210000196006189999 ';
+```
+
+2. 需要用触发器来实现 VIP 折扣的修改，调用函数 `vip_value()` 来实现。请将如下 SQL 语句的空缺部分补充完整。
+
+```sql
+CREATE TRIGGER VIP _TRG
+AFTER ___(g)___ ON ___(h)___ REFERENCING new row AS nrow FOR EACH row BEGIN
+UPDATE 旅客
+SET ___(i)___
+WHERE ___(j)___;
+END
+```
+
+【问题3】 
+
+请将如下 SQL 语句的空缺部分补充完整。
+
+1. 查询搭乘日期在 2012 年 1 月 1 日至 2012 年 12 月 31 日之间，且合计购票金额大于等于 10000 元的所有旅客的身份证号、姓名和购票金额总和，并按额总和降序输出。
+
+```sql
+ELECT 旅客.身份证号,
+   姓名,
+   SUM (购票金额)
+ROM 旅客,
+   购票
+HERE ___(k)___
+ROUP BY ___(l)___
+RDER BY ___(m)___;
+```
+
+2. 经过中转的航班与相同始发地和目的地的直达航班相比，会享受更低的折扣。查询从广州到北京，经过一次中转的所有航班对，输出广州到中转地的航班编号、中转地和中转地到北京的航班编号。
+
+```sql
+SELECT ___(n)___
+FROM 航班航班1,
+    航班航班2
+WHERE ___(o)___;
+```
+
+## 更改和删除触发器
+
+### 更改触发器
+
+语句格式
+
+```sql
+ALTER TRIGGER < 触发器名 > [BEFORE|AFTER] 
+DELETE | INSERT | UPDATE OF [列名] 
+ON 表名 | 视图名 
+AS 
+BEGIN 
+	要执行的SQL语句
+END
+```
+
+### 删除触发器
+
+```sql
+DROP TRIGGER <触发器名>
+```
+
+# 嵌入式 SQL 与存储过程
+
+## 嵌入式 SQL
+
+SQL 提供了将 SQL 语句嵌入到某种高级语言中的方式，通常采用预编译的方法。
+
+1. 区分主语言与 SQL 语句的方式：`EXEC SQL <SQL语句>`
+2. 向主语言传递 SQL 语句执行的状态信息的方式： `SQLCA`，即 `SQL` 通信区，是系统默认定义的全局变量。
+3. 主变量（共享变量）：
+   1. 主语言通过主变量向 SQL 语句提供参数，主变量是由主语言的程序定义的，并用 SQL 的 `DECLARE` 语句说明。
+   2. 在 SQL 语句中，为了与 SQL 中的属性名区分，在引用共享变量时，前面需要加 `:`
+
+
+
+```sql
+EXEC SQL BEGIN
+DECLARE SECTION;
+char Msname [4],
+Msex [3],
+givensno [5];
+int Mage;
+char SQLSTATE [6];
+-- 特殊的共享变量 ， 解释SQL语句的执行状况 
+EXEC SQL
+END
+DECLARE SECTION;
+```
+
+1. 根据共享变量 givensno 值查询学生关系 students 中学生的姓名、年龄和性别。
+```sql
+EXEC SQL
+SELECT sname,
+    age,
+    sex INTO :Msname,
+    :Mage,
+    :Msex
+FROM students
+WHERE sno = :givensno;
+```
+
+2. 某学生选修了一门课程，将其插入学生选课表 SC 中，假设学号、课程号、成绩已分别赋给主变量 HSno、 Hcno 和 Hgrade。
+
+```sql
+EXEC SQL
+INSERT INTO SC(Sno, Cno, Grade)
+Values (:HSno, :HCno, :Hgrade);
+```
+
+## 游标
+
+SQL 语言是面向集合的，一条 SQL 语句可以产生或处理多条记录。而主语言是面向记录的，一组主变量一次只 能放一条记录，所以，引入游标，通过移动游标指针来决定获取哪一条记录。
+
+1. 定义游标：
+
+   语句格式：
+
+   ```sql
+   EXEC SQL
+   DECLARE < 游标名称 > CURSOR FOR 
+   <SELECT 语句 >
+   ```
+
+   它只是一条说明性语句，定义游标后，其中的 `SELECT` 语句并不执行。
+
+2. 打开游标：
+
+   语句格式：
+
+   ```sql
+   EXEC SQL OPEN <游标名称> 
+   ```
+
+   该语句执行游标定义中的 `SELECT` 语句，同时游标处于活动状态。游标是一个指针，此时指向查询结果的第一行之前。
+
+3. 推进游标：
+
+   语句格式： 
+
+   ```sql
+   EXEC SQL FETCH 游标名 INTO 变量表
+   ```
+
+   该语句执行时，游标推进一行，并把游标指向的行（称为当前行）中的值取出，送到共享变量中
+
+4. 关闭游标： 
+
+   ```sql
+   EXEC SQL CLOSE 游标名
+   ```
+
+   该语句关闭游标，使它不再和查询结果相联系。游标关闭后，后面还可以再打开。
+
+某停车场有多个入口和出口，车辆进入时从入口处由系统查询可用的停车位，从出口驶出时系统将其刚使用的车位标记为 空车位。 假设实现停车场管理的伪指令如下表所示：
+
+|    伪指令    |                             说明                             |
+| :----------: | :----------------------------------------------------------: |
+|   `Get( )`   | 返回一个空车位号。如果当前没有空车位，则返回空值 `NULL`。 例如：`x=Get( )`，表示读取空的停车位到变量 `x` 中 |
+| `Writ(A, 0)` |                    置停车位 `A` 状态为空                     |
+| `Writ(A, 1)` |                   置停车位 `A` 状态为非空                    |
+
+【问题3】（4分）
+
+若停车位表的关系模式为：`park(parkno, isused)`，其中 `parkno` 为停车位号，`isused` 为停车位标志，0 为空，1 为非空。  下面是用 E-SQL 实现的查询空车位的函数 `Get()`，请补全空缺处的代码。
+
+```sql
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE EXEC SQL
+DECLARE getblk CURSOR FOR ___(a) ___;
+EXEC SQL OPEN getblk;
+EXEC SQL FETCH getblk INTO :Hparkno;
+-- Hparkno为已声明的主变量 
+IF SQLCA.sqlcode = 100 THEN EXEC SQL CLOSE getblk;
+Return NULL;
+ELSE ___(b) ___;
+END IF
+```
+
+## 存储过程
+
+存储过程（Procedure）：是一组为了完成特定功能的 SQL 语句集合，经编译后存储在数据库中，用户通过指定存储过程的名称并给出参数来执行。 
+
+存储过程中可以包含逻辑控制语句和数据操纵语句，它可以接受参数、输出参数、返回 单个或多个结果集以及返回值。 
+
+由于存储过程在创建时即在数据库服务器上进行了编译并存储在数据库中，所以存储过程运行要比单个的 SQL 语句块要快。 
+
+语句格式：
+
+```sql
+CREATE PROCEDURE 存储过程名(IN | OUT | IN OUT 参数1 数据类型 ， IN | OUT | IN OUT 参数2 数据类型 …) 
+[AS] -- 参数的数据类型只需要指明类型名即可 ， 不需要指定宽度 。 具体宽度由外部调用者决定 
+BEGIN 
+< SQL 语句 >
+END
+```
+
+`IN`：为默认值，表示该参数为输入型参数，在过程体中值一般不变。 
+
+`OUT`：表示该参数为输出参数，可以作为存储过程的输出结果，供外部调用者使用。 
+
+`IN OUT`： 既可作为输入参数，也可作为输出参数。
+某航空售票系统负责所有本地起飞航班的机票销售，并设有多个机票销售网点。以下为 E-SQL 编写的部分售票代码：
+
+```sql
+EXEC SQL
+SELECT balance INTO :x
+FROM tickets
+WHERE flight = :flightno;
+	printf(“ 航班 % 当前剩余机票数为 ： %d \ n请输入购票数 ： ” ， flightno, x);
+	scanf(“ %d ”, & a);
+EXEC SQL
+UPDATE tickets
+SET balance = :x - :a
+WHERE flight = :flightno
+```
+
+【问题3】（4分） 下面是改写的存储过程，其中 flightno 为航班号；a 为购票数；result 为执行状态；1表示成功，0表示失败；表 tickets 中的剩余机票数 balance 具有大于等于零约束。请补充完整。
+
+```sql
+CREATE PROCEDRUE buy_ticket (char [ ] flightno IN, ___(a)___, int result OUT) AS BEGIN … …
+UPDATE tickets
+SET balance = ___(b)___
+WHERE flght = flightno;
+if (SQLcode <> SUCCESS) { -- SQLcode 为 SQL 语句的执行状态 
+	___(c)___;
+	result = 0;
+	return;
+} 
+COMMIT;
+___(d)___
+END
+```

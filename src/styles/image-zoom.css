@@ -1,0 +1,30 @@
+/* ============================================================
+   ImageZoom 宿主与触发图片的全局样式（shadow DOM 外，文档级）
+   自 svelte scoped 迁移（原 :global 部分）
+   ============================================================ */
+
+image-zoom {
+  display: block;
+  margin: 1.2rem auto;
+  width: fit-content;
+  max-width: 100%;
+}
+
+image-zoom .image-zoom-trigger {
+  cursor: zoom-in;
+  transform-origin: center;
+  transition:
+    filter 0.2s ease,
+    transform 0.2s ease;
+}
+
+image-zoom .image-zoom-trigger:hover {
+  filter: brightness(0.96);
+  transform: translateY(-1px) scale(1.01);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  image-zoom .image-zoom-trigger {
+    transition: none;
+  }
+}

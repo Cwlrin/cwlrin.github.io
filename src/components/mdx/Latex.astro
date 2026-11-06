@@ -1,0 +1,19 @@
+---
+/**
+ * MDX 中的数学公式渲染出口
+ *
+ * 背景：satteri 的 mdast 插件返回 `{ rawHtml }` 时，
+ * - 纯 Markdown（.md）编译会原样输出 HTML，KaTeX 正常渲染；
+ * - MDX（.mdx）编译不支持 raw HTML 节点，KaTeX 输出会被转义成纯文本。
+ *
+ * 因此 `src/satteri-plugins/katex.ts` 在 MDX 模式下改为产出
+ * `<Latex html="..." />`，由本组件用 Astro 的 `set:html` 原样注入 KaTeX HTML。
+ */
+interface Props {
+  html: string;
+}
+
+const { html } = Astro.props;
+---
+
+<Fragment set:html={html} />

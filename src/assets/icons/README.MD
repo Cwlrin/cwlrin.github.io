@@ -1,0 +1,2 @@
+由于目前版本 UnoCSS 对于本项目中的 Shadow DOM 穿透无法提供一个很好的解决方案，所以我们将 [Remix Icon](https://remixicon.com/collection) 的部分图标放置在了本目录下
+这些 icon 均属于 Remix Icon 所有，遵循 [Apache License 2.0](https://github.com/Remix-Design/remixicon/blob/master/License) 使用与分发

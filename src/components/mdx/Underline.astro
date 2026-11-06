@@ -1,0 +1,13 @@
+---
+interface Props {
+  type?: "primary" | "info" | "success" | "warning" | "danger" | "default";
+  variant?: "default" | "dot" | "wavy";
+}
+
+const { type = "primary", variant = "default" }: Props = Astro.props;
+const variantClass = variant === "default" ? "" : variant;
+---
+
+<ins class={`underline ${type} ${variantClass}`.trim()}>
+  <slot />
+</ins>

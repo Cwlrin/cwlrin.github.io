@@ -1,0 +1,700 @@
+---
+title: "STL 关联式容器"
+date: 2021-02-22T22:41:48+08:00
+categories: ["C 与 C++", "STL 基础"]
+tags: ["C++", "STL"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZOHF1bUpuY1I5RG9GOW0ydEFRWWhFQmNzWE9UQmFGUmZDdEVIZUp2T205QVE_ZT1qS1RGODg.png"
+---
+
+## `set` 的使用
+
+### 基本特征
+
+`std::set` 是一种关联容器，含有 `Key` 类型对象的已排序集。用比较函数进行排序。搜索、移除和插入拥有对数复杂度。`set` 通常以红黑树实现。
+
+1. **默认构造**： 创建一个空的 set。
+
+   ```cpp
+   set<Key, Compare, Allocator> set1;
+   ```
+
+2. **复制构造**： 使用另一个 set 的内容、比较函数和分配器来构造新的 set。
+
+   ```cpp
+   set<Key, Compare, Allocator> set1;
+   set<Key, Compare, Allocator> set2(set1);
+   ```
+
+3. **移动构造**： 使用另一个 set 的内容来构造新的 set，原 set 将变为空。
+
+   ```cpp
+   set<Key, Compare, Allocator> set1;
+   set<Key, Compare, Allocator> set3(std::move(set1));
+   ```
+
+4. **初始化列表构造**： 使用初始化列表来构造 std:: set。
+
+   ```cpp
+   set<Key, Compare, Allocator> set = {key1, key2, key3};
+   ```
+
+5. **范围构造**（C++23）： 使用给定范围的元素来构造 set。
+
+   ```cpp
+   initializer_list<Key> init_list = {key1, key2, key3};
+   set<Key, Compare, Allocator> set(init_list);
+   ```
+
+6. **按范围构造**（C++23）： 使用给定迭代器范围的元素来构造 set。
+
+   ```cpp
+   Key arr[] = {key1, key2, key3};
+   set<Key, Compare, Allocator> set(begin(arr), end(arr));
+   ```
+
+参数说明
+
+- **Key**：存储在 `std::set` 中的元素类型。
+- **Compare**（可选）：用于比较元素的函数对象，它接受两个参数并返回一个布尔值，指示第一个参数是否被认为小于第二个参数。默认情况下，使用 `std:: less <Key>`。
+- **Allocator**（可选）：用于管理内存分配和释放的分配器类型。默认情况下，使用 `std:: allocator <Key>`。
+
+`set` 的特征：
+
+1. **元素唯一性**：`set` 中的每个元素值必须是唯一的，不允许重复。
+2. **自动排序**：`set` 默认会根据元素的值进行升序排序。
+
+遍历 `set`：
+
+`std::set` 内部实现为二叉搜索树，可以通过以下方式遍历：
+
+1. **迭代器遍历**：使用迭代器遍历 `set` 中的每个元素。
+2. **范围 for 循环**：使用 C++11 的范围 for 循环遍历 `set`。
+
+```cpp
+for (auto &ele : set) {
+  cout << ele << " ";
+}
+
+auto it = set.begin();
+for(; it != set.end(); ++it) {
+  cout << *it << " ";
+}
+```
+
+### 查找
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmNDRQTHdybGhSQm1VcF92OVpZc0ZjQndxUmV3TFZXaC13UXQ0VnV0YWM2WFE_ZT1qaVRTYm4.gif)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRYnlBSmFqdHhCRHBaMmpaWDVndnNjQnBRS3JURlZzdnJOTlVxcXdvZTQybVE_ZT1QQUw2OW4.gif)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhckFIb2cweGF0THNJSXBjVnNwMjdvQmNjYXVaZUFjRzlwTi1FMmF0a3JiNVE_ZT1UVUZUb2E.gif)
+
+```cpp
+struct S {
+  int x;
+
+  S(int i) : x{i} {
+    cout << "S{" << i << "} ";
+  }
+
+  bool operator<(S const &s) const {
+    return x < s.x;
+  }
+};
+
+struct R {
+  int x;
+
+  R(int i) : x{i} {
+    cout << "R{" << i << "} ";
+  }
+
+  bool operator<(R const &r) const {
+    return x < r.x;
+  }
+};
+
+bool operator<(R const &r, int i) {
+  return r.x < i;
+}
+
+bool operator<(int i, R const &r) {
+  return i < r.x;
+}
+
+int main() {
+  set<int> t{3, 1, 4, 1, 5};
+  cout << t.count(1) << ", " << t.count(2) << ".\n";
+  // 1, 0.
+
+  set<S> s{3, 1, 4, 1, 5};
+  cout << ": " << s.count(1) << ", " << s.count(2) << ".\n";
+  // S{3} S{1} S{4} S{1} S{5} : S{1} 1, S{2} 0.
+  // 创建了两个临时对象 S{1} 和 S{2}。
+  // 比较函数对象默认为 less<S>，
+  // 它并非是透明的（没有 is_transparent 成员类型）。
+
+  set<R, less<>> r{3, 1, 4, 1, 5};
+  cout << ": " << r.count(1) << ", " << r.count(2) << ".\n";
+  // R{3} R{1} R{4} R{1} R{5} : 1, 0.
+  // C++14 异质查找；不会创建临时对象。
+  // 比较器 less<void> 预定义了 is_transparent。
+}
+```
+
+```cpp
+struct LightKey {
+  int x;
+};
+
+struct FatKey {
+  int x;
+  int data[1000]; // 大型数据块
+};
+
+// 如上详述，容器必须使用 std::less<>（或其他透明比较器）以访问这些重载。
+// 这包括标准重载，例如在 std::string 与 std::string_view 之间所用的比较。
+bool operator<(const FatKey &fk, const LightKey &lk) { return fk.x < lk.x; }
+
+bool operator<(const LightKey &lk, const FatKey &fk) { return lk.x < fk.x; }
+
+bool operator<(const FatKey &fk1, const FatKey &fk2) { return fk1.x < fk2.x; }
+
+int main() {
+  // 简单比较演示。
+  std::set<int> example{1, 2, 3, 4};
+
+  if (auto search = example.find(2); search != example.end())
+    std::cout << "找到了 " << (*search) << '\n';
+  else
+    std::cout << "未找到\n";
+  // 找到了 2
+
+  // 透明比较演示。
+  std::set<FatKey, std::less<>> example2 = {{1, {}}, {2, {}}, {3, {}}, {4, {}}};
+
+  LightKey lk = {2};
+  if (auto search = example2.find(lk); search != example2.end())
+    std::cout << "找到了 " << search->x << '\n';
+  else
+    std::cout << "未找到\n";
+  // 找到了 2
+}
+```
+
+```cpp
+std::set<int> example{1, 2, 3, 4};
+
+for (int x : {2, 5}) {
+  if (example.contains(x))
+    std::cout << x << ": 找到\n";
+  else
+    std::cout << x << ": 未找到\n";
+}
+```
+
+### `insert` 操作
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VkdHhfTTRlbmlwTmxoWlEzT2lYUTBnQnR5bFB0dHRMcFBNVXRLX2pXR3JXc3c_ZT1WS2lDcDk.gif)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXYWlXNHRJX1lKRmhLOU1WVDBlZTVVQlBMMzNUWUE2WXU0ZXM4RWZxcHZUMmc_ZT1yaDJnRE0.gif)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0ViYXhQT3I4cWZkSXJ3Tk1YakFZeWx3Ql9KUGxoREVkRzNmTW5kQ0JXWnV1VXc_ZT1zckdhUEY.gif)
+
+```cpp
+set<int> set;
+
+auto result_1 = set.insert(3);
+assert(result_1.first != set.end()); // 它是有效的迭代器
+assert(*result_1.first == 3);
+if (result_1.second)
+  cout << "插入完成\n";
+// 插入完成
+
+auto result_2 = set.insert(3);
+assert(result_2.first == result_1.first); // 相同的迭代器
+assert(*result_2.first == 3);
+if (!result_2.second)
+  cout << "未进行插入\n";
+// 未进行插入
+```
+
+### `erase` 删除操作
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VYTmpBZ0kzT0RwQW1DLWZxQWNQdlZrQjhSWXp0bHVEYWc3N1I4WnRERlVIRFE_ZT04WDBxTGM.gif)
+
+```cpp
+set<int> c = {1, 2, 3, 4, 1, 2, 3, 4};
+
+auto print = [&c] {
+  cout << "c = { ";
+  for (int n : c)
+    cout << n << ' ';
+  cout << "}\n";
+};
+print(); // c = { 1 2 3 4 }
+
+cout << "移除所有奇数：\n";
+for (auto it = c.begin(); it != c.end();) {
+  if (*it % 2 != 0)
+    it = c.erase(it);
+  else
+    ++it;
+}
+print(); // c = { 2 4 }
+
+cout << "移除 1，移除个数：" << c.erase(1) << '\n'; // 0
+cout << "移除 2，移除个数：" << c.erase(2) << '\n'; // 1
+cout << "移除 2，移除个数：" << c.erase(2) << '\n'; // 0
+print(); // c = { 4 }
+```
+
+### `set` 不支持下标
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRSWtoNWVPMGFKQ3N6dHpqNG9KampFQklRSXUybk05TGpOaGdSMjZhWGpOVmc_ZT1hSjhpRjM.gif)
+
+### `set` 不支持使用迭代器进行修改
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmcTJ3b3VNT1F4RWl4X2oyV09WUWRjQlVScEprZzFwcnhQQ0p5dUREb3A2eGc_ZT1jVU04ZEc.gif)
+
+### `set` 针对于自定义类型的写法
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VheTZVRVRxcGdkTnNlVEZSc19tQ1ZzQlZEMS1aNmIzR0NRc201UzFNbEQ0TGc_ZT1FdDhTUGk.gif)
+
+#### 模板的特化
+
+```cpp
+// 命名空间的扩展
+namespace std {
+template<>
+struct less<Point> { // 模板的特化
+  bool operator()(const Point &lhs, const Point &rhs) const {
+    // ....
+  }
+};
+}// end of namespace std
+```
+
+#### 运算符重载
+
+```cpp
+bool operator<(const Point &lhs, const Point &rhs) {
+	// ....
+}
+```
+
+#### 函数对象的形式
+
+```cpp
+struct ComparePoint {
+  bool operator()(const Point &lhs, const Point &rhs) const {
+  	// ...
+  }
+};
+```
+
+## `multiset` 的使用
+
+`multiset` 与 `set` 几乎一致，唯一不同点是 `multiset` 的 key 值是不唯一的，可以重复。
+
+`multiset` 的查找（`count`、`find`）、插入（`insert`）、删除（`erase`）与 `set` 基本一样。`multiset` 也不支持下标，也不支持使用迭代器进行修改。
+
+### `bound` 系列函数
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXUmRDeWRHSnRGQmxOcUFqOUZVSzhNQlN1NFpJQnpLaWwwZk5HMzRrWVlzbWc_ZT1uM0h2OVo.gif)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VkQ0FoZXlpZGxaQWtXZmN6MjQyUkFVQnhnbm4yOElhZi05YVltaXJSclhieFE_ZT1UdjBxWEw.gif)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTV0JzbzdUaFpKSmdxd3JBQjdxbDRzQnBwNVVPOTJoV0gyT0h1c0g2dTJKX2c_ZT1DYkI4UjA.gif)
+
+```cpp
+multiset<int> number = {1, 5, 9, 8, 6, 3, 2, 1, 4, 3, 3, 4, 3};
+auto it1 = number.lower_bound(3); // 返回第一个大于等于给定 key 值的迭代器
+cout << "*it1 = " << *it1 << endl; // *it1 = 3
+
+auto it2 = number.upper_bound(3); // 返回第一个大于给定 key 值的迭代器
+cout << "*it2 = " << *it2 << endl; // *it2 = 4
+
+while (it1 != it2) {
+  cout << *it1 << "  ";
+  ++it1;
+} // 3  3  3  3  
+cout << endl;
+
+pair<multiset<int>::iterator, multiset<int>::iterator> ret =
+  number.equal_range(3); // 返回的是一个迭代器返回，第一个迭代器指向是大于等于给定的 key 值的迭代器，第二个迭代器是大于给定 key 值的迭代器
+while (ret.first != ret.second) {
+  cout << *ret.first << "  ";
+  ++ret.first;
+} // 3  3  3  3  
+cout << endl;
+```
+
+### 针对于自定义类型的写法
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VURE4yd1p3cDN4R2dlVk9qeUctZUlNQlNmUTF6V0pLR01MMmZIejlhR081Z0E_ZT05elpwZ3A.gif)
+
+`multiset` 针对于自定义类型的写法与 `set` 完全一样，需要改写第二个模板参数 `Compare`，改写的方式依旧是三种：模板的特化、运算符的重载、函数对象的形式。
+
+## `map` 的使用
+
+`map` 存放的是 `key-value` 类型，`key` 值是唯一的，不能重复，`value` 没有要求是否唯一，默认按照关键字 `key` 进行升序排列，底层实现是红黑树。
+
+1. **默认构造**： 创建一个空的 `map`。
+
+   ```cpp
+   map<Key, T, Compare, Allocator> map;
+   ```
+
+2. **复制构造**： 使用另一个 `map` 的内容、比较函数和分配器来构造新的 `map`。
+
+   ```cpp
+   map<Key, T, Compare, Allocator> map1;
+   map1["key1"] = "value1";
+   map<Key, T, Compare, Allocator> map2(map1);
+   ```
+
+3. **移动构造**： 使用另一个 `map` 的内容来构造新的 `map`，原 `map` 将变为空。
+
+   ```cpp
+   map<Key, T, Compare, Allocator> map1;
+   map1["key1"] = "value1";
+   map<Key, T, Compare, Allocator> map2(std::move(map1));
+   ```
+
+4. **初始化列表构造**： 使用初始化列表来构造 `map`。
+
+   ```cpp
+   map<Key, T, Compare, Allocator> map = {{"key1", "value1"}, {"key2", "value2"}};
+   ```
+
+5. **范围构造**（C++11 及之后）： 使用给定迭代器范围的元素来构造 `map`。
+
+   ```cpp
+   std::pair<const Key, T> arr[] = {{"key1", "value1"}, {"key2", "value2"}};
+   map<Key, T, Compare, Allocator> map(begin(arr), end(arr));
+   ```
+
+6. **按范围构造**（C++23）： 使用给定迭代器范围的元素来构造 `map`。
+
+   ```cpp
+   std::pair<const Key, T> arr[] = {{"key1", "value1"}, {"key2", "value2"}};
+   map<Key, T, Compare, Allocator> map(begin(arr), end(arr));
+   ```
+
+参数说明：
+
+- **Key**：存储在 `map` 中的键的类型。  
+- **T**：存储在 `map` 中的值的类型。
+- **Compare**（可选）：用于比较键的函数对象，它接受两个参数并返回一个布尔值，指示第一个参数是否被认为小于第二个参数。默认情况下，使用 `less<Key>`。
+- **Allocator**（可选）：用于管理内存分配和释放的分配器类型。默认情况下，使用 `allocator<spair<const Key, T>>`。
+
+`map` 的特征：
+
+1. **元素唯一性**：`map` 中的每个键值必须是唯一的。如果插入了具有相同键值的元素，那么新元素的值不会替换现有元素的值，但新元素可能会覆盖老元素（取决于具体的插入操作和元素的比较函数）。
+2. **按键值排序**：`map` 默认按键值进行升序排序。
+
+注意事项：
+
+- `map` 不支持下标访问，因为它没有 `operator[]` 重载函数。
+- 可以通过 `first` 和 `second` 成员访问 `pair` 的内容。
+- 可以使用 `insert` 成员函数插入单个键值对，或者使用 `emplace` 函数就地构造键值对。
+
+### `map` 的查找操作
+
+#### 使用 `count` 函数
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VldzNBUi1BalA5UHZIbWRyZVVnd0xFQklJMjZzZktVbTlyMjdHal8xU0E2bWc_ZT1qT1Q5OWw.gif)
+
+`count` 函数用于检查是否存在与给定键相等的元素。它的返回值是一个 `size_type` 类型，如果找到元素则返回 `1`，如果没有找到则返回 `0`。
+
+```cpp
+#include <map>
+#include <iostream>
+
+int main() {
+  std::map<int, std::string> myMap;
+  myMap[1] = "apple";
+  myMap[2] = "banana";
+
+  if (myMap.count(1) > 0) {
+    std::cout << "Key 1 exists.\n";
+  } else {
+    std::cout << "Key 1 does not exist.\n";
+  }
+
+  if (myMap.count(3) > 0) {
+    std::cout << "Key 3 exists.\n";
+  } else {
+    std::cout << "Key 3 does not exist.\n";
+  }
+
+  return 0;
+}
+```
+
+#### 使用 `find` 函数
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVT3E3cTc4VFcxQmxoSE1faDMwT1RNQmRRdHpEYS15OFRaRUhkbzRBUEtpWXc_ZT0wZHNXU2Q.gif)
+
+`find` 函数用于查找具有特定键的元素。如果找到，它返回一个指向该元素的迭代器；如果没有找到，则返回一个指向 `end()` 的迭代器。
+
+```cpp
+#include <map>
+#include <iostream>
+
+int main() {
+  std::map<int, std::string> myMap;
+  myMap[1] = "apple";
+  myMap[2] = "banana";
+
+  auto it = myMap.find(1);
+  if (it != myMap.end()) {
+    std::cout << "Found key 1: " << it->second << "\n";
+  } else {
+    std::cout << "Key 1 not found.\n";
+  }
+
+  it = myMap.find(3);
+  if (it == myMap.end()) {
+    std::cout << "Key 3 not found.\n";
+  }
+
+  return 0;
+}
+```
+
+#### 使用 `[]` 操作符
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmZVAtRG9tYmUxS3BCajc2ZmY2cjdNQnctMXpBVzg2VjlTNUotYU9KVDhiNmc_ZT1QczJMa1U.gif)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUS09TamRnTEVCT3VzRjhPcFNlM3g4QmtQc20zbzEtUnhwUGsxdkxacmp4Snc_ZT03WXFwMzY.gif)
+
+虽然 `[]` 操作符不是查找操作，但它可以用来访问具有特定键的元素。如果元素不存在，它将创建一个新元素并初始化其值。
+
+**示例**:
+
+```cpp
+#include <map>
+#include <iostream>
+
+int main() {
+  map<int, std::string> myMap;
+  myMap[1] = "apple";
+
+  std::cout << myMap[1] << std::endl;  // Outputs: apple
+  std::cout << myMap[2] << std::endl;  // 创建一个新的元素，键为  2，默认值为空字符串
+
+  return 0;
+}
+```
+
+#### 使用 `at` 函数
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmZ1lDTzlTM3NWSnR0TlNYRWJseWdzQjRIRnltMmNWN1B0ZUdGWGozLVFvTXc_ZT1BY1JzRmU.gif)
+
+`at` 函数用于安全地访问具有特定键的元素。如果元素不存在，它会抛出一个 `std::out_of_range` 异常。
+
+```cpp
+#include <map>
+#include <iostream>
+#include <stdexcept>  // For std::out_of_range
+
+int main() {
+  map<int, std::string> myMap;
+  myMap[1] = "apple";
+
+  try {
+    std::cout << myMap.at(1) << std::endl;  // Outputs: apple
+    std::cout << myMap.at(2) << std::endl;  // Throws std::out_of_range
+  } catch (const std::out_of_range& e) {
+    std::cout << "Exception: " << e.what() << std::endl;
+  }
+
+  return 0;
+}
+```
+
+### `map` 的插入操作
+
+#### 插入单个元素
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZLWNqMXZfRV9GRG5aVW1Tc2VYZC1ZQll5QVVJWmZRNllRc1BQWGF0T3M2dGc_ZT1NTHlUcVI.gif)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWcVpXN2FndXBkS2tGWnJpcjZ4V3pvQmdnZV91UlcxQzdEM0RVQlNKZVQ1WlE_ZT0xaGRBSzk.gif)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaM3dvWXBwTFlaUHFlaElkZ01fMnlZQlZWc1lPRzFZM3dFaFZfM0JybEtrMGc_ZT1ISFdDek4.gif)
+
+使用 `insert` 成员函数可以插入单个元素。这个函数的返回值是一个 `std::pair`，其中第一个元素是指向插入元素的迭代器，第二个元素是一个布尔值，表示插入是否成功（如果元素已存在，则插入失败）。
+
+ `insert` 成员函数也可以插入多个元素，通过迭代器范围或初始化列表来完成。
+
+```cpp
+#include <iomanip>
+#include <iostream>
+#include <map>
+#include <string>
+
+using namespace std;
+
+template<typename It>
+void print_insertion_status(It it, bool success) {
+  cout << "插入 " << it->first << (success ? " 成功\n" : " 失败\n");
+}
+
+int main() {
+  map<string, float> heights;
+
+  // 重载 3：从右值引用插入
+  const auto [it_hinata, success] = heights.insert({"Hinata"s, 162.8});
+  print_insertion_status(it_hinata, success);
+  // 插入 Hinata 成功
+
+  {
+    // 重载 1：从左值引用插入
+    const auto [it, success2] = heights.insert(*it_hinata);
+    print_insertion_status(it, success2);
+    // 插入 Hinata 失败
+  }
+  {
+    // 重载 2：经由转发到 emplace 插入
+    const auto [it, success] = heights.insert({"Kageyama", 180.6});
+    print_insertion_status(it, success);
+    // 插入 Kageyama 成功
+  }
+  {
+    // 重载 6：带位置提示从右值引用插入
+    const size_t n = size(heights);
+    const auto it = heights.insert(it_hinata, {"Azumane"s, 184.7});
+    print_insertion_status(it, size(heights) != n);
+    // 插入 Azumane 成功
+  }
+  {
+    // 重载 4：带位置提示从左值引用插入
+    const size_t n = size(heights);
+    const auto it = heights.insert(it_hinata, *it_hinata);
+    print_insertion_status(it, size(heights) != n);
+    // 插入 Hinata 失败
+  }
+  {
+    // 重载 5：带位置提示经由转发到 emplace 插入
+    const size_t n = size(heights);
+    const auto it = heights.insert(it_hinata, {"Tsukishima", 188.3});
+    print_insertion_status(it, size(heights) != n);
+    // 插入 Tsukishima 成功
+  }
+
+  auto node_hinata = heights.extract(it_hinata);
+  map<string, float> heights2;
+
+  // 重载 7：从范围插入
+  heights2.insert(begin(heights), end(heights));
+
+  // 重载 8：从 initializer_list 插入
+  heights2.insert({{"Kozume"s, 169.2}, {"Kuroo", 187.7}});
+
+  // 重载 9：插入结点
+  const auto status = heights2.insert(move(node_hinata));
+  print_insertion_status(status.position, status.inserted);
+  // 插入 Hinata 成功
+
+  node_hinata = heights2.extract(status.position);
+  {
+    // 重载 10：插入结点带位置提示
+    const size_t n = size(heights2);
+    const auto it = heights2.insert(begin(heights2), move(node_hinata));
+    print_insertion_status(it, size(heights2) != n);
+    // 插入 Hinata 成功
+  }
+
+  // 打印结果 map
+  cout << left << '\n';
+  for (const auto &[name, height] : heights2)
+    cout << setw(10) << name << " | " << height << "cm\n";
+  // Azumane    | 184.7cm
+  // Hinata     | 162.8cm
+  // Kageyama   | 180.6cm
+  // Kozume     | 169.2cm
+  // Kuroo      | 187.7cm
+  // Tsukishima | 188.3cm
+}
+```
+
+#### 使用 `emplace` 函数
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSbTREUEgyVkhKS21IMms2ZzVlaHUwQnhCYlBOaDR4eGZVbzFvSjhvMTlJa0E_ZT1xQTZ0VzA.gif)
+
+`emplace` 函数用于就地构造元素，避免额外的复制或移动操作。
+
+```cpp
+#include <map>
+#include <iostream>
+#include <string>
+
+int main() {
+  std::map<int, std::string> number;
+  auto ret = number.emplace(7, "nanjing");
+
+  if (ret.second) {
+    std::cout << "该元素插入成功" << std::endl;
+    std::cout << ret.first->first << " : " << ret.first->second << std::endl;
+  } else {
+    std::cout << "该元素插入失败" << std::endl;
+  }
+  std::cout << std::endl;
+
+  return 0;
+}
+```
+
+### `map` 的下标操作
+
+1. 返回值： `operator[]` 返回对 `map` 中元素的引用，该元素是一个 `std::pair`，其中包含 `key` 和 `value`。
+2. 下标值代表键：在 `map` 中使用下标操作符时，提供的下标值实际上是键（key），而不是传统数组或向量中的索引。
+3. 插入新元素：如果键不存在于 `map` 中，`operator[]` 会插入一个新的键值对，其中键是下标操作符的参数，值是该值类型的默认值。
+4. 写操作：`operator[]` 允许对值进行写操作，即使键原本不存在于 `map` 中。这不会影响 `std::map` 的排序，因为排序只与键相关。
+
+```cpp
+map<int, string> myMap;
+
+// 访问已存在的键
+myMap[1] = "apple";
+
+// 访问不存在的键，插入新元素
+myMap[2] = "banana";
+
+// 修改已存在的元素
+myMap[1] = "green apple";
+
+// 访问新插入的元素
+cout << "Key 1: " << myMap[1] << endl; // 输出 "Key 1: green apple"
+cout << "Key 2: " << myMap[2] << endl; // 输出 "Key 2: banana"
+
+// 访问不存在的键，插入新元素，键为3，默认值为空字符串
+cout << "Key 3: " << myMap[3] << endl; // 输出 "Key 3: "（默认值）
+```
+
+元素类型：`map` 的元素是 `pair`，其中第一个元素是键（`key_type`），第二个元素是值（`value_type`）。键的类型必须支持比较操作以确保元素可以被排序。
+
+注意事项：
+
+- 使用 `operator[]` 时，如果键不存在，则会创建一个新的元素。这可能会导致不必要的性能开销，特别是在遍历键值时。
+- 如果需要检查键是否存在，应使用 `find` 方法或 `count` 方法，而不是直接使用 `operator[]`。
+- `map` 的下标访问运算符没有重载 `const` 版本。
+
+### 针对于自定义类型
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTRVY1LWgxRmlKUHA0RlNVZGR3TTZjQjZlWlRjVXU3al9Qd20yMGNuVTZDNlE_ZT0zRnRwYTg.gif)
+
+`map` 的模板参数中，第三个参数是 `Compare`，会针对 `Key` 类型进行比较，如果此时 `Key` 类型不能进行比较大小，那么就需要改写 `Compare`，改写的方式有三种：模板的特化、运算符重载、函数对象。但是如果 `Key` 类型可以进行比较大小，即使 `Key` 类型是自定义类型，也不需要改写 `Compare`，也就是与内置类型相似。
+
+## `multimap` 的使用
+
+`multimap` 存放的是 `key-value` 类型，`key` 值是不唯一的，可以重复，`value` 没有要求是否唯一，默认按照关键字 `key` 进行升序排列，底层实现是红黑树。
+
+`multimap` 的查找（`count`、`find`）、插入（`insert`）、删除（`erase`）与 `map` 基本一样。
+
+`multimap` 不支持下标访问，因为下标中传递的是 `key` 类型，而 `multimap` 的 `key` 是可以重复的，可能 `key`—样但是 `value` 不一样，就会出现二义性，所以就没有提供下标访问运算符。
+
+`multimap` 的模板参数中，第三个参数是 `Compare`，会针对 `Key` 类型进行比较，如果此时 `Key` 类型不能进行比较大小，那么就需要改写 `Compare`，改写的方式有三种：模板的特化、运算符重载、函数对象。但是如果 `Key` 类型可以进行比较大小，即使 `Key` 类型是自定义类型，也不需要改写 `Compare`，也就是与内置类型相似。
+

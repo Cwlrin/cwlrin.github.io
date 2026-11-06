@@ -1,0 +1,235 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import { t } from "@/i18n";
+
+const allPosts = await getCollection("posts");
+const postUrls = allPosts
+  .filter((post) => !post.data.draft && !post.data.encrypted)
+  .map((post) => `/posts/${post.id}/`);
+
+const pageTitle = t("random.title");
+const msgRedirecting = t("random.redirecting");
+const msgNoPost = t("random.noPost");
+const msgBackHome = t("common.home");
+const msgNoScript = t("random.noScript");
+---
+
+<Layout pageTitle={pageTitle}>
+  <Fragment slot="head">
+    <meta name="robots" content="noindex, nofollow" />
+  </Fragment>
+
+  <div
+    class="wrap random-page"
+    data-post-urls={JSON.stringify(postUrls)}
+    data-msg-no-post={msgNoPost}
+  >
+    <div class="random-card" id="random-card">
+      <div class="icon-wrap" id="icon-wrap">
+        <span class="icon-spin" id="icon-spin">
+          <i class="i-ri-shuffle-line"></i>
+        </span>
+      </div>
+      <p class="msg" id="msg">{msgRedirecting}</p>
+      <a class="home-link hidden" id="home-link" href="/">{msgBackHome}</a>
+
+      <noscript>
+        <div class="noscript-tip">
+          <p>{msgNoScript}</p>
+          <a class="home-link" href="/">{msgBackHome}</a>
+        </div>
+      </noscript>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const randomPageElement = document.querySelector<HTMLElement>(".random-page");
+  const postUrlsRaw = randomPageElement?.dataset.postUrls ?? "[]";
+  const msgNoPost = randomPageElement?.dataset.msgNoPost ?? "暂无可跳转文章";
+
+  let postUrls: string[] = [];
+  try {
+    const parsed = JSON.parse(postUrlsRaw) as unknown;
+    if (Array.isArray(parsed)) {
+      postUrls = parsed.filter((url): url is string => typeof url === "string");
+    }
+  } catch {
+    postUrls = [];
+  }
+
+  let hasRedirected = false;
+
+  function pickRandom() {
+    if (hasRedirected) {
+      return;
+    }
+
+    if (!postUrls || postUrls.length === 0) {
+      showNoPost();
+      return;
+    }
+
+    const targetUrl = postUrls[Math.floor(Math.random() * postUrls.length)];
+    if (!targetUrl) {
+      showNoPost();
+      return;
+    }
+
+    hasRedirected = true;
+    window.location.replace(targetUrl);
+  }
+
+  function showNoPost() {
+    const iconSpin = document.querySelector("#icon-spin");
+    const msg = document.querySelector("#msg");
+    const card = document.querySelector("#random-card");
+    const homeLink = document.querySelector("#home-link");
+
+    if (iconSpin) {
+      (iconSpin as HTMLElement).style.animation = "none";
+      const icon = iconSpin.querySelector("i");
+      if (icon) {
+        icon.className = "i-ri-inbox-line";
+      }
+    }
+    if (msg) {
+      msg.textContent = msgNoPost;
+    }
+    if (card) {
+      card.classList.add("no-post");
+    }
+    if (homeLink) {
+      homeLink.classList.remove("hidden");
+    }
+  }
+
+  function handlePageReady() {
+    pickRandom();
+  }
+
+  document.addEventListener("DOMContentLoaded", handlePageReady, {
+    once: true,
+  });
+  document.addEventListener("astro:page-load", handlePageReady);
+
+  if (document.readyState !== "loading") {
+    handlePageReady();
+  }
+</script>
+
+<style>
+  .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 16rem;
+    padding: 2rem 1.5rem;
+  }
+
+  .random-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2.5rem 3rem;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, var(--grey-0), var(--grey-1));
+    border: 1px solid var(--grey-2);
+    box-shadow: 0 0.6rem 1.5rem var(--box-bg-shadow);
+    max-width: 22rem;
+    width: 100%;
+  }
+
+  .icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: linear-gradient(
+      135deg,
+      var(--color-blue),
+      var(--color-purple, var(--color-blue))
+    );
+    box-shadow: 0 0.25rem 0.75rem
+      color-mix(in srgb, var(--color-blue) 35%, transparent);
+  }
+
+  .icon-spin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: spin 1.2s linear infinite;
+    font-size: 1.75rem;
+    color: oklch(1 0 0);
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .msg {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--grey-6);
+    text-align: center;
+  }
+
+  .home-link {
+    margin-top: 0.25rem;
+    padding: 0.45rem 1.25rem;
+    border: 1px solid var(--grey-3);
+    border-radius: 2rem;
+    color: var(--grey-6);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition:
+      border-color 0.2s,
+      color 0.2s,
+      background 0.2s;
+  }
+
+  .home-link:hover {
+    border-color: var(--color-blue);
+    color: var(--color-blue);
+    background: color-mix(in srgb, var(--color-blue) 8%, transparent);
+  }
+
+  .home-link.hidden {
+    display: none;
+  }
+
+  .noscript-tip {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .noscript-tip p {
+    margin: 0;
+    color: var(--grey-6);
+    text-align: center;
+    line-height: 1.7;
+  }
+
+  .random-card.no-post .icon-wrap {
+    background: var(--grey-2);
+    box-shadow: none;
+  }
+
+  @media (max-width: 480px) {
+    .random-card {
+      padding: 2rem 1.5rem;
+    }
+  }
+</style>

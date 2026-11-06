@@ -1,0 +1,417 @@
+{
+  "version": 1,
+  "generatedAt": "2026-08-26T08:59:18.939Z",
+  "source": "content.config.ts",
+  "collections": [
+    {
+      "name": "posts",
+      "dir": "src/posts",
+      "pattern": "**/*.{md,mdx}",
+      "extensions": [".md", ".mdx"],
+      "contentKind": "content",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "x-hyacine-hint": "YYYY-MM-DD 或 ISO 时间"
+          },
+          "updated": {
+            "type": "string",
+            "format": "date-time",
+            "x-hyacine-hint": "YYYY-MM-DD 或 ISO 时间"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "categories": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "draft": {
+            "type": "boolean"
+          },
+          "cover": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "sticky": {
+            "type": "boolean"
+          },
+          "license": {
+            "type": "string",
+            "enum": [
+              "CC-BY-4.0",
+              "CC-BY-SA-4.0",
+              "CC-BY-ND-4.0",
+              "CC-BY-NC-4.0",
+              "CC-BY-NC-SA-4.0",
+              "CC-BY-NC-ND-4.0",
+              "NOREPRINT"
+            ]
+          },
+          "encrypted": {
+            "default": false,
+            "type": "boolean"
+          },
+          "password": {
+            "type": "string"
+          },
+          "ai_summary": {
+            "type": "string"
+          },
+          "ai_model": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "summaryModel": {
+            "type": "string"
+          },
+          "ai": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "object",
+                "properties": {
+                  "summary": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "model": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "generatedAt": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "embed": {
+                "type": "object",
+                "properties": {
+                  "present": {
+                    "type": "boolean"
+                  },
+                  "model": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "generatedAt": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "similarPosts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "slug": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "score": {
+                      "type": "number"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "cover": {
+                      "type": "string"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "date": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["slug", "title", "score"]
+                }
+              }
+            }
+          },
+          "similarPosts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "slug": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "score": {
+                  "type": "number"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "cover": {
+                  "type": "string"
+                },
+                "category": {
+                  "type": "string"
+                },
+                "date": {
+                  "type": "string"
+                }
+              },
+              "required": ["slug", "title", "score"]
+            }
+          },
+          "$schema": {
+            "type": "string"
+          }
+        },
+        "required": ["title", "date"]
+      },
+      "ui": {
+        "fields": [
+          {
+            "key": "title",
+            "kind": "string",
+            "required": true,
+            "hasDefault": false
+          },
+          {
+            "key": "description",
+            "kind": "string",
+            "required": false,
+            "hasDefault": false
+          },
+          {
+            "key": "date",
+            "kind": "date",
+            "required": true,
+            "hasDefault": false
+          },
+          {
+            "key": "updated",
+            "kind": "date",
+            "required": false,
+            "hasDefault": false
+          },
+          {
+            "key": "tags",
+            "kind": "string[]",
+            "required": false,
+            "hasDefault": false
+          },
+          {
+            "key": "categories",
+            "kind": "string[]",
+            "required": false,
+            "hasDefault": false
+          },
+          {
+            "key": "draft",
+            "kind": "boolean",
+            "required": false,
+            "hasDefault": false
+          },
+          {
+            "key": "cover",
+            "kind": "string",
+            "required": false,
+            "hasDefault": false,
+            "image": true
+          },
+          {
+            "key": "sticky",
+            "kind": "boolean",
+            "required": false,
+            "hasDefault": false
+          },
+          {
+            "key": "license",
+            "kind": "enum",
+            "required": false,
+            "hasDefault": false,
+            "values": [
+              "CC-BY-4.0",
+              "CC-BY-SA-4.0",
+              "CC-BY-ND-4.0",
+              "CC-BY-NC-4.0",
+              "CC-BY-NC-SA-4.0",
+              "CC-BY-NC-ND-4.0",
+              "NOREPRINT"
+            ]
+          },
+          {
+            "key": "encrypted",
+            "kind": "boolean",
+            "required": false,
+            "hasDefault": true
+          },
+          {
+            "key": "password",
+            "kind": "string",
+            "required": false,
+            "hasDefault": false,
+            "secret": true
+          },
+          {
+            "key": "ai_summary",
+            "kind": "string",
+            "required": false,
+            "hasDefault": false
+          },
+          {
+            "key": "ai_model",
+            "kind": "string",
+            "required": false,
+            "hasDefault": false
+          },
+          {
+            "key": "summary",
+            "kind": "string",
+            "required": false,
+            "hasDefault": false
+          },
+          {
+            "key": "summaryModel",
+            "kind": "string",
+            "required": false,
+            "hasDefault": false
+          },
+          {
+            "key": "ai",
+            "kind": "object",
+            "required": false,
+            "hasDefault": false
+          },
+          {
+            "key": "similarPosts",
+            "kind": "unknown[]",
+            "required": false,
+            "hasDefault": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "moments",
+      "dir": "src/moments",
+      "pattern": "**/*.{md,mdx}",
+      "extensions": [".md", ".mdx"],
+      "contentKind": "content",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "x-hyacine-hint": "YYYY-MM-DD 或 ISO 时间"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "$schema": {
+            "type": "string"
+          }
+        },
+        "required": ["date"]
+      },
+      "ui": {
+        "fields": [
+          {
+            "key": "date",
+            "kind": "date",
+            "required": true,
+            "hasDefault": false
+          },
+          {
+            "key": "images",
+            "kind": "string[]",
+            "required": false,
+            "hasDefault": false,
+            "image": true
+          }
+        ]
+      }
+    }
+  ],
+  "warnings": []
+}

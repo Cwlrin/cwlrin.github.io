@@ -1,0 +1,11 @@
+---
+interface Props {
+  type?: "primary" | "info" | "success" | "warning" | "danger" | "default";
+}
+
+const { type = "primary" }: Props = Astro.props;
+---
+
+<mark class={`highlight ${type}`.trim()}>
+  <slot />
+</mark>

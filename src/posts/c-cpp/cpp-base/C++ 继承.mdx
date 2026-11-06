@@ -1,0 +1,1297 @@
+---
+title: "C++ 继承"
+date: 2020-11-22T17:15:11+08:00
+categories: ["C 与 C++", "C++ 基础"]
+tags: ["C++"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVOWJOV1VibHNWRmswNUltSDZVZmRrQk9Tc3NRVndGNzctUXppcnZSUmdoN1E_ZT1BM094NWQ.png"
+---
+
+## 继承
+
+### 继承的基本概念
+
+在 C++中，继承是一种重要的面向对象编程特性，它允许我们建立类之间的层次关系，实现代码的重用和扩展。
+
+继承的概念：
+
+- **基类（父类）**：被继承的类称为基类，它定义了可以被其他类继承的属性和方法。
+- **派生类（子类）**：从基类继承而来的类称为派生类，它继承了基类的属性和方法，并可以添加自己的属性和方法。
+
+在派生类的定义中，需要在类名前指定继承方式和基类名。
+
+```cpp
+class 基类 {
+    // ...
+};
+
+class 派生类 : public 基类 {
+    // ...
+};
+```
+
+C++ 支持三种继承方式：
+
+1. **public 继承**：基类的公有成员和保护成员在派生类中保持原有的访问属性。
+2. **protected 继承**：基类的公有成员和保护成员在派生类中都变为保护成员。
+3. **private 继承**：基类的公有成员和保护成员在派生类中都变为私有成员。
+
+![image-20231031212558160.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTUFlKazlzemZ4S3AwNmFKQldfNWQ0Qk1jRXdaWGR1dDZnWGppQldFRG9MaFE_ZT1oSkNMdHI.png)
+
+派生类的定义过程：
+
+1. **吸收基类成员**：派生类自动继承基类的公有成员和保护成员。
+2. **添加新成员**（可选）：派生类可以添加自己的成员变量和成员函数。
+3. **隐藏基类成员**（可选）：派生类可以隐藏基类的某些成员，通过定义同名的成员或使用 `using` 声明来显式引入基类的成员。
+
+```cpp
+class Point {
+public:
+    Point(int x, int y) : _x(x), _y(y) {}
+    virtual void print() const { cout << _x << ", " << _y << endl; }
+protected:
+    int _x, _y;
+};
+
+class Point3D : public Point {
+public:
+    Point3D(int x, int y, int z) : Point(x, y), _z(z) {
+        cout << "Point3D(int, int, int)" << endl;
+    }
+
+    void display() const {  // 添加新的成员函数
+        print();
+        cout << _z << endl;
+    }
+private:
+    int _z;  // 添加新的数据成员
+};
+```
+
+在这个例子中，`Point3D` 继承了 `Point` 类，并添加了一个新的数据成员 `_z` 和一个新的成员函数 `display()`。
+
+如果一个派生类只定义了继承关系而没有添加任何自己的内容，这种派生类被称为空派生类。空派生类通常用于建立潜在的扩展点。
+
+```cpp
+class EmptyDerived : public Base {
+    // 没有任何成员
+};
+```
+
+在这种情况下，`EmptyDerived` 类仍然会吸收 `Base` 类的所有成员。
+
+### 三种继承方式的访问权限
+
+#### 三种继承方式的访问权限总结
+
+1. **公有继承（public）**：
+   - 基类的公有成员和保护成员在派生类中保持原有的访问属性。
+   - 派生类对象可以访问基类中的公有成员。
+
+2. **保护继承（protected）**：
+   - 基类的公有成员和保护成员在派生类中都变为保护成员。
+   - 派生类对象和其他类都不能直接访问基类的公有成员和保护成员。
+
+3. **私有继承（private）**：
+   - 基类的公有成员和保护成员在派生类中都变为私有成员。
+   - 派生类对象和其他类都不能直接访问基类的任何成员。
+
+**记忆技巧**：
+
+1. 私有成员在类外无法直接访问。
+2. 继承方式和基类成员访问权限做交集。
+
+#### 保护继承与私有继承的区别
+
+保护继承和私有继承的主要区别在于对后续派生类的影响
+
+- **保护继承**：允许后续派生类访问基类的公有和保护成员，但这些成员在后续派生类中都是保护成员。
+- **私有继承**：导致后续派生类无法访问基类的任何成员（除了通过特定的访问函数）。
+
+考虑一个三层继承的例子，可以更清楚地看到保护继承和私有继承的区别：
+
+```cpp
+class A {
+ public:
+  int a;
+};
+
+class B : protected A {};
+
+class C : private B {
+  void func() {
+    a; // 错误，无法访问 a
+  }
+};
+```
+
+在这个例子中：
+
+- `B` 通过保护继承 `A`，因此 `B` 可以访问 `A` 的公有和保护成员，但它们在 `B` 中都是保护成员。
+- `C` 通过私有继承 `B`，因此 `C` 无法访问 `A` 的任何成员。
+
+#### 多层继承的影响
+
+在多层继承中，私有继承会阻断对更上层基类成员的访问：
+
+```cpp
+class A {
+ public:
+  int a;
+};
+
+class B : private A {
+};
+
+class C : public B {
+  void func() {
+    a; // 错误，无法访问a
+  }
+};
+```
+
+在这个例子中，由于 `B` 通过私有继承 `A`，`C` 无法访问 `A` 的任何成员。
+
+#### 继承访问权限 QA
+
+##### Q1：派生类在类之外对于基类成员的访问限制
+
+在派生类外部，通过派生类的对象访问基类成员时，只有通过公有继承获得的基类公有成员可以被直接访问。其他成员（无论是保护继承还是私有继承得到的公有成员或保护成员）都不能被外部直接访问。
+
+**示例**：
+
+```cpp
+class Base {
+ public:
+  int publicMember;
+ protected:
+  int protectedMember;
+ private:
+  int privateMember;
+};
+
+class Derived : public Base {
+  // 继承方式不影响类外的访问权限
+};
+
+int main() {
+  Derived d;
+  d.publicMember = 10; // 正确，公有成员可以直接访问
+  // d.protectedMember = 10; // 错误，保护成员无法在类外访问
+  // d.privateMember = 10;   // 错误，私有成员无法在类外访问
+  return 0;
+}
+```
+
+##### Q2：派生类在类内部对于基类成员的访问限制
+
+在派生类内部，可以访问基类的公有成员和保护成员，但不能访问基类的私有成员，无论继承方式是什么。
+
+**示例**：
+
+```cpp
+class Base {
+ public:
+  int publicMember;
+ protected:
+  int protectedMember;
+ private:
+  int privateMember;
+};
+
+class Derived : protected Base {
+ public:
+  void accessMembers() {
+    publicMember = 10; // 正确，公有成员可以在派生类内部访问
+    protectedMember = 10; // 正确，保护成员也可以在派生类内部访问
+    // privateMember = 10; // 错误，私有成员不能在派生类内部访问
+  }
+};
+
+```
+
+##### Q3：保护继承和私有继承的区别
+
+保护继承和私有继承的主要区别在于对后续派生类的影响：
+
+- **保护继承**：允许后续派生类访问当前派生类的基类成员（无论是公有成员还是保护成员），但这些成员在后续派生类中都是保护成员。
+- **私有继承**：阻断了后续派生类对当前派生类基类成员的访问，即后续派生类无法访问当前派生类的基类成员。
+
+**示例**：
+
+```cpp
+class Base {
+ public:
+  int publicMember;
+ protected:
+  int protectedMember;
+};
+
+class MiddleProtected : protected Base {
+  // 中间类，保护继承
+};
+
+class DerivedProtected : public MiddleProtected {
+ public:
+  int access() {
+    return publicMember + protectedMember; // 正确，可以访问
+  }
+};
+
+class MiddlePrivate : private Base {
+  // 中间类，私有继承
+};
+
+class DerivedPrivate : public MiddlePrivate {
+ public:
+  int access() {
+    // return publicMember; // 错误，无法访问
+    return 0;
+  }
+};
+```
+
+在这个例子中，`DerivedProtected` 可以访问 `Base` 的成员，因为它的中间类 `MiddleProtected` 使用了保护继承。而 `DerivedPrivate` 无法访问 `Base` 的成员，因为它的中间类 `MiddlePrivate` 使用了私有继承。
+
+### 继承关系的局限性
+
+创建和销毁方式不能被继承
+
+- **构造函数**：派生类必须自己定义构造函数来初始化其新增的成员，基类的构造函数不能自动用于派生类的成员初始化。
+- **析构函数**：虽然派生类的析构函数可以调用基类的析构函数，但它不能从基类继承。析构函数用于清理工作，通常需要针对每个类单独定义。
+
+**示例**：
+
+```cpp
+class Base {
+ public:
+  Base() { /* ... */ }
+  ~Base() { /* ... */ }
+};
+
+class Derived : public Base {
+ public:
+  Derived() { /* 必须初始化Derived的成员 */ }
+  ~Derived() { /* 必须显式调用Base的析构函数 */ }
+};
+```
+
+赋值控制方式不能被继承
+
+- **拷贝构造函数**：派生类必须定义自己的拷贝构造函数来处理所有成员的拷贝，包括继承的成员。
+- **赋值运算符**：派生类的赋值运算符也需要自己定义，以确保深拷贝的正确实现。
+
+**示例**：
+
+```cpp
+class Base {
+ public:
+  Base &operator=(const Base &) { /* ... */ return *this; }
+};
+
+class Derived : public Base {
+ public:
+  Derived &operator=(const Derived &other) {
+    // 必须处理Derived的成员
+    return *this;
+  }
+};
+```
+
+空间分配方式不能被继承
+
+- **`operator new` 和 `operator delete`**：这些运算符用于对象的内存分配和释放，但不能通过继承获得。派生类需要自己定义这些运算符。
+
+**示例**：
+
+```cpp
+class Base {
+ public:
+  void *operator new(size_t size) { /* ... */ }
+  void operator delete(void *ptr) { /* ... */ }
+};
+
+class Derived : public Base {
+  // Derived继承自Base，但没有继承Base的operator new/delete
+};
+```
+
+友元不能被继承
+
+- **友元函数**：友元关系不能通过继承获得。如果派生类需要访问基类的保护成员或私有成员，需要在派生类中重新声明友元。
+
+**示例**：
+
+```cpp
+class Base {
+  friend void func(Base &);
+};
+
+class Derived : public Base {
+  // func不是Derived的友元
+};
+```
+
+## 单继承下派生类对象的创建和销毁
+
+### 简单的单继承结构
+
+#### 构造派生类对象的过程
+
+有这样一种说法：创建派生类对象时，先调用基类构造函数，再调用派生类构造函数，对吗？
+
+创建派生类对象时，确实会先调用基类的构造函数，但这个过程是在派生类构造函数的上下文中进行的。准确地说，派生类的构造函数首先被调用，然后它会调用基类的构造函数来初始化从基类继承的部分。
+
+1. **自动调用基类构造函数**：
+   
+   如果派生类构造函数没有显式调用基类构造函数，编译器会自动调用基类的默认无参构造函数（如果存在）或者所有参数都有默认值的构造函数。
+   
+   ![undefined202403181523373.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUSHpDdm1JNlRCQm5tbS14T3VROXdZQlFGSkplQXVYb2hvYllCRVNCZHpxTkE_ZT1LVVhGZWY.png)
+
+**示例代码**：
+
+```cpp
+class Base {
+ public:
+  Base() { cout << "Base()" << endl; }
+ private:
+  long _base;
+};
+
+class Derived : public Base {
+ public:
+  Derived(long derived)
+    : _derived(derived) { 
+      cout << "Derived(long)" << endl; 
+    }   
+
+  long _derived;
+};
+
+void test() {
+  Derived d(1);  // 自动调用 Base() 构造函数
+}
+```
+
+2. **基类无默认构造函数的情况**：
+   
+   如果基类没有默认无参构造函数，并且派生类没有在初始化列表中显式调用基类构造函数，编译器会报错，因为基类的部分没有被正确初始化。
+
+**示例代码**：
+
+```cpp
+class Base {
+ public:
+  Base(long base) { cout << "Base(long)" << endl; }
+ private:
+  long _base;
+};
+
+class Derived : public Base {
+ public:
+  Derived(long base, long derived) // 错误
+    : _derived(derived) { 
+      cout << "Derived(long)" << endl; 
+    }
+ private:   
+  long _derived;
+};
+```
+
+3. **显式调用非默认基类构造函数**：
+   
+   如果需要使用基类的非默认构造函数，派生类必须在构造函数的初始化列表中显式调用基类的构造函数。
+
+**示例代码**：
+
+```cpp
+class Base {
+ public:
+  Base(long base) { cout << "Base(long)" << endl; }
+ private:
+  long _base;
+};
+
+class Derived : public Base {
+ public:
+  Derived(long base, long derived)
+    : Base(base), _derived(derived) { 
+      cout << "Derived(long)" << endl; 
+    }
+ private:   
+  long _derived;
+};
+
+void test() {
+  Derived d(10, 20);  // 显式调用 Base(10)
+}
+```
+
+#### 派生类对象的销毁过程
+
+当派生类对象的生命周期结束时，首先调用派生类的析构函数，然后自动调用基类的析构函数。这个过程确保了对象的资源被适当地释放。
+
+![image-20240617144336542.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRNkNSdTE3cDBkT3JsVXpBVU0yRjBJQlZ5LTEyZnNmaEFqNmJ0YjJXUzlJSEE_ZT01bDE2ekM.png)
+
+**示例代码**：
+
+```cpp
+class Base {
+ public:
+  Base() { cout << "Base()" << endl; }
+  ~Base() { cout << "~Base()" << endl; }
+  private:
+  long _base;
+};
+
+class Derived : public Base {
+ public:
+  Derived(long derived)
+    : _derived(derived) { 
+      cout << "Derived(long)" << endl; 
+    }
+  ~Derived() { cout << "~Derived()" << endl; }
+
+  long _derived;
+};
+
+void test() {
+  Derived d(1);
+  // 输出顺序: Derived(long), Base(), ~Derived(), ~Base()
+}
+```
+
+- **构造顺序**：派生类构造函数先被调用，然后它在初始化列表中调用基类的构造函数。
+- **析构顺序**：派生类析构函数先被调用，然后是基类的析构函数。
+- **构造函数调用**：如果需要调用基类的特定构造函数，需要在派生类的初始化列表中显式调用。
+
+### 派生类包含对象成员时的构造和析构过程
+
+#### 派生类构造函数的书写规则
+
+在派生类的构造函数中：
+
+1. **基类的构造**：通过基类名调用基类的构造函数。
+2. **成员对象的构造**：通过成员对象名调用成员对象的构造函数。
+3. **成员变量的构造**：可以在初始化列表中直接初始化成员变量。
+
+**示例代码**：
+
+```cpp
+class Base {
+ public:
+  Base(long base) : _base(base) { cout << "Base()" << endl; }
+  ~Base() { cout << "~Base()" << endl; }
+ private:
+  long _base;
+};
+
+class Test {
+ public:
+  Test(long test) : _test(test) { cout << "Test()" << endl; }
+  ~Test() { cout << "~Test()" << endl; }
+ private:
+  long _test;
+};
+
+class Derived : public Base {
+ public:
+  Derived(long base, long test, long b2, long derived)
+    : Base(base), // 基类构造
+  _derived(derived), // 成员变量
+  _t1(test), // 成员对象构造
+  _b2(b2) // 成员变量
+  { cout << "Derived()" << endl; }
+
+  ~Derived() { cout << "~Derived()" << endl; }
+ private:
+  long _derived;
+  Test _t1;
+  long _b2;
+};
+```
+
+#### 派生类构造和析构的顺序
+
+1. **构造顺序**：
+   - 基类的构造函数首先被调用。
+   - 接着是成员对象的构造函数，按照它们在类中声明的顺序。
+   - 然后是成员变量的初始化（如果有）。
+
+2. **析构顺序**：
+   - 成员对象的析构函数首先被调用，按照它们声明的逆序。
+   - 然后是基类的析构函数。
+   
+   ![undefined202403181558960.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWaHRWTXFhNlZCUHR0NWJITEdIeklFQjBRdmFMa2xVeE1uZHJVaTl2UktOa3c_ZT04N0xUeTA.png)
+
+**示例析构过程**：
+
+```cpp
+void test() {
+  Derived d(1, 2, 3, 4);
+}  // 输出顺序: Base(), Test(), Derived(), ~Derived(), ~Test(), ~Base()
+```
+
+#### 扩展：添加另一个基类对象成员
+
+如果派生类中再添加一个基类的对象成员，构造函数的初始化列表中也需要添加对应的初始化。
+
+![image-20240502180126273.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZeHdwMzdCeFp4SGxKQnhkUnJGNHZVQjBKeDlKaXo2MkJVTXhIVjkyeFdfRHc_ZT0wcm03dnU.png)
+
+**示例代码**：
+
+```cpp
+class AnotherBase {
+ public:
+  AnotherBase(double value) : _value(value) {
+    cout << "AnotherBase()" << endl;
+  }
+  ~AnotherBase() {
+    cout << "~AnotherBase()" << endl;
+
+    private:
+    double _value;
+  };
+
+  class Derived : public Base {
+   public:
+    Derived(long base, long test, double value, long derived)
+        : Base(base),
+          _anotherBase(value),
+          _derived(derived),
+          _t1(test) {
+      cout << "Derived()" << endl;
+    }
+
+    ~Derived() {
+      cout << "~Derived()" << endl;
+    }
+   private:
+    long _derived;
+    Test _t1;
+    AnotherBase _anotherBase;
+  };
+}
+```
+
+- **构造顺序**：基类构造函数 → 成员对象构造函数（按声明顺序）→ 成员变量初始化。
+- **析构顺序**：成员对象析构函数（按声明逆序）→ 基类析构函数。
+
+如果 Base/Test/Derived 都有自己的指针成员，申请了堆空间，那么对于堆空间的回收顺序如图
+
+![image-20240527151845077.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlUUtEX2NlT0lSSm54YmUxM2gyS2hRQkR3UWxqT0Y4eTBhWHhmNWxxaEpZc0E_ZT1nQzU1S2E.png)
+
+### 对基类成员的隐藏
+
+#### 基类数据成员的隐藏
+
+如果派生类声明了与基类同名的数据成员，这将导致基类的该数据成员在派生类中被隐藏。这种情况下，派生类对象无法直接通过成员名访问被隐藏的基类数据成员。
+
+```cpp
+class Base {
+ public:
+  Base(long x) : _base(x) {
+    cout << "Base()" << endl;
+  }
+
+  long _data = 100;  // 基类数据成员
+  private:
+  long _base;
+};
+
+class Derived : public Base {
+ public:
+  Derived(long base, long derived)
+    : Base(base), _derived(derived) {
+      cout << "Derived()" << endl;
+    }
+
+  long _data = 19;  // 与基类数据成员同名，隐藏基类_data
+ private:
+  long _derived;
+};
+
+void test() {
+  Derived dd(1, 2);
+  cout << dd._data << endl;  // 访问派生类的_data
+  cout << dd.Base::_data << endl;  // 访问基类的_data
+}
+```
+
+输出结果
+
+```
+Base()
+Derived()
+19
+100
+```
+
+隐藏基类数据成员并不改变基类数据成员本身，它们在内存中仍然是独立的。派生类对象中仍然包含基类子对象，每个子对象拥有自己的数据成员。
+
+![image-20240527155050502.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTOVNwRnVHclRwTXZmMmNyeUNqNUFzQldmWDFOOWFuVmRZWjJJRFdQVDVqYWc_ZT1mUDNtYUw.png)
+
+如果确实需要访问被隐藏的基类数据成员，可以通过作用域分辨符（`Base::_data`）来访问。但这种做法通常不推荐，因为它违反了面向对象的封装原则，使得代码的维护性和可读性变差。
+
+#### 基类成员函数的隐藏
+
+如果派生类声明了与基类同名的成员函数，即使参数列表不同，派生类的函数也会隐藏基类的同名函数。这意味着通过派生类对象直接调用该名称的函数时，调用的是派生类中定义的版本。
+
+```cpp
+class Base {
+ public:
+  Base(long base) : _base(base), _data(100) {
+    cout << "Base()" << endl;
+  }
+
+  void print() const {
+    cout << "Base::_base: " << _base << endl;
+    cout << "Base::_data: " << _data << endl;
+  }
+
+ private:
+  long _base;
+  protected:
+  long _data;
+};
+
+class Derived : public Base {
+ public:
+  Derived(long base, long derived) : Base(base), _derived(derived) {
+    cout << "Derived()" << endl;
+  }
+
+  void print(int x) const {  // 隐藏了基类的 print 函数
+    cout << "Derived::_derived: " << _derived << endl;
+    cout << "Derived::_data: " << _data << endl;
+  }
+
+ private:
+  long _derived;
+ protected:
+  long _data = 19;
+};
+
+void test() {
+  Derived dd(1, 2);
+  dd.print(10);  // 调用 Derived 的 print 函数
+  // dd.print();  // 错误，无法直接调用 Base 的 print 函数
+  cout << dd._data << endl;  // 访问 Derived 的 _data
+  cout << dd.Base::_data << endl;  // 访问 Base 的 _data
+}
+```
+
+输出结果
+
+```
+Base()
+Derived()
+Derived::_derived: 2
+Derived::_data: 19
+19
+100
+```
+
+隐藏机制：
+
+- **函数隐藏**：只要派生类中定义了一个与基类中成员函数同名的函数，不管参数列表是否相同，都会隐藏基类的同名函数。
+- **作用域解析**：如果确实需要调用基类的隐藏函数，可以通过作用域解析运算符（`Base::print()`）来调用，但这种做法通常不推荐，因为它违反了面向对象的封装和抽象原则。
+
+## 多继承
+
+多重继承在 C++ 中允许一个类从多个基类继承属性和方法。这可以模拟现实世界中一个对象具有多重身份或功能的情况。
+
+### 多重继承及其构造和析构过程
+
+多重继承提供了一种方式，允许一个类同时获得多个基类的特性。这在面向对象设计中很有用，特别是当你需要表示一个具有多个来源或多种行为的对象时。
+
+多重继承的定义方式：在多重继承中，一个类可以公有、保护或私有地从多个基类继承。
+
+**示例代码**：
+
+```cpp
+class A {
+ public:
+  A() { cout << "A()" << endl; }
+  ~A() { cout << "~A()" << endl; }
+  void print() const {
+    cout << "A::print()" << endl;
+  }
+};
+
+class B {
+ public:
+  B() { cout << "B()" << endl; }
+  ~B() { cout << "~B()" << endl; }
+  void show() const {
+    cout << "B::show()" << endl;
+  }
+};
+
+class C {
+ public:
+  C() { cout << "C()" << endl; }
+  ~C() { cout << "~C()" << endl; }
+  void display() const {
+    cout << "C::display()" << endl;
+  }
+};
+
+// D 类公有继承了 A 类，但是对 B/C 类采用的默认的继承方式是 private
+class D : public A, B, C {
+ public:
+  D() { cout << "D()" << endl; }
+  ~D() { cout << "~D()" << endl; }
+};
+```
+
+在这个例子中，`D` 类从 `A`、`B` 和 `C` 类多重继承。
+
+**构造过程**：
+
+- 首先调用派生类 `D` 的构造函数。
+- 按照继承的声明顺序依次调用 `A`、`B`、`C` 的构造函数。
+
+**析构过程**：
+
+- 首先调用派生类 `D` 的析构函数。
+- 按照继承声明顺序的逆序依次调用 `A`、`B`、`C` 的析构函数。
+
+调用顺序：
+
+**构造顺序**：`A()` -> `B()` -> `C()` -> `D()`
+
+**析构顺序**：`~D()` -> `~C()` -> `~B()` -> `~A()`
+
+![undefined202403181648182.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUeVVLYW1XSG5WR29BNjgzb2tuZ3Q4QlNwdUJYRGV6M3dYWGNob3E1QmJPTGc_ZT1ic25qNmM.png)
+
+### 多重继承可能引发的问题
+
+#### 成员名访问冲突的二义性
+
+多重继承中，如果两个或多个基类都有相同名称的成员，那么在派生类中访问这些成员时可能会出现二义性问题。这是因为派生类对象不清楚应该访问哪一个基类的成员。
+
+![image-20231102131820080.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWUzBYN3lwajJwTml3aEU3ZWJ1bGJNQjdyLXQ3bVlGS0lBekJQZnItMmFoVlE_ZT1hTldEb2s.png)
+
+1. **使用类作用域**：可以通过指定基类作用域来解决二义性问题。这是一种直接的方法，但通常不推荐，因为它违反了面向对象的封装原则，并且使得代码难以理解和维护。
+
+**示例代码**：
+
+```cpp
+class A {
+ public:
+  void print() const { cout << "A::print()" << endl; }
+};
+
+class B {
+ public:
+  void print() const { cout << "B::print()" << endl; }
+};
+
+class C : public A, public B {
+ public:
+  // C 继承了 A 和 B，A 和 B 都有一个 print 函数，这里存在二义性
+  void print() const {  // 隐藏了 A 和 B 的 print 函数
+    cout << "C::print()" << endl;
+  }
+};
+
+void test(const C &c) {
+  c.A::print(); // 明确指出要调用 A 的 print 函数
+  c.B::print(); // 明确指出要调用 B 的 print 函数
+  c.print();   // 调用 C 自己的 print 函数，没有二义性
+}
+```
+
+2. **在派生类中定义同名成员**：如果在派生类中声明了与基类同名的成员，则基类的这些成员将被隐藏。这样，派生类对象可以直接通过成员名进行访问，而不会访问到被隐藏的基类成员。
+
+**示例代码**：
+
+```cpp
+class A {
+ public:
+  void print() const { cout << "A::print()" << endl; }
+};
+
+class B {
+ public:
+  void print() const { cout << "B::print()" << endl; }
+};
+
+class D : public A, public B {
+ public:
+  // D 类中声明了与 A 和 B 类同名的 print 函数，隐藏了 A 和 B 的 print 函数
+  void print() const { cout << "D::print()" << endl; }
+};
+
+void test(const D& d) {
+  d.A::print(); // 明确指出要调用 A 的 print 函数
+  d.B::print(); // 明确指出要调用 B 的 print 函数
+  d.print();   // 调用 D 自己的 print 函数，没有二义性
+}
+```
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVUFM3cXlsaXJoT2hkVVZQNzdRNG5jQk8tNWRHYUJkRU9SUFV5Slp2YWF0QVE_ZT1peU9WU2U.png)
+
+#### 存储二义性的问题
+
+菱形继承是指一个派生类从两个基类派生，而这两个基类又都从同一个基类派生的情况。这种结构在多重继承中很常见，但也引入了复杂性和二义性问题。
+
+在菱形继承结构中，派生类的对象会包含多个基类子对象，导致存储和访问上的二义性：
+
+1. **存储二义性**：派生类对象中包含多个基类实例，造成资源浪费。
+2. **访问二义性**：编译器不清楚应该访问哪个基类的成员。
+
+**示例代码**：
+
+```cpp
+class A {
+ public:
+  void print() const { cout << "A::print()" << endl; }
+  double _a;
+};
+
+class B : public A {
+ public:
+  double _b;
+};
+
+class C : public A {
+ public:
+  double _c;
+};
+
+class D : public B, public C {
+ public:
+  double _d;
+};
+```
+
+![image-20240527162944430.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VkMmZwUkczRndkTHBIU2EwMjlWNjlBQjhWTmhPSmJqbW4tVk5SbzI1aUhRckE_ZT1hdjVrTGk.png)
+
+![image-20231102161311201.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUam50VEFQRFVsRG9wVDZTd1JCUXhvQkFCZ0NrY2JXSFJGeDI4NWtTVXRBWGc_ZT12aWNDRzU.png)
+
+菱形继承情况下，D 类对象的创建会生成一个 B 类子对象，其中包含一个 A 类子对象；还会生成一个 C 类子对象，其中也包含一个 A 类子对象。所以 D 类对象的内存布局中有多个 A 类子对象，访问继承自 A 的成员时会发生二义性（无论是否涉及 A 类的数据成员，单纯访问 A 类的成员函数也会冲突）
+
+为了解决菱形继承问题，C++ 提供了 **虚拟继承**（虚继承）机制，它确保基类只有一个共享实例。
+
+**虚拟继承**：使用 `virtual` 关键字，基类被作为虚基类被继承，保证只有一个共享实例。
+
+![image-20231102162110832.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRQ2hSd2prNFYxRHRKX01Wb1hKMVVzQmdjV0Noem1UYmFoV21YUVM1dkozc3c_ZT1KS2JzRXk.png)
+
+**示例代码**：
+
+```cpp
+class A {
+ public:
+  void print() const { cout << "A::print()" << endl; }
+  double _a;
+};
+
+class B : virtual public A {
+ public:
+  double _b;
+};
+
+class C : virtual public A {
+ public:
+  double _c;
+};
+
+class D : public B, public C {
+  public:
+  double _d;
+};
+```
+
+使用虚拟继承后，B 类和 C 类的内存布局中会包含一个虚基类指针（vbptr），指向共享的 A 类实例。这样，D 类对象中只包含一份 A 类的实例。
+
+![image-20231102162130028.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWaTVVWFpTcDlkQmc4RTNRZ29XdGc4QmpSbzFpRHBjNDl6TW5qREp1VzBLSFE_ZT1LTE56ZFQ.png)
+
+## 基类与派生类之间的转换
+
+**一般情况下，基类对象占据的空间小于派生类对象。**（空继承时，有可能相等）
+
+1：可否用一个基类对象给一个派生类对象赋值？可否用一个派生类对象给一个基类对象赋值？
+
+2：可否将一个基类指针指向一个派生类对象？可否将一个派生类指针指向一个基类对象？
+
+3：可否将一个基类引用绑定一个派生类对象？可否将一个派生类引用绑定一个基类对象？
+
+### 派生类向基类转换
+
+#### 派生类向基类转换和类型转换安全性
+
+在 C++ 中，类型转换可以分为两种：向上转型（upcasting）和向下转型（downcasting）。
+
+##### 向上转型
+
+向上转型是指将派生类对象转换为基类对象的过程。由于派生类包含基类的全部属性和方法（尽管可能添加了新的属性和方法），所以向上转型是安全的，可以直接进行。
+
+**示例代码**：
+
+```cpp
+class Base {
+ public:
+  Base(long base) : _base(base) {}
+  void display() { cout << "Base::display() " << _base << endl; }
+
+  long _base;
+};
+
+class Derived : public Base {
+ public:
+  Derived(long base, long derived) : Base(base), _derived(derived) {}
+  void display() { cout << "Derived::display() " << _derived << endl; }
+
+  long _derived;
+};
+
+int main() {
+  Base base(1);
+  Derived d1(2, 5);
+
+  // 向上转型
+  base = d1; // 将 Derived 对象赋值给 Base 对象，用基类对象接受派生类对象的赋值，ok
+  Base *pbase = &d1; // Base 指针指向 Derived 对象，用基类指针指向派生类对象，ok
+  Base &rbase = d1; // Base 引用绑定 Derived 对象，用基类引用绑定派生类对象，ok
+
+  // 这些向上转型的操作都是安全的
+  return 0;
+}
+```
+
+##### 向下转型
+
+向下转型是指将基类对象转换为派生类对象的过程。这种转换可能是不安全的，因为基类对象可能并不是从派生类对象派生而来的，所以直接向下转型会导致错误。
+
+**示例代码**：
+
+```cpp
+int main() {
+    Base base(1);
+    Derived d1(2, 5);
+
+    // 尝试向下转型
+    Derived d2 = base; // 错误：Base 对象赋值给 Derived 对象
+    Derived *pderived = &base; // 错误：Derived 指针指向 Base 对象
+    Derived &rderived = base; // 错误：Derived 引用绑定 Base 对象
+
+    // 这些向下转型的操作都是不安全的
+    return 0;
+}
+```
+
+为什么向上转型安全而向下转型不安全？
+
+- **向上转型**：派生类对象包含了基类对象的全部属性和方法，因此将派生类对象视为基类对象是安全的。
+- **向下转型**：基类对象不包含派生类的额外属性和方法，因此将基类对象视为派生类对象可能导致访问不存在的属性和方法。
+
+![image-20231102164339873.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmS2VtdDNEdlMxSnBDamhRZnlJVjU4Qk1aYlNjUmZxdzJWejRBRkZ4QU5lNWc_ZT1SMFJnZHA.png)
+
+`Base` 类的指针指向 `Derived` 类的对象，`d1` 对象中存在一个 `Base` 类的基类子对象，这个 `Base` 类指针所能操纵只有继承自 `Base` 类的部分；
+
+Derived 类的指针指向 Base 对象，除了操纵 Base 对象的空间，还需要操纵一片空间，只能是非法空间，所以会报错。
+
+可以通过尝试调用基类指针指向派生类对象时被隐藏的成员函数来验证这一点。基类指针只能调用基类定义的函数，不能调用派生类的新增或覆盖函数。
+
+基类对象和派生类对象之间的转换没有太大的意义，因为基类对象并不包含派生类的额外信息。重要的是要掌握基类指针指向派生类对象（基类引用绑定派生类对象）的概念，其共同特点是只能访问基类的部分。
+
+### 基类向派生类转换
+
+在 C++ 中，将基类对象转换为派生类对象的过程称为向下转型。与向上转型不同，向下转型可能会失败，因为基类对象可能并不是从特定的派生类派生而来的。
+
+![image-20240527181643868.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlME13dmdTR0gxSmxJODlJclVjMV9nQjlvanhWWlptOWZjT1pnc0V4UWl0ekE_ZT1UYzVGdEQ.png)
+
+示例代码：
+
+```cpp
+class Base {
+ public:
+  Base(long base) : _base(base) {}
+
+  virtual void display() {
+    cout << "Base::display() " << _base << endl;
+  }
+
+  long _base;
+};
+
+class Derived : public Base {
+ public:
+  Derived(long base, long derived) : Base(base), _derived(derived) {}
+
+  void display() override {
+    cout << "Derived::display() " << _derived << endl;
+  }
+
+  long _derived;
+};
+```
+
+#### C 语言风格的转换
+
+C 语言风格的转换使用强制类型转换，它不会检查转换的安全性。
+
+**示例代码**：
+
+```cpp
+void test() {
+  Base base;
+  Derived d1;
+  Base *pbase = &d1;
+  Derived *pderived = (Derived *)pbase; // C 风格的转换，不安全
+
+  pderived->display(); // 可能会调用到不正确的函数
+}
+```
+
+这种转换方式不安全，因为它不会检查转换的有效性，可能会导致未定义行为。
+
+#### C++ 风格的转换
+
+C++提供了几种类型的转换运算符，其中 `dynamic_cast` 用于向下转型时的安全性检查。
+
+1. **`static_cast`**：用于向上转型和非多态类型的向下转型。
+2. **`dynamic_cast`**：用于多态类型的向下转型，并进行运行时检查。
+
+**示例代码**：
+
+```cpp
+void test() {
+  Base base(1);
+  Derived d1(2, 5);
+  Base *pbase = &d1;
+
+  // 向下转型
+  Derived *pd = dynamic_cast<Derived*>(pbase);
+  if (pd) {
+    cout << "转换成功" << endl;
+    pd->display();
+  } else {
+    cout << "转换失败" << endl;
+  }
+}
+```
+
+在这个例子中，`dynamic_cast` 成功将 `Base` 类型的指针转换为 `Derived` 类型的指针，因为 `pbase` 实际上指向一个 `Derived` 对象。
+
+如果转换不合理，`dynamic_cast` 会返回 `nullptr`。
+
+可以用派生类对象赋值给基类对象（用基类对象接受派生类对象的赋值），可以用基类指针指向派生类对象，可以用基类引用绑定派生类对象。
+
+## 派生类对象间的复制控制
+
+复制控制涉及到拷贝构造函数和赋值运算符函数。
+
+复制控制的原则：
+
+1. **基类和派生类部分要单独处理**：在派生类的复制控制函数中，需要分别处理派生类和基类部分的复制。
+2. **显式定义复制控制函数**：如果派生类定义了自己的复制控制函数，需要显式调用基类的复制控制函数。
+
+![image-20231102172052112.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWc0RuVVBRWG9WUHBDTmpCZTY3MFpZQkRSbjhrZlNlUUVYaVRDQWFjSEVyUGc_ZT1DMml4c0Y.png)
+
+派生类复制控制的两种情况
+
+1. **未显式定义复制控制函数**：
+   - 如果派生类没有显式定义复制控制函数，编译器会自动生成默认的拷贝构造函数和赋值运算符函数。
+   - 这些默认生成的函数会自动完成基类部分的复制。
+
+2. **显式定义复制控制函数**：
+   - 如果派生类显式定义了自己的复制控制函数，那么需要在这些函数中显式调用基类的复制控制函数。
+   - 否则，基类部分可能无法正确复制。
+
+示例代码：
+
+```cpp
+class Base {
+ public:
+  Base(long base) : _base(base) {}
+  Base(const Base &rhs) : _base(rhs._base) {
+    cout << "Base(Base &)" << endl;
+  }
+  Base &operator=(const Base &rhs) {
+    _base = rhs._base;
+    cout << "Base = Base &" << endl;
+    return *this;
+  }
+ protected:
+  long _base;
+};
+
+class Derived : public Base {
+ public:
+  Derived(long base, long derived)
+    : Base(base), // 手动调用基类的构造函数
+  _derived(derived) {}
+
+  Derived(const Derived &rhs)
+    : Base(rhs), // 显式调用基类的拷贝构造
+  _derived(rhs._derived) {
+    cout << "Derived(Derived &)" << endl;
+  }
+
+  Derived &operator=(const Derived &rhs) {
+    Base::operator=(rhs);  // 显式调用基类的赋值运算符
+    _derived = rhs._derived;
+    cout << "Derived = Derived &" << endl;
+    return *this;
+  }
+ private:
+  long _derived;
+};
+```
+
+派生类复制控制的注意事项：
+
+- **基类无参构造函数**：如果基类没有无参构造函数，且派生类没有显式调用基类的拷贝构造函数，编译器会报错。
+- **赋值运算符函数**：如果派生类定义了自己的赋值运算符函数，需要显式调用基类的赋值运算符函数，以确保基类部分正确赋值。
+- **堆空间管理**：如果派生类或基类的数据成员申请了堆空间，必须手动定义复制控制函数，并在其中正确管理堆空间的复制。
+
+### 派生类的拷贝构造函数
+
+在 C++ 中，派生类的拷贝构造函数需要特别注意基类和派生类部分的正确复制。如果派生类中包含动态分配的资源（如 `char*` 成员），则必须确保这些资源在拷贝时也能正确复制。
+
+浅拷贝问题：
+
+如果派生类没有显式定义拷贝构造函数，那么基类部分会完成正确的复制，但派生类部分只能完成浅拷贝。这可能导致资源泄漏或 double free 等问题。（三合成原则）
+
+**示例代码**：
+
+```cpp
+class Derived : public Base {
+ public:
+  Derived(long base, long derived, char* str)
+    : Base(base), _derived(derived), _str(str) {}
+
+  // 假设没有显式定义拷贝构造函数和赋值运算符函数
+ private:
+  long _derived;
+  char* _str;
+};
+
+void test() {
+  Derived d1(1, 2, new char[10]);
+  Derived d2 = d1; // 浅拷贝，d1 和 d2 都指向同一个 char 数组
+}
+```
+
+在上面的代码中，`d2` 的拷贝构造没有正确处理 `_str` 成员，导致 `d1` 和 `d2` 都指向同一个 `char` 数组，这可能导致 double free 问题。
+
+![image-20231102205721348.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0ViSU9PNy1WSXBGSG5LcGZoUTBjT293QldRaUVVYXUyNFRHYU9Xa29pYjZ3aEE_ZT1ZbjNWYVY.png)
+
+如果接下来给 Derived 类显式定义了拷贝构造，但是没有在这个拷贝构造中显式调用基类的拷贝构造（没有写任何的基类子对象的创建语句），会直接报错。（在派生类的构造函数的初始化列表中没有显式调用基类的任何的构造函数，编译器会自动调用基类的无参构造，此时基类没有无参构造，所以报错）
+
+为了确保派生类对象的正确复制，需要在派生类中显式定义拷贝构造函数，并在其中显式调用基类的拷贝构造函数。
+
+![image-20231103100603636.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VScHljcVZRcUx0SW5LTTBycXdNNUNjQnF3WWoxa2NCYjlheFNjaUdXYlVidEE_ZT10ZTJ6UTY.png)
+
+**示例代码**：
+
+```cpp
+class Base {
+ public:
+  Base(long base) : _base(base) {}
+  Base(const Base& rhs) : _base(rhs._base) {}
+
+  long _base;
+};
+
+class Derived : public Base {
+ public:
+  Derived(long base, long derived, char* str)
+    : Base(base), _derived(derived), _str(str) {}
+
+  Derived(const Derived& rhs)
+    : Base(rhs), // 显式调用基类的拷贝构造函数
+  _derived(rhs._derived),
+  _str(rhs._str ? new char[strlen(rhs._str) + 1] : nullptr) {
+    strcpy(_str, rhs._str ? rhs._str : "");
+    cout << "Derived(const Derived&)" << endl;
+  }
+
+  ~Derived() {
+    delete[] _str;
+  }
+ private:
+  long _derived;
+  char* _str;
+};
+```
+
+在这个例子中，`Derived` 的拷贝构造函数显式调用了 `Base` 的拷贝构造函数，并正确处理了 `_str` 成员的深拷贝。
+
+### 派生类的赋值运算符函数
+
+如果派生类中有动态分配的资源或独特的成员，需要在赋值运算符函数中显式调用基类的赋值运算符函数，以确保基类部分也得到正确处理。
+
+如果派生类的赋值运算符函数没有显式调用基类的赋值运算符函数，那么基类部分不会自动完成赋值，可能导致资源泄漏或不一致的状态。
+
+**示例代码**：
+
+```cpp
+class Base {
+ public:
+  Base(long base) : _base(base) {}
+  long _base;
+};
+
+class Derived : public Base {
+ public:
+  Derived(const char* str) : _str(str) {}
+
+  Derived &operator=(const Derived &rhs) {
+    // 错误示例：没有调用基类的赋值运算符
+    _str = rhs._str;  // 假设_str是char数组
+    return *this;
+  }
+
+ private:
+  char* _str;
+};
+```
+
+在上面的代码中，如果 `Derived` 对象通过赋值运算符进行赋值操作，基类的 `_base` 成员不会被正确赋值。
+
+![image-20231103101127183.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUZ0tnS3RhWVZwQnNTeUQ5SEx0R29BQldqNHpIckR2bUNlQlBUQWhXMmZXZ2c_ZT1la21FaDU.png)
+
+在派生类的赋值运算符函数中，应该首先检查自赋值，然后显式调用基类的赋值运算符函数，最后处理派生类成员的赋值。
+
+![image-20231103101238353.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VldkFmRHc3bENKRHVOZVA0bnpjdERrQjlwSTlPTjJPcmcwMUlRTXB4NDNVWkE_ZT11cjRpeDA.png)
+
+**示例代码**：
+
+```cpp
+class Derived : public Base {
+public:
+    Derived(const char* str) : Base(0), _str(str ? new char[strlen(str) + 1] : nullptr) {
+        if (_str) strcpy(_str, str);
+    }
+    
+    ~Derived() {
+        delete[] _str;
+    }
+
+    Derived &operator=(const Derived &rhs) {
+        if (this != &rhs) {
+            // 显式调用基类的赋值运算符
+            Base::operator=(rhs);
+
+            // 派生类成员的赋值
+            delete[] _str;
+            if (rhs._str) {
+                _str = new char[strlen(rhs._str) + 1];
+                strcpy(_str, rhs._str);
+            } else {
+                _str = nullptr;
+            }
+        }
+        return *this;
+    }
+
+private:
+    char* _str;
+};
+```
+
+在这个例子中，赋值运算符函数首先调用了基类 `Base` 的赋值运算符函数，确保基类部分得到正确处理。然后，它释放派生类原有的资源，并根据需要重新分配和复制资源。
+

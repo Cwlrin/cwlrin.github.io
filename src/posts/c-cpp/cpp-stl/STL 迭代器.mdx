@@ -1,0 +1,394 @@
+---
+title: "STL 迭代器"
+date: 2021-04-10T23:02:54+08:00
+categories: ["C 与 C++", "STL 基础"]
+tags: ["C++", "STL"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VieXNMVTJzYm10QW5qeng4UTA2TnAwQlVtNnd3cUNYRHhHV19qTnZadWh4bVE_ZT1EQnhtbHg.jpg"
+---
+
+## 迭代器的基本概念 
+
+迭代器（iterator）模式又称为游标（Cursor）模式，用于提供一种方法顺序访问一个聚合对象中各个元素, 而又不需暴露该对象的内部表示。
+
+或者这样说可能更容易理解：Iterator 模式是运用于聚合对象的一种模式，通过运用该模式，使得我们可以在不知道对象内部表示的情况下，按照一定顺序（由 iterator 提供的方法）访问聚合对象中的各个元素。
+
+## 迭代器产生原因
+
+Iterator 类的访问方式就是把不同集合类的访问逻辑抽象出来，使得不用暴露集合内部的结构而达到循环遍历集合的效果。
+
+## 迭代器的类型
+
+输入迭代器(InputIterator)、输出迭代器(OutputIterator)、前向迭代器(ForwardIterator)、双向迭代器 (BidirectionalIterator)、随机访问迭代器(RandomAccessIterator)。
+
+每个迭代器类型对应的操作如下：
+
+| 类别           | 输出 (output) | 输入 (input) | 前向 (Forward) | 双向 (Bidirection) | 随机 (Random)   |
+| -------------- | ------------- | ------------ | -------------- | ------------------ | --------------- |
+| 读 (read)      |            | `=*p`       | `= *p`          | `=*p`              | `=*p`           |
+| 访问 (access)  |             | `->`         | `->`           | `->`               | `->[]`       |
+| 写 (write)     | `*p=`         |           | `*p=`          | `*p=`              | `*p=`          |
+| 选代 (select)  | `++`          | `++`         | `++`           | `++`/`--`          | `++`/`--`/`+`/`-`/`+=`/`--` |
+| 比较 (compare) |          | `==`/`!=`    | `==`/`!=`      | `==`/`!=`/`<`/`>`/`<=`/`> =` | `==`/`!=`/`<`/`>`/`<=`/`>=` |
+
+五种迭代器之间的关系图：
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VjWmd6Yy1KSkFwR2xEbzA4NzVCcEpzQkU3NDdLUmY1T0V0ZmxUZHh1NVBDd2c_ZT1iNm1zNWU.png)
+
+## 为什么定义这么多迭代器 
+
+物尽其用，使得具体的操作使用具体类型的迭代器，避免迭代器的功能太大或者太小，导致使用起来不方便。
+
+每个容器及其对应的迭代器的类型图表如下：
+
+| 容器类型             | 类内迭代器类别 |
+| -------------------- | -------------- |
+| `vector`             | 随机访问迭代器 |
+| `deque`              | 随机访问迭代器 |
+| `list`               | 双向迭代器     |
+| `set`                | 双向迭代器     |
+| `multiset`           | 双向迭代器     |
+| `map`                | 双向迭代器     |
+| `multimap`           | 双向迭代器     |
+| `unordered_set`      | 前向迭代器     |
+| `unordered_multiset` | 前向迭代器     |
+| `unordered_map`      | 前向迭代器     |
+| `unordered_multimap` | 前向迭代器     |
+
+## 流迭代器
+
+流迭代器是特殊的迭代器，可以将输入/输出流作为容器看待（因为输入输出都有缓冲区的概念）。因此，任何接受迭代器参数的算法都可以和流一起工作。
+
+### `ostream_iterator` 的使用
+
+```C++
+/**
+   *  @brief  Provides output iterator semantics for streams.
+   *
+   *  This class provides an iterator to write to an ostream.  The type Tp is
+   *  the only type written by this iterator and there must be an
+   *  operator<<(Tp) defined.
+   *
+   *  @tparam  _Tp  The type to write to the ostream.
+   *  @tparam  _CharT  The ostream char_type.
+   *  @tparam  _Traits  The ostream char_traits.
+  */
+template<typename _Tp, typename _CharT = char,
+    typename _Traits = char_traits<_CharT> >
+class ostream_iterator
+    : public iterator<output_iterator_tag, void, void, void, void> {
+ public:
+  ///@{
+  /// Public typedef
+#if __cplusplus > 201703L
+  using difference_type = ptrdiff_t;
+#endif
+  typedef _CharT char_type;
+  typedef _Traits traits_type;
+  typedef basic_ostream<_CharT, _Traits> ostream_type;
+  ///@}
+
+ private:
+  ostream_type *_M_stream;
+  const _CharT *_M_string;
+
+ public:
+#if __cplusplus > 201703L
+
+  constexpr ostream_iterator() noexcept
+      : _M_stream(nullptr), _M_string(nullptr) {}
+
+#endif
+
+  /// Construct from an ostream.
+  ostream_iterator(ostream_type &__s)
+      : _M_stream(std::__addressof(__s)), _M_string(0) {}
+
+  /**
+   *  Construct from an ostream.
+   *
+   *  The delimiter string @a c is written to the stream after every Tp
+   *  written to the stream.  The delimiter is not copied, and thus must
+   *  not be destroyed while this iterator is in use.
+   *
+   *  @param  __s  Underlying ostream to write to.
+   *  @param  __c  CharT delimiter string to insert.
+  */
+  ostream_iterator(ostream_type &__s, const _CharT *__c)
+      : _M_stream(std::__addressof(__s)), _M_string(__c) {}
+
+  /// Copy constructor.
+  ostream_iterator(const ostream_iterator &__obj)
+      : _M_stream(__obj._M_stream), _M_string(__obj._M_string) {}
+
+#if __cplusplus >= 201103L
+
+  ostream_iterator &operator=(const ostream_iterator &) = default;
+
+#endif
+
+  /// Writes @a value to underlying ostream using operator<<.  If
+  /// constructed with delimiter string, writes delimiter to ostream.
+  ostream_iterator &
+  operator=(const _Tp &__value) {
+    __glibcxx_requires_cond(_M_stream != 0,
+                            _M_message(__gnu_debug::__msg_output_ostream)
+                                ._M_iterator(*this));
+    *_M_stream << __value;
+    if (_M_string)
+      *_M_stream << _M_string;
+    return *this;
+  }
+
+  ostream_iterator &
+  operator*() { return *this; }
+
+  ostream_iterator &
+  operator++() { return *this; }
+
+  ostream_iterator &
+  operator++(int) { return *this; }
+};
+```
+
+### `istream_iterator` 的使用
+
+```C++
+/**
+ * @addtogroup iterators
+ * @{
+ */
+
+/// Provides input iterator semantics for streams.
+template<typename _Tp, typename _CharT = char,
+    typename _Traits = char_traits<_CharT>, typename _Dist = ptrdiff_t>
+class istream_iterator
+    : public iterator<input_iterator_tag, _Tp, _Dist, const _Tp *, const _Tp &> {
+ public:
+  typedef _CharT char_type;
+  typedef _Traits traits_type;
+  typedef basic_istream<_CharT, _Traits> istream_type;
+
+ private:
+  istream_type *_M_stream;
+  _Tp _M_value;
+  // This bool becomes false at end-of-stream. It should be sufficient to
+  // check _M_stream != nullptr instead, but historically we did not set
+  // _M_stream to null when reaching the end, so we need to keep this flag.
+  bool _M_ok;
+
+ public:
+  ///  Construct end of input stream iterator.
+  _GLIBCXX_CONSTEXPR istream_iterator()
+      : _M_stream(0), _M_value(), _M_ok(false) {}
+
+  ///  Construct start of input stream iterator.
+  istream_iterator(istream_type &__s)
+      : _M_stream(std::__addressof(__s)), _M_ok(true) { _M_read(); }
+
+  istream_iterator(const istream_iterator &__obj)
+      : _M_stream(__obj._M_stream), _M_value(__obj._M_value),
+        _M_ok(__obj._M_ok) {}
+
+#if __cplusplus > 201703L && __cpp_lib_concepts
+  constexpr
+      istream_iterator(default_sentinel_t)
+      noexcept(is_nothrow_default_constructible_v<_Tp>)
+      : istream_iterator() { }
+#endif
+
+#if __cplusplus >= 201103L
+
+  istream_iterator &operator=(const istream_iterator &) = default;
+
+  ~istream_iterator() = default;
+
+#endif
+
+  const _Tp &
+  operator*() const {
+    __glibcxx_requires_cond(_M_ok,
+                            _M_message(__gnu_debug::__msg_deref_istream)
+                                ._M_iterator(*this));
+    return _M_value;
+  }
+
+  const _Tp *
+  operator->() const { return std::__addressof((operator*())); }
+
+  istream_iterator &
+  operator++() {
+    __glibcxx_requires_cond(_M_ok,
+                            _M_message(__gnu_debug::__msg_inc_istream)
+                                ._M_iterator(*this));
+    _M_read();
+    return *this;
+  }
+
+  istream_iterator
+  operator++(int) {
+    __glibcxx_requires_cond(_M_ok,
+                            _M_message(__gnu_debug::__msg_inc_istream)
+                                ._M_iterator(*this));
+    istream_iterator __tmp = *this;
+    _M_read();
+    return __tmp;
+  }
+
+ private:
+  bool
+  _M_equal(const istream_iterator &__x) const {
+    // Ideally this would just return _M_stream == __x._M_stream,
+    // but code compiled with old versions never sets _M_stream to null.
+    return (_M_ok == __x._M_ok) && (!_M_ok || _M_stream == __x._M_stream);
+  }
+
+  void
+  _M_read() {
+    if (_M_stream && !(*_M_stream >> _M_value)) {
+      _M_stream = 0;
+      _M_ok = false;
+    }
+  }
+
+  /// Return true if the iterators refer to the same stream,
+  /// or are both at end-of-stream.
+  friend bool
+  operator==(const istream_iterator &__x, const istream_iterator &__y) { return __x._M_equal(__y); }
+
+  /// Return true if the iterators refer to different streams,
+  /// or if one is at end-of-stream and the other is not.
+  friend bool
+  operator!=(const istream_iterator &__x, const istream_iterator &__y) { return !__x._M_equal(__y); }
+
+#if __cplusplus > 201703L && __cpp_lib_concepts
+  friend bool
+      operator==(const istream_iterator& __i, default_sentinel_t)
+      { return !__i._M_stream; }
+#endif
+};
+```
+
+`back_insert_iterator` 类的源码
+
+```C++
+// 24.4.2.2.1 back_insert_iterator
+/**
+ *  @brief  Turns assignment into insertion.
+ *
+ *  These are output iterators, constructed from a container-of-T.
+ *  Assigning a T to the iterator appends it to the container using
+ *  push_back.
+ *
+ *  Tip:  Using the back_inserter function to create these iterators can
+ *  save typing.
+*/
+template<typename _Container>
+class back_insert_iterator
+    : public iterator<output_iterator_tag, void, void, void, void> {
+ protected:
+  _Container *container;
+
+ public:
+  /// A nested typedef for the type of whatever container you used.
+  typedef _Container container_type;
+#if __cplusplus > 201703L
+  using difference_type = ptrdiff_t;
+
+  constexpr back_insert_iterator() noexcept: container(nullptr) {}
+
+#endif
+
+  /// The only way to create this %iterator is with a container.
+  explicit _GLIBCXX20_CONSTEXPR
+  back_insert_iterator(_Container &__x)
+      : container(std::__addressof(__x)) {}
+
+  /**
+   *  @param  __value  An instance of whatever type
+   *                 container_type::const_reference is; presumably a
+   *                 reference-to-const T for container<T>.
+   *  @return  This %iterator, for chained operations.
+   *
+   *  This kind of %iterator doesn't really have a @a position in the
+   *  container (you can think of the position as being permanently at
+   *  the end, if you like).  Assigning a value to the %iterator will
+   *  always append the value to the end of the container.
+  */
+#if __cplusplus < 201103L
+  back_insert_iterator&
+      operator=(typename _Container::const_reference __value)
+      {
+    container->push_back(__value);
+    return *this;
+      }
+#else
+  _GLIBCXX20_CONSTEXPR
+      back_insert_iterator
+  &
+
+  operator=(const typename _Container::value_type &__value) {
+    container->push_back(__value);
+    return *this;
+  }
+
+  _GLIBCXX20_CONSTEXPR
+      back_insert_iterator
+  &
+
+  operator=(typename _Container::value_type &&__value) {
+    container->push_back(std::move(__value));
+    return *this;
+  }
+
+#endif
+
+  /// Simply returns *this.
+  _GLIBCXX20_CONSTEXPR
+      back_insert_iterator
+  &
+
+  operator*() { return *this; }
+
+  /// Simply returns *this.  (This %iterator does not @a move.)
+  _GLIBCXX20_CONSTEXPR
+      back_insert_iterator
+  &
+
+  operator++() { return *this; }
+
+  /// Simply returns *this.  (This %iterator does not @a move.)
+  _GLIBCXX20_CONSTEXPR
+      back_insert_iterator
+
+  operator++(int) { return *this; }
+};
+```
+
+### 三组插入迭代器
+
+`std:: back_inserter` 函数模板的返回类型是类模板 `back_insert_iterator`，该类模板的底层调用了容器的 `push_back` 函数。
+
+`std:: front_inserter` 函数模板的返回类型是类模板 `front_insert_iterator`，该类模板的底层调用了容器的 `push_front` 函数
+
+`std:: inserter` 函数模板的返回类型是类模板 `insert_iterator`，该类模板的底层调用了容器的 `insert` 函数。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSLUZHOEh2SURwSWswSEdrMnJ1ODFrQi1HcmxnRm9tMk9FNGxRN0FneFNoZmc_ZT1MUUhiTFk.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZWEJDRUFOYlpsTXJjbDk2Rlg0QkQ0QmtMdUlPTGcxZFlVei1DMzdldVNyRXc_ZT1Qd1lnanA.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVTFlnSldybmtwT2d6LVdrTkZjelJBQnh0S3RETXY2bXZ3dUY2WUpST1lqU3c_ZT1TVWo4ZXI.png)
+
+## 反向迭代器
+
+![image-20241017094155099.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0Vabkl6NVN2SXFkQm1jRnEwRXBUajA0QmJMV2J6cW44dzNmM29LYURrQ3V3WlE_ZT1jaTFCZWE.png)
+
+```cpp
+vector<int> vec = {1, 3, 5, 7, 9, 10, 4};
+vector<int>::reverse_iterator rit = vec.rbegin();
+for(; rit != vec.rend(); ++rit) {
+  cout << *rit << "  ";
+}
+cout << endl;
+```
+
+

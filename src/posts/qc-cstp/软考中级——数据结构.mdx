@@ -1,0 +1,1884 @@
+---
+title: "软考中级——数据结构"
+date: 2022-03-20T20:49:38+08:00
+categories: ["软考"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUN2VPVThGM3g5RnYzWnpiMEJzMDRRQlNZTnZ4UHdEdjVBNXNvb3pxalg5dGc_ZT0xa0dRNDM.png"
+---
+
+# 线性结构
+
+## 线性表
+
+### 线性表的定义
+
+一个线性表是 $n$ 个元素的有限序列（$n≥0$），通常表示为（$a_1,a_2,a_3,...,a_n$）。
+
+线性表的抽象数据类型如下
+
+```
+ADT 线性表 (List)
+Data
+	线性表的数据对象集合为 {a_1,a_2,...,a_n}，每个元素的类型均为 DataType。其中，除第一个元素 a_1 外，每一个元素有且只有一个直接前驱元素，除了最后一个元素 a_n 外，每一个元素有且只有一个直接后继元素。数据元素之间的关系是一对一的关系。
+Operation
+	InitList(*L): 初始化操作，建立一个空的线性表
+	ListEmpty(L): 若线性表为空，返回 true，否则返回 false。
+	ClearList(*L): 将线性表清空。
+	GetElem(L, i, *e): 将线性表 L 中的第 i 个位置元素值返回给 e。
+	LocateElem(L, e): 在线性表 L 中查找与给定值 e 相等的元素，如果查找成功，返回该元素在表中序号表示成功；否则，返回 0 表示失败。
+	ListInsert(*L, i, e): 在线性表 L 中的第个位置插入新元素。
+	ListDelete(*L, i): 删除线性表 L 中第 i 个位置元素，并用 e 返回其值。
+	ListLength(L): 返回线性表 L 的元素个数。
+endADT
+```
+
+### 线性表的顺序存储（顺序表）
+
+是指用一组地址连续的存储单元依次存储线性表中的数据元素，从而使得逻辑上相邻的两个元素在物理位置上也相邻。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVSmFmOU03aG1oSmhGMThOMjVheWZZQmcxZGVtN2hibjlGVXBuR1BnZ29pNXc_ZT1ma3N2eFY.png)
+
+```c
+#define MAXSIZE 20 // 存储空间初始分配量
+typedef int ElemType; // ElemType 类型根据实际情况而定，这里假设为 int
+typedefstruct {
+    ElemType data[MAXSlZE]; // 数组存储数据元素，最大值为 MAXSIZE
+    int length; // 线性表当前长度
+}
+SqList;
+```
+
+优点：可以随机存取表中的元素，按序号查找元素的速度很快。
+
+缺点：插入和删除操作需要移动元素。
+
+### 顺序存储结构的操作
+
+#### 获得元素操作
+
+```c
+#define OK 1
+#define ERROR 0
+#define TRUE 1
+#define FALSE 0
+typedef int Status;
+
+/* status 是函数的类型，其值是函数结栗状态代码，如 OK 等 */
+/* 初始条件：顺序线性表 L 已存在，1 <= i <= ListLength(L) */
+/* 操作结果：用 e 返回 L 中 第 i 个数据元素的值 */
+Status GetElem(SqList L, int i, ElemType* e) {
+    if (L.length == 0 || i < 1 || i> L.length) return ERROR;
+    *e = L.data[i - 1];
+    return OK;
+}
+```
+
+#### 插入操作
+
+```c
+/* 初始条件：顺序线性表 L 已存在，1 <= i <= ListLength(L)， */
+/* 操作结果：在 L 中第 i 个位置之前插入新的数据元素 e，L 的长度加 1 */
+Status ListInsert(SqList* L, int i, E1emType e）{
+    int k;
+    if (L->length == MAXSIZE) // 顺序线性表已经满
+        return ERROR;
+    if (i < 1 || i> L->1ength + 1) // 当 i 不在范围内时
+    return ERROR;
+    if (i <= L->length) // 若插入数据位置不在表尾 {
+        for (k = L-> 1e
+        ngth - 1;
+        k >= -1;
+        k--) // 将要插入位置后数据元素向后移动一位
+        L —> data[k + l] = L—> data[k];
+    }
+
+    L—>data[i - 1]; /* 将新元素插入 */
+    L—>1ength++;
+    return OK;
+}
+```
+
+#### 删除操作
+
+```c
+/* 初始条件：顺序线性表 L 已存在，1 <= i <= ListLength(L) */
+/* 操作结果：删除 L 的第 i 个数据元素，并用 e 返回其值，L 的长度减 1 */
+
+Status ListDelete(SqList* L, int i, ElemType* e)
+{
+    int k;
+    if (L->length == 0) // 线性表为空
+        return ERROR;
+    if (i < l || i> L->length) // 删除位置不正确
+        return ERROR;
+    *e = L->data[i - 1];
+    if (i < L + length) // 如栗删除不是最后位置
+        for (k = i; k < L + length; k++)
+            // 将删除位置后继元素前移
+            L + data[k - 1] = L + data[k];
+    L->length--;
+    return OK;
+}
+```
+
+## 链表
+
+### 线性表的链式存储（链表）
+
+是指用节点来存储数据元素，元素的节点地址可以连续，也可以
+不连续。节点空间只有在需要时才申请，无需事先分配。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVRlpaQm0zb1ZaUHJ2SjBnbXlWaVZzQnRvWFVUTmhCLUFWalN0UC1yNU1qaGc_ZT1wNkNTR2E.png)
+
+优点：插入和删除操作不需要移动元素
+
+缺点：只能按顺序访问元素，不能进行随机存取。
+
+### 链表的类别
+
+#### 单链表
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVVzZPMjRVTVZoRXVXdklROXJEMkpBQmJ0X0gtY3ZMXzRSQnhuZExKTFlWeHc_ZT1LQ2VYZ3M.png)
+
+#### 循环链表
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTTlRnUU5DMmRSRGwzakY3UEdBSldVQmh0dU5zUy1wcUdKSHJESzJTTmtETmc_ZT16cW9NU0k.png)
+
+#### 双链表
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0Vld1V3YlpsU0loTnRwdnVTTjVrZ0hrQnZsOTJGdXlGY1YxcXFGMkJDQkFFTWc_ZT13ZVA1U3g.png)
+
+### 单链表的操作
+
+#### 单链表的读取
+
+```c
+/* 初始条件：链式线性表 L 已存在，1 ≤ i ≤ ListLength(L) */
+/* 操作结果：用 e 返回 L 中第 i 个数据元素的值 */
+Status GetElem(LinkList L, int i, ElemType* e)
+{
+	int j;
+	LinkList p;        /* 声明一结点 p */
+	p = L->next;        /* 让 p 指向链表 L 的第一个结点 */
+	j = 1;        /*  j 为计数器 */
+	while (p && j < i)  /* p 不为空或者计数器 j 还没有等于 i 时，循环继续 */
+	{
+		p = p->next;  /* 让 p 指向下一个结点 */
+		++j;
+	}
+	if (!p || j> i)
+		return ERROR;  /*  第 i 个元素不存在 */
+	*e = p->data;   /*  取第 i 个元素的数据 */
+	return OK;
+}
+```
+
+#### 单链表的插入
+
+```c
+/* 初始条件：链式线性表 L 已存在, 1 ≤ i ≤ ListLength(L)， */
+/* 操作结果：在 L 中第 i 个位置之前插入新的数据元素 e，L 的长度加 1 */
+Status ListInsert(LinkList* L, int i, ElemType e)
+{
+	int j;
+	LinkList p, s;
+	p = *L;
+	j = 1;
+	while (p && j < i)     /* 寻找第 i 个结点 */
+	{
+		p = p->next;
+		++j;
+	}
+	if (!p || j> i)
+		return ERROR;   /* 第 i 个元素不存在 */
+	s = (LinkList)malloc(sizeof(Node));  /*  生成新结点 (C 语言标准函数) */
+	s->data = e;
+	s->next = p->next;      /* 将 p 的后继结点赋值给 s 的后继  */
+	p->next = s;          /* 将 s 赋值给 p 的后继 */
+	return OK;
+}
+```
+
+#### 单链表的删除
+
+```c
+/* 初始条件：链式线性表 L 已存在，1 ≤ i ≤ ListLength(L) */
+/* 操作结果：删除 L 的第 i 个数据元素，并用 e 返回其值，L 的长度减 1 */
+Status ListDelete(LinkList* L, int i, ElemType* e)
+{
+	int j;
+	LinkList p, q;
+	p = *L;
+	j = 1;
+	while (p->next && j < i)    /* 遍历寻找第 i 个元素 */
+	{
+		p = p->next;
+		++j;
+	}
+	if (!(p->next) || j > i)
+		return ERROR;           /* 第 i 个元素不存在 */
+	q = p->next;
+	p->next = q->next;            /* 将 q 的后继赋值给 p 的后继 */
+	*e = q->data;               /* 将 q 结点中的数据给 e */
+	free(q);                    /* 让系统回收此结点，释放内存 */
+	return OK;
+}
+```
+
+## 栈
+
+栈和队列都是一种特殊的线性表，栈是按 “后进先出” 的规则进行操作的。
+
+栈的抽象数据类型如下
+
+```
+ADT 栈 (stack)
+Data
+	同线性表。元素具有相同的类型，相邻元素具有前驱和后继关系。
+Operation
+	InitStack(*S): 初始化操作，建立一个空栈 S。
+	DestroyStack(*S): 若栈存在，则销毁它。
+	ClearStack(*S): 将栈清空
+	StackEmpty(S): 若栈为空，返回 true，否则返回 false。
+	GetTop(S, *e): 若栈存在且非空，用 e 返回 S 的栈顶元素。
+	Push(*S,e): 若栈 S 存在，插入新元素 e 到栈 S 中并成为栈顶元素。
+	Pop(*S, *e): 删除栈 S 中栈顶元素，并用 e 返回其值。
+	StackLength(S): 返回栈 S 的元素个数。
+endADT
+```
+
+### 顺序栈
+
+用一组地址连续的存储单元依次存储自栈顶到栈底的数据元素。
+
+存储空间是预先定义或申请的，因此可能会出现栈满的情况。
+
+每一个元素入栈时都要判断栈是否已满。
+
+需要设置一个头指针指到栈顶。
+
+需要附设指针 top 指示栈顶元素的位置。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWaGdqemhXUmVCR3ZJQzhHUUw2bXdvQjdFc1o3R0JKcUNaeFRpdUd5eDZaMUE_ZT1nTzk1Z00.png)
+
+### 链栈
+
+用链表存储栈中的元素。
+
+栈中元素的插入和删除仅在栈顶进行，因此不必设置头节点，链表的头指针就是栈顶指针。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSWEJWcmo1a2JGR3BWUDlWR0p5Y2k4QjJNMWE4aFo0NHhlYldPelZZRmFfQ2c_ZT1OdkRmZ2Y.png)
+
+### 顺序栈的主要操作
+
+#### 栈的结构定义
+
+```c
+typedef int SElemType; /* SElemType 类型根据实际情况而定，这里假设为 int */
+
+/* 顺序栈结构 */
+typedef struct
+{
+	SElemType data[MAXSIZE];
+	int top; /* 用于栈顶指针 */
+} SqStack;
+```
+
+#### 进栈操作
+
+```c
+/* 插入元素 e 为新的栈顶元素 */
+Status Push(SqStack* S, SElemType e)
+{
+	if (S->top == MAXSIZE - 1) /* 栈满 */
+	{
+		return ERROR;
+	}
+	S->top++;                /* 栈顶指针增加一 */
+	S->data[S->top] = e;  /* 将新插入元素赋值给栈顶空间 */
+	return OK;
+}
+```
+
+#### 出栈操作
+
+```c
+/* 若栈不空，则删除 S 的栈顶元素，用 e 返回其值，并返回 OK；否则返回 ERROR */
+Status Pop(SqStack* S, SElemType* e)
+{
+	if (S->top == -1)
+		return ERROR;
+	*e = S->data[S->top];    /* 将要删除的栈顶元素赋值给 e */
+	S->top--;                /* 栈顶指针减一 */
+	return OK;
+}
+```
+
+### 链栈的主要操作
+
+#### 栈的结构定义
+
+```c
+typedef int SElemType; /* SElemType 类型根据实际情况而定，这里假设为 int */
+
+/* 链栈结构 */
+typedef struct StackNode
+{
+	SElemType data;
+	struct StackNode* next;
+} StackNode, * LinkStackPtr;
+
+typedef struct
+{
+	LinkStackPtr top;
+	int count;
+} LinkStack;
+```
+
+#### 进栈操作
+
+```c
+/* 插入元素 e 为新的栈顶元素 */
+Status Push(LinkStack* S, SElemType e)
+{
+	LinkStackPtr s = (LinkStackPtr)malloc(sizeof(StackNode));
+	s->data = e;
+	s->next = S->top;    /* 把当前的栈顶元素赋值给新结点的直接后继 */
+	S->top = s;         /* 将新的结点 s 赋值给栈顶指针 */
+	S->count++;
+	return OK;
+}
+```
+
+#### 出栈操作
+
+```c
+/* 若栈不空，则删除 S 的栈顶元素，用 e 返回其值，并返回 OK；否则返回 ERROR */
+Status Pop(LinkStack* S, SElemType* e)
+{
+	LinkStackPtr p;
+	if (StackEmpty(*S))
+		return ERROR;
+	*e = S->top->data;
+	p = S->top;                    /* 将栈顶结点赋值给 p */
+	S->top = S->top->next;    /* 使得栈顶指针下移一位，指向后一结点 */
+	free(p);                    /* 释放结点 p */
+	S->count--;
+	return OK;
+}
+```
+
+## 队列
+
+队列是一种 “先进先出” 的线性表，队尾入队头出。
+
+队列的抽象数据类型如下
+
+```
+ADT 队列 (Queue)
+Data
+	同线性表。元素具有相同的类型，相邻元素具有前驱和后继关系。
+Operation
+	InitQueue(*Q): 初始化操作，建立一个空队列 Q。
+	DestroyQueue(*Q): 若队列 Q 存在，则销毁它。
+	ClearQueue(*Q): 将队列 Q 清空。
+	QueueEmpty(Q): 若队列 Q 为空，返回 true, 否则返回 false。
+	GetHead(Q,*e): 若队列 Q 存在且非空，用 e 返回队列 Q 的队头元素。
+	EnQueue(*Q,e): 若队列 Q 存在，插入新元素 e 到队列 Q 中并成为队尾元素。
+	DeQueue(*Q,*e): 删除队列 Q 中队头元素，并用 e 返回其值。
+	QueueLength(Q): 返回队列 Q 的元素个数
+endADT
+```
+
+
+
+### 队列的顺序存储
+
+顺序队列
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUZHlTcEtUa1J0QnZpdHdaQ0tkdzBjQnFVTGJlOVZQRFpLRVZqaWdBU0FrSGc_ZT1SMGdRcXI.png)
+
+循环队列
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlQW1VTzVqMm9kTG1mZ0gxVDgtQkp3QlFQd0pxZzRfUDVTeTNOQ0pyVmtrY2c_ZT1xREFYYk4.png)
+
+### 队列的链式存储（链队列）
+
+为了便于操作，可以给链队列添加一个头节点，并令头指针指向头节点。
+
+队列为空的判定条件就是头指针和尾指针的的值相同，并且均指向头节点。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VheW5seGpzUU1OTG04OGdNTk1IVGxNQmxRZ3lubVM2bTVtUk9iN2prSW1EY3c_ZT1UTnhSZGc.png)
+
+### 循环队列的主要操作
+
+#### 循环队列的顺序存储结构
+
+````c
+typedef int QElemType; /* QElemType 类型根据实际情况而定，这里假设为 int */
+
+/* 循环队列的顺序存储结构 */
+typedef struct
+{
+	QElemType data[MAXSIZE];
+	int front;        /* 头指针 */
+	int rear;        /* 尾指针，若队列不空，指向队列尾元素的下一个位置 */
+} SqQueue;
+````
+
+#### 循环队列初始化
+
+````c
+/* 初始化一个空队列 Q */
+Status InitQueue(SqQueue* Q)
+{
+	Q->front = 0;
+	Q->rear = 0;
+	return OK;
+}
+````
+
+#### 循环队列求队列长度
+
+```c
+/* 返回 Q 的元素个数，也就是队列的当前长度 */
+int QueueLength(SqQueue Q)
+{
+	return (Q.rear - Q.front + MAXSIZE) % MAXSIZE;
+}
+```
+
+#### 循环队列的入队列操作
+
+```c
+/* 若队列未满，则插入元素 e 为 Q 新的队尾元素 */
+Status EnQueue(SqQueue* Q, QElemType e)
+{
+	if ((Q->rear + 1) % MAXSIZE == Q->front)    /* 队列满的判断 */
+		return ERROR;
+	Q->data[Q->rear] = e;            /* 将元素 e 赋值给队尾 */
+	Q->rear = (Q->rear + 1) % MAXSIZE;/* rear 指针向后移一位置，若到最后则转到数组头部 */
+	return OK;
+}
+```
+
+#### 循环队列的出队列操作
+
+```c
+/* 若队列不空，则删除 Q 中队头元素，用 e 返回其值 */
+Status DeQueue(SqQueue* Q, QElemType* e)
+{
+	if (Q->front == Q->rear)            /* 队列空的判断 */
+		return ERROR;
+	*e = Q->data[Q->front];                /* 将队头元素赋值给 e */
+	Q->front = (Q->front + 1) % MAXSIZE;    /* front 指针向后移一位置，若到最后则转到数组头部 */
+	return OK;
+}
+```
+
+### 链队列的主要操作
+
+#### 链队列的结构
+
+```c
+typedef int QElemType; /* QElemType 类型根据实际情况而定，这里假设为 int */
+
+typedef struct QNode    /* 结点结构 */
+{
+	QElemType data;
+	struct QNode* next;
+} QNode, * QueuePtr;
+
+typedef struct            /* 队列的链表结构 */
+{
+	QueuePtr front, rear; /* 队头、队尾指针 */
+} LinkQueue;
+```
+
+#### 链队列的入队列操作
+
+```c
+/* 插入元素 e 为 Q 的新的队尾元素 */
+Status EnQueue(LinkQueue* Q, QElemType e)
+{
+	QueuePtr s = (QueuePtr)malloc(sizeof(QNode));
+	if (!s) /* 存储分配失败 */
+		exit(OVERFLOW);
+	s->data = e;
+	s->next = NULL;
+	Q->rear->next = s;    /* 把拥有元素 e 的新结点 s 赋值给原队尾结点的后继 */
+	Q->rear = s;        /* 把当前的 s 设置为队尾结点，rear 指向 s */
+	return OK;
+}
+```
+
+#### 链队列的出队列操作
+
+```c
+/* 若队列不空, 删除 Q 的队头元素, 用 e 返回其值, 并返回 OK, 否则返回 ERROR */
+Status DeQueue(LinkQueue* Q, QElemType* e)
+{
+	QueuePtr p;
+	if (Q->front == Q->rear)
+		return ERROR;
+	p = Q->front->next;        /* 将欲删除的队头结点暂存给 p */
+	*e = p->data;                /* 将欲删除的队头结点的值赋值给 e */
+	Q->front->next = p->next;/* 将原队头结点的后继 p->next 赋值给头结点后继 */
+	if (Q->rear == p)        /* 若队头就是队尾，则删除后将 rear 指向头结点 */
+		Q->rear = Q->front;
+	free(p);
+	return OK;
+}
+```
+
+## 串
+
+字符串是一串文字及符号的简称，是一种特殊的线性表。
+
+字符串的基本数据元素是字符，常常把一个串作为一个整体来处理。
+
+串是仅由字符构成的有限序列，是取值范围受限的线性表。一般记为 $S='a_1a_2…a_n'$，其中 $S$ 是串名，单引号括起来的字符序列是串值。
+
+串长：即串的长度，指字符串中的字符个数。
+
+空串：长度为 0 的空串，空串不包含任何字符。
+
+空格串：由一个或多个空格组成的串。
+
+子串：由串中任意长度的连续字符构成的序列称为子串。
+
+串相等：指两个串长度相等且对应位置上的字符也相同。
+
+串比较：两个串比较大小时以字符的 ASCII 码值作为依据。
+
+串的抽象数据类型如下
+
+```
+ADT 串 (string)
+Data
+	串中元素仅由一个字符组成，相邻元素具有前驱和后继关系
+Operation
+	StrAssign(T, *chars): 生成一个其值等于字符串常量 chars 的串 T。
+	StrCopy(T, S): 串 S 存在，由串 S 复制得串 T。
+	ClearString(S): 串 S 存在，将串清空。
+	StringEmpty(S): 若串 S 为空，返回 true，否则返回 false。
+	StrLength(S): 返回串 s 的元素个数，即串的长度。
+	StrCompare(S, T): 若 S > T，返回值 >0，若 S = T, 返回 0，若 S < T，返回值 <0。
+	Concat(T, S1, S2): 用 T 返回由 S1 和 S2 联接而成的新串。
+	SubString(Sub, S, pos, 1en)：串 S 存在，1 <= pos <= StrLength(S)，且 0 <= len <= StrLength(S) - pos + 1，用 Sub 返回串 s 的第 pos 个字符起长度为 len 的子串。
+	Index(S, T, pos): 串 S 和 T 存在，T 是非空串，1 <= pos <= StrLength(s)。若主串 s 中存在和串 T 值相同的子串，则返回它在主串 s 中第 pos 个字符之后第一次出现的位置，否则返回 0。
+	Replace(S, T, V): 串 S, T 和 V 存在，T 是非空串。用 V 替换主串 S 中出现的所有与 T 相等的不重叠的子串。
+	StrInsert(S, pos, T): 串 S 和 T 存在，1 <= pos <= StrLength(S) + 1。在串 S 的第 pos 个字符之前插入串 T。
+	StrDelete(S, pos, len): 串 S 存在，1 <= pos <= StrLength(S) — len + 1。从串 S 中删除第 pos 个字符起长度为 len 的子串。
+endADT
+```
+
+### 串的存储结构
+
+1. 顺序存储：用一组地址连续的存储单元来存储串值的字符序列。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0Vkd1V0WDJlR1FOTnNOajh5N1REbEpnQnlnVld2TE03WGdKNzdRZ2pjaC01UGc_ZT1iUWdqSGw.png)
+
+2. 链式存储：字符串可以采用链表作为存储结构，当用链表存储串中的字符时，每个结点中可以存储一个字符，也可以存储多个字符。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVZ0FKRXBCVHNOTWd2WlFEdWNlajFzQnZzMnp3bVEzYmc0RERvQ1lUd1d2akE_ZT1jZ1poaEg.png)
+
+# 数组和矩阵
+
+## 数组
+
+一维数组是长度固定的线性表，数组中的每个数据元素类型相同。n 维数组是定长线性表在维数上的扩张，即线性表中的元素又是一个线性表。
+
+由于数组一般不做插入和删除，且元素个数和元素之间的关系不再发生变动，那么数组适合采用顺序存储结构。
+
+数组元素的存储方式及相关计算：二维数组的存储结构可分为以行为主序（按行存储）和以列为主序（按列存储）两种方法。
+
+设每个数据元素占用 $L$ 个单元，$m,n$ 为数组的行数和列数，那么：
+
+以行为主序优先存储的地址计算公式为
+$$
+Loc(a_{ij})=Loc(a_{11})+((i-1)×n+(j-1))×L
+$$
+
+以列为主序优先存储的地址计算公式为：
+$$
+Loc(a_{ij})=Loc(a_{11})+((j-1)×m+(i-1))×L
+$$
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VjV1d5c2ZzdUQ1SHQtelMzMGdKNnlvQmNydi1sd3hMeWRpclRCNFJXYjFwSmc_ZT1DY25JTW4.png)
+
+## 矩阵
+
+这里主要讨论一些特殊矩阵的压缩存储的问题。
+
+对多个值相同的元素可以只分配一个存储单元，零元素不分配存储单元。
+
+下面主要讨论对称矩阵、三对角矩阵、稀疏矩阵。
+
+### 对称矩阵
+
+若矩阵 $A_{n×n}$ 中的元素有 $a_{ij}=a_{ji}(1≤i，j≤n)$​ 的特点，则称之为对称矩阵。
+
+$$
+\begin{pmatrix}
+a_{11} & a_{12} & a_{13}& a_{14} \\
+a_{21} & a_{22} & a_{23}& a_{24} \\
+a_{31} & a_{32} & a_{33} & a_{34} \\
+a_{41} & a_{42} & a_{34} & a_{44}
+\end{pmatrix}
+\begin{pmatrix}
+1 & 3& 5& 12 \\
+3 & 10 & 9& 8 \\
+5 & 9 & 7 & 6\\
+12&8 & 6 & 13
+\end{pmatrix}
+$$
+
+
+则矩阵 $A_{n×n}$ 的 $n^2$ 个元素可以压缩存储到可以存放 $\dfrac{n(n+1)}2$ 个元素的存储空间中。假设以行为主序存储下三角（包括对角线）中的元素，并以一个一维
+数组 `B[n(n+1)/2]` 作为 $n$ 阶对称矩阵 $A$ 中元素的存储空间，则 `B[k]` $(0≤k<\dfrac{n(n+1)}2)$ 与矩阵元素 $a_{ij}(a_{ji})$ 之间存在着一一对应的关系：
+
+$$
+k=\left\{\begin{matrix}
+\dfrac{i(i-1)}{2}+j-1\ 当 \ i\ge j   \\
+\dfrac{j(j-1)}{2}+i-1\ 当 \ i< j
+\end{matrix}\right.
+$$
+
+$$
+\begin{pmatrix}
+a_{11} & & &  \\
+a_{21} & a_{22} & &  \\
+a_{31} & a_{32} & a_{33} &  \\
+a_{41} & a_{42} & a_{34} & a_{44}
+\end{pmatrix}
+$$
+
+
+
+### 三对角矩阵
+
+对角矩阵是指矩阵中的非零元素都集中在以主对角线为中心的带状区域中，其余的矩阵元素都为零。
+
+下面主要考虑三对角矩阵，即只有主对角线及其左右两边为非零元素。
+
+若以行为主序将 $n$ 阶三对角矩阵 $A_{n×n}$ 的非零元素存储在一维数组 `B[k]` $(0≤k<3n-2)$ 中，则元素位置之间的对应关系为
+$$
+k=3×(i-1)-1+j-i+1=2i+j-3\ (1≤i,j≤n)
+$$
+
+$$
+\begin{pmatrix}
+a_{1,1} & a_{1,2}& &  \\
+a_{2,1} & a_{2,2} & a_{2,3} &  \\
+& a_{3,2} & a_{3,3} & a_{3,4} \\
+& & ... & ... & ... \\
+& & & a_{i,i-1} & a_{i,i} & a_{i,i+1} \\
+& & & & ... & ...& ...\\
+& & & & & a_{n,n-1} & a_{n,n}\\
+\end{pmatrix}
+$$
+
+
+
+### 稀疏矩阵
+
+在一个矩阵中，若非零元素的个数远远少于零元素的个数，且非零元素的分布没有规律，则称之为稀疏矩阵。
+
+可以用一个三元组 $(i,j,a_{ij})$​唯一确定矩阵中的一个元素。
+$$
+\begin{pmatrix}
+0 & 12 & 9& 0& 0 & 0 & 0\\
+0 & 0& 0& 0& 0 & 0& 0\\
+-3 & 0& 0 & 0 & 0 & 14 &0 \\
+0 & 0& 24 &0 & 0 & 0&0 \\
+0 &18 & 0& 0 & 0& 0 &0 \\
+15 & 0 & 0& -7 & 0 &0 &0
+\end{pmatrix}
+\Rightarrow
+\begin{matrix}
+(1,2,12) & (1,3,9)\\
+& \\
+(3,1,-3) &(3,6,14) \\
+(4,3,24) & \\
+(5,2,18) & \\
+(6,1,15) &(6,4,-7)
+\end{matrix}
+$$
+
+# 树和二叉树
+
+## 树
+
+定义：树是 $n(n≥0)$ 个节点的有限集合。当 $n=0$ 时称为空树。在任一非空树中，有且仅有一个称为根的节点：其余节点可分为 $m(m≥0)$ 个互不相交的有限集 $T_1,T_2…,T_m$​，其中每个集合又都是一棵树，并且称为根节点的子树。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VacmI5SWdWSUJORnVDS3RXUjFOTkkwQkhxMmNOcVRVUEp4SkdoOXlUa09Sanc_ZT1HV05vZmU.png)
+
+### 树的相关概念
+
+1. 双亲、孩子和兄弟
+2. 节点的度：一个节点的子树的个数记为该节点的度。
+3. 叶子节点：也称为终端节点，指度为零的节点。
+4. 内部节点：度不为零的节点称为分支节点或非终端节点。除根节点之外，分支节点也称为内部节点。
+5. 节点的层次：根为第一层，根的孩子在第二层，依此类推。
+6. 树的高度：一棵树的最大层次数记为树的高度（或深度）
+7. 有序（无序）树：若将树中结点的各子树看成是从左到右具有次序的，即不能交换，则称该树为有序树，否则称为无序树。
+8. 森林：$m(m\ge 0)$​ 棵互不相交的树的集合。
+
+### 树的抽象数据类型
+
+```
+ADT 树 (tree)
+Data
+	树是由一个根结点和若干棵子树构成树中结点具有相同数据类型及层次关系
+Operation
+	InitTree(*T): 构造空树 T。
+	DestroyTree(*T): 销毁树 T。
+	CreateTree(*T, definition): 按 definition 中给出树的定义来构造树。
+    ClearTree(*T): 若树 T 存在，则将树 T 清为空树。
+	TreeEmpty(T): 若 T 为空树，返回 true，否则返回 false。
+    TreeDepth(T): 返回 T 的深度。
+	Root(T): 返回 T 的根结点。
+    value(T, cur_e): cur_e 是树 T 中一个结点，返回此结点的值。
+    Assign(T, cur_e, value): 给树于 T 的结点 cur_e 赋值为 value。
+	Parent(T, cur_e): 若 cur_e 是树 T 的非根结点，则返回它的双亲，否则返回空。
+	LeftChild(T, cur_e): 若 cur_e 是树 T 的非叶结点，则返回它的最左孩子，否则返回空。
+	RightSibling(T, cur_e)：若 cur_e 有右兄弟，则返回它的右兄弟，否则返回空。
+	InsertChild(*T, *p, c): 其中 p 指向树 T 的某个结点，i 为所指结点 p 的度加上 1，非空树 c 与 T 不相交，操作结果为插入 c 为树 T 中 p 指结点的第 i 棵子树。
+	DeleteChild(*T, *p, i): 其中 p 指向树 T 的某个结点，i 为所指结点 p 的度，操作结果为删除 T 中 p 所指结点的第主棵子树。
+endADT
+```
+
+
+
+## 二叉树
+
+定义：二叉树是 $n(n≥0)$ 个节点的有限集合，它或者是空树 $(n=0)$，或者是由一个根节点及两棵不相交的、分别称为左子树和右子树的二叉树所组成。
+
+树和二叉树的区别：
+
+1. 二叉树中节点的子树要区分左子树和右子树，即使只有一棵子树，而树中不用区分。
+2. 二叉树中节点的最大度为 2，而树中无限制
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWUE8wRmk2SU9OTXFIMUlFbWhfLTNJQkU1b1hEd21xMHhGV2RENXVzeTRPbEE_ZT14UDQ1NDQ.png)
+
+### 二叉树的性质
+
+1. 二叉树第 $i(i≥1)$ 层上至多有 $2^{i-1}$ 个节点。
+2. 深度为 $k$ 的二叉树至多有 $2^{k-1}$ 个节点 $(k≥1)$。
+3. 对任何一棵二叉树，若其终端节点数为 $n_0$，度为 $2$ 的节点数为 $n_2$，则 $n_0=n_2+1$。
+
+### 满二叉树和完全二叉树
+
+满二叉树的定义：若深度为 $k$ 的二叉树有 $2^k-1$ 个节点，则称其为满二叉树。
+
+完全二叉树：当深度为 $k$、有 $n$ 个节点的二叉树，当且仅当其每一个节点都与深度为 $k$ 的满二叉树中编号为 $1～n$​ 的节点一一对应时，称之为完全二叉树。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0ViYk1WSW8tMy1SSWdncUg0cFZXX3pzQmxxNWZiVDVnalM1YTFQSS15TWZhdVE_ZT1GRlRhVlo.png)
+
+### 完全二叉树的性质
+
+设深度为 $k$ 的完全二叉树共有 $n$ 个节点，那么可知，除第 $k$ 层外，其余各层都有最多的节点数。
+
+具有 $n$ 个节点的完全二叉树的深度为 $\lfloor\log_2n\rfloor+1$。
+
+假设有编号为 $i$ 的节点，则有：
+
+1. 若 $i=1$，则该节点为根节点，无双亲；若 $i>1$，则该节点的双亲节点为 $\lfloor\dfrac{i}{2}\rfloor  $
+2. 若 $2i≤n$，则该节点的左孩子编号为 $2i$，若 $2i>n$，无左孩子。
+3. 若 $2i+1≤n$，则该节点的右孩子编号为 $2i+1$，若 $2i+1>n$，无右孩子。
+
+### 二叉树的存储结构
+
+顺序存储
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWbmJVdk56QW10UHJscEpnNlRGeGhZQlZrd0NkNVJobm1XTm8wNDlQU01qbXc_ZT1haHlZdm8.png)
+
+链式存储
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTbjZuVVYyeXMxRHBzOEU2QjBBMDU4QkFUVTVGZ19qSUJoOFg2Skh0S0x0UGc_ZT0yY1pZTU8.png)
+
+### 二叉树的遍历
+
+遍历是按某种策略访问树中的每个结点，且仅访问一次。
+
+依据访问根节点次序的不同，可分为前序遍历法、中序遍历法、后序
+遍历法。
+
+1. 中序遍历法：（左、根、右）
+
+    1. 中序遍历根的左子树。
+
+    2. 访问根节点。
+
+    3. 中序遍历根的右子树。
+
+        依此类推。
+2. 前序遍历法：先访问根节点（根、左、右）
+3. 后序遍历法：后访问根节点（左、右，根）
+4. 层序遍历法：按层从上至下、每层从左至右的顺序遍历。
+
+### 二叉树的遍历代码实现
+
+#### 前序遍历算法
+
+```c
+/* 初始条件: 二叉树 T 存在 */
+/* 操作结果: 前序递归遍历 T */
+void PreOrderTraverse(BiTree T)
+{
+	if (T == NULL)
+		return;
+	printf("%c", T->data);/* 显示结点数据，可以更改为其它对结点操作 */
+	PreOrderTraverse(T->lchild); /* 再先序遍历左子树 */
+	PreOrderTraverse(T->rchild); /* 最后先序遍历右子树 */
+}
+```
+#### 中序遍历算法
+
+```c
+/* 初始条件: 二叉树 T 存在 */
+/* 操作结果: 中序递归遍历 T */
+void InOrderTraverse(BiTree T)
+{
+	if (T == NULL)
+		return;
+	InOrderTraverse(T->lchild); /* 中序遍历左子树 */
+	printf("%c", T->data);/* 显示结点数据，可以更改为其它对结点操作 */
+	InOrderTraverse(T->rchild); /* 最后中序遍历右子树 */
+}
+```
+
+#### 后序遍历算法
+
+```c
+/* 初始条件: 二叉树 T 存在 */
+/* 操作结果: 后序递归遍历 T */
+void PostOrderTraverse(BiTree T)
+{
+	if (T == NULL)
+		return;
+	PostOrderTraverse(T->lchild); /* 先后序遍历左子树  */
+	PostOrderTraverse(T->rchild); /* 再后序遍历右子树  */
+	printf("%c", T->data);/* 显示结点数据，可以更改为其它对结点操作 */
+}
+```
+
+
+### 最优二叉树（哈夫曼树）
+
+最优二叉树又称哈夫曼树，是一类带权路径长度最短的树。
+
+权：是一个人为的概念，表示计算机对每个节点的访问频率。
+
+路径长度：是每一个结点到根节点的路径的长度。
+
+节点的带权路径长度：是指从该节点到根节点之间的路径长度与该节点权的乘积。
+
+树的带权路径长度为树中所有叶子节点的带权路径长度之和。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRdGEtdFVfa0FsS3JiUmF2N05sQWdJQnowRUNwSVYyemhkWkVWOFpKZVVVYUE_ZT1vc2xWMVg.png)
+
+#### 构造最优二叉树的哈夫曼方法
+
+1. 根据给定的 $n$ 个权值  $\{w_1, w_2,…,w_n\}$ 构成 $n$ 棵二叉树的集合 $F=\{T_1,T_2,…,T_n\}$，其中每棵树 $T_i$ 只有一个带权为 $w_i$  的根节点，其左右子树均空。
+
+2. 在 $F$ 中选取两棵根节点的权值最小的树作为左右子树，构造一棵新的二叉树，置新构造二叉树的根节点的权值为其左、右子树根节点的权值之和。
+
+3. 从 $F$ 中删除这两棵树，同时将新得到的二叉树加入到 $F$ 中。
+
+    重复 2、3 步，直到 $F$​ 中只含一棵树时为止，这棵树便是最优二叉树（哈夫曼树）。
+
+最优二叉树的一个应用是对字符集中的字符进行编码和译码。
+
+### 二叉查找树
+
+二叉查找树又称为二叉排序树。它或者是一棵空树，或者是具有如下性质的二叉树：
+
+1. 若它的左子树非空，则左子树上所有节点的关键码值均小于根节点的关键码值。
+2. 若它的右子树非空，则右子树上所有节点的关键码值均大于根节点的关键码值。
+3. 左、右子树本身就是两棵二叉查找树。
+
+对二叉查找树进行中序遍历，可得到一个关键码递增有序的节点序列。
+
+二叉查找树的作用：使用二叉查找树来查找树中的数值比普通的二叉树更为方便。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRaV9RNXlDaHBKQ3A1Q3BvZEpSVFhNQlpKZW5UWHNUYjlKZE95NkFPeHZmLWc_ZT03RURNRzM.png)
+
+二叉查找树的查找操作递归实现：
+
+1. 从根节点开始查找，如果树为空，则返回 `NULL`，否则，若根节点的关键码值等于查找的值，则查找成功。
+2. 否则，若小于根节点的码值，则查找其左子树，若大于根节点的关键码值，则查找其右子树。
+
+### 二叉查找树代码实现
+
+#### 二叉树定义
+
+```c
+/* 二叉树的二叉链表结点结构定义 */
+typedef struct BiTNode    /* 结点结构 */
+{
+	int data;    /* 结点数据 */
+	struct BiTNode* lchild, * rchild;    /* 左右孩子指针 */
+} BiTNode, * BiTree;
+```
+
+#### 二叉查找树的查找
+
+```c
+/* 递归查找二叉排序树 T 中是否存在 key, */
+/* 指针 f 指向 T 的双亲，其初始调用值为 NULL */
+/* 若查找成功，则指针 p 指向该数据元素结点，并返回 TRUE */
+/* 否则指针 p 指向查找路径上访问的最后一个结点并返回 FALSE */
+Status SearchBST(BiTree T, int key, BiTree f, BiTree* p)
+{
+	if (!T)    /*  查找不成功 */
+	{
+		*p = f;
+		return FALSE;
+	}
+	else if (key == T->data) /*  查找成功 */
+	{
+		*p = T;
+		return TRUE;
+	}
+	else if (key < T->data)
+		return SearchBST(T->lchild, key, T, p);  /*  在左子树中继续查找 */
+	else
+		return SearchBST(T->rchild, key, T, p);  /*  在右子树中继续查找 */
+}
+```
+
+#### 二叉查找树的插入
+
+```c
+/*  当二叉排序树 T 中不存在关键字等于 key 的数据元素时， */
+/*  插入 key 并返回 TRUE，否则返回 FALSE */
+Status InsertBST(BiTree* T, int key)
+{
+	BiTree p, s;
+	if (!SearchBST(*T, key, NULL, &p)) /* 查找不成功 */
+	{
+		s = (BiTree)malloc(sizeof(BiTNode));
+		s->data = key;
+		s->lchild = s->rchild = NULL;
+		if (!p)
+			*T = s;            /*  插入 s 为新的根结点 */
+		else if (key < p->data)
+			p->lchild = s;    /*  插入 s 为左孩子 */
+		else
+			p->rchild = s;  /*  插入 s 为右孩子 */
+		return TRUE;
+	}
+	else
+		return FALSE;  /*  树中已有关键字相同的结点，不再插入 */
+}
+```
+
+#### 二叉查找树的删除
+
+```c
+/* 从二叉排序树中删除结点 p，并重接它的左或右子树。 */
+Status Delete(BiTree* p)
+{
+	BiTree q, s;
+	if ((*p)->rchild == NULL) /* 右子树空则只需重接它的左子树（待删结点是叶子也走此分支) */
+	{
+		q = *p;
+		*p = (*p)->lchild;
+		free(q);
+	}
+	else if ((*p)->lchild == NULL) /* 只需重接它的右子树 */
+	{
+		q = *p;
+		*p = (*p)->rchild;
+		free(q);
+	}
+	else /* 左右子树均不空 */
+	{
+		q = *p;
+		s = (*p)->lchild;
+		while (s->rchild) /* 转左，然后向右到尽头（找待删结点的前驱） */
+		{
+			q = s;
+			s = s->rchild;
+		}
+		(*p)->data = s->data; /*  s 指向被删结点的直接前驱（将被删结点前驱的值取代被删结点的值） */
+		if (q != *p)
+			q->rchild = s->lchild; /*  重接 q 的右子树 */
+		else
+			q->lchild = s->lchild; /*  重接 q 的左子树 */
+		free(s);
+	}
+	return TRUE;
+}
+```
+
+# 图
+
+## 图的定义
+
+一个图 $G(\mathrm{Graph})$ 是由两个集合：$V$ 和 $E$ 所组成的，$V$ 是有限的非空顶点 $(\mathrm{Vertex})$ 集合，E 是用顶点表示的边 $(\mathrm{Edge})$ 集合，图 $G$ 的顶点集和边集分别记为 $V(G)$ 和 $E(G)$，而将图 $G$ 记作 $G=(V,E)$。
+
+可以看出，一个顶点集合与连接这些顶点的边的集合可以唯一表示一个图。
+
+在图中，数据结构中的数据元素用顶点表示，数据元素之间的关系用边表示。
+
+## 图的相关概念
+
+有向图：图中每条边都是有方向的。从顶点 $v_i$ 到顶点 $v_j$ 表示为 $<v_i,v_j>$，而从顶点 $v_j$ 到顶点 $v_i$ 表示为 $<v_j,v_i>$。有向边也称为弧。起点称为弧尾，终点称为弧头。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VldFR0YmZ6VlM1T2xsbXpzUmFxYV9BQjF5UHdsSklNZ3J1emEtTm14UmhybXc_ZT1EQ0NmZmc.png)
+
+无向图：图中每条边都是无方向的。顶点 $v_i$ 和 $v_j$ 之间的边用 $(v_i,v_j)$ 表示。在无向图中，$(v_i,v_j)$ 和 $(v_j,v_i)$ 表示的是同一条边。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXcFplbWE2VWh0TXN2N2s3cUNjZHl3QmpUWWpTLXk3eHZaeGY5dXYxLWJlaVE_ZT1qSjNDNUc.png)
+
+完全图：若一个无向图具有 $n$ 个顶点，而每一个顶点与其他 $n-1$ 个顶点之间都有边，则称之为无向完全图。显然，含有 $n$ 个顶点的无向完全图共有 $\dfrac{n(n-1)}{2}$ 条边，类似地，有 $n$ 个顶点的有向完全图中弧的数目为 $n(n-1)$，即任意两个不同顶点之间都存在方向相反的两条弧。
+
+度：顶点所连边的数目称为 ** 度 **。
+
+出度和入度：在有向图中，由于边有方向，则顶点的度分为 ** 入度 ** 和 ** 出度 **。
+
+路径：两顶点之间的路径指顶点之间经过的顶点序列，经过路径上边的数目称为路径长度。
+
+子图：若有两个图 $G=(V,E),\ G_1=(V_1,E_2)$，若 $V_1$ 是 $V$ 的子集且 $E_2$ 是 $E$ 的子集，称 $G_1$ 是 $G$ 的子图。
+
+连通图：在无向图中，如果两个顶点之间有路径，则称这两个顶点是 ** 连通 ** 的。
+
+强连通图：在有向图中，两顶点两个方向都有路径，两顶点称为强连通。若任一顶点都是强连通的，称为强连通。有向图中极大强连通子图为有向图的强连通分量。
+
+网：图中每条边上标有某种含义的数值，该数值称为该边的 ** 权值 **。这种图称为带树图，也称作网。
+
+## 图的抽象数据类型
+
+```
+ADT 图 （Graph）
+Data
+	顶点的有穷非空集合和边的集合
+Operation
+	CreateGraph(*G, V, VR): 按照顶点集 V 和边弧集 VR 的定义构造图 G。
+	DestroyGraph(*G): 图 G 存在则销毁。
+	LocateVex(G, u): 若图 G 中存在顶点 u，则返回图中的位置。
+	GetVex(G, v): 返回图 G 中顶点的值。
+	PutVex(G, v, value): 将图 G 中顶点 v 赋值 value。
+	FirstAdjVex(G, *v): 返回顶点 v 的一个邻接顶点，若顶点在 G 中无邻接顶点返回空。
+	NextAdjvex(G, v, *w): 返回顶点 V 相对于顶点 w 的下一个邻接顶点，若 w 是 v 的最后一个邻接点则返回 NULL。
+	lnsertvex(*G, v): 在图 G 中增添新顶点 v。
+	DeleteVex(*G, v): 删除图 G 中顶点 v 及其相关的弧。
+	InsertArc(*G，v, w): 在图 G 中增添弧 <v，w>，若 G 是无向图，还需要增添对称弧 <w，v>。
+	DeleteArc(*G, v, w): 在图 G 中删除弧 <v，w>，若 G 是无向图，则还删除对称弧 <w，v>。
+	DFSTraverse(G): 对图 G 中进行深度优先遍历，在遍历过程对每个顶点调用。
+	HFSTraverse(G): 对图 G 中进行广度优先遍历，在遍历过程对每个顶点调用。
+endADT
+```
+
+
+
+## 图的存储结构
+
+### 邻接矩阵表示法
+
+图的邻接矩阵存储方式是用两个数组来表示图。一个一维数组存储图中顶点信息，一个二维数组（称为邻接矩阵）存储图中的边或弧的信息。
+
+设图 $G$ 有 $n$ 个顶点，则邻接矩阵是一个 $n×n$ 的方阵，定义为
+$$
+\mathrm{arc}[i][j]=\left\{\begin{matrix}
+1,& 若 (v_i,v_j)\in E 或 < v_i,v_j>\in E\\
+0,& 反之
+\end{matrix}\right.
+$$
+
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZOG0ybkhZWUc5THRkZjFDX0ZlcXhjQlNQaExYNDZ4V0xwYklIRTVSU083dGc_ZT13RE90SXM.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VUVzdiUGt3YjZwSHFYOExxUkpfUmNvQmo3S0hkLWZ4emI5d0FFWVEycThxSkE_ZT1RVTh5Z1Y.png)
+
+##### 网（带有权值的图）的邻接矩阵的表示
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXSFZJSk5qRzdWTWhmVEROVFYyZmM4QmFYcjJtQVE5aUF3amFxbWFhdmduM1E_ZT1wMVN1MWo.png)
+
+设图 $G$ 是网图，有 $n$ 个顶点，则邻接矩阵是一个 $n×n$ 的方阵，定义为
+$$
+\mathrm{arc}[i][j]=
+\left\{\begin{matrix}W_{ij},& 若 (v_i,v_j)\in E 或 < v_i,v_j>\in E\ 0,& 若 i=j \\
+\infty ,& 反之 
+\end{matrix}\right.
+$$
+
+### 邻接矩阵的代码实现
+
+#### 图的邻接矩阵存储结构
+
+```c
+#define MAXVEX 100 /* 最大顶点数，应由用户定义 */
+#define GRAPH_INFINITY 65535 /* 用 65535 来代表∞ */
+
+typedef int Status;    /* Status 是函数的类型, 其值是函数结果状态代码，如 OK 等 */
+typedef char VertexType; /* 顶点类型应由用户定义  */
+typedef int EdgeType; /* 边上的权值类型应由用户定义 */
+typedef struct
+{
+	VertexType vexs[MAXVEX]; /* 顶点表 */
+	EdgeType arc[MAXVEX][MAXVEX];/* 邻接矩阵，可看作边表 */
+	int numNodes, numEdges; /* 图中当前的顶点数和边数  */
+} MGraph;
+```
+
+#### 无向网图的创建代码
+
+```c
+/* 建立无向网图的邻接矩阵表示 */
+void CreateMGraph(MGraph* G)
+{
+	int i, j, k, w;
+	printf("输入顶点数和边数:\n");
+	scanf("%d,%d", &G->numNodes, &G->numEdges); /* 输入顶点数和边数 */
+	for (i = 0; i < G->numNodes; i++) /* 读入顶点信息, 建立顶点表 */
+		scanf(&G->vexs[i]);
+	for (i = 0; i < G->numNodes; i++)
+		for (j = 0; j < G->numNodes; j++)
+			G->arc[i][j] = GRAPH_INFINITY;    /* 邻接矩阵初始化 */
+	for (k = 0; k < G->numEdges; k++) /* 读入 numEdges 条边，建立邻接矩阵 */
+	{
+		printf("输入边 (vi,vj) 上的下标 i，下标 j 和权 w:\n");
+		scanf("%d,%d,%d", &i, &j, &w); /* 输入边 (vi,vj) 上的权 w */
+		G->arc[i][j] = w;
+		G->arc[j][i] = G->arc[i][j]; /* 因为是无向图，矩阵对称 */
+	}
+}
+```
+
+### 邻接链表表示法
+
+邻接链表是为图的每一个顶点建立一个单链表，第 $i$ 个单链表中的节点表示依附于顶点 $v_i$ 的表（对于有向图是以 $v_i$ 为尾的弧）。
+
+邻接链表中的表节点有表节点和表头节点两种类型
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSWGltSm9HZzVaRmtQcmRVdmFDQlNzQjZWSUhta25VdmZSNTFuWGFEQmVmM2c_ZT05cFExTGU.png)
+
+无向图的邻接链表表示法
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VadVNxS1VUN0hwQXZBeXZxQU45NmU0QmxIRGVuOWRiZ1Y0X0VQeFZwQ3Zoenc_ZT1Ra0dvVTQ.png)
+
+有向图的邻接链表表示法
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VYVnI4WE4wb0I5RmdFLWxsdmpZZW0wQlNQbEZPZkhEd1VHb2pYV1ZrbnpxeWc_ZT1rcWtvNEU.png)
+
+带权值的网的邻接链表表示法
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRZkFQdXh1MTR4Q2hyb3E3cWl2NkZrQlhWOGJuTWxfSkZBbXo2eWpIN2lRVEE_ZT1zM0RjQzA.png)
+
+### 邻接链表的代码实现
+
+#### 结点定义
+
+```c
+typedef int Status;    /* Status 是函数的类型, 其值是函数结果状态代码, 如 OK 等 */
+typedef char VertexType; /* 顶点类型应由用户定义 */
+typedef int EdgeType; /* 边上的权值类型应由用户定义 */
+
+typedef struct EdgeNode /* 边表结点  */
+{
+	int adjvex;    /* 邻接点域, 存储该顶点对应的下标 */
+	EdgeType info;        /* 用于存储权值, 对于非网图可以不需要 */
+	struct EdgeNode* next; /* 链域, 指向下一个邻接点 */
+} EdgeNode;
+
+typedef struct VertexNode /* 顶点表结点 */
+{
+	VertexType data; /* 顶点域, 存储顶点信息 */
+	EdgeNode* firstedge;/* 边表头指针 */
+} VertexNode, AdjList[MAXVEX];
+
+typedef struct
+{
+	AdjList adjList;
+	int numNodes, numEdges; /* 图中当前顶点数和边数 */
+} GraphAdjList;
+```
+
+#### 邻接表的创建
+
+```c
+/* 建立图的邻接表结构 */
+void CreateALGraph(GraphAdjList* G)
+{
+	int i, j, k;
+	EdgeNode* e;
+	printf("输入顶点数和边数:\n");
+	scanf("%d,%d", &G->numNodes, &G->numEdges); /* 输入顶点数和边数 */
+	for (i = 0; i < G->numNodes; i++) /* 读入顶点信息, 建立顶点表 */
+	{
+		scanf(&G->adjList[i].data);    /* 输入顶点信息 */
+		G->adjList[i].firstedge = NULL;    /* 将边表置为空表 */
+	}
+
+	for (k = 0; k < G->numEdges; k++)/* 建立边表 */
+	{
+		printf("输入边 (vi,vj) 上的顶点序号:\n");
+		scanf("%d,%d", &i, &j); /* 输入边 (vi,vj) 上的顶点序号 */
+		e = (EdgeNode*)malloc(sizeof(EdgeNode)); /* 向内存申请空间, 生成边表结点 */
+		e->adjvex = j;                    /* 邻接序号为 j */
+		e->next = G->adjList[i].firstedge;    /* 将 e 的指针指向当前顶点上指向的结点 */
+		G->adjList[i].firstedge = e;        /* 将当前顶点的指针指向 e */
+
+		e = (EdgeNode*)malloc(sizeof(EdgeNode)); /* 向内存申请空间, 生成边表结点 */
+		e->adjvex = i;                    /* 邻接序号为 i */
+		e->next = G->adjList[j].firstedge;    /* 将 e 的指针指向当前顶点上指向的结点 */
+		G->adjList[j].firstedge = e;        /* 将当前顶点的指针指向 e */
+	}
+}
+```
+
+# 排序算法
+
+## 直接插入排序
+
+具体做法是：在插入第 $i$ 个记录时，$R_1,R_2,…,R_{i-1}$ 已经排好序，将记录 $R_i$ 的关键字 $k_i$ 依次与关键字 $k_{i-1},k_{i-2},…,k1$ 进行比较，从而找到 $R_i$ 应该插入的位置，插入位置及其后的记录依次向后移动。
+
+待排序列：35 12 67 29 51
+
+第 1 步：35
+
+第 2 步：12 35
+
+第 3 步：12 35 67
+
+第 4 步：12 29 35 67
+
+第 5 步：12 29 35 51 67
+
+```c
+/* 对顺序表 L 作直接插入排序 */
+void InsertSort(SqList* L)
+{
+	int i, j;
+	for (i = 2; i <= L->length; i++)
+	{
+		if (L->r[i] < L->r[i - 1]) /* 需将 L->r[i] 插入有序子表 */
+		{
+			L->r[0] = L->r[i]; /* 设置哨兵 */
+			for (j = i - 1; L->r[j] > L->r[0]; j--)
+				L->r[j + 1] = L->r[j]; /* 记录后移 */
+			L->r[j + 1] = L->r[0]; /* 插入到正确位置 */
+		}
+	}
+}
+```
+
+## 冒泡排序
+
+首先将第一个记录的关键字和第二个记录的关键字进行比较，若为逆序，则交换两个记录的值，然后比较第二个记录和第三个记录的关键字，依此类推。
+
+待排序列：35 12 67 29 51
+
+第一次冒泡排序：
+
+1. 12 35 67 29 51
+2. **12** 35 67 29 51
+3. **12 35** 29 67 51
+4. **12 35 29** 51 67
+
+第二次冒泡排序：
+
+1. 12 35 29 51 67
+2. 12 29 35 51 67
+
+```c
+/* 对顺序表 L 作冒泡算法 */
+void BubbleSort(SqList* L)
+{
+	int i, j;
+	Status flag = TRUE;            /* flag 用来作为标记 */
+	for (i = 1; i < L->length && flag; i++) /* 若 flag 为 true 说明有过数据交换，否则停止循环 */
+	{
+		flag = FALSE;                /* 初始为 False */
+		for (j = L->length - 1; j >= i; j--)
+		{
+			if (L->r[j] > L->r[j + 1])
+			{
+				swap(L, j, j + 1);    /* 交换 L->r[j] 与 L->r[j+1] 的值 */
+				flag = TRUE;        /* 如果有数据交换，则 flag 为 true */
+			}
+		}
+	}
+}
+```
+
+## 简单选择排序
+
+$n$ 个记录进行简单选择排序的基本方法是：
+
+通过 $n-i$ 次关键字之间的比较，从 $n-i+1$ 个记录中选出关键字最小的记录，并和第 $i(1≤i≤n)$ 个记录进行交换，当 $i$ 等于 $n$ 时所有记录有序排列。
+
+待排序列：35 12 67 29 51
+
+1. 找出最小值 12，与第一个关键字进行交换： **12** 35 67 29 51
+2. 找出剩下 4 个记录中的最小值 29，与第二个关键字交换：**12 29** 67 35 51
+3. 找出剩下 3 个记录中的最小值 35，与第三个关键字交换：**12 29 35** 67 51
+4. 找出剩下 2 个记录中的最小值 51，与第四个关键字交换：**12 29 35 51** 67
+
+```c
+/* 对顺序表 L 作简单选择排序 */
+void SelectSort(SqList* L)
+{
+	int i, j, min;
+	for (i = 1; i < L->length; i++)
+	{
+		min = i;                        /* 将当前下标定义为最小值下标 */
+		for (j = i + 1; j <= L->length; j++)/* 循环之后的数据 */
+		{
+			if (L->r[min] > L->r[j])    /* 如果有小于当前最小值的关键字 */
+				min = j;                /* 将此关键字的下标赋值给 min */
+		}
+		if (i != min)                        /* 若 min 不等于 i，说明找到最小值，交换 */
+			swap(L, i, min);                /* 交换 L->r[i] 与 L->r[min] 的值 */
+	}
+}
+```
+
+## 希尔排序
+
+希尔排序又称 “缩小增量排序”，是对直接插入排序方法的改进。
+
+先将整个待排记录序列分割成若干子序列，然后分别进行直接插入排序，待整个序列中的记录基本有序时，再对全体记录进行一次直接插入排序。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhVWtnTFNFODlsSHNfZWR5ZkV2aUpvQjNWMHJvQ0dtYXk4dGhGVElEbnp2YVE_ZT1Banp3MmY.png)
+
+```c
+/* 对顺序表 L 作希尔排序 */
+void ShellSort(SqList* L)
+{
+	int i, j, k = 0;
+	int increment = L->length;
+	do
+	{
+		increment = increment / 3 + 1;/* 增量序列 */
+		for (i = increment + 1; i <= L->length; i++)
+		{
+			if (L->r[i] < L->r[i - increment])/*  需将 L->r[i] 插入有序增量子表 */
+			{
+				L->r[0] = L->r[i]; /*  暂存在 L->r[0] */
+				for (j = i - increment; j> 0 && L->r[0] < L->r[j]; j -= increment)
+					L->r[j + increment] = L->r[j]; /*  记录后移，查找插入位置 */
+				L->r[j + increment] = L->r[0]; /*  插入 */
+			}
+		}
+		printf("第 %d 趟排序结果:", ++k);
+		print(*L);
+	} while (increment> 1);
+}
+```
+
+## 快速排序
+
+通过一趟排序将待排的记录划分为独立的两部分，称为前半区和后半区，其中，前半区中记录的关键字均不大于后半区记录的关键字，然后再分别对这两部分记录继续进行快速排序，从而使整个序列有序。
+
+具体做法：附设两个位置指示变量 $i$ 和 $j$ ，它们的初值分别指向序列的第一个记录和最后一个记录。设枢轴记录（通常是第一个记录）的关键字为 $pivot$，则首先从 $j$ 所指位置起向前搜索，找到第一个关键字小于 $pivot$ 的记录时将该记录向前移到 i 指示的位置，然后从 $i$ 所指位置起向后搜索，找到第一个关键字大于 $pivot$ 的记录时将该记录向后移到 $j$ 所指位置，重复该过程直至 $i$ 与 $j$ 相等为止。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlWVBfSFZwQ01GTW05SnJDWWZhZ2RFQjRxbVJ1WjVfamMzWmw0WHFPd0VidWc_ZT1ieWFHdnQ.png)
+
+```c
+/* 快速排序 ******************************** */
+
+/* 交换顺序表 L 中子表的记录，使枢轴记录到位，并返回其所在位置 */
+/* 此时在它之前 (后) 的记录均不大 (小) 于它。 */
+int Partition(SqList* L, int low, int high)
+{
+	int pivotkey;
+
+	pivotkey = L->r[low]; /* 用子表的第一个记录作枢轴记录 */
+	while (low < high) /*  从表的两端交替地向中间扫描 */
+	{
+		while (low < high && L->r[high] >= pivotkey)
+			high--;
+		swap(L, low, high);/* 将比枢轴记录小的记录交换到低端 */
+		while (low < high && L->r[low] <= pivotkey)
+			low++;
+		swap(L, low, high);/* 将比枢轴记录大的记录交换到高端 */
+	}
+	return low; /* 返回枢轴所在位置 */
+}
+
+/* 对顺序表 L 中的子序列 L->r[low..high] 作快速排序 */
+void QSort(SqList* L, int low, int high)
+{
+	int pivot;
+	if (low < high)
+	{
+		pivot = Partition(L, low, high); /*  将 L->r[low..high] 一分为二，算出枢轴值 pivot */
+		QSort(L, low, pivot - 1);        /*  对低子表递归排序 */
+		QSort(L, pivot + 1, high);        /*  对高子表递归排序 */
+	}
+}
+
+/* 对顺序表 L 作快速排序 */
+void QuickSort(SqList* L)
+{
+	QSort(L, 1, L->length);
+}
+```
+
+
+
+## 堆排序
+
+堆：对于 $n$ 个元素的关键字序列 $\{k_1,k_2,…,k_n\}$，当且仅当满足下列关系时称其为堆。
+
+$$
+\left\{\begin{matrix}
+k_i ≤ k_{2i} \\
+k_i ≤ k_{2i+1}
+\end{matrix}\right.
+\ 或
+\left\{\begin{matrix}
+k_i \ge k_{2i} \\
+k_i \ge k_{2i+1}
+\end{matrix}\right.
+$$
+
+基本思想：对一组待排序记录的关键字，首先把它们按堆的定义排成一个序列（即建立初始堆），从而输出堆顶的最小关键字（对于小顶堆而言）。然后将剩余的关键字再调整成新堆，便得到次小的关字，如此反复，直到全部关键字排成有序序列为止。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZb1BpNkxBbzdGTWhSSERHeGhsVGg4Qk50Sktfc2JYaXJJRlc0NUtfQjBuSUE_ZT1oVVVoVjE.png)
+
+```c
+/* 堆排序 ********************************** */
+
+/* 已知 L->r[s..m] 中记录的关键字除 L->r[s] 之外均满足堆的定义， */
+/* 本函数调整 L->r[s] 的关键字, 使 L->r[s..m] 成为一个大顶堆 */
+void HeapAdjust(SqList* L, int s, int m)
+{
+	int temp, j;
+	temp = L->r[s];
+	for (j = 2 * s; j <= m; j *= 2) /* 沿关键字较大的孩子结点向下筛选 */
+	{
+		if (j < m && L->r[j] < L->r[j + 1])
+			++j; /* j 为关键字中较大的记录的下标 */
+		if (temp>= L->r[j])
+			break; /* rc 应插入在位置 s 上 */
+		L->r[s] = L->r[j];
+		s = j;
+	}
+	L->r[s] = temp; /* 插入 */
+}
+```
+
+## 归并排序
+
+基本思想：把一个有 $n$ 个记录的无序文件看成是由 $n$ 个长度为 $1$ 的有序子文件组成的文件，然后进行两两归并，得到 $\dfrac{n}{2}$ 个长度为 $2$ 或 $1$ 的有序文件，再两两归并，如此重复，直至最后形成包含 $n$ 个记录的有序文件为止。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmTThNX0VLWWVSRWg4MGY5OTJCaFdzQkVrQnVoanBVQ3J1Y25oTEhtS2FJX1E_ZT1TTTM5bFo.png)
+
+```c
+/* 归并排序 ********************************** */
+
+/* 将有序的 SR[i..m] 和 SR[m+1..n] 归并为有序的 TR[i..n] */
+void Merge(int SR[], int TR[], int i, int m, int n)
+{
+	int j, k, l;
+	for (j = m + 1, k = i; i <= m && j <= n; k++)    /* 将 SR 中记录由小到大地并入 TR */
+	{
+		if (SR[i] < SR[j])
+			TR[k] = SR[i++];
+		else
+			TR[k] = SR[j++];
+	}
+	if (i <= m)
+	{
+		for (l = 0; l <= m - i; l++)
+			TR[k + l] = SR[i + l];        /* 将剩余的 SR[i..m] 复制到 TR */
+	}
+	if (j <= n)
+	{
+		for (l = 0; l <= n - j; l++)
+			TR[k + l] = SR[j + l];        /* 将剩余的 SR[j..n] 复制到 TR */
+	}
+}
+
+/* 将 SR[] 中相邻长度为 s 的子序列两两归并到 TR[] */
+void MergePass(int SR[], int TR[], int s, int n)
+{
+	int i = 1;
+	int j;
+	while (i <= n - 2 * s + 1)
+	{/* 两两归并 */
+		Merge(SR, TR, i, i + s - 1, i + 2 * s - 1);
+		i = i + 2 * s;
+	}
+	if (i < n - s + 1) /* 归并最后两个序列 */
+		Merge(SR, TR, i, i + s - 1, n);
+	else /* 若最后只剩下单个子序列 */
+		for (j = i; j <= n; j++)
+			TR[j] = SR[j];
+}
+
+/* 对顺序表 L 作归并非递归排序 */
+void MergeSort(SqList* L)
+{
+	int* TR = (int*)malloc(L->length * sizeof(int));/* 申请额外空间 */
+	int k = 1;
+	while (k < L->length)
+	{
+		MergePass(L->r, TR, k, L->length);
+		k = 2 * k;/* 子序列长度加倍 */
+		MergePass(TR, L->r, k, L->length);
+		k = 2 * k;/* 子序列长度加倍 */
+	}
+}
+```
+
+
+
+## 总结
+
+1. 直接插入排序：按顺序插入待排关键字，插入时依次查找位置，直接插入，后面的依次后移。
+2. 冒泡排序：依次把相邻的两个记录进行比较，然后交换位置。
+3. 简单选择排序：每次选择最小的，与第一个没有排过序的记录交换。
+4. 希尔排序：间隔若干个空的记录分为一组，进行直接插入排序，依次将间隔缩小到 1 为止。
+5. 快速排序：设两个指针指示头尾，从尾开始，首尾交替轮流和枢轴记录（第一个记录）进行比较，并交换位置。
+6. 堆排序：反复将待排序列建立成堆，并取堆顶。
+7. 归并排序：两两归并为一组，再四个记录归并为一组，依此类推。
+
+| 排序方法     | 最好时间      | 平均时间      | 最坏时间 | 辅助空间 | 稳定性 |
+| ------------ | ------------- | ------------- | -------- | -------- | ------ |
+| 直接插入排序 | $O(n)$        | $O(n^2)$      | $O(n^2)$ | $O(1)$ |   稳定     |
+| 简单选择排序 | $O(n^2)$      | $O(n^2)$      | $O(n^2)$ | $O(1)$ |    不稳定      |
+| 冒泡排序     | $O(n)$        | $O(n^2)$      | $O(n^2)$ | $O(1)$ |    稳定      |
+| 希尔排序     | -             | $O(n^{1.25})$ | -        | $O(1)$ |   不稳定       |
+| 快速排序     | $O(n\log_2n)$ | $O(n\log_2n)$ | $O(n^2)$ | $O(\log_2n)~O(n)$ |  不稳定        |
+| 堆排序       | $O(n\log_2n)$ | $O(n\log_2n)$ | $O(n\log_2n)$     | $O(1)$ |     不稳定     |
+| 归并排序     | $O(n\log_2n)$ | $O(n\log_2n)$ |   $O(n\log_2n)$       | $O(n)$ |    稳定      |
+
+# 查找算法
+
+## 查找表及查找效率
+
+查找表定义：是指由同一类型的数据元素（或记录）构成的集合。
+
+静态查找表：只进行 “查询” 和“检索”操作。
+
+动态查找表：除了查询和检索外可能还会进行插入和删除操作。
+
+关键字：是数据元素（或记录）的某个数据项的值，用它来识别（标识）这个数据元素（或记录）。
+
+查找：根据给定的某个值，在查找表中确定是否存在一个其关键字等于给定值的记录或数据元素。
+
+平均查找长度（ASL）：对于查找算法来说，其基本操作是 “将记录的关键字与给定值进行比较”。因此，通常以“其关键字和给定值进行比较的记录个数的平均值” 作为衡量查找算法好坏的依据。
+
+## 顺序查找
+
+从表中的一端开始，逐个进行记录的关键字和给定值的比较，若找到一个记录的关键字与给定值相等，则查找成功；若整个表中的记录均比较过，仍未找到关键字等于给定值的记录，则查找失败。
+
+查找效率低，但是算法简单且适应面广。
+
+```c
+/* 无哨兵顺序查找，a 为数组，n 为要查找的数组个数，key 为要查找的关键字 */
+int Sequential_Search(int* a, int n, int key)
+{
+	int i;
+	for (i = 1; i <= n; i++)
+	{
+		if (a[i] == key)
+			return i;
+	}
+	return 0;
+}
+/* 有哨兵顺序查找 */
+int Sequential_Search2(int* a, int n, int key)
+{
+	int i;
+	a[0] = key;
+	i = n;
+	while (a[i] != key)
+	{
+		i--;
+	}
+	return i;
+}
+```
+
+## 折半查找（二分查找）
+
+基本思想：先令查找表中间位置记录的关键字和给定值比较，若相等，则查找成功；若不等，则缩小范围，直至新的查找区间中间位置记录的关键字等于给定值或者查找区间没有元素时（查找不成功）为止。
+
+这种方法要求查找表进行顺序存储并且按关键字有序排列。
+
+查找效率比顺序查找要高，但要求关键字有序排列。
+
+适用于表不易变动，且又经常进行查找的情况。
+
+```c
+/* 折半查找 */
+int Binary_Search(int* a, int n, int key)
+{
+	int low, high, mid;
+	low = 1;    /* 定义最低下标为记录首位 */
+	high = n;    /* 定义最高下标为记录末位 */
+	while (low <= high)
+	{
+		mid = (low + high) / 2;    /* 折半 */
+		if (key < a[mid])        /* 若查找值比中值小 */
+			high = mid - 1;        /* 最高下标调整到中位下标小一位 */
+		else if (key> a[mid])/* 若查找值比中值大 */
+			low = mid + 1;        /* 最低下标调整到中位下标大一位 */
+		else
+		{
+			return mid;        /* 若相等则说明 mid 即为查找到的位置 */
+		}
+
+	}
+	return 0;
+}
+```
+
+
+
+### 折半查找断定树
+
+从折半查找的过程来看，可以用一棵二叉树来描述。通常称这个描述折半查找二叉树的过程称为折半查找判定树。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTVnJmTGNwWF94RHZISU1aUHhnV0c0QmxjVFJkRXpQV1hWTEFkNi1qU0ZRRnc_ZT14ejNxRFQ.png)
+
+## 树表查找
+
+二叉查找树是一种动态查找表，表结构本身是在查找过程中动态生成的。
+
+设关键字序列为 &#123;46，25，54，13，29，91&#125;
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmZXh4dXh6cTlCQXEwbk1nVGRDZ0p3QlQ3RFZWeFpFSWZwLURQdW11WVowNlE_ZT02Y241SVU.png)
+
+## 索引顺序查找（分块查找）
+
+是对顺序查找的一种改进
+
+将表分成若干块，每一块中的关键字不一定有序，但块之间是有序的。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZc0xCXzhrRXpsTnNpNVpuWjdiVDU4Qkh1YUFOX2lTYnZldHg3eEJuelNpVnc_ZT04azByNmI.png)
+
+## 哈希查找
+
+前面几种查找方法中，记录的存储位置和关键码之间不存在确定的关系，因此查找时都要建立在对关键字进行比较的基础之上。
+
+哈希函数：关键字作为自变量，关键字存放的地址作为因变量。
+$$
+H_i=\mathrm{Hash}(Key)
+$$
+这一映射过程称为 ** 哈希造表 ** 或 ** 散列 **，所得的存储位置称为 ** 哈希地址 ** 或 ** 散列地址 **。
+
+** 冲突 **：对于某个哈希函数 $\mathrm{Hash}$ 和两个关键字 $K_1$ 和 $K_2$，如果 $K_1≠K_2$ 而 $\mathrm{Hash}(K_1)=\mathrm{Hash}(K_2)$，则称出现了冲突。
+
+采用哈希法主要考虑的两个问题是 ** 哈希函数的构造 ** 和 ** 冲突的解决 **。
+
+冲突的处理：
+
+1. 开放定址法：
+    $H_i=(\mathrm{Hash}(key)+d_i) \% m,\ (i=1,2,…,k\  (k≤m-1)$
+
+    其中，$\mathrm{Hash}(key)$ 为哈希函数，$m$ 为哈希表的表长，$d_i$ 为增量序列。
+
+    常见的增量序列有如下三种：
+
+    - $d_i=1,2,3,…,m-1$，称为线性探测再散列。
+    - $d_i=1^2,-1^2,2^2,-2^2,3^2,…,±k^2 (k≤m/2)$，称为二次探测再散列。
+    - $d_i=$​ 伪随机序列，称为随机探测再散列。
+
+    ![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZc0xCXzhrRXpsTnNpNVpuWjdiVDU4Qkh1YUFOX2lTYnZldHg3eEJuelNpVnc_ZT1VR1Z0bWU.png)
+
+2. 链地址法：它将具有相同哈希函数值的记录组织成一个链表，当链域的值为 `NULL` 时，表示已没有后继记录。
+
+	地址里存放的是指针，而不是关键字，将哈希函数值相同的记录组成一个链表
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaR1U1V0hKTW5sRmdDeG5KQy1YVkpzQlJCSjJfbnlHVjVKM25pWEgxUUZ1MUE_ZT1lbzdzY0s.png)
+
+```c
+#define SUCCESS 1
+#define UNSUCCESS 0
+#define HASHSIZE 12 /* 定义散列表长为数组的长度 */
+#define NULLKEY -32768
+
+typedef int Status;    /* Status 是函数的类型, 其值是函数结果状态代码，如 OK 等 */
+
+typedef struct
+{
+	int* elem; /* 数据元素存储基址，动态分配数组 */
+	int count; /*  当前数据元素个数 */
+} HashTable;
+
+int m = 0; /* 散列表表长，全局变量 */
+
+/* 初始化散列表 */
+Status InitHashTable(HashTable* H)
+{
+	int i;
+	m = HASHSIZE;
+	H->count = m;
+	H->elem = (int*)malloc(m * sizeof(int));
+	for (i = 0; i < m; i++)
+		H->elem[i] = NULLKEY;
+	return OK;
+}
+
+/* 散列函数 */
+int Hash(int key)
+{
+	return key % m; /* 除留余数法 */
+}
+
+/* 插入关键字进散列表 */
+void InsertHash(HashTable* H, int key)
+{
+	int addr = Hash(key); /* 求散列地址 */
+	while (H->elem[addr] != NULLKEY) /* 如果不为空，则冲突 */
+	{
+		addr = (addr + 1) % m; /* 开放定址法的线性探测 */
+	}
+	H->elem[addr] = key; /* 直到有空位后插入关键字 */
+}
+
+/* 散列表查找关键字 */
+Status SearchHash(HashTable H, int key, int* addr)
+{
+	*addr = Hash(key);  /* 求散列地址 */
+	while (H.elem[*addr] != key) /* 如果不为空，则冲突 */
+	{
+		*addr = (*addr + 1) % m; /* 开放定址法的线性探测 */
+		if (H.elem[*addr] == NULLKEY || *addr == Hash(key)) /* 如果循环回到原点 */
+			return UNSUCCESS;    /* 则说明关键字不存在 */
+	}
+	return SUCCESS;
+}
+```
+
+# 图的相关算法
+
+## 生成树与最小生成树
+
+生成树的概念：设图 $G=(V,E)$ 是个连通图，如果其子图是一棵包含 $G$ 的所有顶点的树，则该子图称为 $G$ 的生成树。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaMzdvSWF1ejR4RmlJb2pxaWt5MFNBQnpBbkFOaW5pSTl1Nkg5MFYxU0p1Y1E_ZT12SURCbXM.png)
+
+最小生成树：对于连通网来说，边是带权值的，生成树的各边也带权值，于是就把生成树各边的权值总和称为生成树的权，把权值最小的生成树称为最小生成树。
+
+求最小生成树的两种算法：普里姆算法、克鲁斯卡尔算法。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VkVTBmUDdGenQxTnByeXJ5YTVvQXB3QjRuYkpadmpzTVdkOFlwTnBNWnBGTFE_ZT1EVWJudVg.png)
+
+### 普里姆算法
+
+以顶点为主
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0Via0ZOdFZFUWtSTmpDWlRteTI0cU5BQjZJMzFnb01uN05pd2p6cDkwLTVadHc_ZT1oMTVmQk0.png)
+
+```c
+#define MAXEDGE 20
+#define MAXVEX 20
+#define GRAPH_INFINITY 65535
+
+/* Prim 算法生成最小生成树  */
+void MiniSpanTree_Prim(MGraph G)
+{
+	int min, i, j, k;
+	int adjvex[MAXVEX];        /* 保存相关顶点下标 */
+	int lowcost[MAXVEX];    /* 保存相关顶点间边的权值 */
+	lowcost[0] = 0;/* 初始化第一个权值为 0，即 v0 加入生成树 */
+	/* lowcost 的值为 0，在这里就是此下标的顶点已经加入生成树 */
+	adjvex[0] = 0;            /* 初始化第一个顶点下标为 0 */
+	for (i = 1; i < G.numVertexes; i++)    /* 循环除下标为 0 外的全部顶点 */
+	{
+		lowcost[i] = G.arc[0][i];    /* 将 v0 顶点与之有边的权值存入数组 */
+		adjvex[i] = 0;                    /* 初始化都为 v0 的下标 */
+	}
+	for (i = 1; i < G.numVertexes; i++)
+	{
+		min = GRAPH_INFINITY;    /* 初始化最小权值为∞， */
+		/* 通常设置为不可能的大数字如 32767、65535 等 */
+		j = 1;
+		k = 0;
+		while (j < G.numVertexes)    /* 循环全部顶点 */
+		{
+			if (lowcost[j] != 0 && lowcost[j] < min)/* 如果权值不为 0 且权值小于 min */
+			{
+				min = lowcost[j];    /* 则让当前权值成为最小值 */
+				k = j;            /* 将当前最小值的下标存入 k */
+			}
+			j++;
+		}
+		printf("(%d, %d)\n", adjvex[k], k);/* 打印当前顶点边中权值最小的边 */
+		lowcost[k] = 0;/* 将当前顶点的权值设置为 0, 表示此顶点已经完成任务 */
+		for (j = 1; j < G.numVertexes; j++)    /* 循环所有顶点 */
+		{
+			if (lowcost[j] != 0 && G.arc[k][j] < lowcost[j])
+			{/* 如果下标为 k 顶点各边权值小于此前这些顶点未被加入生成树权值 */
+				lowcost[j] = G.arc[k][j];/* 将较小的权值存入 lowcost 相应位置 */
+				adjvex[j] = k;                /* 将下标为 k 的顶点存入 adjvex */
+			}
+		}
+	}
+}
+```
+
+
+
+### 克鲁斯卡尔算法
+
+以边为主
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWT0xucHVYVmdWS3M1cjM5REZGb3pBQktjOGdZOENiZDhyajhGR1BoaHJUUGc_ZT1WME5tY2k.png)
+
+```c
+/* 生成最小生成树 */
+void MiniSpanTree_Kruskal(MGraph G)
+{
+	int i, j, n, m;
+	int k = 0;
+	int parent[MAXVEX];/* 定义一数组用来判断边与边是否形成环路 */
+
+	Edge edges[MAXEDGE];/* 定义边集数组, edge 的结构为 begin,end,weight, 均为整型 */
+
+	/* 用来构建边集数组并排序 ********************* */
+	for (i = 0; i < G.numVertexes - 1; i++)
+	{
+		for (j = i + 1; j < G.numVertexes; j++)
+		{
+			if (G.arc[i][j] < GRAPH_INFINITY)
+			{
+				edges[k].begin = i;
+				edges[k].end = j;
+				edges[k].weight = G.arc[i][j];
+				k++;
+			}
+		}
+	}
+	sort(edges, &G);
+	/* ******************************************* */
+
+
+	for (i = 0; i < G.numVertexes; i++)
+		parent[i] = 0;    /* 初始化数组值为 0 */
+
+	printf("打印最小生成树：\n");
+	for (i = 0; i < G.numEdges; i++)    /* 循环每一条边 */
+	{
+		n = Find(parent, edges[i].begin);
+		m = Find(parent, edges[i].end);
+		if (n != m) /* 假如 n 与 m 不等，说明此边没有与现有的生成树形成环路 */
+		{
+			parent[n] = m;    /* 将此边的结尾顶点放入下标为起点的 parent 中。 */
+			/* 表示此顶点已经在生成树集合中 */
+			printf("(%d, %d) %d\n", edges[i].begin, edges[i].end, edges[i].weight);
+		}
+	}
+}
+
+/* 查找连线顶点的尾部下标 */
+int Find(int* parent, int f)
+{
+	while (parent[f] > 0)
+	{
+		f = parent[f];
+	}
+	return f;
+}
+```
+
+

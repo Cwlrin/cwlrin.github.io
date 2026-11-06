@@ -1,0 +1,22 @@
+/* Mermaid 图表容器样式（由 src/components/MermaidRenderer.astro 使用） */
+
+.mermaid-diagram {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 渲染成功后原代码块（含 <code-block> 外壳）会被加 hidden，
+   这里确保自定义元素也被彻底移除排版，避免留下标题栏或空白 */
+.mermaid-diagram + pre,
+pre[data-language="mermaid"][hidden],
+code-block[hidden] {
+  display: none !important;
+}

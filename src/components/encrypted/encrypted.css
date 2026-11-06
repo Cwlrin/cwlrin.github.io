@@ -1,0 +1,204 @@
+.encrypted-post {
+  --encrypted-primary: var(--primary-color);
+  --encrypted-bg: var(--grey-1);
+  --encrypted-card-bg: var(--grey-0);
+  --encrypted-text: var(--text-color);
+  --encrypted-border: var(--grey-4);
+  --encrypted-error: var(--color-red);
+  --encrypted-success: var(--color-green);
+}
+
+.encrypted-lock-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.encrypted-lock-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+.encrypted-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--encrypted-text);
+}
+
+.encrypted-description {
+  font-size: 0.95rem;
+  color: var(--encrypted-text);
+  opacity: 0.7;
+  margin-bottom: 2rem;
+  max-width: 400px;
+}
+
+.encrypted-password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.encrypted-password-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  border: 2px solid var(--encrypted-border);
+  border-radius: 8px;
+  background: var(--encrypted-card-bg);
+  color: var(--encrypted-text);
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.encrypted-password-input:focus {
+  border-color: var(--encrypted-primary);
+  box-shadow: 0 0 0 3px var(--color-red-a1);
+}
+
+.encrypted-password-input::placeholder {
+  color: var(--encrypted-text);
+  opacity: 0.5;
+}
+
+.encrypted-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--header-text-color);
+  background: var(--encrypted-primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.encrypted-submit-btn:hover {
+  filter: brightness(0.95);
+  transform: translateY(-1px);
+}
+
+.encrypted-submit-btn:active {
+  transform: translateY(0);
+}
+
+.encrypted-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.encrypted-submit-btn .loading-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid transparent;
+  border-top-color: var(--header-text-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.encrypted-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--encrypted-error);
+  background: var(--color-red-a1);
+  border: 1px solid var(--color-red-a3);
+  border-radius: 6px;
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-5px);
+  }
+  40%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+.encrypted-error .icon {
+  flex-shrink: 0;
+}
+
+/* 解密后的内容样式 */
+.encrypted-content {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 解密中状态 */
+.encrypted-decrypting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.encrypted-decrypting .loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--encrypted-border);
+  border-top-color: var(--encrypted-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.encrypted-decrypting-text {
+  font-size: 0.95rem;
+  color: var(--encrypted-text);
+  opacity: 0.8;
+}

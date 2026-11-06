@@ -1,0 +1,270 @@
+---
+import NavBar from "@/components/navbar/NavBar";
+import Brand from "@/components/Brand.astro";
+import HeaderCover from "@/components/HeaderCover.astro";
+import Waves from "@/components/Waves.astro";
+import { getCollection } from "astro:content";
+import type {
+  TocItem,
+  RelatedPost,
+  QuickNavigation,
+} from "@/components/sidebar/SidebarTypes";
+import "@/styles/view-transition.css";
+import "@vtbag/element-crossing?url";
+
+import themeConfig from "@/theme.config.ts";
+
+import "@/styles/palette.css";
+import "@/styles/style.css";
+import "@/styles/navbar.css";
+import "@/styles/sidebar.css";
+import "@/styles/widgets.css";
+import "@/styles/category-card.css";
+import "@/styles/floating-toolbar.css";
+import "@/styles/about-dialog.css";
+import "@/styles/search-page.css";
+import "@/styles/articles-charts.css";
+import "@/styles/image-zoom.css";
+import "@/styles/header-cover.css";
+import "@/styles/code-block-light.css";
+import "@/styles/mdx-components.css";
+
+import Loading from "@/components/Loading.astro";
+import { covers, resolveFixedCover } from "@/components/Images.astro";
+import FloatingToolbar from "@/components/FloatingToolbar";
+import MermaidRenderer from "@/components/MermaidRenderer.astro";
+import TwoColumnLayout from "@/layouts/TwoColumnLayout.astro";
+import ThreeColumnLayout from "@/layouts/ThreeColumnLayout.astro";
+import { generateTagCloud } from "@/toolkit/posts/generateTagCloud";
+import { createWidgetPosts } from "@/toolkit/posts/createWidgetPosts";
+import { toTagHref } from "@/toolkit/posts/url";
+import { resolveHeaderCovers } from "@/toolkit/headerCover";
+import Footer from "@/components/footer/Footer.astro";
+import type { ImageMetadata } from "astro";
+import { currentLocale } from "@/i18n";
+
+// Accept sidebar props from child pages
+interface PostMeta {
+  date: Date;
+  wordCount: number;
+  readTime: number;
+}
+
+interface Props {
+  toc?: TocItem[];
+  relatedPosts?: RelatedPost[];
+  currentSlug?: string;
+  navigation?: QuickNavigation;
+  pageTitle?: string;
+  postMeta?: PostMeta;
+  indexPage?: boolean;
+  pageCover?: ImageMetadata | string;
+}
+
+const {
+  toc = [],
+  relatedPosts = [],
+  currentSlug = "",
+  navigation = {},
+  pageTitle = "",
+  postMeta,
+  indexPage = false,
+  pageCover,
+} = Astro.props;
+
+const navLinks = themeConfig.nav;
+const siteName = themeConfig.siteName;
+const sidebarConfig = themeConfig.sidebar || {};
+const brandConfig = themeConfig.brand || {};
+const coverConfig = themeConfig.cover || {};
+const footerConfig = themeConfig.footer || {};
+const widgetsConfig = themeConfig.widgets || {};
+const tagCloudConfig = themeConfig.tagCloud || {};
+const layoutConfig = themeConfig.layout || {};
+const rightSidebarConfig = layoutConfig.rightSidebar || {};
+const layoutMode = layoutConfig.mode || "two-column";
+const enableThirdColumn = layoutMode === "three-column";
+const shouldComputeRightSidebarRandomPosts =
+  enableThirdColumn && rightSidebarConfig.randomPosts === true;
+const shouldComputeRightSidebarRecentMoments =
+  enableThirdColumn && rightSidebarConfig.recentMoments === true;
+const shouldComputeRightSidebarTagCloud =
+  enableThirdColumn && rightSidebarConfig.tagCloud === true;
+const ActiveLayout = enableThirdColumn ? ThreeColumnLayout : TwoColumnLayout;
+
+// fixedCover：通过 Images.astro 统一解析（静态导入走 <Image />，字符串走 <img> 兜底）
+const fixedCover = coverConfig.fixedCover?.enable
+  ? resolveFixedCover(coverConfig.fixedCover.url)
+  : undefined;
+const advancedCarousel = coverConfig.advancedCarousel === true;
+const headerCovers = advancedCarousel
+  ? await resolveHeaderCovers({
+      coverUrls: coverConfig.coverUrls,
+      fallbackCovers: covers,
+    })
+  : [];
+const resolvedHeaderCover = pageCover ?? fixedCover;
+
+// Get all posts for widgets
+const allPosts = await getCollection("posts");
+const posts = allPosts.filter((post) => !post.data.draft);
+const moments = shouldComputeRightSidebarRecentMoments
+  ? (await getCollection("moments")).toSorted(
+      (a, b) =>
+        new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+    )
+  : [];
+const rightSidebarPosts = shouldComputeRightSidebarRandomPosts
+  ? posts.filter((post) => !post.data.encrypted)
+  : [];
+const rightSidebarTagCloud = shouldComputeRightSidebarTagCloud
+  ? (() => {
+      const rightSidebarTagCounts = posts.reduce((acc, post) => {
+        post.data.tags?.forEach((tag) => {
+          acc.set(tag, (acc.get(tag) || 0) + 1);
+        });
+
+        return acc;
+      }, new Map<string, number>());
+
+      return generateTagCloud(
+        Array.from(rightSidebarTagCounts.entries()).map(([name, count]) => ({
+          name,
+          count,
+        })),
+        {
+          minFontSize: 12,
+          maxFontSize: 20,
+          startColor: tagCloudConfig.startColor,
+          endColor: tagCloudConfig.endColor,
+          limit: 16,
+        },
+      ).map((tag) => ({
+        name: tag.name,
+        count: tag.count,
+        fontSize: tag.fontSize,
+        color: tag.color,
+        href: toTagHref(tag.name),
+      }));
+    })()
+  : [];
+
+const siteState = {
+  categories: allPosts.reduce((acc, post) => {
+    post.data.categories?.forEach((category) => acc.add(category));
+    return acc;
+  }, new Set()).size,
+  posts: posts.length,
+  tags: allPosts.reduce((acc, post) => {
+    post.data.tags?.forEach((tag) => acc.add(tag));
+    return acc;
+  }, new Set()).size,
+};
+
+const widgetPosts = createWidgetPosts(posts);
+
+// Import custom elements definitions
+import CodeBlock from "@/components/CodeBlock";
+import ImageZoom from "@/components/ImageZoom";
+import SearchPage from "@/components/search/SearchPage";
+import HyacineOutlet from "@hyacine/plugin-astro/components/HyacineOutlet.astro";
+---
+
+<!doctype html>
+<html lang={currentLocale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <script>
+      import "virtual:hyacine/runtime";
+    </script>
+
+    <slot name="head" />
+
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+    <title>{pageTitle}</title>
+  </head>
+  <body data-layout-mode={layoutMode}>
+    <NavBar
+      client:load
+      name={siteName}
+      navLinks={navLinks}
+      clickToggleCallback={() => void 0}
+    />
+    <SearchPage client:idle selector="#search" />
+    <Loading />
+    <div id="container">
+      <HeaderCover
+        enable={coverConfig.enable}
+        preload={coverConfig.preload}
+        fixedCover={resolvedHeaderCover}
+        gradient={coverConfig.gradient}
+        covers={advancedCarousel ? headerCovers : covers}
+        advancedCarousel={advancedCarousel}
+        title={brandConfig.title}
+      />
+      <Brand
+        title={brandConfig.title}
+        subtitle={brandConfig.subtitle}
+        logo={brandConfig.logo}
+        pageTitle={indexPage ? "" : pageTitle}
+        postMeta={postMeta}
+      />
+      <Waves />
+      <main>
+        <ActiveLayout
+          widgetPosts={widgetPosts}
+          widgetsConfig={widgetsConfig}
+          sidebarConfig={sidebarConfig}
+          rightSidebarConfig={rightSidebarConfig}
+          rightSidebarPosts={rightSidebarPosts}
+          rightSidebarMoments={moments}
+          rightSidebarTagCloud={rightSidebarTagCloud}
+          navLinks={navLinks}
+          toc={toc}
+          relatedPosts={relatedPosts}
+          currentSlug={currentSlug}
+          navigation={navigation}
+          siteState={siteState}
+        >
+          <slot />
+        </ActiveLayout>
+      </main>
+      <Footer config={footerConfig} {siteName} author={sidebarConfig.author || ""} />
+    </div>
+    <script>
+      import "@/toolkit/initMdxComponents";
+    </script>
+    <script>
+      import { css } from "@/assets/fonts/LXGWWenKai-Regular.ttf?subsets";
+
+      document.addEventListener("pagereveal", () => {
+        document.body.style.fontFamily = css.family as string;
+        document.documentElement.style.setProperty("--pf-font", css.family as string);
+      });
+      document.addEventListener("DOMContentLoaded", () => {
+        document.body.style.fontFamily = css.family as string;
+        document.documentElement.style.setProperty("--pf-font", css.family as string);
+      });
+    </script>
+    <div class="hidden">
+      <CodeBlock client:idle />
+      <ImageZoom client:idle />
+    </div>
+    <FloatingToolbar client:idle hasNyxPlayer={false} />
+    <HyacineOutlet name="layout-bottom" />
+    <MermaidRenderer />
+  </body>
+</html>
+
+<style>
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+</style>

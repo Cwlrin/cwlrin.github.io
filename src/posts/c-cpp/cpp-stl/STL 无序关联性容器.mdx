@@ -1,0 +1,167 @@
+---
+title: "STL 无序关联性容器"
+date: 2021-03-15T23:01:04+08:00
+categories: ["C 与 C++", "STL 基础"]
+tags: ["C++", "STL"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWUFRCWFBBaDRCRmhWeUhTUW5wWDU4QkQ1enJLZ2RXZ3F6XzdBX0h3SU1hWmc_ZT1yeGNLcVo.jpg"
+---
+
+## 哈希
+
+### 哈希函数 
+
+哈希函数是一种根据关键码 `key` 去寻找值的数据映射的结构，即：根据 `key` 值找到 `key` 对应的存储位置。
+
+```cpp
+size_t index = H(key)  // 由关键字获取所在位置
+```
+
+### 哈希函数的构造方式
+
+- **定址法**： 这种方法使用线性函数来构造哈希函数，公式为 `H(key) = a * key + b`。其中，`a` 和 `b` 是常数，需要根据实际情况进行选择，以确保哈希值的均匀分布。这种方法简单，但可能不适用于所有类型的键。
+- **平方取中法**： 这种方法首先计算键的平方，然后取平方结果的中间几位作为哈希值。例如，对于键 key = 1234，其平方为 $1234^2 = 1522756$，然后可以选择中间的数字 227 作为哈希值。这种方法试图通过平方操作增加键之间的差异性，以减少冲突。
+- **数字分析法**： 这种方法通常涉及到对键的数字特性进行分析，然后根据这些特性来构造哈希值。一个简单的示例是取键除以某个常数的余数，公式为 `H(key) = key % 10000`。这种方法适用于键是数字的情况，且常数的选择对哈希值的分布有很大影响。
+- **除留取余法**： 这种方法与数字分析法类似，但更一般化。它通过取键除以一个质数 `p`（其中 `p` 小于或等于表长 `m`）的余数来构造哈希值，公式为 `H(key) = key mod p`。选择一个合适的质数 `p` 可以提高哈希值的均匀分布，减少冲突。
+
+### 哈希冲突
+
+哈希冲突是哈希表中常见的问题之一，它发生在两个不同的键值通过哈希函数计算后得到相同的哈希值，即它们被映射到哈希表的同一个位置。
+
+ ```cpp
+ if (H(key1) == H(key2)) {
+     // 哈希冲突发生
+ }
+ ```
+
+### 解决哈希冲突
+
+1. **开放定址法**： 这种方法在发生冲突时，会寻找哈希表中的另一个空闲位置来存储元素。这通常通过探测序列实现，如线性探测、二次探测或双重哈希。线性探测简单但可能导致聚集问题，二次探测和双重哈希则试图减少聚集，提高哈希表的利用率。
+2. **链地址法（拉链法）**： 在这种方法中，哈希表的每个槽位不是存储单个元素，而是存储一个链表。当发生冲突时，新元素不是替换原有元素，而是添加到该槽位的链表中。这种方法易于实现，且可以处理大量的冲突，但需要额外的内存来存储链表结构。C++ STL 中的 `unordered_map` 和 `unordered_set` 就是使用链地址法来解决哈希冲突的。
+3. **再散列法**： 这种方法涉及使用另一个哈希函数或一组哈希函数来计算元素的存储位置。如果原始哈希函数产生的位置上已经有元素，就使用备用的哈希函数来寻找新的位置。这种方法可以减少冲突，但增加了计算的复杂性。
+4. **建立公共溢出区**： 这种方法为所有发生冲突的元素设置一个或多个溢出区。当哈希表的某个位置发生冲突时，冲突的元素会被存储在溢出区中，而不是在原位置。这种方法简单，但可能会导致溢出区变得非常大，从而影响性能。
+
+![image-20241014163109413.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXMXlaZHNKMHRCSWpQLUFwYURtaHZFQnpIOTQwa0o4ckIwekFZangzemFKS1E_ZT1UWVBDOTM.jpg)
+
+### 装载因子
+
+装载因子（Load Factor）是衡量哈希表性能的关键指标，它通过已存储元素的数量与哈希表总容量的比值来计算。装载因子的大小直接影响哈希表的冲突概率和空间利用率。当装载因子较小，即哈希表中的元素较少时，不同元素间发生冲突的概率降低，这是因为有更多的空槽位可以容纳新元素，但这也意味着哈希表的空间利用率不高。相反，当装载因子较大，哈希表中的元素较多时，空间利用率提高，但冲突的概率也随之增加，因为更多的元素被映射到有限的槽位上。
+
+装载因子的大小对哈希表的性能有着直接的影响。例如，在开放寻址法中，较小的装载因子可以减少查找时的探测序列长度，从而提高查找效率。而在链地址法中，尽管冲突概率增加，但每个槽位上的链表长度增加，可能导致链表操作的性能下降。因此，在许多哈希表的实现中，当装载因子超过某个阈值时，会触发动态调整机制，如重新哈希，以减少冲突并提高性能，但这需要额外的计算和内存操作。
+
+### 哈希表的设计思想
+
+哈希表的设计思想基于一种“用空间换时间”的策略，其核心目的是通过牺牲一定的存储空间来实现对数据的快速访问。在理想情况下，哈希表能够提供接近常数时间的查找效率，即无论哈希表中有多少元素，查找任意元素所需的时间都是固定的。
+
+## `unordered_set` 的使用
+
+### 基本特征
+
+`unordered_set` 存放的是 `key` 类型，`key` 值是唯一的，不能重复，`key` 值是没有顺序的，底层使用的是哈希表。
+
+`unordered_set` 的查找（`count`、`find`）、插入（`insert`）、删除（`erase`）与 `set` 完全一样。`unordered_set` 也不支持下标。
+
+### 针对于自定义类型
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRYXZRVzJZalg1R3Q1ZUk1TlQyR1pNQmQyMlNZTGlCcS1jSFpOb011LWw0Umc_ZT14dTk4SDg.jpg)
+
+模板的第二个参数需要设置哈希函数，如果 `Key` 类型是自定义类型（类类型），就需要改写 `Hash` 参数，方式有两种：模板的特化、函数对象的写法。
+
+```cpp
+// 模版特化
+namespace std {
+template<>
+struct hash<Point> {
+  size_t operator()(const Point &rhs) const {
+    cout << "template <> struct hash" << endl;
+    return (rhs.getX() << 2) ^ (rhs.getY() << 1);
+  }
+};//end of struct hash
+
+}//end of namespace std
+
+// 函数对象
+struct HashPoint {
+  size_t operator()(const Point &rhs) const {
+    cout << "struct HashPoint" << endl;
+    return (rhs.getX() << 2) ^ (rhs.getY() << 1);
+  }
+};
+```
+
+模板的第三个参数 `KeyEqual`，如果 `Key` 类型是自定义类型（类类型），就需要改写 `KeyEqual` 参数，方式有三种：模板的特化、函数对象的写法、运算符重载。
+
+```cpp
+// 针对于 equal_to 而言，实现了运算符重载
+bool operator==(const Point &lhs, const Point &rhs) {
+  cout << "bool operator==" << endl;
+  return (lhs.getX() == rhs.getX()) && (lhs.getY() == rhs.getY());
+}
+
+// 现在需要将 KeyEqual 的默认值 std::equal_to 写成模板的特化形式
+namespace std {
+template<>
+struct equal_to<Point> {
+  bool operator()(const Point &lhs, const Point &rhs) const {
+    cout << "template <> struct equal_to" << endl;
+    return (lhs.getX() == rhs.getX()) && (lhs.getY() == rhs.getY());
+  }
+
+};//end of struct equal_to
+
+}//end of namespace std
+
+// 函数对象
+struct EqualToPoint {
+  bool operator()(const Point &lhs, const Point &rhs) const {
+    cout << "struct EqualToPoint" << endl;
+    return (lhs.getX() == rhs.getX()) && (lhs.getY() == rhs.getY());
+  }
+};
+```
+
+## `unordered_multiset` 的使用
+
+### 基本特征
+
+`unordered_multiset` 存放的是 `key` 类型，`key` 值是不唯一的，可以重复，`key` 值是没有顺序的，底层使用的是哈希表。
+
+`unordered_multiset` 的查找（`count`、`find`）、插入（`insert`）、删除（`erase`）与 `set` 完全一样。`unordered_set` 也不支持下标。
+
+### 针对于自定义类型
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlSkU4YXBGVlc1Qm9qQzZMdkFVSy1nQk1VNTdHZVhfalRKTkdzWHlSMWtONWc_ZT0ydG44ZEI.jpg)
+
+模板的第二个参数需要设置哈希函数，如果 `Key` 类型是自定义类型（类类型），就需要改写 `Hash` 参数，方式有两种：模板的特化、函数对象的写法。
+
+模板的第三个参数 `KeyEqual`，如果 `Key` 类型是自定义类型（类类型），就需要改写 `KeyEqual` 参数，方式有三种：模板的特化、函数对象的写法、运算符重载。
+
+## `unordered_map` 的使用
+
+### 基本特征
+
+`unordered_map` 存放的是 `key-value` 的 `pair` 类型，`key` 值是唯一的，不能重复，`value` 值既可以重复也可以不重复，`key` 值是没有顺序的，底层使用的是哈希表。
+
+`unordered_map` 的查找（`count`、`find`）、插入（`insert`）、删除（`erase`）与 `set` 完全一样。
+
+`unordered_map` 支持下标操作。
+
+### 针对于自定义类型
+
+`unordered_map` 的模板参数中，第三个参数是 `Hash`，会针对 `Hash` 类型进行设计哈希函数，如果此时 `Key` 类型不需要设计哈希函数，也就是已经特化好了，那么就不需要改写 `Hash`；如果 `Hash` 类型没有特化，那么就需要自己进行改写，改写的方式有两种：模板的特化、函数对象。
+
+第四个参数 `KeyEqual` 需要比较两个 `Key` 是否相等，如果可以直接比较相等，那么就不需要改写，否则需要进行改写 `KeyEqual`，改写方式有三种：模板的特化、运算符重载、函数对象。
+
+## `unordered_multimap` 的使用
+
+### 基本特征
+
+`unordered_multimap` 存放的是 `key-value` 的 `pair` 类型，`key` 值是不唯一的，可以重复，`value` 值既可以重复也可以不重复，`key` 值是没有顺序的，底层使用的是哈希表。
+
+`unordered_multimap` 的查找（`count`、`find`）、插入（`insert`）、删除（`erase`）与 `set` 完全一样。`unordered_multimap` 也不支持下标。
+
+### 针对于自定义类型
+
+`unordered_multimap` 的模板参数中，第三个参数是 `Hash`，会针对 `Hash` 类型进行设计哈希函数，如果此时 `Key` 类型不需要设计哈希函数，也就是已经特化好了，那么就不需要改写 `Hash`；如果 `Hash` 类型没有特化，那么就需要自己进行改写，改写的方式有两种：模板的特化、函数对象。
+
+第四个参数 `KeyEqual` 需要比较两个 `Key` 是否相等，如果可以直接比较相等，那么就不需要改写，否则需要进行改写 `KeyEqual`，改写方式有三种：模板的特化、运算符重载、函数对象。
+

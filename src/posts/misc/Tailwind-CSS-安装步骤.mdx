@@ -1,0 +1,54 @@
+---
+title: "Tailwind CSS 安装步骤"
+date: 2022-04-14T16:06:37+08:00
+categories: ["杂项"]
+tags: ["工具"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVVUtWUkZRV0ZsQm1MeGlVLVVWNVJJQmgxSmNyTWRpVHc4b1VzOWdBTm1hN1E_ZT02b2tLRXA.png"
+---
+
+1. 通过 `npm imit` 初始依赖，然后使用 `npm install -D tailwindcss@latest postcss@latest autoprefixer@latest` 安装 Tailwind，使用 `npm i postcss postcss-cli -g` 安装 postcss 命令
+
+2. 通过 `npx tailwindcss init -p` 初始化两个文件，分别是 `tailwind.config.js` 和 `postcss.config.js`
+
+   ```bash
+   PS C:\Users\ASUS\PycharmProjects\lab8\app> npx tailwindcss init -p
+   Created Tailwind CSS config file: tailwind.config.js
+   Created PostCSS config file: postcss.config.js
+   ```
+
+3. 项目内新建一个目录，名为 CSS ，里面新增一个文件 style.css，在里面使用 `@tailwind` 关键词，载入 Tailwind 三大部件。
+
+   ```css
+   @tailwind base;
+   @tailwind components;
+   @tailwind utilities;
+   ```
+
+4. 在 package.json 内新增一个 scripts
+
+   ```json
+    "scripts" : {
+           "watch": "postcss static/css/style.css -o static/plugins/style.css --watch"
+       }
+   ```
+
+5. 新建文件夹 templates（Django 规定目录，使用其他框架可以重新命名），  新增一个 index.html ，载入 `plugins/style.css`
+
+6. 打开 tailwind.config.js，在 purge 数组里添加 templates 目录下所有 HTML 文件
+
+   ```javascript
+     purge: [
+         './templates/**/*.html'
+     ],
+   ```
+
+7. 在 package.json 内新增一个 script 名为 build
+
+   ```json
+     "scripts": {
+       "watch": "postcss static/css/style.css -o static/plugins/style.css --watch",
+       "build": "cross-env NODE_ENV=production postcss static/css/style.css -o static/plugins/style.css"
+     },
+   ```
+
+   运行build，完成！

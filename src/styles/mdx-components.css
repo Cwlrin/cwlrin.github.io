@@ -1,0 +1,751 @@
+.md .note {
+  border-radius: 0.1875rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  position: relative;
+  background: var(--note-bg, var(--grey-2));
+  color: var(--note-text, var(--text-color));
+  border-left: 0.25rem solid var(--note-border, var(--grey-4));
+  font-size: 0.875rem;
+  padding-left: 2.5rem;
+}
+
+.md .note.note-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem 1rem 1rem;
+  color: var(--note-text, var(--text-color));
+}
+
+.md .note.note-card::before {
+  content: none;
+}
+
+.md .note.note-card .note-icon {
+  flex: 0 0 auto;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--note-text, var(--text-color));
+}
+
+.md .note.note-card .note-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.md .note.note-card .note-title {
+  font-weight: 700;
+  color: var(--note-text, var(--text-color));
+  margin-bottom: 0.25rem;
+}
+
+.md .note.note-card .note-content > :last-child {
+  margin-bottom: 0;
+}
+
+.md .note h2,
+.md .note h3,
+.md .note h4,
+.md .note h5,
+.md .note h6 {
+  margin-top: 0.1875rem;
+  border-bottom: initial;
+  margin-bottom: 0;
+  padding-top: 0;
+}
+
+.md .note p {
+  line-height: 1.8;
+}
+
+.md .note a:not(.btn) {
+  color: var(--note-hover);
+  border-bottom: 0.0625rem dashed var(--note-text);
+}
+
+.md .note a:not(.btn):hover {
+  color: var(--note-text);
+  border-bottom-color: var(--note-text);
+}
+
+.md .note ul li::before {
+  background: var(--note-text);
+}
+
+.md .note ol li::before {
+  background: var(--note-text, var(--primary-color)) !important;
+  width: 0.8rem;
+  height: 0.8rem;
+  font-size: 0.45rem;
+  line-height: 0.8rem;
+  top: 0.4rem;
+  left: -1.2rem;
+}
+
+.md .mdx-collapse__summary::-webkit-details-marker {
+  display: none;
+}
+
+.md .mdx-collapse > summary:first-of-type {
+  list-style-type: none;
+}
+
+.md .mdx-collapse__summary {
+  outline: none;
+  cursor: pointer;
+  padding: 0.625rem;
+  background: var(--note-bg, none);
+  border-radius: 0.25rem;
+  transition: all 0.4s ease;
+}
+
+.md .mdx-collapse__summary::marker {
+  display: none;
+}
+
+.md .mdx-collapse__summary::before {
+  content: "▸";
+  color: var(--text-color-muted);
+  margin-right: 0.5rem;
+}
+
+.md .mdx-collapse__content {
+  padding: 0.625rem;
+}
+
+.md .mdx-collapse.primary,
+.md .mdx-collapse.info,
+.md .mdx-collapse.success,
+.md .mdx-collapse.warning,
+.md .mdx-collapse.danger {
+  margin: 0 0 0.8rem;
+}
+
+.md .mdx-collapse.primary .mdx-collapse__summary,
+.md .mdx-collapse.info .mdx-collapse__summary,
+.md .mdx-collapse.success .mdx-collapse__summary,
+.md .mdx-collapse.warning .mdx-collapse__summary,
+.md .mdx-collapse.danger .mdx-collapse__summary {
+  color: var(--note-text);
+}
+
+.md .mdx-collapse.primary .mdx-collapse__summary::before,
+.md .mdx-collapse.info .mdx-collapse__summary::before,
+.md .mdx-collapse.success .mdx-collapse__summary::before,
+.md .mdx-collapse.warning .mdx-collapse__summary::before,
+.md .mdx-collapse.danger .mdx-collapse__summary::before {
+  color: var(--note-text);
+}
+
+.md .mdx-collapse[open] {
+  background: var(--note-bg, none);
+  border-radius: 0.25rem;
+  color: var(--text-color);
+}
+
+.md .mdx-collapse[open] .mdx-collapse__summary {
+  background: var(--note-hover, var(--grey-2));
+  border-radius: 0.25rem;
+}
+
+.md .mdx-collapse[open] .mdx-collapse__summary::before {
+  content: "▾";
+  color: var(--primary-color);
+}
+
+.md .mdx-collapse[open] .mdx-collapse__content {
+  margin: 0 0 0.8rem;
+}
+
+.md .mdx-collapse[open].primary,
+.md .mdx-collapse[open].info,
+.md .mdx-collapse[open].success,
+.md .mdx-collapse[open].warning,
+.md .mdx-collapse[open].danger {
+  color: var(--note-text);
+}
+
+.md .mdx-collapse[open].primary > .mdx-collapse__summary,
+.md .mdx-collapse[open].info > .mdx-collapse__summary,
+.md .mdx-collapse[open].success > .mdx-collapse__summary,
+.md .mdx-collapse[open].warning > .mdx-collapse__summary,
+.md .mdx-collapse[open].danger > .mdx-collapse__summary {
+  color: var(--grey-0);
+  border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.md .mdx-collapse[open].primary > .mdx-collapse__summary::before,
+.md .mdx-collapse[open].info > .mdx-collapse__summary::before,
+.md .mdx-collapse[open].success > .mdx-collapse__summary::before,
+.md .mdx-collapse[open].warning > .mdx-collapse__summary::before,
+.md .mdx-collapse[open].danger > .mdx-collapse__summary::before {
+  color: var(--grey-0);
+}
+
+.md .kbd,
+.md kbd {
+  background-color: var(--grey-1);
+  background-image: linear-gradient(var(--grey-2), var(--grey-0), var(--grey-2));
+  border: 0.0625rem solid var(--grey-4);
+  border-radius: 0.2rem;
+  box-shadow: 0.1rem 0.1rem 0.2rem var(--grey-9-a1);
+  font-family: inherit;
+  padding: 0.1rem 0.3rem;
+  white-space: nowrap;
+}
+
+.md mark.highlight {
+  background-color: var(--note-bg, color-mix(in oklch, var(--color-yellow) 25%, transparent));
+  color: inherit;
+  border-radius: 0.2rem;
+  padding: 0 0.2rem;
+}
+
+.md mark.highlight.default {
+  --note-bg: color-mix(in oklch, var(--color-yellow) 25%, transparent);
+}
+
+span.label {
+  display: inline;
+  border-radius: 0.3rem;
+  border: 0.0625rem solid;
+  padding: 0.2rem 0.3rem;
+  background: var(--note-bg, var(--grey-2));
+  border-color: var(--note-border, var(--grey-4));
+  color: var(--note-text, var(--text-color));
+}
+
+.md .quiz-group {
+  counter-reset: quiz-counter;
+}
+
+.md .quiz-group .quiz-item {
+  margin: 0.625rem 0;
+  position: relative;
+  padding-left: 0.8rem;
+}
+
+.md .quiz-group .quiz-item::before {
+  counter-increment: quiz-counter;
+  content: counter(quiz-counter) ".";
+  position: absolute;
+  color: var(--primary-color);
+  text-align: right;
+  width: 2rem;
+  left: -2.2rem;
+  height: auto;
+  background: none !important;
+  border: none !important;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.md .quiz-group .quiz-item::after {
+  transition: all 0.3s ease;
+}
+
+.md .quiz-group .quiz-item > .quiz-question {
+  margin: 0;
+}
+
+.md .quiz-group .quiz-item.fill > .quiz-question {
+  cursor: pointer;
+}
+
+.md .quiz-group .quiz-item > .quiz-question > p:first-child {
+  margin: 0;
+  cursor: pointer;
+}
+
+.md .quiz-group .quiz-item > .quiz-question > p:first-child::before {
+  content: "[" attr(data-type) "]";
+  font-size: 0.75rem;
+  color: var(--text-color-muted);
+  margin: auto 0.3125rem;
+}
+
+.md .quiz-group .quiz-options {
+  padding-inline-start: 0.625rem;
+  margin-top: 0.5rem;
+  counter-reset: quiz-option-counter;
+}
+
+.md .quiz-group .quiz-options > .quiz-option {
+  list-style: none;
+  position: relative;
+  margin: 0.25rem 0;
+  cursor: pointer;
+}
+
+.md .quiz-group .quiz-options > .quiz-option::before {
+  counter-increment: quiz-option-counter;
+  content: counter(quiz-option-counter, upper-alpha);
+  color: var(--color-grey);
+  margin-right: 0.625rem;
+  transition: all 0.3s ease;
+}
+
+.md .quiz-group .quiz-options > .quiz-option::after {
+  content: none;
+}
+
+.md .quiz-group .quiz-options > .quiz-option .quiz-result-icon {
+  position: absolute;
+  left: -1.4rem;
+  top: 0.5rem;
+  font-size: 0.9rem;
+  display: none;
+  scale: 1.5;
+}
+
+.md .quiz-group .quiz-options > .quiz-option.selected {
+  color: var(--primary-color);
+}
+
+.md .quiz-group .quiz-options > .quiz-option.right::before {
+  color: var(--color-green);
+}
+
+.md .quiz-group .quiz-options > .quiz-option.right::after {
+  content: none;
+}
+
+.md .quiz-group .quiz-options > .quiz-option.right .quiz-result-icon {
+  color: var(--color-green);
+  display: inline-block;
+  animation: fadeIn 0.5s;
+}
+
+.md .quiz-group .quiz-options > .quiz-option.wrong::before {
+  color: var(--color-red);
+}
+
+.md .quiz-group .quiz-options > .quiz-option.wrong::after {
+  content: none;
+}
+
+.md .quiz-group .quiz-options > .quiz-option.wrong .quiz-result-icon {
+  color: var(--color-red);
+  display: inline-block;
+  animation: fadeIn 0.5s;
+}
+
+.md .quiz-group .quiz-item.show.true::before,
+.md .quiz-group .quiz-item.show.false::before {
+  visibility: hidden;
+}
+
+.md .quiz-group .quiz-item .quiz-state-icon {
+  position: absolute;
+  left: -1.2rem;
+  top: 0.6rem;
+  font-size: 1rem;
+  display: none;
+  scale: 1.5;
+}
+
+.md .quiz-group .quiz-item.show.true .quiz-state-icon,
+.md .quiz-group .quiz-item.show.false .quiz-state-icon {
+  display: inline-block;
+  animation: fadeIn 0.5s;
+}
+
+.md .quiz-group .quiz-item.show.true .quiz-state-icon {
+  color: var(--color-green);
+}
+
+.md .quiz-group .quiz-item.show.false .quiz-state-icon {
+  color: var(--color-red);
+}
+
+.md .quiz-group .quiz-gap {
+  display: inline-block;
+  min-width: 2.5rem;
+  text-align: center;
+  padding: 0 0.625rem;
+  text-indent: -624.9375rem;
+  white-space: nowrap;
+}
+
+.md .quiz-group .quiz-gap::after {
+  display: block;
+  content: "";
+  background: var(--text-color);
+  width: calc(100% + 1.25rem);
+  height: 0.0625rem;
+  margin-bottom: -0.0625rem;
+  margin-left: -0.625rem;
+}
+
+.md .quiz-group .quiz-item.show.fill .quiz-gap {
+  text-indent: 0;
+}
+
+.md .quiz-group .quiz-answer {
+  display: none;
+  margin-top: 0.5rem;
+}
+
+.md .quiz-group .quiz-item.show .quiz-answer {
+  display: block;
+  animation: slideDown 0.3s ease;
+}
+
+.md .quiz-group .quiz-mistake {
+  display: block;
+  border: 0.1875rem dashed var(--text-color-muted);
+  padding: 0.625rem 1.25rem;
+  background: var(--grey-3);
+  margin: 0.3125rem 0;
+}
+
+.md .quiz-group .quiz-mistake::before {
+  display: block;
+  content: "[" attr(data-type) "]";
+  font-size: 0.8125rem;
+  color: var(--text-color-muted);
+}
+
+.md .quiz-group .quiz-check-btn {
+  margin-top: 0.5rem;
+  border: none;
+  border-radius: 0.375rem;
+  background: var(--primary-color);
+  color: var(--grey-0);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.md .quiz-group .quiz-check-btn:hover {
+  filter: brightness(1.08);
+}
+
+.md .quiz-group .quiz-check-btn[hidden] {
+  display: none;
+}
+
+.md ruby.ruby-annotation {
+  padding: 0 0.2rem;
+  ruby-align: center;
+  ruby-position: over;
+}
+
+.md ruby.ruby-annotation rt {
+  color: var(--grey-5);
+  font-size: 0.75em;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.md ruby.ruby-annotation rp {
+  color: var(--grey-5);
+}
+
+.md .spoiler:not(.bulr) {
+  background-color: var(--text-color);
+  color: var(--text-color);
+  text-shadow: none;
+  transition: color 0.3s;
+  padding: 0 0.1875rem;
+}
+
+.md .spoiler:not(.bulr):hover {
+  color: var(--grey-0);
+}
+
+.md .bulr {
+  text-shadow: color-mix(in oklch, var(--grey-9) 70%, transparent) 0 0 0.625rem;
+  color: transparent;
+}
+
+.md s.strike {
+  color: var(--note-text, var(--grey-5));
+  text-decoration-color: var(--note-text, var(--grey-5));
+}
+
+.md s.strike.default {
+  --note-text: var(--grey-5);
+}
+
+/* === macOS 风格代码组选项卡 === */
+.md .tabs {
+  display: block;
+  position: relative;
+  margin: 0 0 2rem;
+  border-radius: 0.5rem;
+  border: 0.0625rem solid var(--grey-1-a7);
+  background: var(--grey-1);
+  box-shadow: 0 0.375rem 1.125rem color-mix(in srgb, var(--grey-9) 10%, transparent);
+  overflow: hidden;
+}
+
+/* 标题栏 — 仿 macOS 窗口顶栏 */
+.md .tabs > .nav {
+  background-color: var(--surface-code-header);
+  border-bottom: 0.0625rem solid var(--grey-1-a7);
+  min-height: 2.6875rem;
+  position: relative;
+}
+
+.md .tabs > .nav[hidden] {
+  display: none;
+}
+
+/* 选项卡列表 — 横向滚动 + 边缘淡出遮罩 */
+.md .tabs > .nav > ul {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 0.75rem,
+    black calc(100% - 0.75rem),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 0.75rem,
+    black calc(100% - 0.75rem),
+    transparent 100%
+  );
+}
+
+.md .tabs > .nav > ul::-webkit-scrollbar {
+  display: none;
+}
+
+/* 滚动阴影指示器 */
+.md .tabs > .nav::before,
+.md .tabs > .nav::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0.5rem;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.md .tabs > .nav::before {
+  left: 0;
+  box-shadow: inset 0.5rem 0 0.375rem -0.25rem color-mix(in srgb, var(--grey-9) 30%, transparent);
+  opacity: 0;
+}
+
+.md .tabs > .nav::after {
+  right: 0;
+  box-shadow: inset -0.5rem 0 0.375rem -0.25rem color-mix(in srgb, var(--grey-9) 30%, transparent);
+  opacity: 0;
+}
+
+/* 显示左右滚动阴影 */
+.md .tabs > .nav[data-at-start="false"]::before {
+  opacity: 1;
+}
+
+.md .tabs > .nav[data-at-end="false"]::after {
+  opacity: 1;
+}
+
+/* 单个标签项 */
+.md .tabs > .nav li {
+  position: relative;
+  cursor: pointer;
+  border: none;
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  color: var(--text-color);
+}
+
+/* 标签按钮 */
+.md .tabs > .nav button {
+  all: unset;
+  position: relative;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  line-height: 2;
+  color: inherit;
+  font-size: 0.95rem;
+  padding: 0.3125rem 1.25rem 0.5rem;
+}
+
+/* 语言圆点徽章 */
+.md .tabs > .nav .lang-badge {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--lang-color, var(--grey-5));
+  flex-shrink: 0;
+}
+
+/* 顶部活动指示条 */
+.md .tabs > .nav button::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 0.125rem;
+  background: var(--primary-color);
+  transform: scaleX(0);
+  transform-origin: center;
+  opacity: 0;
+  transition:
+    transform 0.25s ease,
+    opacity 0.2s ease;
+}
+
+/* 悬停时指示条半展开 */
+.md .tabs > .nav li:hover:not(.active) > button::before,
+.md .tabs > .nav li:focus-within:not(.active) > button::before {
+  transform: scaleX(0.6);
+  opacity: 0.5;
+}
+
+/* 激活状态指示条全展开 */
+.md .tabs > .nav li.active {
+  color: var(--primary-color);
+}
+
+.md .tabs > .nav li.active > button::before {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+.md .tabs > .nav li.active > button {
+  font-weight: 600;
+}
+
+/* 面板容器 */
+.md .tabs .tabs-panels {
+  padding: 1.25rem;
+}
+
+/* 代码组的面板无内边距（代码块填满容器） */
+.md .tabs.code-group .tabs-panels {
+  padding: 0;
+}
+
+/* 普通选项卡面板保留内边距 */
+.md .tabs:not(.code-group) .tabs-panels {
+  padding: 1.25rem;
+}
+
+/* 单个面板项 */
+.md .tabs .tab-item {
+  display: none;
+  animation: tabs-fade-in 0.2s ease;
+}
+
+.md .tabs .tab-item.active {
+  display: block;
+}
+
+.md .tabs .tab-item > :first-child {
+  margin-top: 0;
+}
+
+.md .tabs .tab-item > :last-child {
+  margin-bottom: 0;
+}
+
+.md .text {
+  display: inline;
+}
+
+.md .text.rainbow {
+  background-image: linear-gradient(
+    to left,
+    orangered,
+    orange,
+    gold,
+    lightgreen,
+    cyan,
+    dodgerblue,
+    mediumpurple,
+    hotpink,
+    orangered
+  );
+  background-size: 110vw;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: rainbow 60s linear infinite;
+}
+
+.md ins.underline {
+  --line-color: var(--note-text, var(--primary-color));
+  text-decoration: none;
+  border-bottom: 0.125rem solid var(--line-color);
+}
+
+.md ins.underline.wavy {
+  text-decoration-style: wavy;
+  text-decoration-line: underline;
+  text-decoration-color: var(--line-color);
+  border-bottom: none;
+}
+
+.md ins.underline.dot {
+  border-bottom: 0.2rem dotted var(--line-color);
+}
+
+.md ins.underline.default {
+  --note-text: var(--primary-color);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.125rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tabs-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.125rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rainbow {
+  to {
+    background-position: -2000vw;
+  }
+}

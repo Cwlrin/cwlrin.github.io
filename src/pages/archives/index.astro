@@ -1,0 +1,142 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import { structurePostsByDate } from "@/toolkit/posts/structurePostsByDate";
+import { buildArchiveTimeline } from "@/toolkit/posts/buildArchiveTimeline";
+import { toCategoryHref, toPostHref } from "@/toolkit/posts/url";
+import { fmtNum } from "@/toolkit/tools/fmtNum";
+import { t } from "@/i18n";
+import "../../styles/collapse.css";
+
+// Get all published posts sorted by date
+const allPosts = await getCollection("posts");
+const publishedPosts = allPosts
+  .filter((post) => !post.data.draft)
+  .toSorted((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Structure posts by date
+const structuredPosts = structurePostsByDate(publishedPosts, { daily: false });
+
+// Get all years in descending order
+const years = Object.keys(structuredPosts)
+  .map(Number)
+  .toSorted((a, b) => b - a);
+
+// Total post count for cheers message
+const totalPosts = publishedPosts.length;
+let cheers = "um";
+if (totalPosts > 210) cheers = "excellent";
+else if (totalPosts > 130) cheers = "great";
+else if (totalPosts > 80) cheers = "good";
+else if (totalPosts > 50) cheers = "nice";
+else if (totalPosts > 30) cheers = "ok";
+
+// Helper to format date
+function formatDate(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${month}-${day}`;
+}
+---
+
+<Layout pageTitle={t("archive.title")}>
+  <div class="wrap">
+    <div class="timeline">
+      <h2 class="item header">
+        <a href="/">{t("nav.home")}</a>
+        <small>/</small>
+        {t("common.total")}
+        {totalPosts}
+        {t("category.posts")}。
+        <small class="cheers"
+          >{
+            cheers === "excellent"
+              ? t("archive.excellent")
+              : cheers === "great"
+                ? t("archive.great")
+                : cheers === "good"
+                  ? t("archive.good")
+                  : cheers === "nice"
+                    ? t("archive.nice")
+                    : cheers === "ok"
+                      ? t("archive.ok")
+                      : t("archive.emh")
+          }
+          {t("archive.keepTrying")}。</small
+        >
+      </h2>
+
+      {
+        years.map((year) => {
+          const timelineItems = buildArchiveTimeline(
+            structuredPosts[year].yearlySummary,
+          );
+
+          return timelineItems.map(
+            ({ post, month, showMonthSection, monthPostCount }) => {
+              const postDate = post.data.date;
+              const lastCategory =
+                post.data.categories?.[post.data.categories.length - 1];
+
+              return (
+                <>
+                  {showMonthSection && (
+                    <h3 class="item section">
+                      <a href={`/archives/${year}/`}>
+                        {year} {t("archive.year")}
+                      </a>
+                      <small>/</small>
+                      <a href={`/archives/${year}/${fmtNum(month)}/`}>
+                        {month} {t("archive.month")}
+                      </a>
+                      <small>({monthPostCount})</small>
+                    </h3>
+                  )}
+
+                  <article
+                    class="item normal"
+                    itemscope
+                    itemtype="http://schema.org/Article"
+                  >
+                    <div class="meta">
+                      <time
+                        itemprop="dateCreated"
+                        datetime={postDate.toISOString()}
+                      >
+                        {formatDate(postDate)}
+                      </time>
+                    </div>
+
+                    {lastCategory && (
+                      <div class="meta">
+                        <span>
+                          <a href={toCategoryHref(lastCategory)}>{lastCategory}</a>
+                        </span>
+                      </div>
+                    )}
+
+                    <div class="title">
+                      <a href={toPostHref(post.id)} itemprop="url">
+                        <span itemprop="name">
+                          {post.data.title || t("post.noContent")}
+                        </span>
+                      </a>
+                    </div>
+                  </article>
+                </>
+              );
+            },
+          );
+        })
+      }
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .wrap {
+    max-width: 60rem;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+</style>

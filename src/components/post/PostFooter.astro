@@ -1,0 +1,184 @@
+---
+import { currentLocale, t } from "@/i18n";
+import type { LicenseType } from "@/toolkit/themeConfig";
+import themeConfig from "@/theme.config";
+
+interface Props {
+  date: Date;
+  updated?: Date;
+  permalink: string;
+  title: string;
+  author?: string;
+  siteName?: string;
+  showCopyright?: boolean;
+  showReward?: boolean;
+  rewardConfig?: {
+    enable: boolean;
+    accounts?: Record<string, string>;
+  };
+  license?: LicenseType;
+}
+
+const {
+  date,
+  updated,
+  permalink,
+  title,
+  author = "Author",
+  siteName = "Site",
+  showCopyright = true,
+  showReward = false,
+  rewardConfig,
+  license = themeConfig.copyright?.license || "CC-BY-NC-SA-4.0",
+} = Astro.props;
+
+function formatDate(d: Date): string {
+  return d.toLocaleDateString(currentLocale, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+}
+
+function getLicenseInfo(licenseType: LicenseType) {
+  const licenseMap: Record<
+    LicenseType,
+    { url: string; shortName: string; icon: string }
+  > = {
+    "CC-BY-4.0": {
+      url: "https://creativecommons.org/licenses/by/4.0/",
+      shortName: "BY 4.0",
+      icon: "i-ri-creative-commons-by-line",
+    },
+    "CC-BY-SA-4.0": {
+      url: "https://creativecommons.org/licenses/by-sa/4.0/",
+      shortName: "BY-SA 4.0",
+      icon: "i-ri-creative-commons-sa-line",
+    },
+    "CC-BY-ND-4.0": {
+      url: "https://creativecommons.org/licenses/by-nd/4.0/",
+      shortName: "BY-ND 4.0",
+      icon: "i-ri-creative-commons-nd-line",
+    },
+    "CC-BY-NC-4.0": {
+      url: "https://creativecommons.org/licenses/by-nc/4.0/",
+      shortName: "BY-NC 4.0",
+      icon: "i-ri-creative-commons-nc-line",
+    },
+    "CC-BY-NC-SA-4.0": {
+      url: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      shortName: "BY-NC-SA 4.0",
+      icon: "i-ri-creative-commons-line",
+    },
+    "CC-BY-NC-ND-4.0": {
+      url: "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+      shortName: "BY-NC-ND 4.0",
+      icon: "i-ri-creative-commons-nd-line",
+    },
+    NOREPRINT: {
+      url: "",
+      shortName: "",
+      icon: "i-ri-forbid-line",
+    },
+  };
+  return licenseMap[licenseType];
+}
+
+const hasUpdated = updated && formatDate(date) !== formatDate(updated);
+const licenseInfo = getLicenseInfo(license);
+const isNoReprint = license === "NOREPRINT";
+---
+
+<footer>
+  {
+    hasUpdated && (
+      <div class="meta">
+        <span class="item">
+          <span class="icon">
+            <i class="ic i-ri-calendar-check-line" />
+          </span>
+          <span class="text">{t("post.updatedAt")} </span>
+          <time
+            title={`${t("post.updatedAt")}: ${updated.toLocaleString(currentLocale)}`}
+            itemprop="dateModified"
+            datetime={updated.toISOString()}
+          >
+            {formatDate(updated)}
+          </time>
+        </span>
+      </div>
+    )
+  }
+
+  {
+    showReward && rewardConfig?.enable && (
+      <div class="reward">
+        <button type="button">
+          <i class="ic i-ri-heart-pulse-line" />
+          {t("post.rewardSupport")}
+        </button>
+        <p>{t("post.rewardDescription")}</p>
+        <div id="qr">
+          {rewardConfig.accounts &&
+            Object.entries(rewardConfig.accounts).map(([name, image]) => (
+              <div>
+                <img
+                  loading="lazy"
+                  src={image as string}
+                  alt={`${author} ${name}`}
+                />
+                <p>{name}</p>
+              </div>
+            ))}
+        </div>
+      </div>
+    )
+  }
+  {
+    showCopyright && (
+      <div id="copyright">
+        <ul>
+          <li class="author">
+            <div class="icon i-ri-account-circle-line" />
+            <strong>{t("post.author")}: </strong>
+            {author}
+            <i class="ic i-ri-at-line">
+              <em>@</em>
+            </i>
+            {siteName}
+          </li>
+          <li class="link">
+            <div class="icon i-ri-link" />
+            <strong>{t("post.link")}: </strong>
+            <a href={permalink} title={title}>
+              {permalink}
+            </a>
+          </li>
+          <li class="license" class:list={{ noreprint: isNoReprint }}>
+            <div class="icon i-ri-copyright-line" />
+            <strong>{t("post.copyright")}: </strong>
+            {isNoReprint ? (
+              <span class="noreprint-text">
+                <i class={`ic ${licenseInfo.icon}`}>
+                  <em>(✗)</em>
+                </i>
+                {t("post.license.noreprint")}
+              </span>
+            ) : (
+              <>
+                {t("post.license.text")}
+                <a href={licenseInfo.url} target="_blank" rel="noopener">
+                  <i class={`ic ${licenseInfo.icon}`}>
+                    <em>(CC)</em>
+                  </i>
+                  {licenseInfo.shortName}
+                </a>
+                {t("post.license.suffix")}
+              </>
+            )}
+          </li>
+        </ul>
+      </div>
+    )
+  }
+</footer>

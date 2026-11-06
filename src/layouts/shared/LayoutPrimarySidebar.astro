@@ -1,0 +1,50 @@
+---
+import SidebarWrapper from "@/components/sidebar/SidebarWrapper.astro";
+import type { NavItemType } from "@/components/navbar/NavTypes";
+import type {
+  TocItem,
+  RelatedPost,
+  QuickNavigation,
+  SidebarConfig,
+} from "@/components/sidebar/SidebarTypes";
+
+interface Props {
+  config?: SidebarConfig;
+  navLinks?: NavItemType[];
+  toc?: TocItem[];
+  relatedPosts?: RelatedPost[];
+  currentSlug?: string;
+  navigation?: QuickNavigation;
+  siteState: {
+    categories: number;
+    posts: number;
+    tags: number;
+  };
+}
+
+const {
+  config = {
+    author: "",
+    description: "",
+    social: {},
+  },
+  navLinks = [],
+  toc = [],
+  relatedPosts = [],
+  currentSlug = "",
+  navigation = {},
+  siteState,
+} = Astro.props;
+---
+
+<aside class="layout-sidebar-column" aria-label="primary sidebar">
+  <SidebarWrapper
+    {config}
+    {navLinks}
+    {toc}
+    {relatedPosts}
+    {currentSlug}
+    {navigation}
+    {siteState}
+  />
+</aside>

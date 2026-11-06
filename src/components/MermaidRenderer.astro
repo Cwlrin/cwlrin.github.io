@@ -1,0 +1,103 @@
+---
+/**
+ * Mermaid 图表渲染器
+ *
+ * 背景：原 ShokaX Hexo 站点使用 ```mermaid 代码块绘制图表（6 篇文章、十余张图）。
+ * ShokaX Astro 主题本身不内置 Mermaid，这里用「按需懒加载」补齐：
+ * 页面上存在 ```mermaid 代码块时才 import("mermaid")，其余页面零额外体积。
+ *
+ * 实现要点：
+ * - Shiki 会把 mermaid 代码块渲染成 <pre data-language="mermaid">，
+ *   这里保留原 pre（隐藏）作为源码来源，渲染结果放入紧随其后的容器。
+ * - 渲染失败时保留原始代码块，保证内容不丢失。
+ * - 监听 <html data-theme> 变化，切换明暗主题后自动重绘。
+ */
+import "@/styles/mermaid.css";
+---
+
+<script>
+  const SELECTOR = 'pre[data-language="mermaid"]';
+
+  type MermaidApi = {
+    initialize: (config: Record<string, unknown>) => void;
+    render: (id: string, source: string) => Promise<{ svg: string }>;
+  };
+
+  const isDarkTheme = () => document.documentElement.dataset.theme === "dark";
+
+  async function setupMermaid() {
+    const blocks = Array.from(document.querySelectorAll<HTMLPreElement>(SELECTOR));
+    if (blocks.length === 0) return;
+
+    let mermaid: MermaidApi;
+    try {
+      ({ default: mermaid } = (await import("mermaid")) as unknown as { default: MermaidApi });
+    } catch (error) {
+      console.warn("[mermaid] 加载失败，保留原始代码块", error);
+      return;
+    }
+
+    /** pre 元素 → 渲染容器 */
+    const rendered = new Map<HTMLPreElement, HTMLElement>();
+    let renderId = 0;
+
+    async function renderAll() {
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: "loose",
+        theme: isDarkTheme() ? "dark" : "default",
+      });
+
+      for (const pre of blocks) {
+        const source = pre.textContent ?? "";
+        if (!source.trim()) continue;
+
+        // 主题会把代码块包进 <code-block>（shadow DOM 里带「语言名 + 复制/全屏」标题栏），
+        // 这里整块隐藏，只保留渲染出的图表，避免出现「MERMAID 标题栏 + 图」的重复外观。
+        const host = pre.closest<HTMLElement>("code-block") ?? pre;
+
+        let container = rendered.get(pre);
+        if (!container) {
+          container = document.createElement("div");
+          container.className = "mermaid-diagram";
+          host.after(container);
+          // 保留源码可访问性，但不再显示高亮代码
+          host.hidden = true;
+          rendered.set(pre, container);
+        }
+
+        try {
+          // mermaid.render 会写入全局临时 DOM，并发调用可能互相干扰；这里刻意串行
+          // oxlint-disable-next-line no-await-in-loop -- mermaid.render 非并发安全
+          const { svg } = await mermaid.render(`mermaid-diagram-${renderId++}`, source);
+          container.innerHTML = svg;
+        } catch (error) {
+          console.warn("[mermaid] 图表渲染失败，回退为代码块", error);
+          container.remove();
+          rendered.delete(pre);
+          host.hidden = false;
+        }
+      }
+    }
+
+    await renderAll();
+
+    // 明暗主题切换后重绘，保证图表配色跟随站点
+    let lastTheme = isDarkTheme();
+    new MutationObserver(() => {
+      const nextTheme = isDarkTheme();
+      if (nextTheme === lastTheme) return;
+      lastTheme = nextTheme;
+      void renderAll();
+    }).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme", "class"],
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => void setupMermaid());
+  } else {
+    void setupMermaid();
+  }
+</script>

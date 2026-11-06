@@ -1,0 +1,42 @@
+---
+interface Props {
+  title?: string;
+  content?: string;
+}
+
+const { title, content } = Astro.props;
+const text = title || content || "";
+---
+
+<h2
+  class="divider mb-4 mt-4 h-auto table select-none whitespace-nowrap text-center color-grey-6 font-700 line-height-none tracking-0.2 uppercase"
+>
+  {text}
+</h2>
+
+<style>
+  .divider:after,
+  .divider:before {
+    content: "";
+    background-image: url("../assets/icons/divider.svg");
+    background-repeat: no-repeat;
+    width: 50%;
+    display: table-cell;
+    position: relative;
+    top: 50%;
+  }
+
+  .divider:before {
+    background-position: right 1rem top 50%;
+  }
+
+  .divider:after {
+    background-position: 1rem 50%;
+  }
+
+  :global(:root[data-theme="dark"]) .divider:after,
+  :global(:root[data-theme="dark"]) .divider:before {
+    opacity: 0.55;
+    filter: brightness(0.45);
+  }
+</style>

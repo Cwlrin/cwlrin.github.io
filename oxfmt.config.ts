@@ -1,0 +1,13 @@
+import { defineConfig } from "oxfmt";
+
+export default defineConfig({
+  ignorePatterns: [
+    "dist/**",
+    ".playwright-mcp/**",
+    ".sisyphus/**",
+    ".migration/**",
+    "out/**",
+    "node_modules",
+    "*.mdx",
+  ],
+});

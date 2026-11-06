@@ -1,0 +1,86 @@
+/* ============================================================
+   FloatingToolbar 全局样式（自 svelte scoped 迁移）
+   ============================================================ */
+
+.floating-toolbar {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: var(--z-floating);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.5rem 0.4rem;
+  margin: 0;
+  list-style: none;
+  border-radius: 0.75rem;
+  background: var(--grey-1-a7);
+  color: var(--text-color);
+  border: 1px solid var(--grey-3);
+  box-shadow: 0 0.5rem 1.25rem var(--box-bg-shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.floating-toolbar.is-hidden {
+  transform: translateY(0.5rem);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.floating-toolbar .tool {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.floating-toolbar .tool button {
+  width: 2.125rem;
+  height: 2.125rem;
+  border-radius: 0.625rem;
+  border: none;
+  background: var(--grey-2-a0);
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.floating-toolbar .tool button i {
+  font-size: 1.1rem;
+}
+
+.floating-toolbar .tool button:hover,
+.floating-toolbar .tool button:focus-visible {
+  color: var(--primary-color);
+  background: var(--color-pink-light);
+  box-shadow: 0 0.5rem 1rem var(--color-pink-light-a3);
+}
+
+.floating-toolbar .tool button.active {
+  color: var(--primary-color);
+  background: var(--color-pink-light);
+}
+
+.floating-toolbar .percent {
+  font-size: 0.6875rem;
+  line-height: 1;
+  color: var(--grey-5);
+}
+
+.floating-toolbar .mobile-only {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .floating-toolbar .mobile-only {
+    display: flex;
+  }
+}

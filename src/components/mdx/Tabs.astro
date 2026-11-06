@@ -1,0 +1,18 @@
+---
+interface Props {
+  defaultValue?: string;
+  class?: string;
+}
+
+const { defaultValue = "", class: className = "" }: Props = Astro.props;
+---
+
+<div class={`tabs ${className}`.trim()} data-default-value={defaultValue}>
+  <div class="nav" aria-label="Tabs 导航">
+    <ul role="tablist"></ul>
+  </div>
+
+  <div class="tabs-panels">
+    <slot />
+  </div>
+</div>

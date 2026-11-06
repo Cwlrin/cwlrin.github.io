@@ -1,0 +1,196 @@
+---
+import { getCollection } from "astro:content";
+import { currentLocale, getT } from "@/i18n";
+import { sanitizeThemeColor, type ThemeColorValue } from "@/toolkit/themeColor";
+import HyacineOutlet from "@hyacine/plugin-astro/components/HyacineOutlet.astro";
+import "./footer.css";
+
+interface Props {
+  config?: {
+    since?: number;
+    icon?: {
+      name?: string;
+      color?: ThemeColorValue;
+    };
+    count?: boolean;
+    powered?: boolean;
+    icp?: {
+      enable?: boolean;
+      icon?: string;
+      icpnumber?: string;
+      icpurl?: string;
+      beian?: string;
+      recordcode?: string;
+    };
+  };
+  siteName?: string;
+  author?: string;
+}
+
+const { config = {}, siteName = "ShokaX", author = "Author" } = Astro.props;
+const t = getT(currentLocale);
+
+// Get all posts for statistics
+const allPosts = await getCollection("posts");
+const posts = allPosts.filter((post) => !post.data.draft);
+
+// Calculate statistics
+const wordCounts = posts.map((post) => {
+  const content = post.body || "";
+  // Simple word count: Chinese characters + English words
+  const chineseCount = (content.match(/[\u4E00-\u9FFF]/g) || []).length;
+  const englishText = content.replaceAll(/[\u4E00-\u9FFF]/g, "");
+  const englishCount = englishText
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word.length > 0).length;
+  return chineseCount + englishCount;
+});
+const totalWords = wordCounts.reduce((a, b) => a + b, 0);
+
+// Calculate reading time (using 300 WPM as baseline for mixed content)
+const avgWordsPerMinute = 300;
+const readingMinutes = Math.ceil(totalWords / avgWordsPerMinute);
+const readingTimeStr =
+  readingMinutes === 1
+    ? `1 ${t("post.minutes")}`
+    : `${readingMinutes} ${t("post.minutes")}`;
+
+// Get current year for copyright
+const currentYear = new Date().getFullYear();
+const since = config.since || currentYear;
+
+const iconName = config.icon?.name || "sakura rotate";
+const iconColor = sanitizeThemeColor(
+  config.icon?.color,
+  "var(--color-pink)",
+  "footer.icon.color(runtime)",
+);
+---
+
+<footer
+  id="footer"
+  class="text-grey-5 text-sm bg-body-bg-shadow mt-4 py-2"
+>
+  <div class="inner mx-auto w-full max-w-3xl px-4">
+    <div class="status text-center w-full">
+      <!-- Copyright Section -->
+      <div class="copyright block my-2">
+        {since !== currentYear && <span>&copy; {since} -</span>}
+        <span>{currentYear}</span>
+        <span
+          class="with-love inline-block mx-0.5 ml-0.5"
+          style={`color: ${iconColor}`}
+        >
+          <i class={`${iconName}`}></i>
+        </span>
+        <span class="author">{author} @ {siteName}</span>
+      </div>
+
+      <!-- Statistics Section -->
+      {
+        config.count && (
+          <div class="count block my-2">
+            <span class="post-meta-item-icon mr-0 inline">
+              <div class="i-ri-line-chart-fill inline-block align-text-bottom text-1rem" />
+            </span>
+            <span title={t("footer.totalWordsTitle")}>
+              {totalWords} {t("post.words")}
+            </span>
+            <span class="post-meta-divider mx-2"> | </span>
+            <span class="post-meta-item-icon mr-0 inline">
+              <div class="i-ri-cup-fill inline-block align-text-bottom text-1rem" />
+            </span>
+            <span title={t("footer.estimatedReadingTimeTitle")}>{readingTimeStr}</span>
+          </div>
+        )
+      }
+
+      <!-- Powered By Section -->
+      {
+        config.powered && (
+          <div class="powered-by block my-2 text-xs">
+            {t("footer.poweredBy")}{" "}
+            <a
+              href="https://astro.build"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:opacity-80 border-b border-dashed"
+            >
+              Astro
+            </a>{" "}
+            {t("footer.and")}{" "}
+            <a
+              href="https://github.com/theme-shoka-x/astro-blog-shokax"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="ShokaX GitHub 项目"
+              class="hover:opacity-80 border-b border-dashed"
+            >
+              ShokaX
+            </a>{" "}
+            {t("footer.poweredSuffix")}
+          </div>
+        )
+      }
+
+      <!-- ICP Section -->
+      {
+        config.icp?.enable && (
+          <div class="icp block text-xs leading-loose mt-4">
+            <a
+              href={config.icp.icpurl || "https://beian.miit.gov.cn/"}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-grey-5 hover:opacity-80 border-b border-dashed"
+            >
+              {config.icp.icpnumber}
+            </a>
+            {config.icp.beian && config.icp.recordcode && (
+              <>
+                <br />
+                <a
+                  target="_blank"
+                  href={`https://beian.mps.gov.cn/#/query/webSearch?code=${config.icp.recordcode}`}
+                  rel="noopener noreferrer"
+                  class="inline-block text-grey-5 hover:opacity-80 border-b border-dashed"
+                >
+                  {config.icp.icon && (
+                    <img
+                      src={config.icp.icon}
+                      alt="ICP"
+                      class="max-w-8 inline align-middle"
+                    />
+                  )}
+                  {config.icp.beian}
+                </a>
+              </>
+            )}
+          </div>
+        )
+      }
+
+      <!-- Hyacine Plugin Outlet: Footer Status -->
+      <HyacineOutlet name="footer-status" />
+    </div>
+  </div>
+</footer>
+
+<style>
+  .inner {
+    margin: 0 auto 0.625rem;
+    position: relative;
+  }
+
+  @media (min-width: 1024px) {
+    .inner {
+      max-width: 1160px;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .inner {
+      max-width: 1340px;
+    }
+  }
+</style>

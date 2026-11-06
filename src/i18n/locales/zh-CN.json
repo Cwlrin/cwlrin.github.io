@@ -1,0 +1,244 @@
+{
+  "nav": {
+    "home": "首页",
+    "posts": "文章",
+    "categories": "分类",
+    "tags": "标签",
+    "archives": "归档",
+    "statistics": "统计"
+  },
+  "post": {
+    "wordCount": "字数统计",
+    "readingTime": "阅读时长",
+    "minutes": "分钟",
+    "words": "字",
+    "author": "文章作者",
+    "link": "文章链接",
+    "copyright": "版权声明",
+    "sticky": "置顶文章",
+    "latest": "最新文章",
+    "noContent": "暂无文章",
+    "publishedAt": "发布于",
+    "createdAt": "创建于",
+    "updatedAt": "更新于",
+    "previousPost": "上一篇",
+    "nextPost": "下一篇",
+    "rewardSupport": "赞赏支持",
+    "rewardDescription": "您的支持是我继续创作的动力",
+    "readingNeed": "需要",
+    "license": {
+      "text": "本文采用",
+      "suffix": "许可协议，转载请注明出处",
+      "noreprint": "本文禁止任何形式的转载",
+      "CC-BY-4.0": "署名 4.0 国际 (CC BY 4.0)",
+      "CC-BY-SA-4.0": "署名-相同方式共享 4.0 国际 (CC BY-SA 4.0)",
+      "CC-BY-ND-4.0": "署名-禁止演绎 4.0 国际 (CC BY-ND 4.0)",
+      "CC-BY-NC-4.0": "署名-非商业性使用 4.0 国际 (CC BY-NC 4.0)",
+      "CC-BY-NC-SA-4.0": "署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0)",
+      "CC-BY-NC-ND-4.0": "署名-非商业性使用-禁止演绎 4.0 国际 (CC BY-NC-ND 4.0)"
+    },
+    "encryptedExcerpt": "这是一篇加密文章，无法显示摘要"
+  },
+  "category": {
+    "title": "分类",
+    "all": "全部",
+    "subcategories": "个子分类",
+    "posts": "篇文章",
+    "label": "分类",
+    "noContent": "该分类下暂无文章",
+    "untitled": "无标题"
+  },
+  "tag": {
+    "title": "标签"
+  },
+  "archive": {
+    "title": "归档",
+    "all": "全部",
+    "year": "年",
+    "month": "月",
+    "excellent": "太棒了",
+    "great": "非常好",
+    "good": "很好",
+    "nice": "不错",
+    "ok": "还行",
+    "emh": "嗯..",
+    "keepTrying": "继续努力"
+  },
+  "statistics": {
+    "title": "文章统计",
+    "totalPosts": "文章总数",
+    "totalCategories": "分类总数",
+    "totalTags": "标签总数",
+    "topCategory": "最常用分类",
+    "postCount": "文章数",
+    "monthlyPosts": "每月发布趋势",
+    "categoryDistribution": "分类文章分布（Top 10）",
+    "tagDistribution": "Tag 文章分布（Top 16）",
+    "latestMonthSummary": "最近统计月份 {{month}} 共发布 {{count}} 篇文章。"
+  },
+  "sidebar": {
+    "toc": "目录",
+    "overview": "站点概览",
+    "author": "作者",
+    "scrollTop": "回到顶部",
+    "scrollBottom": "去到底部",
+    "relatedPosts": "相关文章",
+    "state": {
+      "posts": "文章",
+      "categories": "分类",
+      "tags": "标签"
+    },
+    "related": {
+      "noContent": "暂无相关文章"
+    },
+    "calendar": {
+      "title": "日历",
+      "subtitle": "三栏布局预览",
+      "placeholder": "更多侧栏内容正在路上"
+    },
+    "search": {
+      "title": "全站搜索",
+      "subtitle": "快速定位内容",
+      "action": "打开搜索面板",
+      "helper": "复用现有 Pagefind 搜索，查文章、标签和关键词更省心。"
+    },
+    "moments": {
+      "title": "最近动态",
+      "subtitle": "说说更新"
+    },
+    "randomPosts": {
+      "title": "随机文章",
+      "subtitle": "换个口味"
+    },
+    "tagCloud": {
+      "title": "标签云",
+      "subtitle": "热门主题",
+      "browseAll": "查看全部标签 →"
+    },
+    "announcement": {
+      "title": "公告",
+      "subtitle": "站点小黑板"
+    },
+    "extra": {
+      "title": "右栏",
+      "subtitle": "附加内容区",
+      "empty": "当前未启用任何右栏内容"
+    },
+    "panels": {
+      "contents": "目录",
+      "related": "相关",
+      "overview": "站点"
+    }
+  },
+  "footer": {
+    "poweredBy": "由",
+    "and": "和",
+    "poweredSuffix": "主题强力驱动",
+    "totalWordsTitle": "总字数",
+    "estimatedReadingTimeTitle": "预计阅读时间",
+    "randomPosts": "随机文章",
+    "recentComments": "最新评论",
+    "noRecentComments": "暂无评论，来抢个沙发吧～",
+    "recentCommentsLoadFailed": "最新评论加载失败，请稍后重试",
+    "commentAnonymous": "匿名用户",
+    "walineNotConfigured": "Waline 服务地址未配置"
+  },
+  "pagination": {
+    "prev": "上一页",
+    "next": "下一页"
+  },
+  "button": {
+    "readMore": "阅读更多",
+    "more": "更多"
+  },
+  "tags": {
+    "title": "标签",
+    "allTags": "所有标签",
+    "tagged": "标签"
+  },
+  "common": {
+    "loading": "加载中",
+    "more": "更多",
+    "total": "共",
+    "home": "首页",
+    "in": "在"
+  },
+  "search": {
+    "devModeSkipped": "当前为开发模式，已跳过 Pagefind 加载。",
+    "buildHint": "请先执行构建（含索引生成）后再预览站内搜索效果。"
+  },
+  "encrypted": {
+    "title": "文章已加密",
+    "description": "这篇文章需要密码才能查看",
+    "passwordPlaceholder": "请输入密码",
+    "submit": "解密",
+    "decrypting": "正在解密内容...",
+    "error": "密码错误，请重试",
+    "passwordRequired": "请输入密码"
+  },
+  "moments": {
+    "title": "动态",
+    "noContent": "暂无动态",
+    "publishedAt": "发布于",
+    "imageAlt": "动态图片 {{index}}"
+  },
+  "imageZoom": {
+    "dialog": "图片预览",
+    "close": "关闭图片预览",
+    "previous": "查看上一张图片",
+    "next": "查看下一张图片"
+  },
+  "random": {
+    "title": "随机文章",
+    "redirecting": "正在跳转到随机文章...",
+    "noPost": "暂无可跳转的文章",
+    "retry": "重新随机",
+    "noScript": "当前浏览器未启用 JavaScript，请先返回首页手动挑选文章。"
+  },
+  "aboutDialog": {
+    "defaults": {
+      "title": "快速对话",
+      "intro": "选择一个回复选项继续对话。你可以在组件里预先定义分支与回复。",
+      "authorName": "作者",
+      "authorInitial": "作",
+      "endHint": "这段对话已经结束。你可以点击“重新开始”再聊一次。"
+    },
+    "defaultNodes": {
+      "intro": {
+        "text": "你好，这里是可配置对话组件示例。请选择一个回复继续。",
+        "optionA": {
+          "label": "示例问题 A",
+          "reply": "我想看示例问题 A 的回复。"
+        },
+        "optionB": {
+          "label": "示例问题 B",
+          "reply": "我想看示例问题 B 的回复。"
+        }
+      },
+      "answerA": {
+        "text": "这是示例回答 A。你可以把节点文本和选项替换成自己的内容。"
+      },
+      "answerB": {
+        "text": "这是示例回答 B。你也可以通过 nodes 属性在页面里覆盖默认对话。"
+      },
+      "backToMenu": {
+        "label": "返回菜单",
+        "reply": "回到菜单。"
+      }
+    },
+    "runtime": {
+      "noNodesConfigured": "还没有配置对话节点。",
+      "branchNotConfigured": "这个分支还没配置完成，请先选择其它选项。",
+      "noDialogContent": "暂无对话内容，请先配置节点。"
+    },
+    "typing": {
+      "ariaLabel": "正在输入",
+      "peerTyping": "对方正在输入…",
+      "inputPlaceholder": "在这里输入消息（演示输入框）"
+    },
+    "actions": {
+      "send": "发送",
+      "restart": "重新开始"
+    }
+  }
+}

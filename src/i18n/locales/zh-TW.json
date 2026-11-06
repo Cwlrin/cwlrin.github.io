@@ -1,0 +1,244 @@
+{
+  "nav": {
+    "home": "首頁",
+    "posts": "文章",
+    "categories": "分類",
+    "tags": "標籤",
+    "archives": "歸檔",
+    "statistics": "統計"
+  },
+  "post": {
+    "wordCount": "字數統計",
+    "readingTime": "閱讀時長",
+    "minutes": "分鐘",
+    "words": "字",
+    "author": "文章作者",
+    "link": "文章連結",
+    "copyright": "版權聲明",
+    "sticky": "置頂文章",
+    "latest": "最新文章",
+    "noContent": "暫無文章",
+    "publishedAt": "發佈於",
+    "createdAt": "建立於",
+    "updatedAt": "更新於",
+    "previousPost": "上一篇",
+    "nextPost": "下一篇",
+    "rewardSupport": "贊賞支持",
+    "rewardDescription": "您的支持是我持續創作的動力",
+    "readingNeed": "需要",
+    "license": {
+      "text": "本文採用",
+      "suffix": "授權協議，轉載請註明出處",
+      "noreprint": "本文禁止任何形式的轉載",
+      "CC-BY-4.0": "姓名標示 4.0 國際 (CC BY 4.0)",
+      "CC-BY-SA-4.0": "姓名標示-相同方式分享 4.0 國際 (CC BY-SA 4.0)",
+      "CC-BY-ND-4.0": "姓名標示-禁止改作 4.0 國際 (CC BY-ND 4.0)",
+      "CC-BY-NC-4.0": "姓名標示-非商業性 4.0 國際 (CC BY-NC 4.0)",
+      "CC-BY-NC-SA-4.0": "姓名標示-非商業性-相同方式分享 4.0 國際 (CC BY-NC-SA 4.0)",
+      "CC-BY-NC-ND-4.0": "姓名標示-非商業性-禁止改作 4.0 國際 (CC BY-NC-ND 4.0)"
+    },
+    "encryptedExcerpt": "這是一篇加密文章，無法顯示摘要"
+  },
+  "category": {
+    "title": "分類",
+    "all": "全部",
+    "subcategories": "個子分類",
+    "posts": "篇文章",
+    "label": "分類",
+    "noContent": "此分類下暫無文章",
+    "untitled": "無標題"
+  },
+  "tag": {
+    "title": "標籤"
+  },
+  "archive": {
+    "title": "歸檔",
+    "all": "全部",
+    "year": "年",
+    "month": "月",
+    "excellent": "太棒了",
+    "great": "非常好",
+    "good": "很好",
+    "nice": "不錯",
+    "ok": "還行",
+    "emh": "嗯..",
+    "keepTrying": "繼續努力"
+  },
+  "statistics": {
+    "title": "文章統計",
+    "totalPosts": "文章總數",
+    "totalCategories": "分類總數",
+    "totalTags": "標籤總數",
+    "topCategory": "最常用分類",
+    "postCount": "文章數",
+    "monthlyPosts": "每月發佈趨勢",
+    "categoryDistribution": "分類文章分佈（Top 10）",
+    "tagDistribution": "標籤文章分佈（Top 16）",
+    "latestMonthSummary": "最近統計月份 {{month}} 共發佈 {{count}} 篇文章。"
+  },
+  "sidebar": {
+    "toc": "目錄",
+    "overview": "站點概覽",
+    "author": "作者",
+    "scrollTop": "回到頂部",
+    "scrollBottom": "前往底部",
+    "relatedPosts": "相關文章",
+    "state": {
+      "posts": "文章",
+      "categories": "分類",
+      "tags": "標籤"
+    },
+    "related": {
+      "noContent": "暫無相關文章"
+    },
+    "calendar": {
+      "title": "日曆",
+      "subtitle": "三欄佈局預覽",
+      "placeholder": "更多側欄內容正在路上"
+    },
+    "search": {
+      "title": "全站搜尋",
+      "subtitle": "快速定位內容",
+      "action": "打開搜尋面板",
+      "helper": "沿用現有 Pagefind 搜尋，查文章、標籤與關鍵字更省心。"
+    },
+    "moments": {
+      "title": "最近動態",
+      "subtitle": "說說更新"
+    },
+    "randomPosts": {
+      "title": "隨機文章",
+      "subtitle": "換個口味"
+    },
+    "tagCloud": {
+      "title": "標籤雲",
+      "subtitle": "熱門主題",
+      "browseAll": "查看全部標籤 →"
+    },
+    "announcement": {
+      "title": "公告",
+      "subtitle": "站點小黑板"
+    },
+    "extra": {
+      "title": "右欄",
+      "subtitle": "附加內容區",
+      "empty": "目前未啟用任何右欄內容"
+    },
+    "panels": {
+      "contents": "目錄",
+      "related": "相關",
+      "overview": "站點"
+    }
+  },
+  "footer": {
+    "poweredBy": "由",
+    "and": "和",
+    "poweredSuffix": "主題強力驅動",
+    "totalWordsTitle": "總字數",
+    "estimatedReadingTimeTitle": "預估閱讀時間",
+    "randomPosts": "隨機文章",
+    "recentComments": "最新留言",
+    "noRecentComments": "暫無留言，快來搶沙發吧～",
+    "recentCommentsLoadFailed": "最新留言載入失敗，請稍後再試",
+    "commentAnonymous": "匿名使用者",
+    "walineNotConfigured": "Waline 服務位址尚未配置"
+  },
+  "pagination": {
+    "prev": "上一頁",
+    "next": "下一頁"
+  },
+  "button": {
+    "readMore": "閱讀更多",
+    "more": "更多"
+  },
+  "tags": {
+    "title": "標籤",
+    "allTags": "所有標籤",
+    "tagged": "標籤"
+  },
+  "common": {
+    "loading": "載入中",
+    "more": "更多",
+    "total": "共",
+    "home": "首頁",
+    "in": "在"
+  },
+  "search": {
+    "devModeSkipped": "目前為開發模式，已跳過 Pagefind 載入。",
+    "buildHint": "請先執行建置（含索引生成）後，再預覽站內搜尋效果。"
+  },
+  "encrypted": {
+    "title": "文章已加密",
+    "description": "這篇文章需要密碼才能查看",
+    "passwordPlaceholder": "請輸入密碼",
+    "submit": "解密",
+    "decrypting": "正在解密內容...",
+    "error": "密碼錯誤，請重試",
+    "passwordRequired": "請輸入密碼"
+  },
+  "moments": {
+    "title": "動態",
+    "noContent": "暫無動態",
+    "publishedAt": "發佈於",
+    "imageAlt": "動態圖片 {{index}}"
+  },
+  "imageZoom": {
+    "dialog": "圖片預覽",
+    "close": "關閉圖片預覽",
+    "previous": "查看上一張圖片",
+    "next": "查看下一張圖片"
+  },
+  "random": {
+    "title": "隨機文章",
+    "redirecting": "正在跳轉到隨機文章...",
+    "noPost": "暫無可跳轉的文章",
+    "retry": "重新隨機",
+    "noScript": "目前瀏覽器未啟用 JavaScript，請先返回首頁手動挑選文章。"
+  },
+  "aboutDialog": {
+    "defaults": {
+      "title": "快速對話",
+      "intro": "選擇一個回覆選項繼續對話。你可以在元件中預先定義分支與回覆。",
+      "authorName": "作者",
+      "authorInitial": "作",
+      "endHint": "這段對話已經結束。你可以點擊「重新開始」再聊一次。"
+    },
+    "defaultNodes": {
+      "intro": {
+        "text": "你好，這裡是可配置對話元件示例。請選擇一個回覆繼續。",
+        "optionA": {
+          "label": "示例問題 A",
+          "reply": "我想看示例問題 A 的回覆。"
+        },
+        "optionB": {
+          "label": "示例問題 B",
+          "reply": "我想看示例問題 B 的回覆。"
+        }
+      },
+      "answerA": {
+        "text": "這是示例回答 A。你可以把節點文字與選項替換成自己的內容。"
+      },
+      "answerB": {
+        "text": "這是示例回答 B。你也可以透過 nodes 屬性在頁面中覆蓋預設對話。"
+      },
+      "backToMenu": {
+        "label": "返回選單",
+        "reply": "回到選單。"
+      }
+    },
+    "runtime": {
+      "noNodesConfigured": "尚未配置任何對話節點。",
+      "branchNotConfigured": "這個分支尚未配置完成，請先選擇其他選項。",
+      "noDialogContent": "暫無對話內容，請先配置節點。"
+    },
+    "typing": {
+      "ariaLabel": "正在輸入",
+      "peerTyping": "對方正在輸入…",
+      "inputPlaceholder": "在這裡輸入訊息（示範輸入框）"
+    },
+    "actions": {
+      "send": "發送",
+      "restart": "重新開始"
+    }
+  }
+}

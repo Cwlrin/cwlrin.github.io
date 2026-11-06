@@ -1,0 +1,122 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import { structurePostsByDate } from "@/toolkit/posts/structurePostsByDate";
+import { buildArchiveTimeline } from "@/toolkit/posts/buildArchiveTimeline";
+import { toCategoryHref, toPostHref } from "@/toolkit/posts/url";
+import { fmtNum } from "@/toolkit/tools/fmtNum";
+import { t } from "@/i18n";
+import "../../../styles/collapse.css";
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection("posts");
+  const publishedPosts = allPosts
+    .filter((post) => !post.data.draft)
+    .toSorted((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+  const structuredPosts = structurePostsByDate(publishedPosts, {
+    daily: false,
+  });
+
+  const years = Object.keys(structuredPosts).map(Number);
+  const sortedYears = [...years].toSorted((a, b) => b - a);
+
+  return sortedYears.map((year) => ({
+    params: { year: String(year) },
+    props: {
+      year,
+      posts: structuredPosts[year].yearlySummary,
+      allYears: sortedYears,
+    },
+  }));
+}
+
+import type { CollectionEntry } from "astro:content";
+
+const { year, posts } = Astro.props as {
+  year: number;
+  posts: CollectionEntry<"posts">[];
+};
+
+// Helper to format date
+function formatDate(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${month}-${day}`;
+}
+---
+
+<Layout pageTitle={`${year} 年归档`}>
+  <div class="wrap">
+    <div class="timeline">
+      <h2 class="item header">
+        <a href="/archives/">{t("archive.all")}</a>
+        <small>/</small>
+        {year} 年
+        <small>归档</small>
+      </h2>
+
+      {
+        buildArchiveTimeline(posts).map(
+          ({ post, month, showMonthSection, monthPostCount }) => {
+            const postDate = post.data.date;
+            const lastCategory =
+              post.data.categories?.[post.data.categories.length - 1];
+
+            return (
+              <>
+                {showMonthSection && (
+                  <h3 class="item section">
+                    <a href={`/archives/${year}/${fmtNum(month)}/`}>
+                      {month} 月
+                    </a>
+                    <small>({monthPostCount})</small>
+                  </h3>
+                )}
+
+                <article
+                  class="item normal"
+                  itemscope
+                  itemtype="http://schema.org/Article"
+                >
+                  <div class="meta">
+                    <time
+                      itemprop="dateCreated"
+                      datetime={postDate.toISOString()}
+                    >
+                      {formatDate(postDate)}
+                    </time>
+                  </div>
+
+                  {lastCategory && (
+                    <div class="meta">
+                      <span>
+                        <a href={toCategoryHref(lastCategory)}>{lastCategory}</a>
+                      </span>
+                    </div>
+                  )}
+
+                  <div class="title">
+                    <a href={toPostHref(post.id)} itemprop="url">
+                      <span itemprop="name">
+                        {post.data.title || t("post.noContent")}
+                      </span>
+                    </a>
+                  </div>
+                </article>
+              </>
+            );
+          },
+        )
+      }
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .wrap {
+    max-width: 60rem;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+</style>

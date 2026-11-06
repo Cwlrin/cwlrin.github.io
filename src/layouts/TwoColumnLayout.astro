@@ -1,0 +1,64 @@
+---
+import "@/styles/layout-common.css";
+import "@/styles/layout-two-column.css";
+import type { NavItemType } from "@/components/navbar/NavTypes";
+import type { WidgetPost } from "@/toolkit/posts/createWidgetPosts";
+import type {
+  TocItem,
+  RelatedPost,
+  QuickNavigation,
+  SidebarConfig,
+} from "@/components/sidebar/SidebarTypes";
+import LayoutMainColumn from "./shared/LayoutMainColumn.astro";
+import LayoutPrimarySidebar from "./shared/LayoutPrimarySidebar.astro";
+
+interface WidgetsConfig {
+  randomPosts?: boolean;
+  recentComments?: boolean;
+  recentCommentsLimit?: number;
+  recentCommentsServerURL?: string;
+}
+
+interface Props {
+  widgetPosts: WidgetPost[];
+  widgetsConfig?: WidgetsConfig;
+  sidebarConfig?: SidebarConfig;
+  navLinks?: NavItemType[];
+  toc?: TocItem[];
+  relatedPosts?: RelatedPost[];
+  currentSlug?: string;
+  navigation?: QuickNavigation;
+  siteState: {
+    categories: number;
+    posts: number;
+    tags: number;
+  };
+}
+
+const {
+  widgetPosts,
+  widgetsConfig = {},
+  sidebarConfig,
+  navLinks = [],
+  toc = [],
+  relatedPosts = [],
+  currentSlug = "",
+  navigation = {},
+  siteState,
+} = Astro.props;
+---
+
+<div class="inner layout-frame layout-two-column">
+  <LayoutPrimarySidebar
+    config={sidebarConfig}
+    {navLinks}
+    {toc}
+    {relatedPosts}
+    {currentSlug}
+    {navigation}
+    {siteState}
+  />
+  <LayoutMainColumn posts={widgetPosts} {widgetsConfig}>
+    <slot />
+  </LayoutMainColumn>
+</div>

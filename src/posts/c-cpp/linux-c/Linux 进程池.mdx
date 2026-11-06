@@ -1,0 +1,3101 @@
+---
+title: "Linux 进程池"
+date: 2020-10-07T11:35:15+08:00
+categories: ["C 与 C++", "Linux C"]
+tags: ["C", "Linux"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTT3pacHNKeUdwTnNTWmtoeDFFWVJrQk1ORGpneUdmWi1HZDJjZjYyMEs3X0E_ZT1ydG1uaVQ.png"
+---
+
+## 需求分析
+
+假设: 我们结合学过的文件操作、网络通信、以及进程和线程的知识，实现一个基本的文件下载服务器模型，我们需要做哪些准备工作，或者说我们怎么设计整个数据通信逻辑。
+
+首先，服务器需要能够处理大量连接的频繁接入和断开，这就要求我们不能简单地让一个进程同时处理连接接入和业务逻辑，这样的设计在现代应用领域是低效的。它不仅无法有效解耦，增加了代码书写的复杂性，还增加了并行逻辑设计的难度，并且无法充分利用多核 CPU 的性能，容易导致性能瓶颈。
+
+在设计服务器架构时，我们需要考虑可维护性和性能两个基本要求。可维护性要求应用程序对开发者友好，使得开发和维护人员能够快速理解程序架构并进行后续开发。为了提供可维护性，项目各个部分的功能应当彼此分离。性能则要求应用程序充分利用操作系统资源，并减少资源消耗。在多进程程序中，创建和销毁进程的开销是非常大的。
+
+因此，我们有必要利用多进程或多线程来实现 **业务逻辑** 和 **任务管控逻辑** 的分离。
+
+**我们可以维护一个主进程，它只负责接收用户请求，并将接收到的用户请求分配到不同的进程中去处理。** 但是，如果我们不对任务进程进行任何限制和管理，随着任务的到达开始一个进程处理任务，任务处理结束后立即结束这个进程，这样的处理方式是非常不好的，因为进程的频繁创建和销毁会带来很大的软硬件开销。
+
+为了解决这个问题，我们可以采用池化思想。**维护一个包含多个进程的进程池，当有任务到来时，把任务交给空闲的进程执行。当任务执行完毕，并且没有任务可执行时，让进程休眠**。这种池化的思想可以显著减少创建和销毁进程的软硬件开销，进而提高程序的执行效率。
+
+![_.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmVkJ3MzAzeHAxTnFEQ2dlUkpjbW5zQnFRaExaQ2RaTFVUSE9waV9Fbm5vU1E_ZT11OWlqQ00.png)
+
+在进程池模型中，父进程负责接收用户请求，获得连接的文件描述符，并且维护所有进程池中进程的状态，以便于把文件描述符对象交给空闲的池中进程来和客户端直接交互。进程池中的进程，在被主进程唤醒后，接收到对应的连接文件描述符对象，按照需求读取磁盘文件，并将读取的磁盘文件发送给客户端。客户端建立连接后，就可以接收返回的文件。
+
+在设计服务器时，我们还需要考虑是使用进程池还是线程池。进程池设计中，每个进程有独立的内存空间，增加了进程间的隔离性。一个进程崩溃不会影响到其他进程。进程间存在隔离性，使得业务逻辑方便书写。但是，进程的创建和销毁比线程开销大，占用的内存空间也比线程大，上下文的调度切换时间也长。进程池适合并发量低、业务复杂、任务执行事件长的系统设计。
+
+相比之下，线程池设计中，线程之间共享资源，隔离性差，一个线程极容易影响到另一个线程，需要更多的数据同步和一致性处理。但是，线程间通信比进程间通信要方便，线程较轻量，创建和销毁的开销较小。线程池适合并发量高、内存使用要求高、业务简单、可以大量快速、轻量级任务处理的场景。
+
+## 第一版
+
+### 设计逻辑
+
+头文件引入和定义 (`head.h`)
+
+- 引入所需的头文件
+- 为整个项目提供基础的函数声明、结构体和类型定义。
+
+主函数 (`main.c`)
+
+- 初始化进程池并启动工作线程。
+- 初始化 TCP 监听，绑定 IP 和端口，准备接收客户端连接。
+- 使用 `epoll` 监听客户端连接。当客户端连接建立时，将连接分配给进程池中的工作进程，并更新进程状态为忙碌。
+- 监听进程池中的线程，等待它们处理完客户端请求，然后通知主进程将状态从忙碌改为空闲。
+
+进程池管理 (`pool.c`)
+
+- 根据主进程的要求，启动指定数量的工作进程。
+- 维护一个数组来记录工作进程及其状态，以便主进程监控工作进程何时完成任务。
+- 当主进程接收到客户端连接时，进程池选择一个空闲的工作进程来处理连接。
+
+工作进程 (`worker.c`)
+
+- 由进程池初始化和启动。
+- 等待接收主进程传递的客户端连接。
+- 接收到客户端连接后，与客户端进行通信，完成文件传输，然后关闭连接。
+- 通信结束后，向主进程发送状态更新，从忙碌状态改为空闲状态。
+- 等待主进程分配新的客户端连接。
+
+TCP 初始化 (`tcpInit.c`)
+
+- 负责初始化 IP 和端口的监听
+- 避免在主函数中编写大量 TCP 连接代码，实现解耦。
+
+Epoll 操作 (`epoll.c`)
+
+- 封装 `epoll` 的相关操作
+- 避免在主函数中编写大量 `epoll` 添加文件描述符监听的代码，实现解耦。
+
+本地 Socket 通信 (`localSocket.c`)
+
+- 处理主进程和工作进程之间的进程间通信（IPC），特别是文件描述符的传递。
+- 使用本地 Socket 实现复杂的 IPC，允许在主进程和工作进程之间传递文件描述符，并确保共享文件对象的能力。
+
+### 该项目中需要使用的新函数
+
+#### `socketpair` 创建一对互相连接的全双工通信
+
+`socketpair` 函数用于创建一对已连接的 socket，即两个 socket 彼此相连，可以互相通信。这对 socket 通常用于在本地主机上的进程间通信（IPC）。
+
+函数原型如下：
+
+```c
+#include <sys/socket.h>
+int socketpair(int domain, int type, int protocol, int sv[2]);
+```
+
+参数说明：
+
+1. **int domain**: 指定通信协议的家族。常见的值是 `AF_UNIX`，用于 Unix 域套接字，或 `AF_INET` 用于 IPv4 套接字。本项目中使用 `AF_LOCAL` 用于本地通信。
+
+2. **int type**: 指定 socket 的类型，这决定了 socket 支持的通信语义。常见的类型包括：
+   - `SOCK_STREAM`: 提供基于连接的、可靠的字节流服务（TCP）。
+   - `SOCK_DGRAM`: 提供无连接的、尽最大努力交付的数据报服务（UDP）。
+
+3. **int protocol**: 指定使用的具体协议。对于 `AF_UNIX` 域，通常设置为 0，由系统选择默认协议。对于 `AF_INET` 域，常用的值是 `IPPROTO_TCP` 或 `IPPROTO_UDP`。默认设置 0 即可
+
+4. **int sv [2]**: 这是一个整数数组，用于存储创建的一对 socket 文件描述符。`sv[0]` 是第一个 socket 的文件描述符，`sv[1]` 是第二个 socket 的文件描述符。
+
+返回值：
+
+- 如果调用成功，返回 0，并且 `sv` 数组被填充为两个 socket 的文件描述符。
+- 如果调用失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：
+
+- 当需要在两个进程之间建立一个可靠的字节流连接或数据报连接时。
+- 当需要创建一个简单的 IPC 通道，用于进程间的数据交换。
+
+工作机制：
+
+- `socketpair` 函数调用操作系统内核，请求创建一对 socket，并确保它们彼此连接。
+- 创建的这对 socket 可以立即用于双向通信，无需使用 `connect` 或 `bind` 等函数。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+int main() {
+    int sv[2];
+    if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv) == -1) {
+        perror("Failed to create socket pair");
+        exit(EXIT_FAILURE);
+    }
+
+    // 使用 sv[0] 和 sv[1] 进行通信
+
+    // 写入一些数据到 sv[1]
+    const char *message = "Hello from one side!";
+    if (write(sv[1], message, strlen(message)) == -1) {
+        perror("Failed to write to socket");
+    }
+
+    // 从 sv[0] 读取数据
+    char buffer[1024];
+    ssize_t len = read(sv[0], buffer, sizeof(buffer));
+    if (len == -1) {
+        perror("Failed to read from socket");
+    } else {
+        printf("Received message: %s\n", buffer);
+    }
+
+    // 关闭 socket
+    close(sv[0]);
+    close(sv[1]);
+    return 0;
+}
+```
+
+这个示例使用了 `socketpair` 函数创建一对 socket，并使用它们进行简单的通信。我们向一个 socket 写入数据，并从另一个 socket 读取数据，最后关闭这两个 socket。
+
+如果想通过 `socketpair` 函数 实现两个本地进程间的文件对象描述符的传输，除了需要 `socketpair` 函数创建通信的端点,  还需要借助 `sendmsg` 函数和 `recvmsg` 函数 来实现 具体的数据传输。 
+
+#### `sendmsg` 发送数据
+
+`sendmsg` 函数是一种高级的发送接口，用于通过 socket 发送数据。与 `send` 或 `sendto` 函数相比，`sendmsg` 提供了更多的灵活性和控制，允许发送者指定更多的消息属性，如辅助数据、文件描述符等。
+
+函数原型如下：
+
+```c
+#include <sys/socket.h>
+ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags);
+```
+
+参数说明：
+
+1. **int sockfd**: 这是 socket 的文件描述符，用于指定要发送数据的 socket。对应 `socketpair` 中创建的文件描述符 `sv[]` 数组
+2. **const struct msghdr *msg**: 这是一个指向 `msghdr` 结构的指针，该结构定义了要发送的消息的元数据和数据部分。`msghdr` 结构包含以下主要成员：
+   - `void *msg_name`: 指向地址信息的指针，对于 `SOCK_DGRAM` 类型的 socket，这指定了目的地地址。填充 NULL 交给系统处理。
+   - `socklen_t msg_namelen`: 地址结构的长度，为 NULL 时系统自动填充
+   - ` struct iovec *msg_iov`: 指向 `iovec` 结构数组的指针，`iovec` 包含了要发送的数据块的指针 `void *iov_base` 和长度 `size_t iov_len`。
+   -  `size_t msg_iovlen`: `iovec` 数组的长度，即数据块的数量。
+   - `void* msg_control`: 指向辅助数据的指针，可以包含额外的信息，如权限或文件描述符。
+   - `size_t msg_controllen`: 辅助数据的长度。
+   - `int msg_flags`: 用于存储或接收特定于消息的标志。
+3. **int flags**: 用于修改发送行为的选项标志。常用的标志包括：
+   - `MSG_OOB`: 发送带外数据（out-of-band data）。
+   - `MSG_DONTROUTE`: 不对数据进行路由选择，直接发送。
+   - `MSG_EOR`: 表示记录结束（仅用于 `SOCK_SEQPACKET` 类型的 socket）。
+   - 默认为 0。
+
+返回值：
+
+- 如果调用成功，返回已发送的字节总数。
+- 如果调用失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：
+
+- 当需要发送非连续的数据块时，`sendmsg` 允许将多个数据块一次性发送，而不是先复制到一个连续的缓冲区中。
+- 当需要发送辅助数据或文件描述符时，`sendmsg` 提供了发送这些附加信息的能力。
+
+工作机制：
+
+- `sendmsg` 函数从 `msghdr` 结构指定的 `iovec` 数组中收集数据，并将其发送到 `sockfd` 指定的 socket。
+- 如果 `msg_name` 成员不为空，对于 `SOCK_DGRAM` 类型的 socket，它将指定消息的目的地地址。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+int main() {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        perror("Failed to create socket");
+        exit(EXIT_FAILURE);
+    }
+
+    // 绑定、监听、连接的代码...
+
+    const char *message1 = "Hello, ";
+    const char *message2 = "world!";
+    struct iovec iov[2] = {
+        { .iov_base = (void *)message1, .iov_len = strlen(message1) },
+        { .iov_base = (void *)message2, .iov_len = strlen(message2) }
+    };
+    struct msghdr msg = {
+        .msg_iov = iov,
+        .msg_iovlen = 2,
+    };
+    
+    ssize_t sent = sendmsg(sockfd, &msg, 0);
+    if (sent == -1) {
+        perror("Failed to send message");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Sent %zd bytes\n", sent);
+
+    close(sockfd);
+    return 0;
+}
+```
+
+这个示例创建了一个 socket，并使用 `sendmsg` 函数发送两条数据消息。定义一个 `iovec` 数组，其中包含了两条消息的指针和长度，并初始化了一个 `msghdr` 结构来引用这个数组。然后调用了 `sendmsg` 发送整个消息。如果发送失败则打印错误信息并关闭 socket。
+
+#### `recvmsg` 接收数据
+
+`recvmsg` 函数是一种高级的接收接口，用于接收通过 socket 发送的数据。与 `recv` 函数相比，`recvmsg` 提供了更多的灵活性和控制，允许接收者获取关于接收数据的详细信息，包括辅助数据、文件描述符等。
+
+函数原型如下：
+
+```c
+#include <sys/socket.h>
+ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags);
+```
+
+参数说明：
+
+1. **int sockfd**: 这是 socket 的文件描述符，用于指定要接收数据的 socket。
+
+2. **struct msghdr *msg**: 这是一个指向 `msghdr` 结构的指针，该结构定义了接收数据的目标缓冲区和辅助数据缓冲区。
+   
+3. **int flags**: 用于修改接收行为的选项标志。常用的标志包括：
+   - `0`: 正常接收数据。
+   - `MSG_PEEK`: 窥视接收数据，即读取数据但不去删除缓冲区中的数据。
+   - `MSG_WAITALL`: 等待直到接收到足够多的数据，至少填满一个 `iovec` 缓冲区。
+
+返回值：
+
+- 如果调用成功，返回接收到的字节总数。
+- 如果调用失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：
+
+- 当需要接收非连续的数据块时，`recvmsg` 允许将数据直接接收到多个数据块中，而不是先接收到一个连续的缓冲区再复制到各个数据块。
+- 当需要接收辅助数据或文件描述符时，`recvmsg` 提供了接收这些附加信息的能力。
+
+工作机制：
+
+- `recvmsg` 函数从 socket 中接收数据，并将其存储到 `msghdr` 结构指定的 `iovec` 数组中。
+- 如果 `msg_name` 成员不为空，`recvmsg` 将填充该缓冲区以包含发送方的地址信息。
+
+示例：
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <string.h>
+
+int main() {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        perror("Failed to create socket");
+        exit(EXIT_FAILURE);
+    }
+
+    // 连接的代码...
+
+    char buffer1[32];
+    char buffer2[32];
+    struct iovec iov[2] = {
+        { .iov_base = buffer1, .iov_len = sizeof(buffer1) },
+        { .iov_base = buffer2, .iov_len = sizeof(buffer2) }
+    };
+    struct msghdr msg = {
+        .msg_iov = iov,
+        .msg_iovlen = 2,
+        .msg_control = NULL,
+        .msg_controllen = 0,
+    };
+
+    ssize_t received = recvmsg(sockfd, &msg, 0);
+    if (received == -1) {
+        perror("Failed to receive message");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    } else if (received == 0) {
+        printf("Connection closed by the peer.\n");
+    } else {
+        printf("Received %zd bytes\n", received);
+        // 处理接收到的数据
+    }
+
+    close(sockfd);
+    return 0;
+}
+```
+
+这个示例创建了一个 socket 并连接到一个服务器。然后定义了两个数据接收缓冲区和一个 `iovec` 数组，以及一个 `msghdr` 结构来接收数据。使用 `recvmsg` 函数接收数据，并检查返回值以确定是否成功接收。如果接收到数据，打印出接收到的字节数并处理数据。如果连接被关闭，打印相应的消息。最后关闭 socket。
+
+#### `cmsghdr`
+
+`struct cmsghdr` 是 POSIX 系统上的一个 C 结构体，用于定义控制消息（也称为辅助数据）的头部信息，这些控制消息可以与正常的 socket 数据一起发送或接收。`recvmsg` 和 `sendmsg` 函数使用这种结构体来处理与 socket 相关的辅助数据，例如文件描述符、权限设置或其他协议特定的信息。
+
+```c
+struct cmsghdr {
+    socklen_t     cmsg_len;
+    int           cmsg_level;
+    int           cmsg_type;
+    unsigned char cmsg_data[];
+};
+```
+
+
+
+结构体成员说明：
+
+1. **socklen_t cmsg_len**: 控制消息的长度，以字节为单位。这个长度包括了 `cmsghdr` 结构本身的整个大小，以及 `cmsg_data` 数组中数据的长度。
+2. **int cmsg_level**: 指定控制消息的协议层。例如，`SOL_SOCKET` 表示这是一个通用的 socket 选项。
+3. **int cmsg_type**: 指定控制消息的类型。类型依赖于 `cmsg_level`。例如，`SCM_RIGHTS` 用于传输文件描述符，`SCM_CREDENTIALS` 用于传输用户凭证。
+4. **unsigned char cmsg_data []**: 一个无符号字符数组，用于存放实际的控制消息数据。数组的长度由 `cmsg_len` 成员减去 `cmsghdr` 头部的大小确定。
+
+控制消息的使用场景：
+
+- 当需要在 socket 通信中发送或接收额外的元数据时。
+- 当需要在不同的进程间传输文件描述符或用户凭证等信息时。
+
+控制消息的工作机制：
+
+- 控制消息被封装在 `sendmsg` 和 `recvmsg` 函数的 `msg_control` 缓冲区中。
+- 发送端使用 `cmsghdr` 结构来构造控制消息，并将其放入 `msg_control` 缓冲区。
+- 接收端从 `msg_control` 缓冲区解析 `cmsghdr` 结构，以获取控制消息。
+
+**`cmsg_data` 数组**：`cmsg_data` 数组用于存放 `cmsghdr` 结构中额外的数据，其长度可以根据实际需求变化。例如，当需要传递文件描述符时，`cmsg_data` 的长度将与 `int` 类型的大小一致。
+
+**`CMSG_LEN` 宏**：`CMSG_LEN` 宏用于计算包括 `cmsg_data` 在内的 `cmsghdr` 结构的完整长度。使用时，传入 `cmsg_data` 的长度作为参数。例如，若 `cmsg_data` 用于存储文件描述符（通常是 `int` 类型），则 `CMSG_LEN(sizeof(int))` 将给出整个 `cmsghdr` 结构的长度。
+
+**`CMSG_DATA` 宏**：`CMSG_DATA` 宏用于获取指向 `cmsghdr` 结构中 `cmsg_data` 部分的指针。这对于访问和修改传输的额外数据非常有用。
+
+示例代码：
+
+```c
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+// 假设netfd是要传输的文件描述符
+int *netfd = ...;
+
+// 分配足够的内存以存储cmsghdr结构，包括cmsg_data
+struct cmsghdr *pcms = malloc(CMSG_LEN(sizeof(int)));
+if (!pcms) {
+    // 错误处理
+}
+
+// 设置cmsghdr结构
+pcms->cmsg_level = SOL_SOCKET; // 通常使用SOL_SOCKET
+pcms->cmsg_type = SCM_RIGHTS;  // 文件描述符传递类型
+pcms->cmsg_len = CMSG_LEN(sizeof(int));
+
+// 获取cmsg_data部分的指针并设置文件描述符
+void *addr = CMSG_DATA(pcms);
+int *p_fd = (int *)addr;
+*p_fd = *netfd;
+
+// 使用recvmsg或sendmsg函数进行通信时，将cmsghdr结构传递给相应的缓冲区
+// ...
+```
+
+在上述代码中，首先使用 `malloc` 分配了足够的内存来存储 `cmsghdr` 结构，包括 `cmsg_data` 部分。然后，使用 `CMSG_LEN` 宏计算结构的长度，并使用 `CMSG_DATA` 宏获取指向 `cmsg_data` 的指针。最后，将文件描述符的值赋给通过指针 `p_fd` 访问的位置。
+
+### Makefile
+
+```makefile
+# makefile
+# 定义一个 srcs 变量, 来代指: 使用 wildcard 函数获取当前目录下的所有. c 文件
+srcs:=$(wildcard *.c)
+# 定义一个 objs 变量, 来代指: 使用 patsubst 函数讲 srcs 中所有的. c 文件拓展名替换成. o 文件
+objs:=$(patsubst %.c,%.o, $(srcs))
+
+# 编译 '-c $^'(源依赖项. c 文件)  输出到 '-o $@'(目标. o) 文件
+%.o:%.c
+    gcc -c $^ -o $@ -g
+# mian 文件依赖于所有的 objs 文件
+# 把所有依赖项 ($^) 指定输出到当前目标 (-o $@)(即: main)
+main:$(objs)
+    gcc $^ -o $@ -lpthread
+
+# 清理 objs 文件 清理 main 文件
+clean:
+    $(RM) $(objs) main
+
+rebuild: clean main
+```
+
+### header.h
+
+```c
+/**
+ * @file head.h
+ * @brief 头文件，包含整个项目中使用的全局定义、数据结构和函数声明。
+ */
+
+#ifndef HEAD_H
+#define HEAD_H
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/epoll.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+/**
+ * @brief 定义进程的状态。
+ */
+enum {
+    BUSY,  /**< 子进程当前正忙，正在处理任务。 */
+    FREE   /**< 子进程当前空闲，可以接受新任务。 */
+};
+
+/**
+ * @brief 子进程状态结构体，用于记录子进程的信息。
+ */
+typedef struct son_status_s {
+    pid_t pid;         /**< 子进程的进程ID */
+    int flag;          /**< 子进程的当前状态，BUSY 或 FREE */
+    int local_socket;  /**< 子进程与父进程通信的本地socket文件描述符 */
+} son_status_s;
+
+/**
+ * @brief 初始化进程池。
+ * 
+ * 根据指定的数量初始化进程池，创建子进程，并设置它们的状态。
+ *
+ * @param list 指向存储子进程状态的数组的指针。
+ * @param num 要初始化的子进程数量。
+ * @return 返回 0 表示初始化成功，-1 表示初始化失败。
+ */
+int initPool(son_status_s *list, int num);
+
+/**
+ * @brief 初始化 socket 服务端。
+ * 
+ * 根据提供的端口和 IP 地址创建并配置 socket，使其能够监听网络连接。
+ *
+ * @param socket_fd 指向 socket 文件描述符的指针。
+ * @param port 要监听的端口号。
+ * @param ip 要绑定的 IP 地址。
+ * @return 返回 0 表示初始化成功，-1 表示初始化失败。
+ */
+int initSocket(int *socket_fd, const char *port, const char *ip);
+
+/**
+ * @brief 将文件描述符添加到 epoll 实例中。
+ * 
+ * 将指定的文件描述符添加到 epoll 实例中，以便进行事件监听。
+ *
+ * @param epoll_fd epoll 实例的文件描述符。
+ * @param fd 要添加的文件描述符。
+ * @return 返回 0 表示添加成功，-1 表示添加失败。
+ */
+int addEpoll(int epoll_fd, int fd);
+
+/**
+ * @brief 将客户端连接分配给子进程处理。
+ * 
+ * 在进程池中找到一个空闲的子进程，并将客户端连接传递给它处理。
+ *
+ * @param list 指向子进程状态数组的指针。
+ * @param num 子进程的数量。
+ * @param net_fd 客户端连接的文件描述符。
+ * @return 返回 0 表示分配成功，-1 表示分配失败。
+ */
+int toSonNetFd(son_status_s *list, int num, int net_fd);
+
+/**
+ * @brief 子进程的工作函数。
+ * 
+ * 子进程在此函数中循环等待接收任务，并处理客户端请求。
+ *
+ * @param local_socket 子进程与父进程通信的本地 socket 文件描述符。
+ * @return 返回 0 表示正常，-1 表示处理过程中出现错误。
+ */
+int doWorker(int local_socket);
+
+/**
+ * @brief 通过本地 socket 发送客户端文件描述符给子进程。
+ * 
+ * 将客户端连接的文件描述符通过本地 socket 发送给子进程。
+ *
+ * @param local_socket 父进程与子进程通信的本地 socket 文件描述符。
+ * @param net_fd 客户端连接的文件描述符。
+ * @return 返回 0 0表示成功，-1 表示失败。
+ */
+int sendMsg(int local_socket, int net_fd);
+
+/**
+ * @brief 子进程通过本地 socket 接收客户端文件描述符。
+ * 
+ * 子进程在此函数中接收父进程通过本地 socket 发送的客户端连接文件描述符。
+ *
+ * @param local_socket 子进程与父进程通信的本地 socket 文件描述符。
+ * @param net_fd 指向接收到的客户端连接文件描述符的指针。
+ * @return 返回 0 表示成功，-1 表示失败。
+ */
+int recvMsg(int local_socket, int *net_fd);
+
+/**
+ * @brief 与客户端进行交互。
+ * 
+ * 子进程使用此函数与客户端进行通信，例如发送或接收数据。
+ *
+ * @param net_fd 客户端连接的文件描述符。
+ * @return 返回 0 表示成功，-1 表示通信失败。
+ */
+int toClientFile(int net_fd);
+
+#endif // !HEAD_H
+```
+
+### main.c
+
+1. **初始化进程池**：调用 `initPool` 函数，创建 4 个子进程，并将它们的状态设置为 `FREE`。
+2. **初始化网络 socket**：调用 `initSocket` 函数，创建一个 socket 用于监听端口 `8080` 上的连接请求。
+3. **创建 epoll 实例**：调用 `epoll_create` 函数创建一个 epoll 实例，用于后续的事件监听。
+4. **添加监听 socket 到 epoll**：调用 `addEpoll` 函数，将监听 socket 添加到 epoll 实例中，以便监听新的连接请求。
+5. **添加子进程的本地 socket 到 epoll**：遍历进程池，将每个子进程的本地 socket 添加到 epoll 实例中，以便监听子进程的通知。
+6. 主事件循环：使用 `epoll_wait` 函数等待 epoll 事件的发生。对于每个事件：
+   - 如果事件是由监听 socket 触发的，接受新的客户端连接，然后调用 `toSonNetFd` 函数将客户端连接分配给一个空闲的子进程处理。
+   - 如果事件是由子进程的本地 socket 触发的，读取子进程发送的消息，并更新子进程的状态为 `FREE`。
+7. **循环结束**：主事件循环无限循环，直到程序被外部中断或终止。
+
+```c
+/**
+ * @file main.c
+ * @brief 主程序文件，包含程序的入口点和主逻辑。
+ *
+ * 此文件定义了程序的主要入口点 main 函数，负责初始化进程池、网络连接，
+ * epoll 事件循环，并处理客户端请求。
+ */
+
+#include "head.h"
+
+int main() {
+    son_status_s list[4]; /**< 定义一个进程池数组，存储子进程的状态信息 */
+
+    /**
+   * 初始化进程池。
+   * 创建一定数量的子进程，并将它们的状态设置为 FREE（空闲）。
+   */
+    initPool(list, 4);
+
+    /**
+   * 初始化网络 socket。
+   * 创建并配置 socket，使其能够监听指定 IP 地址和端口上的连接请求。
+   */
+    int socket_fd;
+    initSocket(&socket_fd, "8080", "172.16.0.3");
+
+    /**
+   * 创建 epoll 实例，并设置为非阻塞模式。
+   * epoll 用于高效地处理大量并发连接。
+   */
+    int epoll_fd = epoll_create(1);
+
+    /**
+   * 将监听 socket 添加到 epoll 实例中。
+   * 这样，当有新的连接请求时，epoll 可以通知主进程。
+   */
+    addEpoll(epoll_fd, socket_fd);
+
+    /**
+   * 将进程池中每个子进程的本地 socket 添加到 epoll 实例中。
+   * 这样，主进程可以接收来自子进程的通知，例如任务完成。
+   */
+    for (int i = 0; i < 4; i++) {
+        addEpoll(epoll_fd, list[i].local_socket);
+    }
+
+    /**
+   * 主事件循环。
+   * 使用 epoll_wait 等待并处理 I/O 事件。
+   */
+    while (1) {
+        struct epoll_event events[10]; /**< 定义一个事件数组，存储 epoll 事件 */
+        memset(events, 0, sizeof(events)); /**< 清零事件数组 */
+
+        /**
+     * 等待 epoll 事件。
+     * -1 表示无限期等待，直到有事件发生。
+     */
+        int epoll_num = epoll_wait(epoll_fd, events, 10, -1);
+
+        /**
+     * 遍历所有事件，处理它们。
+     */
+        for (int i = 0; i < epoll_num; i++) {
+            int fd = events[i].data.fd; /**< 获取事件对应的文件描述符 */
+
+            /**
+       * 如果事件是由监听 socket 触发的，接受新的客户端连接。
+       */
+            if (fd == socket_fd) {
+                int net_fd = accept(socket_fd, NULL, NULL);
+                if (net_fd < 0) {
+                    perror("accept");
+                    continue;
+                }
+
+                /**
+         * 将新的客户端连接分配给一个空闲的子进程。
+         */
+                toSonNetFd(list, 4, net_fd);
+
+                close(net_fd); /**< 关闭新创建的 socket，由子进程处理 */
+                continue;
+            }
+
+            /**
+       * 如果事件是由子进程的本地 socket 触发的，处理子进程的通知。
+       */
+            for (int j = 0; j < 4; j++) {
+                if (list[j].local_socket == fd) {
+                    char buf[60] = {0};
+                    recv(fd, buf, sizeof(buf), 0); /**< 读取子进程发送的消息 */
+                    list[j].flag = FREE; /**< 将子进程状态设置为 FREE */
+                    break;
+                }
+            }
+        }
+    }
+
+    return 0; /**< 程序正常退出 */
+}
+```
+
+### pool.c
+
+**初始化进程池 (`initPool` 函数)**:
+
+- 定义一个循环，根据传入的 `num` 参数创建相应数量的子进程。
+- 对于每个子进程：
+  - 创建一个 socketpair，用于父进程和子进程之间的通信。
+  - 使用 `fork` 创建子进程。
+  - 子进程关闭不需要的 socket 端点，然后调用 `doWorker` 函数进入工作循环。
+  - 父进程保存子进程的 PID 和用于通信的 socket 端点，并将子进程的状态设置为 `FREE`。
+- 如果创建 socketpair 或者 `fork` 失败，函数返回 -1 表示错误。
+
+**分配客户端连接给子进程 (`toSonNetFd` 函数)**:
+
+- 遍历进程池，寻找第一个状态为 `FREE` 的子进程。
+- 使用 `sendMsg` 函数将客户端的网络文件描述符 `net_fd` 发送给子进程。
+- 将找到的子进程状态设置为 `BUSY`。
+- 如果所有子进程都忙，或者发送消息失败，则函数返回 -1 表示错误。
+
+```c
+/**
+ * @file pool.c
+ * @brief 进程池管理模块。
+ * 
+ * 该文件实现了进程池的初始化和子进程的管理工作。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 初始化进程池。
+ *
+ * 为指定数量的子进程分配资源，并创建 socketpair 用于与子进程通信。
+ * 每个子进程通过 fork 创建，并进入 doWorker 函数循环等待任务。
+ *
+ * @param list 指向 son_status_s 结构体数组的指针，该数组用于存储子进程的状态。
+ * @param num 子进程的数量。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int initPool(son_status_s *list, int num) {
+    for (int i = 0; i < num; i++) {
+        int socket_fd[2];
+        if (socketpair(AF_LOCAL, SOCK_STREAM, 0, socket_fd) == -1) {
+            // 处理错误...
+            return -1;
+        }
+
+        pid_t son_id = fork();
+        if (son_id == -1) {
+            // 处理错误...
+            return -1;
+        } else if (son_id == 0) {
+            // 子进程
+            close(socket_fd[1]); // 关闭未使用的 socket 端点
+            doWorker(socket_fd[0]); // 执行子进程任务循环
+            exit(0); // 子进程结束
+        } else {
+            // 父进程
+            list[i].flag = FREE; // 设置子进程状态为 FREE
+            list[i].local_socket = socket_fd[1]; // 保存与子进程通信的 socket
+            list[i].pid = son_id; // 保存子进程的 PID
+            close(socket_fd[0]); // 关闭子进程未使用的 socket 端点
+        }
+    }
+    return 0;
+}
+
+/**
+ * @brief 将网络文件描述符传递给子进程处理。
+ *
+ * 遍历进程池，寻找第一个标记为 FREE 的子进程，并通过 socketpair 发送网络文件描述符。
+ * 之后，将该子进程的状态标记为 BUSY。
+ *
+ * @param list 指向 son_status_s 结构体数组的指针，包含子进程的状态信息。
+ * @param num 子进程的数量。
+ * @param net_fd 需要传递给子进程的网络文件描述符。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int toSonNetFd(son_status_s *list, int num, int net_fd) {
+    for (int i = 0; i < num; i++) {
+        if (list[i].flag == FREE) {
+            if (sendMsg(list[i].local_socket, net_fd) == -1) {
+                // 处理错误...
+                return -1;
+            }
+            list[i].flag = BUSY; // 将子进程状态设置为 BUSY
+            return 0;
+        }
+    }
+    return -1; // 没有找到空闲的子进程
+}
+```
+
+### worker.c
+
+1. **子进程工作循环 (`doWorker` 函数)**:
+   - 子进程进入一个无限循环，持续运行直到程序终止或出现错误。
+   - 在循环中，子进程首先调用 `recvMsg` 函数来接收父进程通过本地 socket 发送的客户端文件描述符 `net_fd`。
+   - 如果 `recvMsg` 失败，子进程将退出循环并结束。
+2. **处理客户端请求 (`toClientFile` 函数)**:
+   - 接收到客户端文件描述符后，子进程调用 `toClientFile` 函数来处理客户端请求。
+   - 在示例中，`toClientFile` 函数向客户端发送一个简单的 "hello" 消息。
+   - 如果 `send` 调用失败，`toClientFile` 函数将返回 -1 表示错误。
+3. **关闭客户端连接**:
+   - 完成与客户端的交互后，子进程关闭客户端 socket。
+4. **通知父进程**:
+   - 子进程通过本地 socket 发送一个特定的消息（例如 "111"）来通知父进程任务已完成。
+   - 这允许父进程更新子进程的状态，使其准备接收新的客户端连接。
+
+```c
+/**
+ * @file worker.c
+ * @brief 子进程工作模块。
+ * 
+ * 该文件实现了子进程的工作循环，负责接收父进程发送的任务，
+ * 并执行与客户端的交互。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 子进程的工作函数。
+ *
+ * 子进程在此函数中循环运行，等待父进程通过本地 socket 发送的任务。
+ * 当接收到任务后，子进程将调用 toClientFile 函数来处理客户端请求，
+ * 然后通知父进程任务已完成。
+ *
+ * @param local_socket 子进程与父进程通信的本地 socket 文件描述符。
+ * @return 始终返回 0，表示子进程正常运行。
+ */
+int doWorker(int local_socket) {
+    while (1) {
+        int net_fd;
+        /**
+         * 接收父进程发送的客户端文件描述符。
+         * 如果 recvMsg 失败，子进程将退出循环并结束。
+         */
+        if (recvMsg(local_socket, &net_fd) == -1) {
+            break;
+        }
+
+        /**
+         * 处理客户端请求。
+         * toClientFile 函数负责与客户端的交互，例如发送响应。
+         */
+        if (toClientFile(net_fd) == -1) {
+            // 处理错误...
+        }
+
+        /**
+         * 关闭客户端 socket，完成与客户端的交互。
+         */
+        close(net_fd);
+
+        /**
+         * 通知父进程任务已完成，子进程准备接收新任务。
+         * 发送特定的消息（例如 "111"）作为通知。
+         */
+        send(local_socket, "111", 3, 0);
+    }
+    return 0;
+}
+
+/**
+ * @brief 子进程与客户端的交互函数。
+ *
+ * 此函数负责子进程与客户端的交互，例如发送欢迎消息。
+ * 这里仅为示例，实际应用中可能包含更复杂的逻辑。
+ *
+ * @param net_fd 客户端连接的文件描述符。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int toClientFile(int net_fd) {
+    const char *message = "hello";
+    /**
+     * 向客户端发送消息。
+     * 如果 send 调用失败，函数将返回 -1 表示错误。
+     */
+    int ret = send(net_fd, message, strlen(message), 0);
+    if (ret == -1) {
+        return -1;
+    }
+    return 0;
+}
+```
+
+### local.c
+
+**发送文件描述符 (`sendMsg` 函数)**:
+
+- 初始化 `msghdr` 结构和相关的 `iovec` 结构，用于构造消息。
+- 分配控制缓冲区 `cmbuf` 用于存储控制消息。
+- 创建控制消息 `cmsg`，设置其长度、层级、类型，并在数据部分存储要发送的文件描述符 `net_fd`。
+- 使用 `sendmsg` 系统调用发送消息，包括控制消息中的文件描述符。
+
+**接收文件描述符 (`recvMsg` 函数)**:
+
+- 初始化 `msghdr` 结构和相关的 `iovec` 结构，用于接收消息。
+- 分配控制缓冲区 `cmbuf` 用于接收控制消息。
+- 使用 `recvmsg` 系统调用接收消息，包括控制消息。
+- 遍历接收到的消息的控制消息，找到类型为 `SCM_RIGHTS` 的控制消息，并从中提取文件描述符。
+- 如果控制消息存在且类型正确，将接收到的文件描述符存储在提供的指针 `net_fd` 中。
+
+```c
+/**
+ * @file local.c
+ * @brief 本地通信模块。
+ *
+ * 该文件实现了父子进程间通过本地 socket 进行通信的函数。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 通过本地 socket 发送客户端文件描述符给子进程。
+ *
+ * 使用 sendmsg 系统调用和控制消息（cmsg）来发送一个文件描述符。
+ * 这种方法允许父子进程之间传递打开的文件描述符。
+ *
+ * @param local_socket 父进程与子进程通信的本地 socket 文件描述符。
+ * @param net_fd 要发送给子进程的客户端 socket 文件描述符。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int sendMsg(int local_socket, int net_fd) {
+  struct msghdr msg;
+  bzero(&msg, sizeof(msg));
+  char *str = "hello";  // 可以忽略的消息体，仅用于构造 msghdr 结构
+  struct iovec vec[1];
+
+  vec[0].iov_base = str;
+  vec[0].iov_len = strlen(str);
+
+  msg.msg_iov = vec;
+  msg.msg_iovlen = 1;
+
+  struct cmsghdr *cmsg = (struct cmsghdr *)malloc(CMSG_LEN(sizeof(int)));
+  cmsg->cmsg_len = CMSG_LEN(sizeof(int));
+  cmsg->cmsg_level = SOL_SOCKET;
+  cmsg->cmsg_type = SCM_RIGHTS;
+
+  int *fdptr = (int *)CMSG_DATA(cmsg);
+  *fdptr = net_fd;
+
+  msg.msg_control = cmsg;
+  msg.msg_controllen = CMSG_LEN(sizeof(int));
+
+  if (sendmsg(local_socket, &msg, 0) == -1) {
+    return -1;
+  }
+  return 0;
+}
+
+/**
+ * @brief 子进程通过本地 socket 接收父进程发送的客户端文件描述符。
+ *
+ * 使用 recvmsg 系统调用接收文件描述符。
+ * 该函数从控制消息中提取文件描述符，并将其存储在提供的参数中。
+ *
+ * @param local_socket 子进程与父进程通信的本地 socket 文件描述符。
+ * @param net_fd 指向用于存储接收到的客户端 socket 文件描述符的变量的指针。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int recvMsg(int local_socket, int *net_fd) {
+  struct msghdr msg;
+  bzero(&msg, sizeof(msg));
+
+  // 准备正文信息
+  char str[60] = {0};
+  struct iovec vec[1];
+  vec[0].iov_base = str;
+  vec[0].iov_len = sizeof(str);
+
+  msg.msg_iov = vec;
+  msg.msg_iovlen = 1;
+
+  // 准备控制信息
+  struct cmsghdr *cms = (struct cmsghdr *)malloc(CMSG_LEN(sizeof(int)));
+  cms->cmsg_len = CMSG_LEN(sizeof(int));  // 指明这个结构体的大小
+  cms->cmsg_level = SOL_SOCKET;
+  cms->cmsg_type = SCM_RIGHTS;
+
+  msg.msg_control = cms;
+  msg.msg_controllen = CMSG_LEN(sizeof(int));
+
+  recvmsg(local_socket, &msg, 0);
+
+  void *p = CMSG_DATA(cms);
+  int *fd = (int *)p;
+
+  *net_fd = *fd;
+
+  return 0;
+}
+```
+
+### socket.c
+
+1. **创建 socket**：使用 `socket` 系统调用创建一个新的 socket 文件描述符。如果创建失败，函数返回 -1。
+2. **设置 socket 选项**：使用 `setsockopt` 系统调用设置 `SO_REUSEADDR` 选项，以允许重新使用本地地址和端口。如果设置失败，关闭 socket 并返回 -1。
+3. **构建地址结构体**：初始化 `sockaddr_in` 结构体，设置地址族、端口号和 IP 地址。端口号和 IP 地址由字符串转换为网络字节序。
+4. **绑定 IP 地址和端口**：使用 `bind` 系统调用将 socket 绑定到指定的 IP 地址和端口。如果绑定失败，关闭 socket 并返回 -1。
+5. **监听连接**：使用 `listen` 系统调用设置 socket 为监听模式，最多允许指定数量的客户端连接等待接受。如果监听失败，关闭 socket 并返回 -1。
+6. **成功返回**：如果所有步骤都成功完成，函数返回 0，表示 socket 初始化和配置成功。
+
+```c
+/**
+ * @file socket.c
+ * @brief 网络通信模块。
+ * 
+ * 该文件实现了网络 socket 的初始化和配置，用于监听和接受客户端连接。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 初始化并配置 socket 服务端。
+ *
+ * 创建一个 socket，绑定到指定的 IP 地址和端口，设置为监听模式。
+ * 此函数还配置 socket 选项，以避免 TIME_WAIT 状态导致的端口占用问题。
+ *
+ * @param socket_fd 指向整数的指针，用于存储新创建的 socket 文件描述符。
+ * @param port 要监听的端口号的字符串表示。
+ * @param ip 要绑定的 IP 地址的字符串表示。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int initSocket(int *socket_fd, char *port, char *ip) {
+    // 创建 socket 文件对象
+    *socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (*socket_fd == -1) {
+        return -1;  // 创建 socket 失败
+    }
+
+    // 解除 TIME_WAIT 等待时：导致端口占用问题
+    int reuse = 1;
+    if (setsockopt(*socket_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) == -1) {
+        close(*socket_fd);  // 设置 socket 选项失败，关闭 socket
+        return -1;
+    }
+
+    // 构建 sockaddr_in 结构体
+    struct sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(atoi(port));  // 将端口号从字符串转换为网络字节序
+    addr.sin_addr.s_addr = inet_addr(ip);  // 将 IP 地址从字符串转换为网络字节序
+
+    // 绑定端口
+    if (bind(*socket_fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+        close(*socket_fd);  // 绑定失败，关闭 socket
+        return -1;
+    }
+
+    // 开始监听
+    if (listen(*socket_fd, 10) == -1) {  // 最多允许 10 个客户端连接等待接受
+        close(*socket_fd);  // 监听失败，关闭 socket
+        return -1;
+    }
+    return 0;  // 初始化成功
+}
+```
+
+### epoll.c
+
+1. **函数声明**：定义了 `addEpoll` 函数，该函数接受两个参数：`epoll_fd`（epoll 实例的文件描述符）和 `fd`（需要监听的文件描述符）。
+2. **创建 epoll 事件对象**：声明并初始化了一个 `epoll_event` 结构体实例，用于设置监听的事件类型和关联的文件描述符。
+3. **设置监听事件**：将 `event.data.fd` 设置为传入的 `fd`，表示该事件对象将关联到这个文件描述符。将 `event.events` 设置为 `EPOLLIN`，表示只监听可读事件。
+4. **添加到 epoll 实例**：调用 `epoll_ctl` 函数，传入 `epoll_fd`、`EPOLL_CTL_ADD`、`fd` 和 `event` 作为参数，尝试将该事件添加到 epoll 实例中。
+5. **错误处理**：如果 `epoll_ctl` 调用失败（返回 -1），则 `addEpoll` 函数也返回 -1，表示添加操作失败。
+6. **成功返回**：如果添加操作成功，函数返回 0，表示文件描述符已成功添加到 epoll 实例中进行监听。
+
+```c
+/**
+ * @file epoll.c
+ * @brief 包含 epoll 相关的函数实现。
+ * 
+ * 该文件提供了将文件描述符添加到 epoll 实例的函数。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 将文件描述符添加到 epoll 实例中进行事件监听。
+ *
+ * 此函数创建一个 epoll 事件对象，设置其监听的事件类型为 EPOLLIN，
+ * 然后将该事件对象与指定的文件描述符一起添加到 epoll 实例中。
+ * 
+ * @param epoll_fd epoll 实例的文件描述符。
+ * @param fd 需要添加到 epoll 实例中监听的文件描述符。
+ * @return 返回 0 表示添加成功，返回 -1 表示添加失败。
+ */
+int addEpoll(int epoll_fd, int fd) {
+    struct epoll_event event;  /**< epoll 事件对象 */
+    event.data.fd = fd;        /**< 设置事件对象关联的文件描述符 */
+    event.events = EPOLLIN;    /**< 设置事件类型为可读 */
+
+    int ret = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event);  /**< 调用 epoll_ctl 执行添加操作 */
+    if (ret == -1) {
+        return -1;  /**< 如果添加失败，返回 -1 */
+    }
+    return 0;  /**< 添加成功，返回 0 */
+}
+```
+
+### client.c
+
+1. **定义服务器地址**：设置服务器的端口号和 IP 地址。
+2. **创建 socket**：使用 `socket` 系统调用创建一个新的 socket 文件描述符。如果创建失败，打印错误并退出程序。
+3. **设置服务器地址结构**：初始化 `sockaddr_in` 结构体，设置服务器的地址族为 `AF_INET`，端口号和 IP 地址转换为网络字节序。
+4. **连接到服务器**：使用 `connect` 系统调用尝试连接到服务器。如果连接失败，打印错误，关闭 socket 并退出程序。
+5. **接收消息**：定义一个缓冲区 `buf` 用于接收服务器发送的消息。使用 `recv` 系统调用接收消息。如果接收失败，打印错误，关闭 socket 并退出程序。成功接收消息后，打印消息内容。
+6. **关闭 socket**：通信完成后，使用 `close` 系统调用关闭 socket 连接。
+
+```c
+/**
+ * @file client.c
+ * @brief 客户端程序。
+ * 
+ * 该文件实现了一个简单的客户端，用于连接到指定的服务器地址和端口，
+ * 并接收服务器发送的消息。
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+
+int main() {
+    // 定义服务器的端口和 IP 地址
+    char *port = "8080";
+    char *ip = "172.16.0.3";
+
+    /**
+     * 创建 socket。
+     * 创建一个用于通信的 socket，用于连接到服务器。
+     */
+    int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (socket_fd == -1) {
+        // 处理错误...
+        return -1;
+    }
+
+    /**
+     * 设置服务器地址结构。
+     * 初始化 sockaddr_in 结构，设置服务器的地址族、端口和 IP 地址。
+     */
+    struct sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(atoi(port));  // 端口号转换为网络字节序
+    addr.sin_addr.s_addr = inet_addr(ip);  // IP 地址转换为网络字节序
+
+    /**
+     * 连接到服务器。
+     * 使用 connect 系统调用建立到服务器的连接。
+     */
+    if (connect(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+        // 处理错误...
+        close(socket_fd);
+        return -1;
+    }
+
+    /**
+     * 接收服务器消息。
+     * 从 socket 中接收服务器发送的消息，并存储在缓冲区 buf 中。
+     */
+    char buf[60] = {0};
+    if (recv(socket_fd, buf, sizeof(buf), 0) == -1) {
+        // 处理错误...
+        close(socket_fd);
+        return -1;
+    }
+    printf("buf: %s\n", buf);  // 打印接收到的消息
+
+    /**
+     * 关闭 socket。
+     * 完成通信后，关闭 socket 连接。
+     */
+    close(socket_fd);
+    return 0;
+}
+```
+
+## 第二版
+
+### 文件传输
+
+#### client.c
+
+1. **接收文件名称**：客户端首先接收服务器发送的文件名。这是通过调用 `recv` 函数并指定缓冲区 `buf_name` 来完成的。接收到的文件名将被用于本地文件的命名。
+2. **打开或创建本地文件**：使用 `open` 函数，客户端尝试打开一个用于保存接收到的文件内容的本地文件。如果文件不存在，`open` 函数将创建该文件，并根据提供的权限参数 `0666` 设置文件权限。
+3. **循环接收文件内容**：客户端进入一个循环，使用 `recv` 函数持续接收来自服务器的数据。每次接收到数据后，客户端都会检查返回值以确定是否接收到更多数据。如果 `recv` 返回大于 0 的值，表示接收到了数据。
+4. **写入文件内容**：对于每次接收到的数据，客户端使用 `write` 函数将其写入到之前打开的本地文件中。`write` 函数的参数包括文件描述符、数据缓冲区和接收到的数据大小。
+5. **错误处理**：如果在接收或写入过程中发生错误，客户端将执行错误处理逻辑。这可能包括打印错误信息、关闭文件描述符和 socket 连接，并退出程序。
+6. **关闭资源**：完成数据接收后，客户端使用 `close` 函数关闭本地文件描述符，然后关闭与服务器的 socket 连接。这释放了所有相关的系统资源，并确保不会有资源泄露。
+7. **退出程序**：在资源关闭后，客户端程序正常退出，返回 0 表示程序成功执行完成。
+
+```c
+/**
+ * @file client.c
+ * @brief 客户端程序。
+ *
+ * 该文件实现了客户端的主要功能，包括连接到服务器、接收服务器发送的文件名称和内容，
+ * 并将接收到的内容保存到本地文件中。
+ */
+
+#include <stdc.h>
+
+int main() {
+  // 定义服务器的端口和 IP 地址
+  char *port = "8080";
+  char *ip = "172.16.0.3";
+
+  /**
+   * 创建 socket。
+   * 创建一个用于通信的 socket，用于连接到服务器。
+   */
+  int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+  if (socket_fd == -1) {
+    // 错误处理，例如打印错误信息并退出程序
+    perror("socket creation failed");
+    return -1;
+  }
+
+  /**
+   * 设置服务器地址结构。
+   * 初始化 sockaddr_in 结构，设置服务器的地址族、端口和 IP 地址。
+   */
+  struct sockaddr_in addr;
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(atoi(port));     // 端口号转换为网络字节序
+  addr.sin_addr.s_addr = inet_addr(ip);  // IP 地址转换为网络字节序
+
+  /**
+   * 连接到服务器。
+   * 使用 connect 系统调用建立到服务器的连接。
+   */
+  if (connect(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+    // 错误处理，例如关闭 socket_fd 并退出程序
+    perror("connect failed");
+    close(socket_fd);
+    return -1;
+  }
+
+  /**
+   * 接收服务器发送的文件名称。
+   * 从 socket 中接收服务器发送的文件名，并存储在缓冲区 buf_name 中。
+   */
++ char buf_name[60] = {0};
++ if (recv(socket_fd, buf_name, sizeof(buf_name), 0) == -1) {
++   // 错误处理
++   perror("recv failed");
++   close(socket_fd);
++   return -1;
++ }
+
+  /**
+   * 打开或创建用于保存文件内容的本地文件。
+   */
++ int file_fd = open(buf_name, O_RDWR | O_CREAT, 0666);
++ if (file_fd == -1) {
++   // 错误处理
++   perror("open file failed");
++   close(socket_fd);
++   return -1;
++  }
+
+  /**
+   * 接收服务器发送的文件内容。
+   * 循环接收服务器发送的数据，并将其写入到本地文件中。
+   */
++ char buf[1024] = {0};
++ ssize_t res;
++ while ((res = recv(socket_fd, buf, sizeof(buf), 0)) > 0) {
++   write(file_fd, buf, res);
+  }
+
++ if (res == -1) {
++   // 错误处理
++   perror("recv failed");
++ }
+
+  /**
+   * 关闭文件和 socket。
+   * 完成通信后，关闭文件描述符和 socket 连接。
+   */
++ close(file_fd);
+  close(socket_fd);
+  return 0;
+}
+```
+
+#### send_file.c
+
+1. **定义文件名**：设置要发送的文件名。
+2. **发送文件名**：使用 `send` 函数将文件名作为字符串发送给客户端。
+3. **打开文件**：使用 `open` 函数以只读模式打开文件，准备读取文件内容。
+4. **读取并发送文件内容**：循环使用 `read` 函数从文件中读取数据到缓冲区 `buf`。
+   - 使用 `send` 函数将缓冲区 `buf` 中的数据发送给客户端。
+5. **错误处理**：如果在打开文件或读取文件过程中发生错误，关闭文件描述符并返回错误代码 `-1`。
+6. **正常结束**：
+   - 如果读取到文件末尾（`read` 返回 `0`），循环结束。
+   - 关闭文件描述符。
+7. **返回结果**：如果所有操作成功完成，函数返回 `0`。
+
+```c
+/**
+ * @file send_file.c
+ * @brief 文件发送模块。
+ * 
+ * 该文件实现了子进程发送文件给客户端的功能。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 发送文件给客户端。
+ *
+ * 该函数负责打开指定的文件，并发送文件内容到客户端。
+ * 首先发送文件名，然后打开文件并发送文件内容。
+ *
+ * @param net_fd 客户端连接的文件描述符。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int sendFile(int net_fd) {
+    // 文件名，这里只是一个示例，实际使用时应根据情况确定文件名
+    char *file_name = "file.txt";
+    // 发送文件名给客户端
+    send(net_fd, file_name, strlen(file_name), 0);
+
+    // 打开文件，准备发送文件内容
+    int file_fd = open(file_name, O_RDONLY);
+    if (file_fd < 0) {
+        // 如果打开文件失败，返回错误
+        return -1;
+    }
+
+    // 读取文件内容并发送
+    char buf[1024] = {0};
+    ssize_t sret;
+    while ((sret = read(file_fd, buf, sizeof(buf))) > 0) {
+        // 发送读取到的数据
+        send(net_fd, buf, sret, 0);
+    }
+
+    // 检查读取操作是否成功完成
+    if (sret == -1) {
+        // 如果读取失败，返回错误
+        close(file_fd);
+        return -1;
+    }
+
+    // 关闭文件描述符
+    close(file_fd);
+    return 0;
+}
+```
+
+### 粘包问题
+
+在 TCP/IP 网络编程中，"粘包问题" 是一个常见的现象，它源于 TCP 协议的流式传输特性。当应用层数据通过 TCP 发送时，这些数据被视为一个连续的字节流，而 TCP 协议本身并不为每个数据包提供明确的边界。这意味着，如果服务器连续发送多个数据包，客户端在接收时可能会发现一次 `recv` 调用就读取了多个数据包的内容，这种现象称为粘包。
+
+例如，如果服务器首先发送一个文件名，然后发送该文件的内容，客户端可能在一次 `recv` 调用中同时接收到文件名和文件内容的一部分。这可能导致客户端将文件名和文件内容误认为是同一个数据实体，从而引发错误。
+
+与 TCP 不同，UDP 是一个无连接的协议，它不会在传输层对数据进行拆分和重组。每个 UDP 数据报都是独立的，因此 UDP 不存在粘包问题。在 UDP 中，每个数据报都被视为一个完整的消息单元，由 IP 层负责拆分和重组。
+
+为了解决 TCP 的粘包问题，开发者需要在应用层协议中明确定义数据的边界。
+
+#### client.c
+
+```c
+/**
+ * @file client.c
+ * @brief 客户端程序。
+ *
+ * 该文件实现了客户端的主要功能，包括连接到服务器、接收服务器发送的文件名称和内容，
+ * 并将接收到的内容保存到本地文件中。
+ */
+
+#include <stdc.h>
+
+int main() {
+  // 定义服务器的端口和 IP 地址
+  char *port = "8080";
+  char *ip = "172.16.0.3";
+
+  /**
+   * 创建 socket。
+   * 创建一个用于通信的 socket，用于连接到服务器。
+   */
+  int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+  if (socket_fd == -1) {
+    // 错误处理，例如打印错误信息并退出程序
+    perror("socket creation failed");
+    return -1;
+  }
+
+  /**
+   * 设置服务器地址结构。
+   * 初始化 sockaddr_in 结构，设置服务器的地址族、端口和 IP 地址。
+   */
+  struct sockaddr_in addr;
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(atoi(port));     // 端口号转换为网络字节序
+  addr.sin_addr.s_addr = inet_addr(ip);  // IP 地址转换为网络字节序
+
+  /**
+   * 连接到服务器。
+   * 使用 connect 系统调用建立到服务器的连接。
+   */
+  if (connect(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+    // 错误处理，例如关闭 socket_fd 并退出程序
+    perror("connect failed");
+    close(socket_fd);
+    return -1;
+  }
+
+  /**
+   * 接收服务器发送的文件名称长度。
+   * 首先接收一个表示文件名长度的整数，以便分配合适的缓冲区。
+   */
+  int file_name_len;
+  int recv_fd = recv(socket_fd, &file_name_len, sizeof(int), 0);
+
+  /**
+   * 检查接收文件名称长度是否成功。
+   */
+  if (recv_fd == -1) {
+    // 错误处理
+    perror("recv failed");
+    close(socket_fd);
+    return -1;
+  }
+  /**
+   * 接收服务器发送的文件名称。
+   * 根据接收到的长度，接收文件名字符串。
+   */
+  char buf_name[60] = {0};
+  recv_fd = recv(socket_fd, buf_name, file_name_len, 0);
+
+  if (recv_fd == -1) {
+    // 错误处理
+    perror("recv failed");
+    close(socket_fd);
+    return -1;
+  }
+
+  /**
+   * 打开或创建用于保存文件内容的本地文件。
+   */
+  int file_fd = open(buf_name, O_RDWR | O_CREAT, 0666);
+  if (file_fd == -1) {
+    // 错误处理
+    perror("open file failed");
+    close(socket_fd);
+    return -1;
+  }
+
+  /**
+   * 接收文件内容长度。
+   * 接收一个表示接下来要接收的文件内容长度的整数。
+   */
+  int len;
+  recv_fd = recv(socket_fd, &len, sizeof(int), 0);
+
+  if (recv_fd == -1) {
+    // 错误处理
+    perror("recv failed");
+    close(socket_fd);
+    return -1;
+  }
+  /**
+   * 接收服务器发送的文件内容。
+   * 根据接收到的长度，接收文件内容并写入本地文件。
+   */
+  char buf[1024] = {0};
+  ssize_t res = recv(socket_fd, buf, len, 0);
+  write(file_fd, buf, len);
+
+  if (res == -1) {
+    // 错误处理
+    perror("recv failed");
+  }
+
+  printf("文件已成功接收！\n");
+
+  /**
+   * 关闭文件和 socket。
+   * 完成通信后，关闭文件描述符和 socket 连接。
+   */
+  close(file_fd);
+  close(socket_fd);
+  return 0;
+}
+```
+
+1. **接收文件名称长度**：客户端首先接收一个整数，该整数表示服务器随后发送的文件名称的长度。
+2. **错误检查**：如果接收文件名称长度失败，客户端将打印错误信息，关闭 socket 并退出。
+3. **接收文件名称**：客户端根据接收到的长度，接收文件名称字符串，并将其存储在 `buf_name` 缓冲区中。
+4. **错误检查**：如果接收文件名称失败，客户端将执行错误处理。
+5. **打开或创建文件**：客户端尝试打开一个文件用于写入，如果文件不存在则创建它。
+6. **接收文件内容长度**：客户端接收另一个整数，表示接下来要从服务器接收的文件内容的字节长度。
+7. **接收文件内容**：客户端根据接收到的长度，从服务器接收文件内容到缓冲区 `buf` 中。
+8. **写入文件**：接收到的内容被写入到之前打开的本地文件中。
+9. **错误检查**：如果在接收文件内容时发生错误，客户端将打印错误信息。
+10. **打印成功消息**：如果文件接收成功，打印确认消息。
+11. **关闭资源**：最后，客户端关闭文件描述符和 socket，释放资源。
+
+#### send_file.c
+
+```c
+/**
+ * @file send_file.c
+ * @brief 文件发送模块。
+ *
+ * 该文件实现了子进程发送文件给客户端的功能。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 结构体用于封装传输的数据和长度。
+ */
+typedef struct train_s {
+  int len;        /**< 数据长度 */
+  char buf[1024]; /**< 数据缓冲区 */
+} train_t;
+
+/**
+ * @brief 发送文件给客户端。
+ *
+ * 该函数负责打开指定的文件，并发送文件内容到客户端。
+ * 首先发送文件名，然后打开文件并发送文件内容。
+ *
+ * @param net_fd 客户端连接的文件描述符。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int sendFile(int net_fd) {
+  // 文件名，这里只是一个示例，实际使用时应根据情况确定文件名
+  char *file_name = "file.txt";
+
+  /**
+   * 初始化传输结构体，设置文件名长度并复制文件名。
+   */
+  train_t train;
+  bzero(&train, 0);
+  train.len = strlen(file_name);
+  memcpy(train.buf, file_name, train.len);
+
+  /**
+   * 发送文件名长度和文件名。
+   * 将文件名和长度一同发送给客户端，以便客户端申请足够的接收缓冲区。
+   */
+  send(net_fd, &train, sizeof(int) + train.len, 0);
+
+  // 打开文件，准备发送文件内容
+  int file_fd = open(file_name, O_RDONLY);
+  if (file_fd < 0) {
+    perror("open file error");
+    // 如果打开文件失败，返回错误
+    return -1;
+  }
+
+  char buf[1024] = {0};
+
+  int read_num = read(file_fd, buf, sizeof(buf));
+
+  // 发送读取到的数据
+  send(net_fd, &read_num, sizeof(int), 0);
+  send(net_fd, buf, read_num, 0);
+
+  // 检查读取操作是否成功完成
+  if (read_num == -1) {
+    // 如果读取失败，返回错误
+    close(file_fd);
+    return -1;
+  }
+
+  // 关闭文件描述符
+  close(file_fd);
+  return 0;
+}
+```
+
+1. **初始化传输结构体**：定义并初始化 `train_t` 结构体，用于封装数据和长度信息。
+2. **设置文件名信息**：将文件名的长度和内容复制到 `train_t` 结构体的缓冲区中。
+3. **发送文件名长度和文件名**：将文件名的长度和文件名本身发送给客户端，这样客户端可以知道接收缓冲区需要多大。
+4. **打开文件**：打开要发送的文件，准备读取内容。
+5. **读取并发送文件内容**：
+   - 循环读取文件内容到缓冲区，发送数据长度和数据本身给客户端。
+   - 继续读取直到读取操作返回 0，表示文件读取完毕。
+6. **错误检查**：如果文件读取失败，打印错误信息，关闭文件描述符，并返回错误代码 `-1`。
+7. **关闭文件描述符**：完成文件内容发送后，关闭文件描述符以释放资源。
+8. **返回结果**：如果所有操作成功完成，函数返回 `0`。
+
+### 大文件传输
+
+#### client.c
+
+```c
+/**
+ * @file client.c
+ * @brief 客户端程序。
+ *
+ * 该文件实现了客户端的主要功能，包括连接到服务器、接收服务器发送的文件名称和内容，
+ * 并将接收到的内容保存到本地文件中。
+ */
+
+#include <stdc.h>
+
+int main() {
+  // 定义服务器的端口和 IP 地址
+  char *port = "8080";
+  char *ip = "172.16.0.3";
+
+  /**
+   * 创建 socket。
+   * 创建一个用于通信的 socket，用于连接到服务器。
+   */
+  int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+  if (socket_fd == -1) {
+    // 错误处理，例如打印错误信息并退出程序
+    perror("socket creation failed");
+    return -1;
+  }
+
+  /**
+   * 设置服务器地址结构。
+   * 初始化 sockaddr_in 结构，设置服务器的地址族、端口和 IP 地址。
+   */
+  struct sockaddr_in addr;
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(atoi(port));     // 端口号转换为网络字节序
+  addr.sin_addr.s_addr = inet_addr(ip);  // IP 地址转换为网络字节序
+
+  /**
+   * 连接到服务器。
+   * 使用 connect 系统调用建立到服务器的连接。
+   */
+  if (connect(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+    // 错误处理，例如关闭 socket_fd 并退出程序
+    perror("connect failed");
+    close(socket_fd);
+    return -1;
+  }
+
+  /**
+   * 接收服务器发送的文件名称长度。
+   * 首先接收一个表示文件名长度的整数，以便分配合适的缓冲区。
+   */
+  int file_name_len;
+  int recv_fd = recv(socket_fd, &file_name_len, sizeof(int), 0);
+
+  /**
+   * 检查接收文件名称长度是否成功。
+   */
+  if (recv_fd == -1) {
+    // 错误处理
+    perror("recv failed");
+    close(socket_fd);
+    return -1;
+  }
+  /**
+   * 接收服务器发送的文件名称。
+   * 接收到文件名称长度后，根据该长度接收实际的文件名。
+   */
+  char buf_name[60] = {0};
+  recv_fd = recv(socket_fd, buf_name, file_name_len, 0);
+
+  if (recv_fd == -1) {
+    // 错误处理
+    perror("recv failed");
+    close(socket_fd);
+    return -1;
+  }
+
+  /**
+   * 打开或创建用于保存文件内容的本地文件。
+   */
+  int file_fd = open(buf_name, O_RDWR | O_CREAT, 0666);
+  if (file_fd == -1) {
+    // 错误处理
+    perror("open file failed");
+    close(socket_fd);
+    return -1;
+  }
+  /**
+   * 循环接收文件内容。
+   * 直到从服务器接收完所有文件数据。
+   */
+  while (1) {
+    int len = 0;
+    /**
+     * 接收文件块的长度。
+     * 每次循环首先接收接下来要接收的数据块的长度。
+     */
+    recv_fd = recv(socket_fd, &len, sizeof(int), 0);
+    /**
+     * 检查接收长度信息是否成功，并处理接收结束条件。
+     * 如果接收到的长度为0，表示文件传输结束。
+     */
+    if (recv_fd == -1) {
+      perror("recv failed");
+      close(socket_fd);
+      return -1;
+    }
+    if (len == 0) {
+      break;
+    }
+    /**
+     * 接收文件数据块并写入文件。
+     * 根据接收到的长度，接收数据并写入到之前打开的文件中。
+     */
+    char buf[1000] = {0};
+    ssize_t recv_len = recv(socket_fd, buf, len, 0);
+    write(file_fd, buf, recv_len);
+  }
+
+  printf("文件已成功接收！\n");
+
+  /**
+   * 关闭文件和 socket。
+   * 完成通信后，关闭文件描述符和 socket 连接。
+   */
+  close(file_fd);
+  close(socket_fd);
+  return 0;
+}
+```
+
+1. **接收文件名称**：根据先前接收到的文件名称长度，客户端接收实际的文件名称。
+2. **打开文件**：客户端使用接收到的文件名称打开或创建一个本地文件，准备写入接收到的文件内容。
+3. **循环接收文件内容**：客户端进入一个循环，准备接收服务器发送的文件内容。
+4. **接收数据块长度**：在循环中，客户端首先接收接下来要接收的数据块的长度。
+5. **错误检查**：如果接收长度信息失败，客户端将执行错误处理。
+6. **检查接收结束条件**：如果接收到的长度为 0，表示文件内容已经全部接收完毕，客户端将退出循环。
+7. **接收数据块并写入文件**：客户端根据接收到的长度接收数据块，并将其写入到本地文件中。
+8. **打印成功消息**：接收完毕后，客户端打印一条消息，通知用户文件接收成功。
+9. **关闭资源**：最后，客户端关闭文件描述符和 socket 连接，释放所有资源。
+
+#### send_file.c
+
+```c
+/**
+ * @file send_file.c
+ * @brief 文件发送模块。
+ *
+ * 该文件实现了子进程发送文件给客户端的功能。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 结构体用于封装传输的数据和长度。
+ */
+typedef struct train_s {
+  int len;        /**< 数据长度 */
+  char buf[1024]; /**< 数据缓冲区 */
+} train_t;
+
+/**
+ * @brief 发送文件给客户端。
+ *
+ * 该函数负责打开指定的文件，并发送文件内容到客户端。
+ * 首先发送文件名的长度和文件名，然后分块读取并发送文件内容。
+ *
+ * @param net_fd 客户端连接的文件描述符。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int sendFile(int net_fd) {
+  // 文件名，这里只是一个示例，实际使用时应根据情况确定文件名
+  char *file_name = "斗破苍穹.txt";
+
+  /**
+   * 定义传输结构体，用于封装文件名和内容。
+   */
+  train_t train;
+  /**
+   * 初始化传输结构体，设置文件名长度。
+   */
+  bzero(&train, 0);
+  train.len = strlen(file_name);
+  /**
+   * 复制文件名到传输结构体的缓冲区。
+   */
+  memcpy(train.buf, file_name, train.len);
+
+  /**
+   * 发送文件名长度和文件名。
+   * 将文件名和长度一同发送给客户端，以便客户端申请足够的接收缓冲区。
+   */
+  send(net_fd, &train, sizeof(int) + train.len, 0);
+
+  // 打开文件，准备发送文件内容
+  int file_fd = open(file_name, O_RDONLY);
+  if (file_fd < 0) {
+    perror("open file error");
+    // 如果打开文件失败，返回错误
+    return -1;
+  }
+  /**
+   * 循环读取文件内容并发送。
+   * 直到读取完文件的所有内容。
+   */
+  while (1) {
+    bzero(&train, sizeof(train));
+
+    ssize_t read_res = read(file_fd, train.buf, sizeof(train.buf));
+    train.len = read_res;
+    if (read_res == 0) {
+      break;
+    }
+    /**
+     * 发送文件内容长度和内容。
+     * 读取文件并发送内容长度和内容本身给客户端。
+     */
+    int net_res = send(net_fd, &train, train.len + sizeof(train.len), 0);
+
+    // 检查读取操作是否成功完成
+    if (net_res == -1) {
+      // 如果读取失败，返回错误
+      close(file_fd);
+      return -1;
+    }
+  }
+  // 关闭文件描述符
+  close(file_fd);
+  return 0;
+}
+```
+
+1. **定义传输结构体**：定义 `train_t` 结构体用于封装文件名和内容的传输。
+2. **初始化传输结构体**：使用 `bzero` 函数初始化 `train_t` 结构体，设置文件名长度。
+3. **复制文件名**：将文件名复制到 `train_t` 结构体的缓冲区中。
+4. **发送文件名长度和文件名**：先发送文件名的长度，然后发送文件名本身，以便客户端可以接收并存储文件名。
+5. **打开文件**：打开指定的文件以读取内容。
+6. **循环读取和发送文件内容**：
+   - 使用循环读取文件内容到缓冲区，然后发送数据长度和数据本身给客户端。
+   - 继续循环直到文件读取完毕。
+7. **发送数据长度**：在发送每个数据块之前，先发送该数据块的长度，以便客户端可以分配合适的缓冲区。
+8. **发送数据块**：发送从文件中读取的数据块。
+9. **错误检查**：如果文件读取或发送过程中发生错误，执行错误处理并返回错误代码。
+10. **关闭文件描述符**：发送完毕后，关闭文件描述符以释放资源。
+11. **返回结果**：如果所有操作成功完成，函数返回 `0`。
+
+### 半包问题
+
+在 TCP/IP 网络编程中，尤其是在处理大文件传输时，可能会遇到所谓的 "半包问题"。这个问题描述了在数据传输过程中，一个数据包（或称为数据段）可能被操作系统只发送了一部分，而剩余部分延迟发送的情况。这种不连续的数据发送可能导致客户端在接收时出现错误，尤其是在客户端期望接收固定长度数据时。
+
+数据的发送是由操作系统的网络栈控制的，`send` 函数调用只是将数据交给操作系统，而实际的网络传输时机和行为由操作系统决定。操作系统可能会因为多种原因（如网络拥塞、资源调度等）导致数据包的不完整发送。
+
+如果客户端在接收数据时只读取了部分数据，而剩余的数据在之后的某个时刻才到达，这可能导致客户端在处理数据时出现错误。例如，在根据长度前缀接收后续数据时，如果长度不匹配，客户端可能会错误地将部分数据解释为完整消息，导致数据解析错误。
+
+为了解决半包问题，可以在使用 `recv` 函数接收数据时，使用 `MSG_WAITALL` 标志位。这个标志位指示 `recv` 函数在接收到请求的长度 `len` 的数据之前不会返回，即使数据是分批次到达的。
+
+#### client.c
+
+```c
+/**
+ * @file client.c
+ * @brief 客户端程序。
+ *
+ * 该文件实现了客户端的主要功能，包括连接到服务器、接收服务器发送的文件名称和内容，
+ * 并将接收到的内容保存到本地文件中。
+ */
+
+#include <stdc.h>
+
+int main() {
+  // 定义服务器的端口和 IP 地址
+  char *port = "8080";
+  char *ip = "172.16.0.3";
+
+  /**
+   * 创建 socket。
+   * 创建一个用于通信的 socket，用于连接到服务器。
+   */
+  int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+  if (socket_fd == -1) {
+    // 错误处理，例如打印错误信息并退出程序
+    perror("socket creation failed");
+    return -1;
+  }
+
+  /**
+   * 设置服务器地址结构。
+   * 初始化 sockaddr_in 结构，设置服务器的地址族、端口和 IP 地址。
+   */
+  struct sockaddr_in addr;
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(atoi(port));     // 端口号转换为网络字节序
+  addr.sin_addr.s_addr = inet_addr(ip);  // IP 地址转换为网络字节序
+
+  /**
+   * 连接到服务器。
+   * 使用 connect 系统调用建立到服务器的连接。
+   */
+  if (connect(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+    // 错误处理，例如关闭 socket_fd 并退出程序
+    perror("connect failed");
+    close(socket_fd);
+    return -1;
+  }
+
+  /**
+   * 接收服务器发送的文件名称长度。
+   * 首先接收一个表示文件名长度的整数，以便分配合适的缓冲区。
+   */
+  int file_name_len;
+  int recv_fd = recv(socket_fd, &file_name_len, sizeof(int), 0);
+
+  /**
+   * 检查接收文件名称长度是否成功。
+   */
+  if (recv_fd == -1) {
+    // 错误处理
+    perror("recv failed");
+    close(socket_fd);
+    return -1;
+  }
+  /**
+   * 接收服务器发送的文件名称。
+   * 接收到文件名称长度后，根据该长度接收实际的文件名。
+   */
+  char buf_name[60] = {0};
+  recv_fd = recv(socket_fd, buf_name, file_name_len, 0);
+
+  if (recv_fd == -1) {
+    // 错误处理
+    perror("recv failed");
+    close(socket_fd);
+    return -1;
+  }
+
+  /**
+   * 打开或创建用于保存文件内容的本地文件。
+   */
+  int file_fd = open(buf_name, O_RDWR | O_CREAT, 0666);
+  if (file_fd == -1) {
+    // 错误处理
+    perror("open file failed");
+    close(socket_fd);
+    return -1;
+  }
+  /**
+   * 循环接收文件内容。
+   * 直到从服务器接收完所有文件数据。
+   */
+  while (1) {
+    int len = 0;
+    /**
+     * 接收文件块的长度。
+     * 每次循环首先接收接下来要接收的数据块的长度。
+     * 使用带有 MSG_WAITALL 标志的 recv 调用确保接收到完整的长度信息
+     */
+    recv_fd = recv(socket_fd, &len, sizeof(int), MSG_WAITALL);
+    /**
+     * 检查接收长度信息是否成功，并处理接收结束条件。
+     * 如果接收到的长度为0，表示文件传输结束。
+     */
+    if (recv_fd == -1) {
+      perror("recv failed");
+      close(socket_fd);
+      return -1;
+    }
+    if (len == 0) {
+      break;
+    }
+    /**
+     * 接收文件数据块并写入文件。
+     * 根据接收到的长度，接收数据并写入到之前打开的文件中。
+     * 使用带有 MSG_WAITALL 标志的 recv 调用确保接收到完整的长度信息
+     */
+    char buf[1000] = {0};
+    ssize_t recv_len = recv(socket_fd, buf, len, MSG_WAITALL);
+    write(file_fd, buf, recv_len);
+  }
+
+  printf("文件已成功接收！\n");
+
+  /**
+   * 关闭文件和 socket。
+   * 完成通信后，关闭文件描述符和 socket 连接。
+   */
+  close(file_fd);
+  close(socket_fd);
+  return 0;
+}
+```
+
+### 抛出异常信号终止问题
+
+当 TCP 连接的对端关闭连接时，发送端如果尝试向该连接发送数据，操作系统会发送一个 `SIGPIPE` 信号给发送进程。在默认情况下，这可能导致进程异常终止。
+
+为了防止因 `SIGPIPE` 信号而导致的进程终止，可以在调用 `send` 函数时使用 `MSG_NOSIGNAL` 标志位。`MSG_NOSIGNAL` 指示 `send` 函数在对方关闭连接时不抛出 `SIGPIPE` 信号，而是返回一个错误码（通常是-1），并将 `errno` 设置为 `EPIPE`。
+
+#### send_file.c
+
+```c
+/**
+ * @file send_file.c
+ * @brief 文件发送模块。
+ *
+ * 该文件实现了子进程发送文件给客户端的功能。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 结构体用于封装传输的数据和长度。
+ */
+typedef struct train_s {
+  int len;        /**< 数据长度 */
+  char buf[1024]; /**< 数据缓冲区 */
+} train_t;
+
+/**
+ * @brief 处理 SIGPIPE 信号的函数。
+ * 当发生管道破裂时（例如对方关闭了连接），此函数会被调用。
+ * @param num 信号的编号
+ */
+void fun (int num) {
+  printf("sigpeipe %d\n", num);
+}
+
+/**
+ * @brief 发送文件给客户端。
+ *
+ * 该函数负责打开指定的文件，并发送文件内容到客户端。
+ * 首先发送文件名的长度和文件名，然后分块读取并发送文件内容。
+ *
+ * @param net_fd 客户端连接的文件描述符。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int sendFile(int net_fd) {
+  /**
+   * 设置当发生 SIGPIPE 信号时，调用 fun 函数。
+   */
+  signal(SIGPIPE, fun);
+
+  // 文件名，这里只是一个示例，实际使用时应根据情况确定文件名
+  char *file_name = "斗破苍穹.txt";
+
+  /**
+   * 定义传输结构体，用于封装文件名和内容。
+   */
+  train_t train;
+  /**
+   * 初始化传输结构体，设置文件名长度。
+   */
+  bzero(&train, 0);
+  train.len = strlen(file_name);
+  /**
+   * 复制文件名到传输结构体的缓冲区。
+   */
+  memcpy(train.buf, file_name, train.len);
+
+  /**
+   * 发送文件名长度和文件名。
+   * 将文件名和长度一同发送给客户端，以便客户端申请足够的接收缓冲区。
+   */
+  send(net_fd, &train, sizeof(int) + train.len, MSG_NOSIGNAL);
+
+  // 打开文件，准备发送文件内容
+  int file_fd = open(file_name, O_RDONLY);
+  if (file_fd < 0) {
+    perror("open file error");
+    // 如果打开文件失败，返回错误
+    return -1;
+  }
+  /**
+   * 循环读取文件内容并发送。
+   * 直到读取完文件的所有内容。
+   */
+  while (1) {
+    bzero(&train, sizeof(train));
+
+    int read_res = read(file_fd, train.buf, sizeof(train.buf));
+    train.len = read_res;
+    if (read_res == 0) {
+      break;
+    }
+    /**
+     * 发送文件内容长度和内容。
+     * 发送前先发送长度，然后发送内容，使用 MSG_NOSIGNAL 标志防止 SIGPIPE。
+     */
+    int net_res = send(net_fd, &train, train.len + sizeof(train.len), MSG_NOSIGNAL);
+
+    // 检查读取操作是否成功完成
+    if (net_res == -1) {
+      // 如果读取失败，返回错误
+      close(file_fd);
+      return -1;
+    }
+  }
+  // 关闭文件描述符
+  close(file_fd);
+  return 0;
+}
+```
+
+### 进度条
+
+如果要模拟日常下载文件时的进度条显示效果，可以采取以下步骤：在文件传输开始之前，首先将文件的总大小信息发送至客户端。随后，在文件传输过程中，客户端可以依据已接收的文件数据量与文件总大小的比例，动态更新并展示进度条。
+
+实现这一功能需利用 `fstat` 函数来获取文件的状态信息。
+
+#### `fstat` 获取文件描述符元数据
+
+`fstat` 函数用于获取一个文件描述符（file descriptor）的元数据（metadata），并将这些信息存储在一个 `stat` 结构体中。这个函数是 POSIX 标准的一部分，通常用于获取文件或文件系统的状态信息。
+
+函数原型如下：
+
+```c
+#include <sys/stat.h>
+#include <unistd.h>
+int fstat(int fd, struct stat *statbuf);
+```
+
+参数说明：
+
+1. **int fd**: 这是要获取状态信息的文件描述符。这个文件描述符可以是任何打开的文件、socket、管道或其他特殊文件的描述符。
+2. **struct stat \*statbuf**: 这是一个指向 `stat` 结构的指针，用于接收文件描述符的状态信息。`stat` 结构包含了广泛的信息，例如文件大小、块大小、总块数、访问权限、所有者、组、访问时间、修改时间等。
+
+返回值：
+
+- 如果调用成功，返回 0。
+- 如果调用失败，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：
+
+- 当需要获取有关文件或文件系统的状态信息时。
+- 当需要检查文件的访问权限、所有者、组或其他属性时。
+
+工作机制：
+
+- `fstat` 函数调用操作系统内核，请求获取与给定文件描述符关联的文件的状态信息。
+- 内核将这些信息填充到 `statbuf` 指向的结构中。
+
+#### client.c
+
+```c
+/**
+ * @file client.c
+ * @brief 客户端程序。
+ *
+ * 该文件实现了客户端的主要功能，包括连接到服务器、接收服务器发送的文件名称和内容，
+ * 并将接收到的内容保存到本地文件中。
+ */
+
+#include <stdc.h>
+
+int main() {
+  // 定义服务器的端口和 IP 地址
+  char *port = "8080";
+  char *ip = "172.16.0.3";
+
+  /**
+   * 创建 socket。
+   * 创建一个用于通信的 socket，用于连接到服务器。
+   */
+  int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+  if (socket_fd == -1) {
+    // 错误处理，例如打印错误信息并退出程序
+    perror("socket creation failed");
+    return -1;
+  }
+
+  /**
+   * 设置服务器地址结构。
+   * 初始化 sockaddr_in 结构，设置服务器的地址族、端口和 IP 地址。
+   */
+  struct sockaddr_in addr;
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(atoi(port));     // 端口号转换为网络字节序
+  addr.sin_addr.s_addr = inet_addr(ip);  // IP 地址转换为网络字节序
+
+  /**
+   * 连接到服务器。
+   * 使用 connect 系统调用建立到服务器的连接。
+   */
+  if (connect(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+    // 错误处理，例如关闭 socket_fd 并退出程序
+    perror("connect failed");
+    close(socket_fd);
+    return -1;
+  }
+  // 接收文件大小
+  // 在接收文件之前，先接收文件的总大小，用于后续显示接收进度
+  off_t file_size = 0;
+  recv(socket_fd, &file_size, sizeof(off_t), MSG_WAITALL);
+  printf("文件大小为：%ld\n", file_size);
+
+  /**
+   * 接收服务器发送的文件名称长度。
+   * 首先接收一个表示文件名长度的整数，以便分配合适的缓冲区。
+   */
+  int file_name_len;
+  int recv_fd = recv(socket_fd, &file_name_len, sizeof(int), 0);
+
+  /**
+   * 检查接收文件名称长度是否成功。
+   */
+  if (recv_fd == -1) {
+    // 错误处理
+    perror("recv failed3");
+    close(socket_fd);
+    return -1;
+  }
+  /**
+   * 接收服务器发送的文件名称。
+   * 接收到文件名称长度后，根据该长度接收实际的文件名。
+   */
+  char buf_name[60] = {0};
+  recv_fd = recv(socket_fd, buf_name, file_name_len, 0);
+
+  if (recv_fd == -1) {
+    // 错误处理
+    perror("recv failed 1");
+    close(socket_fd);
+    return -1;
+  }
+
+  /**
+   * 打开或创建用于保存文件内容的本地文件。
+   */
+  int file_fd = open(buf_name, O_RDWR | O_CREAT, 0666);
+  if (file_fd == -1) {
+    // 错误处理
+    perror("open file failed");
+    close(socket_fd);
+    return -1;
+  }
+
+  off_t cursize = 0;
+  off_t last_update_size = 0;
+
+  /**
+   * 循环接收文件内容。
+   * 直到从服务器接收完所有文件数据。
+   */
+  while (1) {
+    int len = 0;
+    /**
+     * 接收文件块的长度。
+     * 每次循环首先接收接下来要接收的数据块的长度。
+     * 使用带有 MSG_WAITALL 标志的 recv 调用确保接收到完整的长度信息
+     */
+    recv_fd = recv(socket_fd, &len, sizeof(int), MSG_WAITALL);
+    /**
+     * 检查接收长度信息是否成功，并处理接收结束条件。
+     * 如果接收到的长度为0，表示文件传输结束。
+     */
+    if (recv_fd == -1) {
+      perror("recv failed 2");
+      close(socket_fd);
+      return -1;
+    }
+    if (len == 0) {
+      break;
+    }
+    /**
+     * 接收文件数据块并写入文件。
+     * 根据接收到的长度，接收数据并写入到之前打开的文件中。
+     * 使用带有 MSG_WAITALL 标志的 recv 调用确保接收到完整的长度信息
+     */
+    char buf[1000] = {0};
+    ssize_t recv_len = recv(socket_fd, buf, len, MSG_WAITALL);
+    write(file_fd, buf, recv_len);
+
+    cursize += recv_len;
+
+    /**
+     * 打印接收进度。
+     * 每接收到一定量的数据，打印接收进度。
+     */
+    if (cursize - last_update_size >= 1024 * 1024) {
+      printf("接收进度：%.2f%%\n", (double)cursize / file_size * 100);
+      last_update_size = cursize;
+    }
+
+  }
+
+  printf("文件已成功接收！\n");
+
+  /**
+   * 关闭文件和 socket。
+   * 完成通信后，关闭文件描述符和 socket 连接。
+   */
+  close(file_fd);
+  close(socket_fd);
+  return 0;
+}
+```
+
+
+
+1. **接收文件大小**：在开始接收文件之前，客户端首先接收并打印出文件的总大小，这有助于计算和显示接收进度。
+2. **接收文件名称长度和名称**：客户端接收文件名称的长度和名称，以便知道保存文件的名称。
+3. **打开或创建文件**：客户端根据接收到的文件名称打开或创建文件，准备写入接收到的数据。
+4. **初始化接收进度**：初始化当前接收大小和上次更新的接收大小。
+5. **循环接收文件内容**：客户端进入循环，使用 `recv` 函数接收服务器发送的数据块。
+6. **接收数据块长度**：在循环中，客户端首先接收数据块的长度。
+7. **接收数据块并写入文件**: 客户端根据接收到的长度接收数据块，并将其写入到本地文件中。
+8. **更新接收进度**：每次接收到一定量的数据后，客户端更新当前接收大小，并根据当前大小与上次更新大小的差值决定是否打印当前接收进度。
+9. **检查接收结束条件**：如果接收到的长度为 0，表示文件传输结束，客户端退出循环。
+10. **打印成功消息**：接收完毕后，客户端打印一条消息，通知用户文件接收成功。
+11. **关闭资源**：最后，客户端关闭文件描述符和 socket 连接，释放所有资源。
+
+#### send_file.c
+
+```c
+/**
+ * @file send_file.c
+ * @brief 文件发送模块。
+ *
+ * 该文件实现了子进程发送文件给客户端的功能。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 结构体用于封装传输的数据和长度。
+ */
+typedef struct train_s {
+  int len;        /**< 数据长度 */
+  char buf[1024]; /**< 数据缓冲区 */
+} train_t;
+
+/**
+ * @brief 处理 SIGPIPE 信号的函数。
+ * 当发生管道破裂时（例如对方关闭了连接），此函数会被调用。
+ * @param num 信号的编号
+ */
+void fun(int num) { printf("sigpeipe %d\n", num); }
+
+/**
+ * @brief 发送文件给客户端。
+ *
+ * 该函数负责打开指定的文件，并发送文件内容到客户端。
+ * 首先发送文件名的长度和文件名，然后分块读取并发送文件内容。
+ *
+ * @param net_fd 客户端连接的文件描述符。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int sendFile(int net_fd) {
+  // 设置当发生 SIGPIPE 信号时，调用 fun 函数。
+  signal(SIGPIPE, fun);
+
+  // 文件名，这里只是一个示例，实际使用时应根据情况确定文件名
+  char *file_name = "斗破苍穹.txt";
+
+  // 打开文件，准备发送文件内容
+  int file_fd = open(file_name, O_RDONLY);
+  if (file_fd < 0) {
+    perror("open file error");
+    // 如果打开文件失败，返回错误
+    return -1;
+  }
+
+  // 定义传输结构体，用于封装文件名和内容。
+  train_t train;
+  // 获取文件信息
+  struct stat stat_file;
+  fstat(file_fd, &stat_file);
+  // 发送文件长度
+  send(net_fd, &stat_file.st_size, sizeof(off_t), MSG_NOSIGNAL);
+
+  // 初始化传输结构体，设置文件名长度。
+  bzero(&train, 0);
+  train.len = strlen(file_name);
+  // 复制文件名到传输结构体的缓冲区。
+  memcpy(train.buf, file_name, train.len);
+
+  /**
+   * 发送文件名长度和文件名。
+   * 将文件名和长度一同发送给客户端，以便客户端申请足够的接收缓冲区。
+   */
+  send(net_fd, &train, sizeof(int) + train.len, MSG_NOSIGNAL);
+
+  /**
+   * 循环读取文件内容并发送。
+   * 直到读取完文件的所有内容。
+   */
+  while (1) {
+    bzero(&train, sizeof(train));
+
+    int read_res = read(file_fd, train.buf, sizeof(train.buf));
+    train.len = read_res;
+    if (read_res == 0) {
+      break;
+    }
+    /**
+     * 发送文件内容长度和内容。
+     * 发送前先发送长度，然后发送内容，使用 MSG_NOSIGNAL 标志防止 SIGPIPE。
+     */
+    int net_res =
+        send(net_fd, &train, train.len + sizeof(train.len), MSG_NOSIGNAL);
+
+    // 检查读取操作是否成功完成
+    if (net_res == -1) {
+      // 如果读取失败，返回错误
+      close(file_fd);
+      return -1;
+    }
+  }
+  // 关闭文件描述符
+  close(file_fd);
+  return 0;
+}
+```
+
+### 零拷贝
+
+在传统的文件传输过程中，服务端首先需要从磁盘读取文件数据到内核缓冲区，然后将数据从内核缓冲区拷贝到用户空间的应用程序缓冲区，最后再次将数据从用户空间拷贝到内核空间的套接字缓冲区，以便发送。这个过程中的两次数据拷贝可能导致效率低下。
+
+零拷贝技术旨在减少或消除这种不必要的数据拷贝。通过直接在内核空间操作数据，零拷贝避免了数据在用户空间和内核空间之间的来回拷贝，从而提高了数据传输的效率。
+
+`mmap` 函数创建了文件内容的内存映射，它允许程序像访问普通内存一样访问文件内容。虽然 `mmap` 本身并不直接实现零拷贝，但它可以作为实现零拷贝技术的一部分。当使用 `mmap` 映射文件后，数据传输可以通过直接操作内存映射来完成，避免了从内核到用户空间的第一次数据拷贝。
+
+#### `mmap` 映射文件到进程的地址空间
+
+`mmap` 函数是一种在 POSIX 兼容的操作系统中使用的内存映射方法，它允许程序员将一个文件或者其他对象映射到进程的地址空间中。这样，文件内容就可以像访问内存一样被访问，这通常用于提高文件访问的效率。
+
+函数原型如下：
+
+```c
+#include <sys/mman.h>
+void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
+```
+
+参数说明：
+
+1. **void \*addr**: 期望的映射区域的起始地址。如果为 `NULL`，则由系统选择映射区域的地址。
+2. **size_t length**: 映射区域的长度，必须是非负整数，并且通常是页面大小的整数倍。
+3. **int prot**: 期望的内存保护选项，可以是以下选项的组合：
+   - `PROT_EXEC`: 允许执行内存内容。
+   - `PROT_READ`: 允许读取内存内容。
+   - `PROT_WRITE`: 允许写入内存内容。
+   - `PROT_NONE`: 不允许访问内存。
+4. **int flags**: 控制映射区域的选项，常用的标志包括：
+   - `MAP_SHARED`: 映射区域的修改会反映到文件上，多个映射可以共享数据。
+   - `MAP_PRIVATE`: 映射区域是私有的，对它的修改不会反映到文件上。
+   - `MAP_ANONYMOUS`: 匿名映射，不与任何文件关联。
+   - `MAP_FIXED`: 强制将映射放在 `addr` 指定的位置。
+5. **int fd**: 被映射文件的文件描述符。如果是匿名映射，这个值通常是 `-1`。
+6. **off_t offset**: 文件映射的起始位置偏移量，通常应该是文件系统页大小的整数倍。
+
+返回值：
+
+- 如果调用成功，`mmap` 返回指向映射区域的指针。
+- 如果调用失败，返回 `MAP_FAILED`（通常是 `(void *)-1`），并设置全局变量 `errno` 以指示错误类型。
+
+使用场景：
+
+- 当需要高效地访问大型文件时。
+- 当需要创建或修改一块可以被多个进程共享的内存区域时。
+
+工作机制：
+
+- `mmap` 将文件内容映射到进程的地址空间，使得文件可以像访问内存一样被访问。
+- 对映射区域的修改可能会影响到文件本身，这取决于 `flags` 参数。
+
+#### client.c
+
+```c
+/**
+ * @file client.c
+ * @brief 客户端程序。
+ *
+ * 该文件实现了客户端的主要功能，包括连接到服务器、接收服务器发送的文件名称和内容，
+ * 并将接收到的内容保存到本地文件中。
+ */
+
+#include <stdc.h>
+
+int main() {
+  // 定义服务器的端口和 IP 地址
+  char *port = "8080";
+  char *ip = "172.16.0.3";
+
+  /**
+   * 创建 socket。
+   * 创建一个用于通信的 socket，用于连接到服务器。
+   */
+  int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+  if (socket_fd == -1) {
+    // 错误处理，例如打印错误信息并退出程序
+    perror("socket creation failed");
+    return -1;
+  }
+
+  /**
+   * 设置服务器地址结构。
+   * 初始化 sockaddr_in 结构，设置服务器的地址族、端口和 IP 地址。
+   */
+  struct sockaddr_in addr;
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(atoi(port));     // 端口号转换为网络字节序
+  addr.sin_addr.s_addr = inet_addr(ip);  // IP 地址转换为网络字节序
+
+  /**
+   * 连接到服务器。
+   * 使用 connect 系统调用建立到服务器的连接。
+   */
+  if (connect(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+    // 错误处理，例如关闭 socket_fd 并退出程序
+    perror("connect failed");
+    close(socket_fd);
+    return -1;
+  }
+  // 接收文件大小
+  // 在接收文件之前，先接收文件的总大小，用于后续显示接收进度
+  off_t file_size = 0;
+  recv(socket_fd, &file_size, sizeof(off_t), MSG_WAITALL);
+  printf("文件大小为：%ld\n", file_size);
+
+  /**
+   * 接收服务器发送的文件名称长度。
+   * 首先接收一个表示文件名长度的整数，以便分配合适的缓冲区。
+   */
+  int file_name_len;
+  int recv_fd = recv(socket_fd, &file_name_len, sizeof(int), 0);
+
+  /**
+   * 检查接收文件名称长度是否成功。
+   */
+  if (recv_fd == -1) {
+    // 错误处理
+    perror("recv failed");
+    close(socket_fd);
+    return -1;
+  }
+  /**
+   * 接收服务器发送的文件名称。
+   * 接收到文件名称长度后，根据该长度接收实际的文件名。
+   */
+  char buf_name[60] = {0};
+  recv_fd = recv(socket_fd, buf_name, file_name_len, 0);
+
+  if (recv_fd == -1) {
+    // 错误处理
+    perror("recv failed");
+    close(socket_fd);
+    return -1;
+  }
+
+  /**
+   * 打开或创建用于保存文件内容的本地文件。
+   */
+  int file_fd = open(buf_name, O_RDWR | O_CREAT, 0666);
+  if (file_fd == -1) {
+    // 错误处理
+    perror("open file failed");
+    close(socket_fd);
+    return -1;
+  }
+
+  // 预分配文件空间
+  ftruncate(file_fd, file_size);
+
+  sleep(3);
+  // 创建内存映射，允许整个文件一次性读入内存，提高传输效率。
+  char *p = (char *)mmap(NULL, file_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+                         file_fd, 0);
+  if (p == MAP_FAILED) {
+    perror("mmap failed");
+    return -1;
+  }
+  // 接收文件内容到内存映射区域
+  // 一次性接收整个文件的内容到通过 mmap 创建的内存映射区域
+  recv(socket_fd, p, file_size, MSG_WAITALL);
+
+  printf("文件已成功接收！\n");
+  // 使用 munmap 释放之前创建的内存映射区域
+  munmap(p, file_size);
+
+  /**
+   * 关闭文件和 socket。
+   * 完成通信后，关闭文件描述符和 socket 连接。
+   */
+  close(file_fd);
+  close(socket_fd);
+  return 0;
+}
+```
+
+1. **接收文件大小**：客户端首先接收服务器发送的文件大小，这用于后续操作中的进度显示和文件空间预分配。
+2. **接收文件名称**：客户端接收服务器发送的文件名称。
+3. **打开或创建文件**：客户端根据接收到的文件名称打开或创建文件。
+4. **预分配文件空间**：使用 `ftruncate` 系统调用预分配文件大小，为使用 `mmap` 映射整个文件做准备。
+5. **使用 mmap 映射文件**：客户端创建内存映射，将文件一次性读入内存，这可以提高大文件传输的效率。
+6. **接收文件内容**：客户端通过 socket 接收文件内容，直接写入到内存映射区域。
+7. **打印接收成功消息**：文件内容接收完成后，客户端打印成功消息。
+8. **内存映射释放**：客户端使用 `munmap` 函数释放之前创建的内存映射区域。
+9. **关闭资源**：客户端关闭文件描述符和 socket 连接，释放所有资源。
+
+#### send_file.c
+
+```c
+/**
+ * @file send_file.c
+ * @brief 文件发送模块。
+ *
+ * 该文件实现了子进程发送文件给客户端的功能。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 结构体用于封装传输的数据和长度。
+ */
+typedef struct train_s {
+  int len;        /**< 数据长度 */
+  char buf[1024]; /**< 数据缓冲区 */
+} train_t;
+
+/**
+ * @brief 处理 SIGPIPE 信号的函数。
+ * 当发生管道破裂时（例如对方关闭了连接），此函数会被调用。
+ * @param num 信号的编号
+ */
+void fun(int num) { printf("sigpeipe %d\n", num); }
+
+/**
+ * @brief 发送文件给客户端。
+ *
+ * 该函数负责打开指定的文件，并发送文件内容到客户端。
+ * 首先发送文件名的长度和文件名，然后分块读取并发送文件内容。
+ *
+ * @param net_fd 客户端连接的文件描述符。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int sendFile(int net_fd) {
+  // 设置当发生 SIGPIPE 信号时，调用 fun 函数。
+  signal(SIGPIPE, fun);
+
+  // 文件名，这里只是一个示例，实际使用时应根据情况确定文件名
+  char *file_name = "斗破苍穹.txt";
+
+  // 打开文件，准备发送文件内容
+  int file_fd = open(file_name, O_RDWR);
+  if (file_fd < 0) {
+    perror("open file error");
+    // 如果打开文件失败，返回错误
+    return -1;
+  }
+
+  // 定义传输结构体，用于封装文件名和内容。
+  train_t train;
+  // 获取文件信息
+  struct stat stat_file;
+  fstat(file_fd, &stat_file);
+  // 发送文件长度
+  send(net_fd, &stat_file.st_size, sizeof(off_t), MSG_NOSIGNAL);
+
+  // 初始化传输结构体，设置文件名长度。
+  bzero(&train, 0);
+  train.len = strlen(file_name);
+  // 复制文件名到传输结构体的缓冲区。
+  memcpy(train.buf, file_name, train.len);
+
+  // 发送文件名长度和文件名
+  send(net_fd, &train, sizeof(int) + train.len, MSG_NOSIGNAL);
+  // 使用内存映射发送文件内容
+  char *p = (char *)mmap(NULL, stat_file.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, file_fd, 0);
+  if (p == MAP_FAILED)
+  {
+    perror("mmap error");
+    return -1;
+  }
+  send(net_fd, p, stat_file.st_size, MSG_NOSIGNAL);
+
+  printf("传输完成！\n");
+
+  munmap(p, stat_file.st_size);
+  // 关闭文件描述符
+  close(file_fd);
+  return 0;
+}
+```
+
+1. **设置 SIGPIPE 信号处理器**：使用 `signal` 函数设置当 SIGPIPE 信号发生时调用 `fun` 函数，以处理客户端突然断开连接的情况。
+2. **打开文件**：打开要发送的文件，如果文件打开失败，打印错误信息并返回错误代码。
+3. **获取文件信息**：使用 `fstat` 函数获取文件的大小和其他信息。
+4. **发送文件大小**：将文件的大小发送给客户端，以便客户端可以预先知道文件的大小。
+5. **发送文件名**：发送文件名的长度和文件名本身给客户端。
+6. **内存映射文件**：使用 `mmap` 将文件内容映射到内存中，这样可以高效地发送大文件。
+7. **发送文件内容**：通过内存映射，一次性发送整个文件的内容给客户端。
+8. **打印传输完成信息**：文件发送完成后，打印传输完成的信息。
+9. **清理资源**：使用 `munmap` 解除内存映射，并关闭文件描述符，释放所有资源。
+10. **返回结果**：如果所有操作成功完成，函数返回 `0`。
+
+#### sendfile
+
+`sendfile` 函数允许数据直接在内核空间内进行传输，这意味着数据可以从文件系统的缓冲区直接发送到网络接口，而无需先拷贝到应用程序的用户空间缓冲区，再由用户空间拷贝到内核的套接字缓冲区。这种机制减少了数据拷贝的次数，从而提高了文件传输的效率。`
+
+使用 `sendfile` 时，数据的传输路径是：磁盘文件 -> 内核文件缓冲区 -> 网卡。这个过程中，数据避免了进入用户空间，减少了上下文切换和数据拷贝的开销。
+
+虽然 `mmap` 可以减少从磁盘到用户空间的数据拷贝，但在使用 `sendfile` 的情况下，可以进一步减少从用户空间到内核空间的套接字缓冲区的数据拷贝。`sendfile` 直接在内核中处理数据传输，避免了额外的数据拷贝步骤。
+
+#### send_file.c
+
+```c
+/**
+ * @file send_file.c
+ * @brief 文件发送模块。
+ *
+ * 该文件实现了子进程发送文件给客户端的功能。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 结构体用于封装传输的数据和长度。
+ */
+typedef struct train_s {
+  int len;        /**< 数据长度 */
+  char buf[1024]; /**< 数据缓冲区 */
+} train_t;
+
+/**
+ * @brief 处理 SIGPIPE 信号的函数。
+ * 当发生管道破裂时（例如对方关闭了连接），此函数会被调用。
+ * @param num 信号的编号
+ */
+void fun(int num) { printf("sigpeipe %d\n", num); }
+
+/**
+ * @brief 发送文件给客户端。
+ *
+ * 该函数负责打开指定的文件，并发送文件内容到客户端。
+ * 首先发送文件名的长度和文件名，然后分块读取并发送文件内容。
+ *
+ * @param net_fd 客户端连接的文件描述符。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int sendFile(int net_fd) {
+  // 设置当发生 SIGPIPE 信号时，调用 fun 函数。
+  signal(SIGPIPE, fun);
+
+  // 文件名，这里只是一个示例，实际使用时应根据情况确定文件名
+  char *file_name = "file.txt";
+
+  // 打开文件，准备发送文件内容
+  int file_fd = open(file_name, O_RDWR);
+  if (file_fd < 0) {
+    perror("open file error");
+    // 如果打开文件失败，返回错误
+    return -1;
+  }
+
+  // 定义传输结构体，用于封装文件名和内容。
+  train_t train;
+  bzero(&train, 0);
+  // 获取文件信息
+  struct stat stat_file;
+  fstat(file_fd, &stat_file);
+  // 发送文件长度
+  send(net_fd, &stat_file.st_size, sizeof(off_t), MSG_NOSIGNAL);
+
+  // 初始化传输结构体，设置文件名长度。
+  bzero(&train, 0);
+  train.len = strlen(file_name);
+  // 复制文件名到传输结构体的缓冲区。
+  memcpy(train.buf, file_name, train.len);
+
+  // 发送文件名长度和文件名
+  send(net_fd, &train, sizeof(int) + train.len, MSG_NOSIGNAL);
+
+  sendfile(net_fd, file_fd, NULL, stat_file.st_size);
+
+  printf("传输完成！\n");
+
+  // 关闭文件描述符
+  close(file_fd);
+  return 0;
+}
+```
+
+## 第三版
+
+在多进程程序中，确保主进程退出时子进程也能随之退出是一个重要的编程实践，这有助于防止孤儿进程的产生并确保资源得到适当的清理。为了实现这一目标，可以通过监听信号并相应地处理这些信号来控制子进程的行为。
+
+首主进程可以设置一个信号处理函数来监听特定的信号，如 `SIGTERM` 或 `SIGINT`。当这些信号被触发时，例如用户按下 Ctrl+C 或向主进程发送终止信号，信号处理函数将被调用。在这个函数中，主进程可以向所有子进程发送退出的信号或消息，指示它们进行清理并退出。这可以通过发送特定的系统调用，如 `kill`，或者使用进程间通信机制，如管道、共享内存或消息队列来实现。
+
+一旦子进程接收到退出信号或消息，它们应该执行必要的清理工作，如关闭打开的文件描述符、释放分配的内存和注销注册的信号处理函数。完成这些清理工作后，子进程通过调用 `exit` 函数来终止自身。
+
+在子进程开始退出流程后，主进程需要等待它们的退出。这可以通过使用 `wait` 或 `waitpid` 系统调用来实现，这些调用将阻塞主进程，直到所有子进程都已经退出。在子进程全部退出后，主进程可以继续执行任何剩余的清理工作，如关闭它自己的文件描述符和注销信号处理函数，然后退出。
+
+### main.c
+
+```c
+/**
+ * @file main.c
+ * @brief 主程序文件，包含程序的入口点和主逻辑。
+ *
+ * 此文件定义了程序的主要入口点 main 函数，负责初始化进程池、网络连接，
+ * epoll 事件循环，并处理客户端请求。
+ */
+
+#include "head.h"
+
+/**
+ * 初始化信号处理和管道。
+ * 创建一个管道用于信号处理，当接收到特定信号时，向管道写入数据。
+ */
+int pipe_fd[2];
+void fun(int num) { write(pipe_fd[1], "1", 1); }
+
+int main() {
+  son_status_s list[4]; /**< 定义一个进程池数组，存储子进程的状态信息 */
+
+  /**
+   * 初始化进程池。
+   * 创建一定数量的子进程，并将它们的状态设置为 FREE（空闲）。
+   */
+  initPool(list, 4);
+  /**
+   * 创建管道并设置信号处理函数。
+   * 当接收到 SIGINT (信号 2) 时，向管道写入一个字符。
+   */
+  pipe(pipe_fd);
+  signal(2, fun);
+
+  /**
+   * 初始化网络 socket。
+   * 创建并配置 socket，使其能够监听指定 IP 地址和端口上的连接请求。
+   */
+  int socket_fd;
+  initSocket(&socket_fd, "8080", "172.16.0.3");
+
+  /**
+   * 创建 epoll 实例，并设置为非阻塞模式。
+   * epoll 用于高效地处理大量并发连接。
+   */
+  int epoll_fd = epoll_create(1);
+
+  /**
+   * 将监听 socket 添加到 epoll 实例中。
+   * 这样，当有新的连接请求时，epoll 可以通知主进程。
+   */
+  addEpoll(epoll_fd, socket_fd);
+
+  /**
+   * 将进程池中每个子进程的本地 socket 添加到 epoll 实例中。
+   * 这样，主进程可以接收来自子进程的通知，例如任务完成。
+   */
+  for (int i = 0; i < 4; i++) {
+    addEpoll(epoll_fd, list[i].local_socket);
+  }
+  /**
+   * 将管道读端添加到epoll监听中。
+   * 这样，当信号处理函数向管道写入数据时，epoll可以捕捉到事件。
+   */
+  addEpoll(epoll_fd, pipe_fd[0]);
+
+  /**
+   * 主事件循环。
+   * 使用 epoll_wait 等待并处理 I/O 事件。
+   */
+  while (1) {
+    struct epoll_event events[10]; /**< 定义一个事件数组，存储 epoll 事件 */
+    memset(events, 0, sizeof(events)); /**< 清零事件数组 */
+
+    /**
+     * 等待 epoll 事件。
+     * -1 表示无限期等待，直到有事件发生。
+     */
+    int epoll_num = epoll_wait(epoll_fd, events, 10, -1);
+
+    /**
+     * 遍历所有事件，处理它们。
+     */
+    for (int i = 0; i < epoll_num; i++) {
+      int fd = events[i].data.fd; /**< 获取事件对应的文件描述符 */
+
+      /**
+       * 如果事件是由监听 socket 触发的，接受新的客户端连接。
+       */
+      if (fd == socket_fd) {
+        int net_fd = accept(socket_fd, NULL, NULL);
+        if (net_fd < 0) {
+          perror("accept");
+          continue;
+        }
+
+        /**
+         * 将新的客户端连接分配给一个空闲的子进程。
+         */
+        toSonNetFd(list, 4, net_fd);
+
+        close(net_fd); /**< 关闭新创建的 socket，由子进程处理 */
+        continue;
+      }
+      /**
+       * 处理管道事件。
+       * 当从管道读取数据时，意味着接收到了 SIGINT 信号。
+       * 通知所有子进程退出，并等待它们结束，然后主进程也退出。
+       */
+      else if (fd == pipe_fd[0]) {
+        char buf[60] = {0};
+        read(fd, buf, sizeof(buf));
+
+        for (int i = 0; i < 4; i++) {
+          sendMsg(list[i].local_socket, 1);
+        }
+        for (int j = 0; j < 4; j++) {
+          wait(NULL);
+        }
+
+        printf("子进程全部退出, 主进程也退出 \n");
+      }
+
+      /**
+       * 如果事件是由子进程的本地 socket 触发的，处理子进程的通知。
+       */
+      for (int j = 0; j < 4; j++) {
+        if (list[j].local_socket == fd) {
+          char buf[60] = {0};
+          recv(fd, buf, sizeof(buf), 0); /**< 读取子进程发送的消息 */
+          list[j].flag = FREE; /**< 将子进程状态设置为 FREE */
+          break;
+        }
+      }
+    }
+  }
+
+  return 0; /**< 程序正常退出 */
+}
+```
+
+1. **初始化管道和信号处理**：
+   - 创建一个管道 `pipe_fd` 用于信号处理。
+   - 设置信号处理函数 `fun`，当接收到 SIGINT 信号时，向管道写入一个字符。
+2. **添加管道读端到 epoll 监听**：将管道读端添加到 epoll 实例中，以便能够监听到信号事件。
+3. **主事件循环**：在 epoll 事件循环中，除了监听网络连接和子进程通知外，还监听管道事件。
+4. **处理管道事件**：
+   - 当从管道读取数据时，意味着接收到了 SIGINT 信号。
+   - 遍历进程池，向每个子进程发送退出信号。
+5. **等待子进程退出**：使用 `wait` 函数等待所有子进程结束。
+6. **主进程退出**：所有子进程结束后，主进程打印退出信息并退出。
+
+### local.c
+
+```c
+/**
+ * @file local.c
+ * @brief 本地通信模块。
+ *
+ * 该文件实现了父子进程间通过本地 socket 进行通信的函数。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 通过本地 socket 发送客户端文件描述符给子进程。
+ *
+ * 使用 sendmsg 系统调用和控制消息（cmsg）来发送一个文件描述符。
+ * 这种方法允许父子进程之间传递打开的文件描述符。
+ *
+ * @param local_socket 父进程与子进程通信的本地 socket 文件描述符。
+ * @param net_fd 要发送给子进程的客户端 socket 文件描述符。
+ * @param flag 附加的标志，可以用于控制子进程的行为。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int sendMsg(int local_socket, int net_fd, int flag) {
+  struct msghdr msg;
+  bzero(&msg, sizeof(msg));
+
+  struct iovec vec[1];
+
+  vec[0].iov_base = &flag;
+  vec[0].iov_len = sizeof(int);
+
+  msg.msg_iov = vec;
+  msg.msg_iovlen = 1;
+
+  struct cmsghdr *cmsg = (struct cmsghdr *)malloc(CMSG_LEN(sizeof(int)));
+  cmsg->cmsg_len = CMSG_LEN(sizeof(int));
+  cmsg->cmsg_level = SOL_SOCKET;
+  cmsg->cmsg_type = SCM_RIGHTS;
+
+  msg.msg_control = cmsg;
+  msg.msg_controllen = CMSG_LEN(sizeof(int));
+
+  void *p = CMSG_DATA(cms);
+  int *fd = (int *)p;
+  *fd = net_fd;
+
+  if (sendmsg(local_socket, &msg, 0) == -1) {
+    return -1;
+  }
+  return 0;
+}
+
+/**
+ * @brief 子进程通过本地 socket 接收父进程发送的客户端文件描述符。
+ *
+ * 使用 recvmsg 系统调用接收文件描述符。
+ * 该函数从控制消息中提取文件描述符，并将其存储在提供的参数中。
+ *
+ * @param local_socket 子进程与父进程通信的本地 socket 文件描述符。
+ * @param net_fd 指向用于存储接收到的客户端 socket 文件描述符的变量的指针。
+ * @param flag 指向用于存储接收到的标志的变量的指针。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int recvMsg(int local_socket, int *net_fd, int *flag) {
+  struct msghdr msg;
+  bzero(&msg, sizeof(msg));
+
+  // 准备正文信息
+  int *num = (int *)malloc(sizeof(int));
+  struct iovec vec[1];
+  vec[0].iov_base = num;
+  vec[0].iov_len = sizeof(int);
+
+  msg.msg_iov = vec;
+  msg.msg_iovlen = 1;
+
+  // 准备控制信息
+  struct cmsghdr *cms = (struct cmsghdr *)malloc(CMSG_LEN(sizeof(int)));
+  cms->cmsg_len = CMSG_LEN(sizeof(int));  // 指明这个结构体的大小
+  cms->cmsg_level = SOL_SOCKET;
+  cms->cmsg_type = SCM_RIGHTS;
+
+  msg.msg_control = cms;
+  msg.msg_controllen = CMSG_LEN(sizeof(int));
+
+  recvmsg(local_socket, &msg, 0);
+
+  void *p = CMSG_DATA(cms);
+  int *fd = (int *)p;
+
+  *net_fd = *fd;
+
+  *flag = *num;
+
+  return 0;
+}
+```
+
+### worker.c
+
+```c
+/**
+ * @file worker.c
+ * @brief 子进程工作模块。
+ *
+ * 该文件实现了子进程的工作循环，负责接收父进程发送的任务，
+ * 并执行与客户端的交互。
+ */
+
+#include "head.h"
+
+/**
+ * @brief 子进程的工作函数。
+ *
+ * 子进程在此函数中循环运行，等待父进程通过本地 socket 发送的任务。
+ * 当接收到任务后，子进程将调用 toClientFile 函数来处理客户端请求，
+ * 然后通知父进程任务已完成。如果接收到退出信号，则子进程将退出。
+ *
+ * @param local_socket 子进程与父进程通信的本地 socket 文件描述符。
+ * @return 始终返回 0，表示子进程正常运行。
+ */
+int doWorker(int local_socket) {
+  while (1) {
+    int net_fd;
+    int flag = 0;
+    /**
+     * 接收父进程发送的客户端文件描述符。
+     * 如果 recvMsg 失败，子进程将退出循环并结束。
+     */
+    if (recvMsg(local_socket, &net_fd) == -1) {
+      break;
+    }
+    /**
+     * 检查标志是否指示子进程退出。
+     * 如果标志为 -1，表示父进程发送了退出信号。
+     */
+    if (flag == -1) {
+      printf("收到父进程的通知, 要求退出的通知 \n");
+      exit(0);
+    }
+
+    /**
+     * 处理客户端请求。
+     * toClientFile 函数负责与客户端的交互，例如发送响应。
+     */
+    if (toClientFile(net_fd) == -1) {
+      // 处理错误...
+      break;
+    }
+
+    /**
+     * 关闭客户端 socket，完成与客户端的交互。
+     */
+    close(net_fd);
+
+    /**
+     * 通知父进程任务已完成，子进程准备接收新任务。
+     * 发送特定的消息（例如 "111"）作为通知。
+     */
+    send(local_socket, "任务完成", 3, 0);
+  }
+  return 0;
+}
+
+/**
+ * @brief 子进程与客户端的交互函数。
+ *
+ * 此函数负责子进程与客户端的交互，例如发送欢迎消息。
+ * 这里仅为示例，实际应用中可能包含更复杂的逻辑。
+ *
+ * @param net_fd 客户端连接的文件描述符。
+ * @return 成功返回 0，失败返回 -1。
+ */
+int toClientFile(int net_fd) {
+  /**
+   * 向客户端发送消息。
+   * 如果 send 调用失败，函数将返回 -1 表示错误。
+   */
+  if (sendFile(net_fd) == -1) {
+    return -1;
+  }
+  return 0;
+}
+```
+
+

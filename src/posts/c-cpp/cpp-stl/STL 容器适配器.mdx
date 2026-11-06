@@ -1,0 +1,94 @@
+---
+title: "STL 容器适配器"
+date: 2021-03-30T10:01:05+08:00
+categories: ["C 与 C++", "STL 基础"]
+tags: ["C++", "STL"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaeVA1MS1vaWQ5RnNpWmJYQXJNTjMwQlQ0eThhMktCcWRWR1VIdlhQQmtxeHc_ZT0wUnhwWTk.jpg"
+---
+
+## 容器的选择
+
+### 元素是不是有序
+
+如果需要保持元素的有序状态，那么关联式容器通常是最佳选择。这些容器，如 `set` 和 `map`，内部使用平衡二叉树（通常是红黑树），它们会自动维护元素的有序性，且允许进行高效的查找、插入和删除操作。
+
+对于无序关联式容器，如 `unordered_set` 和 `unordered_map`，它们基于哈希表实现，不保证元素的顺序，因此如果需要有序的元素，不应选择这些容器。
+
+如果元素的顺序需要动态维护，或者需要频繁的排序操作，那么序列式容器 `list` 可能是一个合适的选择。`list` 是一个双向链表，提供了 `sort` 成员函数，可以对链表中的元素进行排序。虽然 `vector` 和 `deque` 也支持排序，但它们内部是基于连续内存的数组实现的，排序时可能需要更多的内存操作，通常使用标准库中的 `sort` 函数来对它们进行排序。
+
+### 下标
+
+序列式容器 `vector` 和 `deque` 都支持下标操作，允许通过下标直接访问元素。这种访问方式是随机访问，可以在常数时间内完成，因此非常快速。`vector` 是基于连续内存的动态数组，适合需要频繁随机访问元素的场景，同时它也支持在尾部进行快速的插入和删除操作。而 `deque` 是双端队列，由多个固定大小的数组片段组成，适合需要在两端进行频繁插入和删除操作的场景。
+
+虽然关联式容器 `map` 和无序关联式容器 `unordered_map` 不支持下标操作，但它们提供了 `operator[]`，允许通过键来访问或修改对应的值。如果键不存在，`operator[]` 会插入一个新元素。`map` 的元素是键值对，它根据键自动排序，内部实现通常是基于平衡二叉树，因此查找、插入和删除操作的时间复杂度为对数时间。而 `unordered_map` 基于哈希表实现，不保证元素的顺序，其性能在很大程度上取决于哈希函数的质量，在理想情况下，它提供了平均常数时间的查找、插入和删除操作。
+
+在选择容器时，如果需要通过下标进行随机访问，那么 `vector` 和 `deque` 是合适的选择。如果需要通过键来访问元素，并且关心元素的有序性，那么 `map` 是一个好选择。如果元素的顺序不重要，而更关心查找效率，那么 `unordered_map` 可能更合适。需要注意的是，尽管 `map` 和 `unordered_map` 提供了 `operator[]` 来访问元素，但这并不意味着它们支持随机访问迭代器或下标。`operator[]` 的使用主要是为了方便地通过键来访问或修改元素，而不是为了提供随机访问的能力。在需要随机访问的场景中，应该选择 `vector` 或 `deque`。
+
+### 查找的时间复杂度
+
+序列式容器如 `vector`、`deque` 和 `list` 在查找时往往需要线性搜索，这意味着必须遍历容器中的每个元素直到找到目标元素或确认元素不存在，因此在最坏情况下查找的时间复杂度是 $O(n)$，$N$ 代表容器中元素的数量。
+
+关联式容器如 `set` 和 `map` 以及它们的多重版本，通常基于平衡二叉树结构，例如红黑树，这使得元素自动按照键值排序，查找操作可以通过树的层级结构高效进行，每次比较都能排除一半的元素，因此它们的查找操作平均和最坏情况下的时间复杂度为 $O(\log n)$。
+
+无序关联式容器，包括 `unordered_set`、`unordered_map` 及其多重版本，使用哈希表作为内部数据结构，通过哈希函数将键值快速映射到表中的一个位置，如果哈希函数设计得当且冲突处理得当，这些容器在理想情况下能够以平均 $O(n)$ 的时间复杂度进行查找。然而，如果哈希函数导致大量冲突，最坏情况下查找的时间复杂度可能会退化到 $O(n)$。
+
+### 迭代器的类型
+
+`vector` 和 `deque` 提供了随机访问迭代器，这意味着你可以通过下标直接访问任意元素，或者使用像 `sort` 这样的算法，它们需要随机访问迭代器来工作。随机访问迭代器允许进行高效的元素访问，因为它们提供了对容器元素的直接内存引用。
+
+`list` 以及所有的关联式容器（例如 `set`、`map` 等）提供双向迭代器。双向迭代器允许你向前和向后遍历容器，但不能像随机访问迭代器那样通过下标直接访问元素。这些容器通常基于树结构或链表，因此它们在插入和删除操作上比基于数组的容器更高效。
+
+无序关联式容器，如 `unordered_set` 和 `unordered_map`，提供前向迭代器。前向迭代器允许你从容器的开始向结束遍历，但不能反向遍历，也不能随机访问元素。这些容器基于哈希表，因此它们的迭代器只能顺序地访问元素。
+
+容器适配器，如 `stack`、`queue` 和 `priority_queue`，不提供迭代器。这些适配器提供了特定的接口来访问容器中的元素，例如只能访问第一个元素或最后一个元素，这取决于它们模拟的特定数据结构。
+
+## 优先级队列
+
+### 模板形式与基本特征
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VmeVU5OGxwNERGQ2k3eHB0TnRPaU9FQmVmOGpvTjY1SGtsSmwwOU4xeXRUZEE_ZT1yWW5FNno.jpg)
+
+优先级队列（Priority Queue）在 C++ 标准模板库（STL）中通常是基于堆数据结构实现的，具体来说，默认情况下它使用的是大根堆（或称为顶堆）。在这种实现方式中，堆顶元素总是最大的元素，而其他元素根据特定的顺序排列在堆中。
+
+优先级队列的工作原理如下：
+
+1. **元素插入**： 当新元素插入优先级队列时，它会被放置在堆的末尾（逻辑上的末尾，不一定是数组的末尾）。然后，通过一个上浮（percolate up）的过程，新插入的元素会与其父节点进行比较。如果新元素比父节点大（在大根堆中），则它们会交换位置；如果新元素已经比父节点大，则上浮过程停止。这个过程一直持续到新元素找到合适的位置或者到达堆顶。
+2. **元素删除**： 当从优先级队列中删除元素时（通常是取出堆顶元素），堆顶元素会被移除，并用堆的最后一个元素替换。然后，通过一个下沉（percolate down）的过程，新堆顶的元素会与其子节点进行比较。如果堆顶元素小于子节点中的较大者，则它会与较大的子节点交换位置；如果堆顶元素已经大于或等于子节点，则下沉过程停止。这个过程一直持续到堆顶元素找到合适的位置或者到达堆的底部。
+3. **比较函数**： 优先级队列的行为由一个比较函数决定，默认情况下使用的是 `std::less`，这意味着它将构建一个大根堆。如果需要一个小根堆，可以提供 `std::greater` 作为比较函数。
+4. **底层数据结构**： 优先级队列的底层数据结构通常是一个数组，元素从数组的开始处按照堆的性质进行排序。例如，在大根堆中，对于任意索引 `i`（不考虑数组的开始几个元素），元素 `a[i]` 总是大于或等于其子节点 `a[2 * i + 1]` 和 `a[2 * i + 2]`。
+
+### 常用成员函数
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZM0xxUGE2djQ1TWxqT2pyV1UtdkJrQkJzWmE0blQtVnljamQ1U2Z6amx4bUE_ZT1pY0JBWFI.jpg)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVOXR4cGFibWMxRW4tR3AyZUdHQk5JQmNwSUNJcGVWTUZOZnB0Q0szOHhaMHc_ZT1hY241S2U.jpg)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VidGlsNmNEbkpkT2hJUnEwYi01R2swQjlUa0xGdkVRTWo5RUg4aFZhQVJvcmc_ZT0zOGhWRms.jpg)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRRi0ybjljOFI1QnBvWmZjVnJEejZjQmFtS3g4RWpNZUZUeEZNMmNCTS1LU2c_ZT1qQ21HTk4.jpg)
+
+```cpp
+vector<int> vec = {1, 7, 9, 3, 6, 8, 10};
+priority_queue<int> pque;
+
+for (int idx : vec) {
+  pque.push(idx);
+  cout << "优先级最高的元素 " << pque.top() << endl;
+}
+
+cout << endl << "遍历优先级队列" << endl;
+
+while (!pque.empty()) {
+  cout << pque.top() << "  ";
+  pque.pop();
+}
+cout << endl;
+```
+
+### 针对于自定义类型
+
+如果模板第三个参数 `Compare` 针对于的 `Key` 类型不能比较大小，那么就需要进行改写 `Compare`，改写方式有三种：模板的特化、函数对象、运算符重载。
+
+特别注意：模板的第二个参数 `Container` 在使用的时候不要漏掉。
+
+

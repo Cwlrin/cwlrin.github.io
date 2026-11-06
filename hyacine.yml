@@ -1,0 +1,28 @@
+contentDir: src/posts
+assetsDir: src/assets
+databaseDir: .hyacine
+defaultCategories:
+postExtension:
+  - .md
+  - .mdx
+assetResolution: standard
+
+themeConfigPath: src/theme.config.ts
+themeConfigDefPath: src/toolkit/themeConfig.ts
+themeConfigDefType: ShokaXThemeConfig
+themeConfigTemplatePath: src/theme.config.template.txt
+
+fonts:
+  - path: src/assets/fonts/LXGWWenKai-Regular.ttf
+    type: standard
+  - path: src/assets/fonts/MapleMono-CN-Regular.ttf
+    type: monospace
+
+images:
+  - path: src/assets/avatar.avif
+  - path: src/assets/images/cover-1.avif
+  - path: src/assets/images/cover-2.avif
+  - path: src/assets/images/cover-3.avif
+  - path: src/assets/images/cover-4.avif
+  - path: src/assets/images/cover-5.avif
+  - path: src/assets/images/cover-6.avif

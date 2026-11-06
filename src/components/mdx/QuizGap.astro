@@ -1,0 +1,11 @@
+---
+interface Props {
+  answer?: string;
+}
+
+const { answer = "" }: Props = Astro.props;
+---
+
+<span class="quiz-gap" data-answer={answer} aria-label="填空题答案占位">
+  {answer}
+</span>

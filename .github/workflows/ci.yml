@@ -1,0 +1,134 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# 双 job 并行：
+# - static-checks：lint（无 --fix，CI 不改写文件）/ 格式化一致性 / 类型内容检查 / 单测
+# - build-and-e2e：构建 → 死链检查 → E2E（smoke/critical/regression）
+# 两者互不依赖，同时跑；各自失败互不影响，且都产出明确信号。
+jobs:
+  static-checks:
+    name: Static checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          # 自动缓存 pnpm store（key 基于 pnpm-lock.yaml）
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Astro content/container types
+        # oxlint --type-check 依赖 astro:content/astro:container 等 virtual 模块类型，
+        # 由 astro sync 生成到 .astro/（gitignore，CI 干净 clone 缺失 → lint 假阳性）
+        run: pnpm exec astro sync
+
+      - name: Run lint
+        # 显式不带 --fix：CI 不改写文件，避免"能修的违规被静默修掉"掩盖问题
+        run: pnpm run lint:ci
+
+      - name: Check formatting
+        run: pnpm run format:ci
+
+      - name: Check deploy configs are generated
+        run: pnpm run config:deploy:check
+
+      - name: Run type/content check
+        run: pnpm run check
+
+      - name: Run unit tests
+        run: pnpm run test
+
+  build-and-e2e:
+    name: Build & E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: |
+          sudo snap install lychee
+          pnpm install --frozen-lockfile
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build site
+        run: pnpm run build
+
+      - name: Restore lychee cache
+        uses: actions/cache@v5
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+
+      - name: Check for broken links
+        run: pnpm run check-links
+
+      - name: Run E2E smoke tests
+        run: pnpm run e2e:smoke
+
+      - name: Run E2E critical
+        id: e2e_critical
+        run: pnpm run e2e:critical
+
+      - name: Run E2E regression
+        id: e2e_regression
+        # critical 失败也继续跑 regression，尽量收集中间态失败信息
+        if: always()
+        run: pnpm run e2e:regression
+
+      - name: Upload Playwright artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-artifacts
+          path: |
+            test-results
+            playwright-report
+          if-no-files-found: ignore

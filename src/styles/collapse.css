@@ -1,0 +1,162 @@
+/* Timeline styles for categories/archives - migrated from old_project */
+
+.timeline {
+  position: relative;
+}
+
+.timeline small {
+  color: var(--text-color-muted);
+  margin: auto 0.3125rem;
+}
+
+.timeline .item {
+  position: relative;
+  padding: 1.25rem 1.875rem;
+  margin: 0;
+}
+
+.timeline .item::before {
+  content: "";
+  position: absolute;
+  z-index: var(--z-content);
+  transition: all 0.4s ease-in-out;
+  box-sizing: unset;
+  top: 1.9rem;
+  left: 0;
+  width: 0.6rem;
+  height: 0.6rem;
+  border: 0.15rem solid var(--primary-color);
+  border-radius: 50%;
+  background: var(--grey-1);
+}
+
+.timeline .item:not(:last-child):not(.title)::after {
+  content: "";
+  position: absolute;
+  top: 1.9rem;
+  bottom: -1.9rem;
+  left: 0.35rem;
+  border-left: 0.2rem solid var(--color-red-a3);
+}
+
+.timeline .item:hover::before {
+  border-color: var(--color-blue);
+}
+
+/* Header item styles */
+.timeline .item.header::after {
+  border-left-style: dashed !important;
+}
+
+.timeline .item.header .cheers {
+  display: block;
+}
+
+/* Section item styles */
+.timeline .item.section::before {
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-left: 0.1rem;
+}
+
+/* Link styles for title, header, section */
+.timeline .item.title a,
+.timeline .item.header a,
+.timeline .item.section a {
+  border-bottom: 0.0625rem dashed var(--text-color-muted);
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.collapse .item.title:hover a,
+.collapse .item.header:hover a,
+.collapse .item.section:hover a {
+  border-bottom-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+/* Normal item styles */
+.timeline .item.normal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0.625rem 1.875rem;
+}
+
+.timeline .item.normal::before {
+  top: 1.4rem;
+  width: 0.2rem;
+  height: 0.2rem;
+  margin-left: 0.2rem;
+  background: var(--primary-color);
+}
+
+.timeline .item.normal:hover::before {
+  background: var(--color-blue);
+}
+
+.timeline .item.normal .meta {
+  display: inline;
+  font-size: 0.75rem;
+  margin-right: 0.625rem;
+}
+
+.timeline .item.normal .meta time {
+  color: var(--text-color-muted);
+}
+
+.timeline .item.normal .title {
+  display: inline;
+}
+
+.timeline .item.normal .title a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.timeline .item.normal .title a:hover {
+  color: var(--color-blue);
+}
+
+.timeline .item.normal .title .i-link-alt,
+.timeline .item.normal .title .i-ri-external-link-line {
+  font-size: 0.875rem;
+  margin-left: 0.3125rem;
+}
+
+/* External link styles */
+.timeline .item.normal .title a.external {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .timeline .item {
+    padding: 1rem 1.25rem;
+  }
+
+  .collapse .item.normal {
+    padding: 0.5rem 1.25rem;
+  }
+
+  .collapse .item::before {
+    top: 1.6rem;
+  }
+
+  .timeline .item.normal::before {
+    top: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .timeline .item {
+    padding: 0.75rem 1rem;
+  }
+
+  .collapse .item.normal {
+    padding: 0.375rem 1rem;
+  }
+}

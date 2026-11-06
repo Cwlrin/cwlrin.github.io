@@ -1,0 +1,30 @@
+---
+title: "使用 ffmpeg 将文件夹中的所有视频合并为单个视频文件"
+date: 2023-02-23T16:10:32+08:00
+categories: ["杂项"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVeTJoQVRfRU5STmpTUVZJOHZqX004QmhTYzhzX1hZcWFUZHdxUEZ1SktwbVE_ZT1iWnpKSlI.png"
+---
+
+]需要安装 ffmpeg
+
+首先使用 Windows PowerShell 输入 bash 指令
+
+```bash
+foreach ($i in Get-ChildItem .\*.mp4) {echo "file '$i'" >> mylist.txt}
+```
+
+由于使用 Windows PowerShell 生成的文件默认为 UTF-16，我们需要使用 VSCode 将其转换为 UTF-8 格式
+
+转换之后键入 ffmpeg 的批量合成指令即可
+
+```bash
+ffmpeg -f concat -safe 0 -i mylist.txt -c copy output.mp4
+```
+
+最后删除生成的文档即可
+
+```bash
+delete mylist.txt
+```
+
+

@@ -1,0 +1,513 @@
+/* ============================================================
+   sidebar 组件族全局样式（自 svelte scoped <style> 迁移）
+   ============================================================ */
+
+/* ===== Sidebar 主体 ===== */
+#sidebar {
+  position: static;
+  overflow: visible;
+  width: 100%;
+  top: 0;
+  bottom: 0;
+  scrollbar-width: none;
+}
+
+#sidebar::-webkit-scrollbar,
+.panels > .inner::-webkit-scrollbar {
+  display: none;
+}
+
+/* Tablet/Mobile */
+@media (max-width: 1023px) {
+  #sidebar {
+    display: none;
+    position: fixed;
+    right: 0;
+    background: var(--grey-1);
+    box-shadow: var(--shadow-sidebar-mobile);
+    z-index: var(--z-sidebar);
+    width: 280px;
+    height: 100%;
+  }
+}
+
+/* 注意：.on 必须放在 media 外——astro 构建管线（疑似 @playform/inline 后处理）会
+   丢弃 media 块内与同选择器其它规则合并时重复出现的 display 声明（实测 #sidebar.on
+   的 display:block 在产物中消失 → 移动端只出遮罩不出菜单）。
+   放顶层后：移动端由 base #sidebar{display:none} + .on{display:block} 控制，
+   宽屏 #sidebar 本就是 static 显示，不受影响。 */
+#sidebar.on {
+  display: block;
+}
+
+/* 移动端抽屉遮罩（SidebarOverlay）：宽屏必隐藏——uno 的 lg:hidden 可能被
+   后加载的工具类（.fixed 等）覆盖，显式提权（与 navbar 汉堡同策略） */
+@media (min-width: 1024px) {
+  button[aria-label="Close sidebar"] {
+    display: none !important;
+  }
+}
+
+[data-theme="dark"] #sidebar {
+  background-color: var(--grey-1);
+}
+
+#sidebar > .inner {
+  margin-top: 3.5rem;
+  position: relative;
+  width: 15rem;
+  color: var(--grey-6);
+  text-align: center;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  z-index: var(--z-content);
+}
+
+#sidebar.affix > .inner {
+  position: fixed;
+  width: 15rem;
+  top: 0;
+}
+
+#sidebar.affix .panels {
+  height: 100vh;
+}
+
+.panels {
+  padding: 4.6875rem 0 2rem;
+  width: 100%;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+.panels > .inner {
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  width: auto;
+  height: 100%;
+}
+
+@media (max-width: 1023px) {
+  #sidebar > .inner {
+    width: 100%;
+  }
+
+  .panels > .inner {
+    margin-top: 0;
+  }
+}
+
+.dimmer {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .dimmer {
+    background: black;
+    height: 100%;
+    left: 100%;
+    opacity: 0;
+    top: 0;
+    width: 100%;
+    z-index: var(--z-sidebar-overlay);
+    transition: opacity 1s;
+  }
+
+  .dimmer.active {
+    position: fixed;
+    display: block;
+    opacity: 0.3;
+    transform: translateX(-100%);
+  }
+}
+
+/* iPad landscape mode */
+@media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape),
+  screen and (min-width: 768px) and (max-width: 1366px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2),
+  screen and (min-width: 768px) and (max-width: 1440px) and (-webkit-min-device-pixel-ratio: 1) {
+  #sidebar {
+    overflow: visible;
+  }
+}
+
+/* ===== SidebarAuthor ===== */
+.author .image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+}
+
+.author:hover .image {
+  animation: sidebar-shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes sidebar-shake {
+  0% {
+    transform: scale(1);
+  }
+
+  10%,
+  20% {
+    transform: scale(0.9) rotate(3deg);
+  }
+
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: scale(1.1) rotate(-3deg);
+  }
+
+  40%,
+  60%,
+  80% {
+    transform: scale(1.1) rotate(3deg);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ===== SidebarOverlay 背景淡入 ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== SidebarPanel ===== */
+.panels .panel {
+  display: none;
+  padding: 0.875rem 0.9375rem 2rem;
+  animation: sidebar-slide-in 0.3s ease-in-out;
+  content-visibility: auto;
+}
+
+.panels .panel.active {
+  display: block;
+}
+
+@keyframes sidebar-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== SidebarState ===== */
+.state .item:not(:first-child) {
+  border-left: 0.0625rem solid var(--grey-4);
+}
+
+/* ===== SidebarMenu ===== */
+.menu .item {
+  border-radius: 0.9375rem;
+  margin-bottom: 0.625rem;
+  display: block;
+  color: var(--grey-5);
+  transition: all 0.2s ease-in-out;
+  list-style: none;
+}
+
+.menu .item a {
+  color: inherit;
+  display: block;
+  line-height: 3;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.menu .item .submenu {
+  display: none;
+  padding: 0;
+  list-style: none;
+  animation: sidebar-slide-down 0.3s ease-in-out;
+}
+
+@keyframes sidebar-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu .item:hover {
+  background-color: var(--grey-9-a1);
+  color: inherit;
+}
+
+.menu .item:hover .submenu {
+  display: block;
+}
+
+.menu .item.active {
+  background: linear-gradient(to right, var(--color-pink), var(--color-orange));
+  color: var(--grey-0);
+  box-shadow: 0 0.25rem 0.625rem var(--color-pink-a3);
+}
+
+.menu .item.active:hover {
+  box-shadow: 0 0 0.75rem var(--color-pink);
+  color: var(--grey-0);
+}
+
+/* ===== SidebarTabs ===== */
+.tab li {
+  display: inline-flex;
+}
+
+.tab .item {
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.8125rem;
+  padding: 0.3125rem 0.9375rem;
+  color: var(--grey-5);
+  border-radius: 0.625rem;
+  text-align: center;
+  text-decoration: none;
+  background-color: color-mix(in oklch, var(--grey-9) 8%, transparent);
+  transition: all 0.2s ease-out;
+  border: none;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.tab .item:hover,
+.tab .item.active {
+  background: linear-gradient(to right, var(--color-pink), var(--color-orange));
+  color: var(--grey-0);
+  box-shadow: 0 0.25rem 0.625rem var(--color-pink-a3);
+}
+
+.tab .item.active:hover {
+  box-shadow: 0 0 0.75rem var(--color-pink);
+}
+
+/* ===== SidebarQuick ===== */
+#quick {
+  display: none;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  position: sticky;
+  bottom: 0.125rem;
+  list-style: none;
+  background: transparent;
+}
+
+#quick.visible {
+  display: flex;
+}
+
+#quick li {
+  width: 25%;
+  min-height: 1.875rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#quick li i {
+  cursor: pointer;
+  font-size: 1.25rem;
+}
+
+#quick li a,
+#quick li button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 0;
+}
+
+#quick li:hover {
+  color: var(--primary-color);
+}
+
+#quick li.percent {
+  display: block;
+  background: var(--primary-color);
+  width: 0;
+  min-height: 0.125rem;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transition: width 0.1s ease;
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape),
+  screen and (min-width: 768px) and (max-width: 1366px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2),
+  screen and (min-width: 768px) and (max-width: 1440px) and (-webkit-min-device-pixel-ratio: 1) {
+  #quick {
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+/* ===== SidebarRelated ===== */
+.related ul li a:hover {
+  color: var(--primary-color);
+}
+
+.related ul li.active a {
+  color: var(--primary-color);
+}
+
+.related ul li::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--primary-color);
+  box-sizing: unset;
+  left: -1.25rem;
+  top: 0.3125rem;
+  border-radius: 100%;
+  position: absolute;
+  border: 0.1875rem solid var(--grey-1);
+  z-index: var(--z-content);
+  transition: all 0.2s ease;
+}
+
+.related ul li:hover::before {
+  background: var(--color-blue);
+}
+
+.related ul li:not(:last-child)::after {
+  content: "";
+  height: 100%;
+  width: 0.125rem;
+  background: var(--color-red-a3);
+  position: absolute;
+  left: -0.875rem;
+  top: 0.5rem;
+}
+
+/* ===== SidebarSocial ===== */
+.social {
+  margin-top: 0.9375rem;
+  text-align: center;
+}
+
+.social .item {
+  display: inline-flex;
+  width: 1.875rem;
+  height: 1.875rem;
+  line-height: 1.875rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 38%;
+  text-decoration: none;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.social .item div {
+  font-size: 1.4em;
+  vertical-align: middle;
+  transform: scale(0.8);
+  transition: all 0.35s cubic-bezier(0.31, -0.105, 0.43, 1.59);
+  color: var(--social-color, var(--grey-5));
+}
+
+.social .item::before {
+  top: 90%;
+  left: -110%;
+  content: "";
+  width: 120%;
+  height: 120%;
+  position: absolute;
+  transform: rotate(45deg);
+  background-color: var(--social-color, var(--color-pink));
+  transition: all 0.35s cubic-bezier(0.31, -0.105, 0.43, 1.59);
+}
+
+.social .item:focus::before,
+.social .item:hover::before {
+  top: -10%;
+  left: -10%;
+}
+
+.social .item:focus div,
+.social .item:hover div {
+  color: var(--grey-0);
+  transform: scale(1);
+}
+
+/* ===== SidebarContents ===== */
+.contents ol {
+  padding: 0 0.125rem 0.3125rem 0.625rem;
+  text-align: left;
+  list-style: none;
+  margin: 0;
+}
+
+.contents .toc-item {
+  font-size: 0.875rem;
+  line-height: 1.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contents .toc-child {
+  display: none;
+}
+
+.contents .active > .toc-child,
+.contents .current > .toc-child {
+  display: block;
+}
+
+.contents .current > .toc-child > .toc-item {
+  display: block;
+}
+
+.contents .active > a,
+.contents .current > a,
+.contents .current > a:hover,
+.contents .toc-link:hover {
+  color: var(--primary-color);
+}
+
+.contents .toc-link {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+  transition: color 0.2s ease;
+}
+
+.no-toc {
+  color: var(--grey-5);
+  text-align: center;
+  font-size: 0.875rem;
+}

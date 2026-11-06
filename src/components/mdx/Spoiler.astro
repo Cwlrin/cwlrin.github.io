@@ -1,0 +1,11 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title = "..." }: Props = Astro.props;
+---
+
+<span class="spoiler" title={title}>
+  <slot />
+</span>

@@ -1,0 +1,8 @@
+name = "astro-blog-shokax"
+compatibility_date = "2026-08-22"
+
+# Workers Static Assets — 纯静态（无 SSR / 无 adapter），Astro 构建产物
+# 配合 pnpm-workspace.yaml 的 allowBuilds.workerd（否则 pnpm 11 拒绝下载 workerd 二进制）
+[assets]
+directory = "dist"
+not_found_handling = "404-page"

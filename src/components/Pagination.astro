@@ -1,0 +1,161 @@
+---
+import { getT } from "@/i18n";
+import { buildPaginationItems } from "@/toolkit/posts/buildPaginationItems";
+
+interface Props {
+  currentPage: number;
+  lastPage: number;
+  /** 第一页链接，默认 '/' */
+  firstPageHref?: string;
+  /** 其他页前缀，默认 '/page'，最终会输出 `${routePrefix}/${n}/` */
+  routePrefix?: string;
+  ariaLabel?: string;
+}
+
+const {
+  currentPage,
+  lastPage,
+  firstPageHref = "/",
+  routePrefix = "/page",
+  ariaLabel = "Pagination",
+} = Astro.props;
+
+const clampInt = (n: number) => Math.max(1, Math.floor(n || 1));
+const safeCurrent = clampInt(currentPage);
+const safeLast = clampInt(lastPage);
+
+const getHref = (n: number) => {
+  const pageNum = clampInt(n);
+  if (pageNum <= 1) return firstPageHref;
+  return `${routePrefix}/${pageNum}/`;
+};
+
+const prevHref = safeCurrent > 1 ? getHref(safeCurrent - 1) : undefined;
+const nextHref = safeCurrent < safeLast ? getHref(safeCurrent + 1) : undefined;
+
+const items = buildPaginationItems(safeCurrent, safeLast);
+const t = getT();
+---
+
+{
+  safeLast > 1 && (
+    <nav class="pagination" aria-label={ariaLabel}>
+      <div class="inner">
+        {prevHref ? (
+          <a class="prev" href={prevHref} rel="prev">
+            {t("pagination.prev")}
+          </a>
+        ) : null}
+
+        {items.map((it) =>
+          it === "…" ? (
+            <span class="space" aria-hidden="true">
+              …
+            </span>
+          ) : it === safeCurrent ? (
+            <span class="page-number current" aria-current="page">
+              {it}
+            </span>
+          ) : (
+            <a class="page-number" href={getHref(it)}>
+              {it}
+            </a>
+          ),
+        )}
+
+        {nextHref ? (
+          <a class="next" href={nextHref} rel="next">
+            {t("pagination.next")}
+          </a>
+        ) : null}
+      </div>
+    </nav>
+  )
+}
+
+<style>
+  .pagination {
+    width: 100%;
+    padding: 1.25rem 3.125rem;
+    text-align: center;
+    display: inline-block;
+    color: var(--grey-5);
+  }
+
+  .pagination .inner {
+    width: auto;
+    border-radius: 0.9375rem;
+  }
+
+  .pagination .prev,
+  .pagination .next,
+  .pagination .page-number,
+  .pagination .space {
+    display: inline-block;
+    margin: 0 0.5rem;
+    padding: 0 0.75rem;
+    position: relative;
+    border-radius: 0.3125rem;
+  }
+
+  .pagination .prev,
+  .pagination .next,
+  .pagination .page-number {
+    transition:
+      background 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .pagination .prev:hover,
+  .pagination .next:hover,
+  .pagination .page-number:hover {
+    background: linear-gradient(
+      to right,
+      var(--color-pink),
+      var(--color-orange)
+    );
+    color: var(--grey-0);
+  }
+
+  .pagination .space {
+    margin: 0;
+    padding: 0;
+  }
+
+  .pagination .prev {
+    margin-left: 0;
+  }
+
+  .pagination .next {
+    margin-right: 0;
+  }
+
+  .pagination .page-number.current {
+    background: linear-gradient(
+      to right,
+      var(--color-pink),
+      var(--color-orange)
+    );
+    color: var(--grey-0);
+  }
+
+  .pagination .page-number.current:hover {
+    box-shadow: 0 0 0.3125rem var(--primary-color);
+  }
+
+  @media (max-width: 480px) {
+    .pagination {
+      padding: 1.25rem 0.625rem;
+    }
+
+    .pagination .prev,
+    .pagination .next,
+    .pagination .page-number,
+    .pagination .space {
+      margin: 0 0.3125rem;
+    }
+  }
+</style>

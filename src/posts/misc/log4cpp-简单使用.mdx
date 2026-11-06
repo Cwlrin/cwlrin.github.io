@@ -1,0 +1,768 @@
+---
+title: "log4cpp 简单使用"
+date: 2024-09-09T16:56:41+08:00
+categories: ["杂项"]
+tags: ["工具", "C++"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRNm5LQWZFekUxRXRoTW9XQ09ZaVZZQkprUER4MnBOVXFrVlBEY3JETTFwSUE_ZT1iaGVqVGw.png"
+---
+
+## 日志系统
+
+### 日志系统的重要性
+
+1. **错误跟踪**：当系统出现问题时，日志是诊断问题的重要工具。通过分析日志，可以追踪错误发生的原因和上下文。
+2. **安全审计**：日志可以记录安全相关的事件，如登录尝试、权限变更等，这对于检测和响应安全威胁至关重要。
+3. **性能监控**：日志可以帮助监控系统性能，通过分析日志中的性能指标，可以发现潜在的性能瓶颈。
+4. **系统维护**：日志提供了系统运行的历史记录，有助于理解系统的运行模式和预测可能的故障。
+
+### 日志系统的分类
+
+1. **业务日志**：记录业务操作的详细情况，如交易处理、订单状态变更等，有助于业务分析和问题追踪。
+2. **系统日志**：记录系统运行时的关键信息，如启动、关闭、错误、警告等，有助于系统维护和故障排查。
+
+### 日志系统的设计原则
+
+1. **性能影响最小化**：日志系统应该设计为对系统性能的影响尽可能小，避免成为性能瓶颈。
+2. **可配置性**：日志系统应该允许配置不同的日志级别和输出格式，以适应不同的需求。
+3. **可靠性**：日志系统本身应该是高度可靠的，确保在任何情况下都能记录日志。
+4. **易于查询和分析**：日志应该易于查询和分析，可以考虑使用专门的日志分析工具。
+5. **安全和隐私**：确保日志中不包含敏感信息，遵守相关的数据保护法规。
+6. **灵活的存储和管理**：日志应该可以存储在不同的介质上，并提供灵活的管理策略，如日志轮转、归档和删除。
+
+## 日志系统的设计
+
+### 日志系统的设计原则
+
+在设计一个日志系统时，应该考虑以下几个关键点：
+
+1. **灵活性**：日志系统应该能够灵活地适应不同的需求，包括不同的日志级别、格式和输出目标。
+2. **可扩展性**：随着系统的发展，日志系统应该能够容易地扩展新的功能和特性。
+3. **性能**：日志系统的性能影响应该最小化，以避免对主应用程序的性能造成负面影响。
+4. **可靠性**：日志系统应该是可靠的，即使在高负载或异常情况下也能保证日志数据不丢失。
+5. **易于配置和使用**：应该能够容易地配置和使用日志系统，而不需要深入了解其内部实现。
+
+### 日志系统的四个主要部分
+
+1. **记录器**：负责捕获和记录日志的原始信息，如时间戳、日志级别、发生位置和线程信息。
+2. **过滤器**：根据预设的条件（如日志级别、日志内容等）来决定是否记录某条日志。
+3. **格式化器**：将日志信息格式化为指定的格式，如日期、时间、日志级别和消息内容的组合。
+4. **输出器**：负责将格式化后的日志信息输出到不同的目的地，如控制台、文件、数据库或远程日志服务器。
+
+下面以一条日志的生命周期为例说明日志库是怎么工作的。
+
+一条日志的生命周期：
+
+1.  产生： `info(“log information.”)`；
+2.  经过记录器，记录器去获取日志发生的时间、位置、线程信息等等信息；
+3.  经过过滤器，决定是否记录；
+4.  经过格式化器处理成设定格式后传递给输出器。例如输出 `2018-3-22 10:00:00 [info] log information.` 这样格式的日志到文件中。日志的输出格式由格式化器实现，输出目的地则由输出器决定；
+5.  这条日志信息生命结束。
+
+## log4cpp 安装
+
+### Linux
+
+
+
+下载压缩包，下载地址：https://sourceforge.net/projects/log4cpp/files/Windows
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTenZOS3dHYzZ4Tmd0SnlTcTNMRjVFQkozbG1yT3lVQWJHelJTbVpsMlZCSmc_ZT1NYUdMcDg.jpg)
+
+安装：
+
+```shell command:("[root@localhost] $":1-5)
+tar xzvf log4cpp-1.1.4rc3.tar.gz
+cd log4cpp
+./configure  # 进行自动化构建，自动生成makefile
+make
+sudo make install # 安装，把头文件和库文件拷贝到系统路径下
+```
+
+安装后，默认头文件路径为：`/usr/local/include/log4cpp`，默认 lib 库路径为：`/usr/local/lib`
+
+打开 log4cpp 官网 [Log for C++ Project (sourceforge.net)](https://log4cpp.sourceforge.net/)
+
+拷贝 Simple example 的内容，编译运行
+
+编译指令：`g++ log4cppTest.cc -llog4cpp -lpthread`
+
+运行时可能会报错：
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSLTM1QmE3aC1SSXA4OVBDNThLdllVQkRva2dPcnNnVW5yZnRQTG85Z2MzaVE_ZT1TeVdldVk.jpg)
+
+解决方法：
+
+```shell command:("[root@localhost] $":1-2)
+cd /etc
+sudo vim ld.so.conf
+```
+
+将默认的 lib 库路径写入，再重新加载
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXeHl0aVZ0cElKQ3ZJTktmbjZsM3RjQjVqOTQ4VjlfS2w1cnV2bDR2MmlEMkE_ZT1YZUUyTko.jpg)
+
+```shell shell command:("[root@localhost] $":1)
+sudo ldconfig
+```
+
+让动态链接库为系统所共享
+
+ld.so.cache 执行了 `$ sudo ldconfig` 之后，会更新该缓存文件，会将所有动态库信息写入到该文件。当可执行程序需要加载相应动态库时，会从这里查找。
+
+完成这些操作后，再使用上面的编译指令去编译示例代码。
+
+### Windows
+
+参考：[C++ Log4cpp 跨平台日志库使用记录(Window 与 Linux)](https://blog.csdn.net/cpp_learner/article/details/128738417)
+
+## log4cpp 的核心组件
+
+```cpp
+#include "log4cpp/Appender.hh"
+#include "log4cpp/BasicLayout.hh"
+#include "log4cpp/Category.hh"
+#include "log4cpp/FileAppender.hh"
+#include "log4cpp/Layout.hh"
+#include "log4cpp/OstreamAppender.hh"
+#include "log4cpp/Priority.hh"
+using namespace log4cpp;
+
+int main(int argc, char** argv) {
+  // 基类指针指向派生类对象
+  /* Appender * appender1 = new OstreamAppender("console", &std::cout); */
+
+  // 创建输出器对象
+  // OstreamAppender 的构造函数
+  // 第一个参数代表目的地名称（随便写）
+  // 第二个参数是一个 ostream*，真正决定了日志的目的地
+  OstreamAppender* appender1 = new OstreamAppender("console", &std::cout);
+  // 输出器绑定布局
+  appender1->setLayout(new BasicLayout());
+
+  // 创建输出器对象
+  // FileAppender 的构造函数
+  // 第一个参数代表目的地名称（随便写）
+  // 第二个参数代表日志所保存到的文件名
+  FileAppender* appender2 = new FileAppender("default", "program.log");
+  // 输出器绑定布局
+  appender2->setLayout(new BasicLayout());
+
+  // 创建根节点级别的 Category 对象
+  // 在程序中以引用的形式使用
+  Category& root = Category::getRoot();
+  // 设置系统的优先级
+  root.setPriority(Priority::WARN);
+  // 添加目的地 (绑定输出器)
+  root.addAppender(appender1);
+
+  // 创建叶子节点级别的 Category 对象（root 下一级的）
+  // 会继承父节点的优先级和目的地
+  //
+  // 前一个 sub1 是引用的名称，供程序员在代码中使用
+  // 后一个 sub1(getInstance 的参数) 代表日志来源
+  Category& sub1 = Category::getInstance("sub1");
+  // 也可以重新设置门槛（系统优先级）
+  sub1.setPriority(Priority::ERROR);
+  sub1.addAppender(appender2);
+  /* sub1.setAdditivity(false);// 不继承父节点的目的地 */
+
+  // root 的子节点 
+  /* Category& sub2 = Category::getInstance("sub2"); */
+  // sub1 的子节点
+  /* Category& sub11 = Category::getInstance("sub1.sub11"); */
+
+  // 写入日志
+  // 函数的名称直接对应该日志信息的优先级
+  //  use of functions for logging messages
+  root.error("root error");  // 1
+  root.warn("root warn");    // 1
+  root.info("root info");    // 0
+  sub1.crit("sub1 crit");    // 1
+  sub1.error("sub1 error");  // 1
+  sub1.warn("sub1 warn");    // 0
+
+  // printf-style for logging variables
+  root.warn("%d + %d == %s ?", 1, 1, "two");  // 1
+
+  // use of streams for logging messages
+  root << Priority::ERROR << "Streamed root error";  // 1
+  root << Priority::INFO << "Streamed root info";    // 0
+  sub1 << Priority::ERROR << "Streamed sub1 error";  // 1
+  sub1 << Priority::WARN << "Streamed sub1 warn";    // 0
+
+  // or this way:
+  root.errorStream() << "Another streamed error";  // 1
+
+  return 0;
+}
+
+```
+
+### 日志目的地（Appender）
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWWDYzY0xJMjJST2hVUllxOExzYmp3QkxfMGJER3NWWDh6R1o3QnpwWmF5YWc_ZT1HTFRZQTY.jpg)
+
+
+
+####  `OstreamAppender` 类
+
+`OstreamAppender` 类的构造函数在 log4cpp 库中用于初始化日志记录器，以便将日志消息输出到一个指定的输出流（ostream）。在 C++ 中，ostream 是一个用于输出数据到不同目的地（如标准输出、文件等）的类。
+
+在 log4cpp 的 `OstreamAppender` 类中，构造函数通常具有以下形式：
+
+```cpp
+OstreamAppender::OstreamAppender(const std::string& name, std::ostream* target)
+```
+
+1. **name**: 这是一个 `std::string` 类型的参数，用于指定日志记录器的名称。这个名称用于在配置文件中标识这个特定的日志记录器。
+2. **target**: 这是一个指向 `std::ostream` 的指针，指向你想要日志消息输出到的目标。这可以是 `std::cout`（标准输出），`std::cerr`（标准错误），或者指向一个文件的 `std::ofstream` 对象。
+
+#### `FileAppender` 类
+
+`FileAppender` 类在 log4cpp 库中用于将日志信息输出到文件。这个类提供了两个构造函数，允许你以不同的方式初始化日志文件的输出。
+
+构造函数 1
+
+```cpp
+FileAppender::FileAppender(const std::string& name, const std::string& fileName, bool append, mode_t mode = 00644)
+```
+
+参数:
+
+- `name`: 日志记录器的名称。
+- `fileName`: 日志信息将要写入的文件名。
+- `append`: 布尔值，如果为 `true`，则日志信息将追加到文件末尾；如果为 false，则文件会被截断（即原有内容会被删除）。
+- `mode`: 文件的权限模式，通常使用八进制表示法。默认值为 00644，表示文件所有者具有读写权限，而组用户和其他用户只有读权限。
+
+构造函数 2
+
+```cpp
+FileAppender::FileAppender(const std::string& name, std::FILE* fd)
+```
+
+参数:
+
+- `name`: 日志记录器的名称。
+- `fd`: 已经打开的文件描述符，日志信息将写入到这个文件描述符指向的文件。
+
+功能说明
+
+- **构造函数 1**: 这个构造函数是最常见的用法，它允许你指定日志文件的名称、是否追加以及文件的权限模式。这种方式下，`FileAppender` 会负责打开和关闭文件。
+- **构造函数 2**: 这个构造函数允许你传递一个已经打开的文件描述符。这种方式下，`FileAppender` 不会关闭文件，因为文件的打开和关闭由调用者控制。这种方式通常用于文件已经被外部程序打开，并且希望 `FileAppender` 直接使用这个文件描述符进行日志写入的场景。
+
+#### `RollingFileAppender` 类
+
+`RollingFileAppender` 的构造函数用于初始化日志文件滚动记录器。构造函数允许你指定日志文件的名称、最大文件大小、备份文件数量、是否追加到现有文件以及文件的权限。
+
+以下是 `RollingFileAppender` 构造函数的一般形式：
+
+```cpp
+RollingFileAppender::RollingFileAppender(
+  const std::string& filename,
+  const std::string& layout,
+  size_t maxFileSize = 10 * 1024 * 1024,
+  unsigned int maxBackupIndex = 1,
+  bool append = true,
+  mode_t mode = 00644
+);
+```
+
+**参数解释**：
+
+1. `filename`: 日志文件的名称。
+2. `layout`: 用于格式化日志消息的布局对象。
+3. `maxFileSize`: 日志文件达到这个大小时，将触发滚动。单位通常是字节。
+4. `maxBackupIndex`: 指定可以保留的旧日志文件的数量。例如，如果设置为 3，则会保留 3 个旧文件。
+5. `append`: 布尔值，表示是否追加到现有日志文件。如果为 true，则追加；如果为 false，则覆盖。
+6. `mode`: 用于设置文件权限的模式。这是一个位掩码，用于定义文件的权限。
+
+**构造函数的作用**：
+
+- **初始化日志文件**: 根据提供的文件名创建或打开日志文件。
+- **设置布局**: 使用提供的布局对象来格式化日志消息。
+- **设置滚动策略**: 根据 `maxFileSize` 和 `maxBackupIndex` 参数设置滚动策略。
+- **设置文件模式**: 根据 `mode` 参数设置文件的权限。
+
+当日志文件达到预设的大小限制时，旧的日志文件会被重命名，新的日志文件被创建来继续记录日志的过程。这种机制有助于控制日志文件的大小，避免无限制地增长，同时保留历史日志记录以供分析。
+
+以下是滚动机制的详细步骤：
+
+1. **检查文件大小**：每当有日志消息写入时，`RollingFileAppender` 会检查当前日志文件的大小。
+2. **触发滚动**：如果当前日志文件的大小超过了 `setMaxFileSize` 方法设置的最大文件大小，就会触发滚动。
+3. **重命名旧文件**：触发滚动后，`RollingFileAppender` 会将当前的日志文件重命名。重命名的规则通常是在文件名后面添加一个后缀，后缀通常是数字，表示这是第几个备份文件。例如，如果 `maxBackupIndex` 设置为 3，那么可能会有 example.log.1、example.log.2、example.log.3 这样的文件。
+4. **删除最旧的备份**：如果有超过 `maxBackupIndex` 设置数量的备份文件，最旧的备份文件会被删除，以释放空间。
+5. **创建新文件**：滚动完成后，会创建一个新的日志文件，文件名与原始日志文件相同，用于继续记录新的日志消息。
+6. **继续记录**：新的日志文件创建后，日志记录操作会继续在这个新文件中进行。
+
+### 日志布局（Layout）
+
+示例代码中使用的是 `BasicLayout`，也就是默认的日志布局，这样一条日志最开始的信息就是日志产生时距离 1970.1.1 的秒数，不方便观察。
+
+实际使用时可以用 `PatrrenLayout` 对象来定制化格式，类似于 `printf` 的格式化输出
+
+在 log4cpp 中，`PatternLayout` 类的构造函数用于初始化日志的模式布局。这种布局方式允许你定义日志消息的格式，这通常包括日期、日志级别、消息内容等。
+
+**无参构造函数**
+
+```cpp
+PatternLayout::PatternLayout()
+```
+
+这个构造函数不接受任何参数。它将使用默认的日志模式。默认模式通常是 `%m%n`，其中 `%m` 表示日志消息，`%n` 是行分隔符。
+
+**带参数的构造函数**
+
+```cpp
+PatternLayout::PatternLayout(const std::string& pattern)
+```
+
+这个构造函数接受一个字符串参数，允许你在创建 PatternLayout 对象时直接指定日志的格式。这里的 pattern 参数是你希望日志消息遵循的模式。
+
+参数解释：
+
+1. `%c` - 日志事件的类别（logger name）
+   - 例如：`%c{1}` 表示仅包含 logger name 的第一个字符。
+2. `%d` - 日志事件的日期
+   - 例如：`%d{%a %b %d %H:%M:%S %Y}` 表示按星期、月份、日期、小时、分钟、秒、年份的格式输出日期。
+3. `%m` - 日志事件的消息
+   - 表示日志消息的文本。
+4. `%n` - 平台特定的行分隔符
+   - 在 Unix/Linux 上是换行符 `\n`，在 Windows 上是回车换行 `\r\n`。
+5. `%p` - 日志事件的优先级（日志级别）
+   - 例如：`DEBUG`、`INFO`、`WARN`、`ERROR`、`FATAL`。
+6. `%r` - 自日志事件创建到当前时间的毫秒数。
+7. `%t` - 当前线程的名字。
+8. `%x` - 与当前线程关联的 NDC（Nested Diagnostic Context）。
+9. `%%` - 字面上的百分号（%）
+
+转换模式还可以包含自定义的日期格式，使用 %d 后跟花括号 &#123;&#125; 内的格式字符串。例如：
+
+- `%d{HH: mm: ss}` - 24 小时制的小时、分钟和秒。
+- `%d{dd MMM yyyy}` - 日、月份缩写和年份。
+
+转换模式还可以包含可选的修饰符，如：
+
+- `%-5c` - 左对齐，至少占 5 个字符的宽度。
+- `%5c` - 右对齐，至少占 5 个字符的宽度。
+- `%.2c` - 截断，取 logger name 的前两个字符。
+
+转换模式还可以包含可选的格式化信息，如：
+
+- `%d{%a %b %d %H:%M:%S %Y}` - 完整的日期和时间。
+
+使用这些转换符号，你可以创建非常灵活的日志格式，以满足你的特定需求。例如，一个常见的日志格式可能是：
+
+```
+%d{%Y-%m-%d %H:%M:%S} [%c] %-5p %m%n
+```
+
+这个格式将输出如下的日志行：
+
+```
+2024-09-25 14:35:59 [com.example.MyLogger] INFO  This is a log message.
+```
+
+其中：
+
+- `%d{%Y-%m-%d %H:%M:%S}` 输出日期和时间。
+- `[%c]` 输出日志类别（logger name）。
+- `%-5p` 输出日志级别，至少占 5 个字符的宽度。
+- `%m` 输出日志消息。
+- `%n` 输出行分隔符。
+
+注意：当日志系统有多个日志目的地时，每一个目的地 `Appender` 都需要设置一个布局 `Layout`（一对一关系）
+
+### 日志记录器（Category）
+
+在 log4cpp 库中，创建 `Category` 对象的过程可以通过以下步骤进行：
+
+1. **创建根类别**：首先，使用 `getRoot` 方法创建一个根类别对象。这个对象是日志系统的顶级类别，可以为其设置日志优先级和附加器（Appender）。
+
+2. **设置根类别属性**：接下来，可以为根类别对象设置优先级和附加器，这些设置将影响所有未明确设置优先级和附加器的子类别。
+
+3. **创建子类别**：然后，使用 `getInstance` 方法创建子类别对象。这些子类别对象将继承根类别的优先级和附加器设置，但也可以在需要时重写这些设置。
+
+4. **修改子类别属性**：子类别对象可以进一步修改其优先级和附加器，以满足特定模块的日志需求。
+
+5. **隐式创建根对象**：如果未显式创建根对象，直接使用 `getInstance` 方法创建子类别时，log4cpp 会隐式地创建一个根对象。
+
+![image-20231124171810154.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRNmdxZDlJajJwSmttSXJPbll4UXMwQjZjYWJLOUtYM0J1MUxsbkowSS1LLVE_ZT12eEhsNE8.jpg)
+
+**子类别继承父类别信息**：子类别可以继承父类别的优先级和附加器信息。
+
+**示例代码**：
+
+```cpp
+// 创建根类别对象并设置优先级和附加器
+log4cpp::Category &root = log4cpp::Category::getRoot();
+root.setPriority(log4cpp::Priority::WARN);
+root.addAppender(appender1);
+
+// 创建子类别对象并添加附加器
+log4cpp::Category &sub1 = log4cpp::Category::getInstance("sub1"); // 传入的字符串sub1就会是日志中记录下的日志来源
+sub1.addAppender(appender2);
+```
+
+**简化创建子类别**：
+
+```cpp
+// 一行代码创建子类别对象
+log4cpp::Category& sub1 = log4cpp::Category::getRoot().getInstance("salesDepart");
+sub1.setPriority(log4cpp::Priority::WARN);
+sub1.addAppender(appender1);
+```
+
+**注意事项**：
+
+- `sub1` 是一个引用，用于操作 `Category` 对象，包括设置优先级、添加附加器和记录日志。
+- `getInstance` 的参数 `salesDepart` 定义了日志信息中的类别名称，也就是日志的来源，对应布局中的 `%c` 占位符。
+- 通常，为了清晰地识别日志来源，子类别的名称应与 `getInstance` 的参数保持一致。
+
+### 日志优先级（Priority）
+
+在 log4cpp 日志系统中，我们关注两类优先级：一是日志记录器（Category 对象）的优先级，二是具体日志条目的优先级。设置 Category 对象时，需要指定其优先级。当记录一条日志时，如使用 `logger.debug("this is a debug message")`，这条日志的优先级即为 DEBUG 级别。简而言之：
+
+**日志系统有一个阈值优先级 A，日志条目有一个指定优先级 B。**
+
+**只有当 B 大于或等于 A 时，该日志条目才会被记录；如果 B 低于 A，则该日志条目将被忽略。**
+
+```cpp
+class LOG4CPP_EXPORT Priority {
+ public:
+  typedef enum {
+    EMERG = 0,
+    FATAL = 0,
+    ALERT = 100,
+    CRIT = 200,
+    ERROR = 300,
+    WARN = 400,
+    NOTICE = 500,
+    INFO = 600,
+    DEBUG = 700,
+    NOTSET = 800 // 此值不代表有效的优先级
+  } PriorityLevel;
+  //...
+};  //数值越小，表示优先级越高；数值越大，表示优先级越低
+```
+
+## 定制日志系统
+
+模仿示例代码的形式去设计定制化的日志系统：
+
+```cpp
+#include <iostream>
+#include "log4cpp/OstreamAppender.hh"
+#include "log4cpp/FileAppender.hh"
+#include "log4cpp/RollingFileAppender.hh"
+#include "log4cpp/Category.hh"
+#include "log4cpp/Priority.hh"
+#include "log4cpp/PatternLayout.hh"
+using std::cout;
+using std::endl;
+using namespace log4cpp;
+
+int main() {
+  // 1. 创建布局对象
+  auto *ptn1 = new PatternLayout();
+  ptn1->setConversionPattern("%d %c [%p] %m%n");
+
+  auto *ptn2 = new PatternLayout();
+  ptn2->setConversionPattern("%d %c [%p] %m%n");
+
+  auto *ptn3 = new PatternLayout();
+  ptn3->setConversionPattern("%d %c [%p] %m%n");
+
+  // 2. 创建输出器对象
+  auto *pos =
+      new OstreamAppender("console", &cout);
+  pos->setLayout(ptn1);
+
+  auto *pfile =
+      new FileAppender("file", "log.txt");
+  pfile->setLayout(ptn2);
+
+  auto pRoll = new RollingFileAppender("rolling", "res.txt", 5 * 1024, 9);
+  // 输出器与布局绑定
+  pRoll->setLayout(ptn3);
+
+  // 3. 创建记录器对象
+  // 引用名 salesDepart 是在代码中使用的，表示 Category 对象
+  // 参数中 salesDepart 是获取冂志来源时返回的记录器的名字
+  // 一般让两者相同，方便理解
+  Category & sub1 = Category::getInstance("sub1");
+
+  // 4. 设置优先级
+  sub1.setPriority(Priority::DEBUG);
+
+  // 5. 设置输出器
+  sub1.addAppender(pos);
+  sub1.addAppender(pfile);
+  sub1.addAppender(pRoll);
+
+  // 6. 写入日志
+  int count = 30;
+  while (count-- > 0) {
+    sub1.emerg("this is an emerg msg");
+    sub1.fatal("this is a fatal msg");
+    sub1.alert("this is an alert msg");
+    sub1.crit("this is a crit msg");
+    sub1.error("this is an error msg");
+    sub1.warn("this is a warn msg");
+    sub1.notice("this is a notice msg");
+    sub1.info("this is an info msg");
+    sub1.debug("this is a debug msg");
+  }
+
+  // 7. 回收资源
+  Category::shutdown();
+  return 0;
+}
+```
+
+在设计日志系统时多次使用了 `new` 语句，这些核心组件的构造函数具体细节我们也并不清楚，但可以知道的是这个过程必然会申请资源，所以规范的写法在日志系统退出时要调用 `shutdown` 回收资源。
+
+## log4cpp 的单例实现
+
+参考：[C++ day07 log4cpp的实际使用习题(有答案)](https://blog.csdn.net/weixin_43679037/article/details/116889618)
+
+MyLogger.h
+
+```cpp
+#ifndef __MY_LOGGER_H__
+#define __MY_LOGGER_H__
+#include "log4cpp/Category.hh"
+
+using namespace log4cpp;
+
+class Mylogger {
+ public:
+  // 单例类创建函数
+  static Mylogger *getInstance();
+  // 释放单例类
+  static void destroy();
+
+  // 警告
+  void warn(const char *msg);
+  // 错误
+  void error(const char *msg);
+  // 检测
+  void debug(const char *msg);
+  // 通知
+  void info(const char *msg);
+
+ private:
+  // 构造函数
+  Mylogger();
+  // 析构函数
+  ~Mylogger();
+ private:
+  static Mylogger *_pInstance;
+  // category，定义错误等级
+  Category &_mycat;
+
+};
+
+// 宏定义，用于绑定输出错误日志的函数及错误行号
+#define prefix(msg) (string(__FILE__) + string(" ")+ string(__FUNCTION__) \
+        + string(" ")+ string(std::to_string(__LINE__)) + string(" ") \
+        + msg).c_str()
+
+// 定义具体错误类型
+#define LogError(msg)  Mylogger::getInstance()->error(prefix(msg))
+#define LogInfo(msg)  Mylogger::getInstance()->info(prefix(msg))
+#define LogWarn(msg)  Mylogger::getInstance()->warn(prefix(msg))
+#define LogDebug(msg)  Mylogger::getInstance()->debug(prefix(msg))
+
+#endif // __MY_LOGGER_H__
+```
+
+MyLogger.cpp
+
+```cpp
+#include "MyLogger.h"
+#include "log4cpp/PatternLayout.hh"
+#include "log4cpp/OstreamAppender.hh"
+#include "log4cpp/FileAppender.hh"
+#include "log4cpp/Priority.hh"
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+Mylogger *Mylogger::_pInstance = nullptr;
+
+Mylogger *Mylogger::getInstance() {
+  if (nullptr == _pInstance) {
+    _pInstance = new Mylogger();
+  }
+  return _pInstance;
+}
+
+void Mylogger::destroy() {
+  if (_pInstance) {
+    delete _pInstance;
+    _pInstance = nullptr;
+  }
+}
+
+void Mylogger::warn(const char *msg) {
+  _mycat.warn(msg);
+}
+
+void Mylogger::error(const char *msg) {
+  _mycat.error(msg);
+}
+
+void Mylogger::debug(const char *msg) {
+  _mycat.debug(msg);
+}
+
+void Mylogger::info(const char *msg) {
+  _mycat.info(msg);
+}
+
+Mylogger::Mylogger()
+    : _mycat(log4cpp::Category::getInstance("Mycat")) {
+  // 日志的格式
+  auto *ppl1 = new PatternLayout();
+  ppl1->setConversionPattern("%d %c [%p] %m %n");
+
+  auto *ppl2 = new PatternLayout();
+  ppl2->setConversionPattern("%d %c [%p] %m %n");
+
+  // 日志的目的地
+  auto *poa = new OstreamAppender("OstreamAppender123", &cout); // 输出到终端
+  poa->setLayout(ppl1);
+  // 输出到日志文件
+  auto *pfa = new FileAppender("FileAppender123", "wd.log");
+  pfa->setLayout(ppl2);
+
+  _mycat.addAppender(poa);
+  _mycat.addAppender(pfa);
+  // DEBUG 及以上危险等级的日志都要输出
+  _mycat.setPriority(Priority::DEBUG);
+}
+
+// 析构函数就是执行 shutdown() 文件，整体退出
+Mylogger::~Mylogger() {
+  Category::shutdown();
+}
+
+```
+
+TestLog.cpp
+
+```cpp
+#include "MyLogger.h"
+#include <iostream>
+#include <string>
+
+using std::cout;
+using std::endl;
+using std::string;
+
+// 测试用，在实际中不用
+string func(const char *msg) {
+  string s1 = string(__FILE__) + string(" ")+ string(__FUNCTION__)
+      + string(" ")+ string(std::to_string(__LINE__)) + string(" ")
+      + msg;
+  return s1;
+}
+
+// 实际使用日志返利
+void test1() {
+  Mylogger *ps1 = Mylogger::getInstance();
+  ps1->error("error1");
+  Mylogger::getInstance()->error("error2");
+   Mylogger::getInstance()->error(func("error3").c_str()); 
+   Mylogger::getInstance()->error(prefix("helloworld")); 
+   Mylogger::getInstance()->warn(prefix("helloworld")); 
+   Mylogger::getInstance()->info(prefix("helloworld")); 
+   Mylogger::getInstance()->debug(prefix("helloworld")); 
+  LogError("error3");
+  const char *pstr = "hello";
+  int number = 1;
+  int value = 2;
+  // 可变参数输出
+  LogError("hello, %d, %s %d\n", number, pstr, value);
+}
+
+// test2 在实际中不用
+void test2() {
+  cout << __FILE__ << "   " << __FUNCTION__ << "  " << __LINE__ << endl;
+}
+int main(int argc, char **argv) {
+  test1();
+  return 0;
+}
+```
+
+## log4cpp 配置文件读取
+
+如果想要更灵活地使用 log4cpp，可以使用读取配置文件的方式
+
+```ini
+// log4cpp.properties
+log4cpp.rootCategory=DEBUG, rootAppender
+log4cpp.category.sub1=DEBUG, A1, A2
+log4cpp.category.sub1.sub2=DEBUG, A3
+
+log4cpp.appender.rootAppender=ConsoleAppender
+log4cpp.appender.rootAppender.layout=PatternLayout
+log4cpp.appender.rootAppender.layout.ConversionPattern=%d [%p] %m%n 
+
+log4cpp.appender.A1=FileAppender
+log4cpp.appender.A1.fileName=A1.log
+log4cpp.appender.A1.layout=BasicLayout
+
+log4cpp.appender.A2=FileAppender
+log4cpp.appender.A2.threshold=WARN
+log4cpp.appender.A2.fileName=A2.log
+log4cpp.appender.A2.layout=PatternLayout
+log4cpp.appender.A2.layout.ConversionPattern=%d [%p] %m%n 
+
+log4cpp.appender.A3=RollingFileAppender
+log4cpp.appender.A3.fileName=A3.log
+log4cpp.appender.A3.maxFileSize=200
+log4cpp.appender.A3.maxBackupIndex=1
+log4cpp.appender.A3.layout=PatternLayout
+log4cpp.appender.A3.layout.ConversionPattern=%d [%p] %m%n 
+```
+
+```cpp
+#include <log4cpp/Category.hh>
+#include <log4cpp/PropertyConfigurator.hh>
+
+int main(int argc, char* argv[])
+{
+  std::string initFileName = "log4cpp.properties";
+  log4cpp::PropertyConfigurator::configure(initFileName);
+
+  log4cpp::Category& root = log4cpp::Category::getRoot();
+
+  log4cpp::Category& sub1 = 
+    log4cpp::Category::getInstance(std::string("sub1"));
+
+  log4cpp::Category& sub2 = 
+    log4cpp::Category::getInstance(std::string("sub1.sub2"));
+
+  root.warn("Storm is coming");
+
+  sub1.debug("Received storm warning");
+  sub1.info("Closing all hatches");
+
+  sub2.debug("Hiding solar panels");
+  sub2.error("Solar panels are blocked");
+  sub2.debug("Applying protective shield");
+  sub2.warn("Unfolding protective shield");
+  sub2.info("Solar panels are shielded");
+
+  sub1.info("All hatches closed");
+
+  root.info("Ready for storm.");
+
+  log4cpp::Category::shutdown();
+
+  return 0;
+}
+```

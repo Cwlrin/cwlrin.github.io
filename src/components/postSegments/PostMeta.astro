@@ -1,0 +1,110 @@
+---
+import { currentLocale, t } from "@/i18n";
+
+export interface Props {
+  date: Date;
+  showLabel?: boolean;
+  wordCount?: number;
+  readTime?: number;
+}
+
+const { date, showLabel = false, wordCount, readTime } = Astro.props;
+
+const formatDate = (d: Date) =>
+  d.toLocaleDateString(currentLocale, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+const formatReadTime = (minutes: number) => `${minutes} ${t("post.minutes")}`;
+---
+
+<div class={`post-meta text-grey-5${showLabel ? " full" : ""}`}>
+  <span
+    class="meta-item"
+    title={`${t("post.publishedAt")}：${date.toLocaleString()}`}
+  >
+    <span class="icon">
+      <i class="i-ri-calendar-line"></i>
+    </span>
+
+    {showLabel && <span class="text">{t("post.publishedAt")}</span>}
+
+    <time datetime={date.toISOString()}>
+      {formatDate(date)}
+    </time>
+  </span>
+
+  {
+    wordCount && (
+      <span class="meta-item" title={t("post.wordCount")}>
+        <span class="icon">
+          <i class="i-ri-pencil-line" />
+        </span>
+
+        {showLabel && <span class="text">{t("post.wordCount")}</span>}
+
+        <span>
+          {wordCount} {t("post.words")}
+        </span>
+      </span>
+    )
+  }
+
+  {
+    readTime && (
+      <span class="meta-item" title={t("post.readingTime")}>
+        <span class="icon">
+          <i class="i-ri-time-line" />
+        </span>
+
+        {showLabel && <span class="text">{t("post.readingNeed")}</span>}
+
+        <span>{formatReadTime(readTime)}</span>
+      </span>
+    )
+  }
+</div>
+
+<style>
+  .post-meta {
+    display: flex;
+    font-size: 0.875rem;
+    gap: 0.625rem;
+    align-items: center;
+  }
+
+  .post-meta.full {
+    justify-content: flex-end;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+  }
+
+  .icon {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .icon i {
+    margin-right: 0.0625rem;
+  }
+
+  .text {
+    margin-right: 0.25rem;
+  }
+
+  time {
+    font-family: inherit;
+  }
+
+  @media (max-width: 768px) {
+    .post-meta .meta-item:not(:first-child) {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,337 @@
+---
+title: "Linux 管道和 IO 多路复用"
+date: 2020-08-20T15:48:41+08:00
+categories: ["C 与 C++", "Linux C"]
+tags: ["C", "Linux"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0Vldnc2RUppb2laR3ZwOFpWMjFyZDgwQlFuZm5kS2xTeTh6TW1ldC1BbjRybWc_ZT1pdk5IRjE.jpg"
+---
+
+## 管道
+
+### 通信的方式
+
+在通信系统中，根据数据传输的方向和方式，通信可以被分为单工、双工和半双工三种模式。
+
+| 通信方式   | 描述                                                 |
+| ---------- | ---------------------------------------------------- |
+| 单工通信   | 永远只能由一方向另一方发送数据                       |
+| 半双工通信 | 双方都可以收发数据, 但是在同一时刻只能一端发另一端收 |
+| 全双工通信 | 两端可以同时收发数据                                 |
+
+### 命名管道
+
+Linux 中的命名管道（named pipe）是一种特殊类型的文件, 又称为 FIFO。它为进程提供一个独立于文件的实际 I/O 来源和目的地。在 Linux 系统中它是一种重要的进程间通信（IPC）的机制。
+
+管道虽然看起来像是磁盘上的文件，但实际上是一个数据流或缓冲区，与匿名管道相比，命名管道有自己的存在形式，而匿名管道则不存在于文件系统中。命名管道不会长期占用磁盘空间存储数据，它仅作为一个通信接口，允许读写操作以文件系统操作的方式进行。
+
+命名管道创建后, 可以用于两个进程之间通信的 “管道”，一个进程用 `write` 命令向管道写入数据, 另一个进程用 `read` 命令从管道中读取数据。这样就实现了进程间的数据交换。需要同时打开读端和写端，不能单独打开任一端。
+
+命名管道是一种半双工通信方式，但通常按照单工方式使用，即一个进程写入数据，另一个进程读取数据。
+
+使用命名管道需要注意以下几点:
+
+- 读操作在缓冲区无数据时会被阻塞，写操作在缓冲区满时也会被阻塞。
+- 如果写端关闭，读端可以继续读取剩余数据，直至缓冲区空，此时读操作返回 0。
+- 如果读端关闭，写端尝试写入将触发 SIGPIPE 信号，可能导致写端进程异常终止。
+- 为了实现两个进程间的全双工通信，通常会使用两个命名管道。
+
+### 进程间通信的必要性
+
+在构建复杂的软件系统时，往往需要多个进程共同工作以实现系统的整体功能。这些进程可能需要共享数据或协同执行任务。进程间通信提供了一种机制，允许进程之间交换信息，从而实现紧密的协作。
+
+1. **功能实现**：软件可能由多个进程组成，每个进程负责特定的任务。通过进程间通信，这些进程可以协同工作，共同完成复杂的功能。
+2. **独立性和解耦**：进程间通信允许进程之间保持独立性。每个进程可以独立运行，互不干扰。这种解耦的设计使得系统更加灵活，易于维护和扩展。
+3. **容错性**：在正常情况下，一个进程的崩溃不应该导致整个系统的崩溃。进程间通信可以帮助系统在某个进程失败时，通过其他进程的协作来恢复或继续执行任务。
+4. **数据共享**：在某些情况下，多个进程可能需要访问或修改共享的数据。进程间通信提供了一种方式，使得进程可以安全地访问和更新这些共享资源。
+5. **通信手段**：进程间通信提供了多种手段，如管道、消息队列、共享内存和套接字等，这些手段可以根据不同的应用场景和需求来选择。
+
+## 创建与使用管道
+
+命名管道创建的管道文件不是普通的磁盘文件, 所以创建的方式也和普通文件创建方式不同。
+
+### 直接使用命名管道
+
+1. **创建管道**：首先，使用 `mkfifo` 命令创建一个命名管道，例如 `mkfifo 1.pipe`。
+2. **写入数据**：尝试使用 `echo hello > 1.pipe` 向管道写入数据。这时，写入操作可能会被阻塞，因为命名管道需要读端和写端同时打开。
+3. **读取数据**：在另一个窗口或进程中，使用 `cat 1.pipe` 命令打开读端。这将允许写端从阻塞状态变为非阻塞状态，并继续写入数据。
+4. **数据传输**：写端完成写入后，读端可以读取写入的数据。
+
+### 在代码中使用管道
+
+**写端示例**：
+
+```c
+int main(int argc, char* argv[]) {
+	int pipe_fd = open("1.pipe", O_WRONLY);
+	while (1) {
+		write(pipe_fd, "hello", 5);
+		printf("write once \n");
+		sleep(5);
+	}
+	return 0;
+}
+```
+
+- 这段代码使用 `open` 函数以只写方式打开命名管道 `1.pipe`。
+- 在无限循环中，使用 `write` 函数不断向管道写入字符串 "hello"。
+- 每次写入后，打印 "write once" 并暂停 5 秒。
+
+**读端示例**：
+
+```c
+int main(int argc, char* argv[]) {
+	int pipe_fd = open("1.pipe", O_RDONLY);
+	while (1) {
+		char buf[60] = {0};
+		read(pipe_fd, buf, sizeof(buf));
+		printf("read : %s\n", buf);
+	}
+	return 0;
+}
+```
+
+- 这段代码使用 `open` 函数以只读方式打开命名管道 `1.pipe`。
+- 在无限循环中，使用 `read` 函数从管道读取数据到缓冲区 `buf`。
+- 读取到的数据被打印出来。
+
+**注意**：在实际使用中，需要确保写端和读端的程序能够协调运行，以避免写入操作被阻塞或读取到未完成的数据。
+
+通过这种方式，命名管道可以作为进程间通信的一个有效工具，允许数据从一个进程流向另一个进程。
+
+### 管道写堵塞
+
+当使用管道（pipe）进行进程间通信时，如果写端持续写入数据而读端不读取，最终会发生写阻塞。这是因为管道的缓冲区大小是有限的。
+
+写端示例：
+
+```c
+int main(int argc, char* argv[]) {
+    int fd_write = open("1.pipe", O_WRONLY);
+
+    char buf[4096] = {0};
+    int times = 0;
+    while (1) {
+        write(fd_write, buf, sizeof(buf));
+        printf("write times: %d\n", ++times);
+    }
+
+    close(fd_write);
+    return 0;
+}
+```
+
+这个写端程序以无限循环的方式向管道写入数据，每次写入后打印写入次数。
+
+读端示例：
+
+```c
+int main(int argc, char* argv[]) {
+    int fd_read = open("1.pipe", O_RDONLY);
+
+    sleep(10); // 延迟 10 秒开始读取，模拟写端先运行的情况
+    char buf[4096] = {0};
+    while (1) {
+        read(fd_read, buf, sizeof(buf));
+        printf("read\n");
+        sleep(2); // 每读取一次后暂停 2 秒
+    }
+
+    close(fd_read);
+    return 0;
+}
+```
+
+这个读端程序在启动后延迟 10 秒，然后以无限循环的方式从管道读取数据，每次读取后打印提示并暂停 2 秒。
+
+**写阻塞情况**：
+
+如果写端持续写入数据而读端不读取，管道缓冲区最终会被填满。
+
+一旦缓冲区满，写端的 `write` 调用将被阻塞，直到读端读取数据并释放缓冲区空间。
+
+### 管道的真实可用缓冲区的大小
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VhOTk1aDhKZW81RGtRcHV0ZHVpRE9rQlp0djhyajF3ZnBvckZ6ZDZzUVAzWEE_ZT1hQ29heTE.png)
+
+管道的缓冲区大小，直接影响了管道能够存储多少数据以及进程间通信的效率。管道的真实可用缓冲区大小取决于单个管道缓冲区的大小和缓冲区的数目，这两个参数在不同的操作系统设置中可能会有所不同。
+
+通过 `ulimit -a` 命令可以查看到 pipe size 为 8\*512 = 4096 字节，这是单个缓冲区的大小。同时，从 Linux 内核的源码中可以发现，管道缓冲区的个数为 16。这意味着可以在不读的情况下连续写入 16 个 4096 字节的数据，填满整个管道缓冲区。如果尝试继续写入，就会发生写阻塞。然而一旦读出一些数据，比如 4096 字节，就可以继续写入相应数量的数据。
+
+```c ~/linux-5.17.4/include/linux/pipe_fs_i.h
+/* SPDX-License-Identifier: GPL-2.0 */
+#ifndef _LINUX_PIPE_FS_I_H
+#define _LINUX_PIPE_FS_I_H
+
+#define PIPE_DEF_BUFFERS	16
+
+#define PIPE_BUF_FLAG_LRU	0x01	/* page is on the LRU */
+#define PIPE_BUF_FLAG_ATOMIC	0x02	/* was atomically mapped */
+#define PIPE_BUF_FLAG_GIFT	0x04	/* page is a gift */
+#define PIPE_BUF_FLAG_PACKET	0x08	/* read() as a packet */
+#define PIPE_BUF_FLAG_CAN_MERGE	0x10	/* can merge buffers */
+#define PIPE_BUF_FLAG_WHOLE	0x20	/* read() must return entire buffer or error */
+#ifdef CONFIG_WATCH_QUEUE
+#define PIPE_BUF_FLAG_LOSS	0x40	/* Message loss happened after this buffer */
+#endif
+```
+
+在使用管道时，如果创建了一个管道并获取了两个文件描述符，即使使用这两个文件描述符写入数据，管道的总写入次数仍然是受限于缓冲区的总数。此外，如果创建了两个不同的管道，比如 1.pipe 和 2.pipe，并分别对它们进行写入，每个管道的写入次数也是独立的，都是 16 次。
+
+`PIPE_BUF` 是一个宏，它定义了管道缓冲区中小于它的写入操作应该是原子操作，即这些操作不会被中断。这一点在 Linux 内核源码的 `pipe_fs_i.h` 和 `limits.h` 文件中有所体现。
+
+```c ~/linux-5.17.4/include/uapi/linux/limits.h
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+#ifndef _UAPI_LINUX_LIMITS_H
+#define _UAPI_LINUX_LIMITS_H
+
+#define NR_OPEN	        1024
+
+#define NGROUPS_MAX    65536	/* supplemental group IDs are available */
+#define ARG_MAX       131072	/* # bytes of args + environ for exec() */
+#define LINK_MAX         127	/* # links a file may have */
+#define MAX_CANON        255	/* size of the canonical input queue */
+#define MAX_INPUT        255	/* size of the type-ahead buffer */
+#define NAME_MAX         255	/* # chars in a file name */
+#define PATH_MAX        4096	/* # chars in a path name including nul */
+#define PIPE_BUF        4096	/* # bytes in atomic write to a pipe */
+#define XATTR_NAME_MAX   255	/* # chars in an extended attribute name */
+#define XATTR_SIZE_MAX 65536	/* size of an extended attribute value (64k) */
+#define XATTR_LIST_MAX 65536	/* size of extended attribute namelist (64k) */
+
+#define RTSIG_MAX	  32
+
+#endif
+```
+
+> Applications should not rely on a particular capacity: an application should be designed so that a reading process consumes data as soon as it is available, so that a writing process does not remain blocked.
+> （应用程序不应依赖于特定的容量：应用程序的设计应确保读取过程在数据可用时立即消耗数据，这样写入过程就不会被阻止）
+
+## IO 多路复用
+
+### `Select` 监控文件描述符函数
+
+`select` 函数是 POSIX 标准中用于监控多个文件描述符（file descriptors）的系统调用，它可以等待直到某个或某些文件描述符状态发生变化，如可读、可写或有错误发生。这个函数定义在 `sys/select.h` 头文件中。
+
+函数原型：
+
+```c
+int select(int nfds, fd_set *restrict readfds,
+           fd_set *restrict writefds, fd_set *restrict errorfds,
+           struct timeval *restrict timeout);
+```
+
+参数：
+
+1. `nfds`：要监控的文件描述符数量，实际是要监控的最高文件描述符编号加 1。例如，如果你只监控文件描述符 0 到 3，`nfds` 应该设置为 4。
+2. `readfds`：指向 `fd_set` 结构的指针，如果非空，则函数返回时，该结构将包含所有就绪读操作的文件描述符。
+3. `writefds`：指向 `fd_set` 结构的指针，如果非空，则函数返回时，该结构将包含所有就绪写操作的文件描述符。
+4. `errorfds`：指向 `fd_set` 结构的指针，如果非空，则函数返回时，该结构将包含所有检测到错误条件的文件描述符。
+5. `timeout`：指向 `struct timeval` 的指针，指定 `select` 等待文件描述符状态变化的最大时间。如果设置为 `NULL`，`select` 将无限期地等待。
+
+`fd_set` 是一个用来表示文件描述符集合的数据结构，可以使用 `FD_ZERO`, `FD_SET`, `FD_CLR`, 和 `FD_ISSET` 等宏来操作它。`FD_ZERO`, `FD_SET`, `FD_CLR`, 和 `FD_ISSET` 是一组宏，用于操作 POSIX 系统中的 `fd_set` 数据结构，该结构用于表示文件描述符集合。这些宏定义在 `sys/select.h` 头文件中，通常与 `select` 函数一起使用来监控多个文件描述符的状态。
+
+1. **FD_ZERO**
+
+   功能：初始化 `fd_set` 结构，将其所有位清零。
+
+   用法示例：
+
+   ```c
+   fd_set readfds;
+   FD_ZERO(&readfds); // 初始化 readfds，清零所有位
+   ```
+
+2. **FD_SET**
+
+   功能：将指定的文件描述符添加到 `fd_set` 结构的集合中。
+
+   用法示例：
+
+   ```c
+   FD_SET(fd, &readfds); // 将文件描述符 fd 添加到 readfds 集合
+   ```
+
+3. **FD_CLR**
+
+   功能：从 `fd_set` 结构的集合中移除指定的文件描述符。
+
+   用法示例：
+
+   ```c
+   FD_CLR(fd, &readfds); // 从 readfds 集合中移除文件描述符 fd
+   ```
+
+4. **FD_ISSET**
+
+   功能：检查指定的文件描述符是否是 `fd_set` 结构集合中的一个成员。
+
+   返回值：如果文件描述符在集合中，返回非零值（通常为 1）；否则返回 0。
+
+   用法示例：
+
+   ```c
+   if (FD_ISSET(fd, &readfds)) {
+   	// 文件描述符 fd 在 readfds 集合中
+    }
+   ```
+
+这些宏的使用场景主要是在调用 `select` 函数时，用于设置要监控的文件描述符集合，以及在 `select` 函数返回后检查哪些文件描述符状态发生了变化。
+
+`struct timeval` 是 POSIX 标准中定义的一个结构体，用于表示时间，它通常以秒和微秒的形式来精确地度量时间间隔。这个结构体定义在 `sys/time.h` 头文件中。
+
+结构体定义如下：
+
+```c
+struct timeval {
+    time_t tv_sec;    // 秒
+    suseconds_t tv_usec; // 微秒
+};
+```
+
+成员：
+
+- `tv_sec`：一个 `time_t` 类型的值，表示时间的秒部分。
+- `tv_usec`：一个 `suseconds_t` 类型的值，表示时间的微秒部分，`suseconds_t` 通常是 `signed long` 或 `long` 类型。
+
+`struct timeval` 通常用于需要精确计时或设置超时时间的场合，例如在 `select`、`gettimeofday` 或其他需要时间参数的系统调用中。
+
+返回值：
+
+- 成功时，返回就绪的文件描述符的数量（可以是读就绪、写就绪或有错误）。
+- 如果超时且没有文件描述符状态发生变化，则返回 0。
+- 失败时，返回 -1，并设置全局变量 `errno` 以指示错误类型。
+
+### `select` 的底层顺序
+
+使用 `select` 系统调用时，其底层操作顺序如下：
+
+1. **创建并初始化监听集合**：首先，需要创建一个 `fd_set` 类型的监听集合，并对其进行初始化，准备添加需要监听的文件描述符。
+2. **添加文件描述符**：将所有需要监听的文件描述符添加到 `fd_set` 集合中。这些文件描述符可以是读操作、写操作或异常操作的文件描述符。
+3. **调用 `select` 函数**：通过调用 `select` 函数开始监听过程。`select` 函数需要知道监听的文件描述符集合、最大文件描述符加一、以及可选的超时时间。
+4. **拷贝到内核态**：`select` 函数将用户态的监听集合拷贝到内核态空间，以便内核可以访问和监听这些文件描述符。
+5. **内核轮询**：内核进程根据拷贝到内核态的监听集合，轮询访问每个文件描述符对象，检查它们的状态变化。轮询的范围是根据 `select` 调用中提供的最大文件描述符参数确定的。
+6. **检测到就绪状态**：在一次轮询过程中，如果发现某个文件描述符状态已就绪，内核将其标记为就绪状态，并更新内核态的监听集合。
+7. **结束阻塞**：一旦有文件描述符就绪，`select` 调用结束阻塞状态，并返回。
+8. **拷贝回用户态**：内核将更新后的、包含就绪状态文件描述符的集合从内核态拷贝回用户态。
+9. **`select` 结束**：`select` 调用完成后，返回就绪的文件描述符数量。应用程序可以根据这个信息继续执行相应的代码逻辑。
+
+### `select` 的局限性
+
+`select` 是一种在 UNIX 和类 UNIX 系统中广泛使用的 I/O 多路复用技术，但它存在一些局限性和缺陷：
+
+1. **最大文件描述符限制**：`select` 能够监听的最大文件描述符数量为 1024，这是由其底层实现的位图（`fd_set` 类型）决定的。这意味着 `select` 无法监听超过 1024 个文件描述符。
+
+   ```c
+   typedef struct{
+       __fd_mask __fds_bits[1024 / (8 * (int) sizeof (__fd_mask))];
+   } fd_set;
+   ```
+
+2. **不可修改的限制**：尽管进程可以打开的文件数量可以通过 `ulimit -a` 查看并修改，但 `select` 的最大监听文件描述符限制是固定的，无法通过配置修改，除非重新编译操作系统。
+
+3. **内核态与用户态的拷贝开销**：在循环监听的场景中，监听集合和就绪集合需要在内核态和用户态之间反复拷贝，这可能导致额外的性能开销。
+
+4. **监听和就绪集合不分离**：在使用 `select` 时，监听集合和就绪集合没有明确分离，每次监听后都需要重置监听集合，这增加了编程的复杂性。
+
+5. **不适合海量监听**：当有大量文件描述符被监听但只有少数几个就绪时，`select` 需要遍历所有被监听的文件描述符来确定哪些已经就绪，这可能导致效率低下。
+

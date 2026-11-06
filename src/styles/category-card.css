@@ -1,0 +1,316 @@
+/* ============================================================
+   categoryCard 全局样式（自 svelte scoped 迁移）
+   私有类统一加 .cards 前缀限定，避免与全局 .item 等通用类碰撞
+   ============================================================ */
+
+.cards {
+  display: flex;
+  margin: 0 auto;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.cards .item.show {
+  display: block !important;
+  animation: category-slide-up-big-in 0.5s;
+  opacity: 1;
+  will-change: auto;
+}
+
+.cards .item {
+  position: relative;
+  color: inherit;
+  width: calc(50% - 2rem);
+  min-width: calc(50% - 2rem);
+  height: 14rem;
+  margin: 1rem;
+  opacity: 0;
+  perspective: 62.5rem;
+  /* 防止动画导致CLS - 预留空间 */
+  will-change: opacity, transform;
+  contain-intrinsic-height: 14rem;
+}
+
+@keyframes category-slide-up-big-in {
+  0% {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cards .cover,
+.cards .info {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem;
+  height: 100%;
+  width: 100%;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transition: ease-in-out 600ms;
+  top: 0;
+}
+
+.cards .cover {
+  background-position: center;
+  background-size: cover;
+  background-image: linear-gradient(to bottom right, var(--color-pink), var(--color-orange));
+  padding: 0.5rem 1rem;
+  font-size: 1.125rem;
+  color: var(--header-text-color, var(--grey-0));
+  overflow: hidden;
+  transform: rotateY(0deg);
+  position: relative;
+}
+
+.cards .cover::before {
+  position: absolute;
+  display: block;
+  content: "";
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: var(--cover-overlay-gradient);
+  opacity: 0.25;
+  z-index: var(--z-base);
+}
+
+.cards .cover .title {
+  margin: 0;
+  white-space: normal;
+  text-align: center;
+  position: relative;
+  z-index: var(--z-content);
+}
+
+.cards .cover span {
+  font-size: 0.75rem;
+  position: absolute;
+  right: 0.9375rem;
+  top: 0.625rem;
+  padding: 0 0.3125rem;
+  border-radius: 0.3125rem;
+  box-shadow: 0 0 0.3125rem 0.0625rem var(--grey-9-a6);
+  background: var(--grey-9-a5);
+  z-index: var(--z-content);
+}
+
+.cards .info {
+  background-color: var(--grey-0);
+  transform: rotateY(-180deg);
+  padding: 1rem 1.5rem 4rem;
+  justify-content: space-between;
+}
+
+.cards .item:nth-child(even) .info {
+  transform: rotateY(180deg);
+}
+
+.cards .item.active .cover {
+  transform: rotateY(180deg);
+}
+
+.cards .item.active .info {
+  transform: rotateY(0deg);
+  box-shadow: 0 0 2rem var(--box-bg-shadow);
+}
+
+.cards .item:nth-child(even).active .cover {
+  transform: rotateY(-180deg);
+}
+
+.cards .ribbon {
+  display: inline-block;
+  align-self: flex-start;
+  position: relative;
+  left: -2.5rem;
+  margin-bottom: 0.8rem;
+  max-width: calc(100% + 2rem);
+  padding: 0 1rem 0 2rem;
+  border-radius: 0 0.3rem 0.3rem 0;
+  background-image: linear-gradient(to right, var(--color-orange) 0, var(--color-pink) 100%);
+  color: var(--grey-0);
+}
+
+.cards .ribbon::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 0;
+  height: 0;
+  background-color: transparent;
+  border-style: solid;
+  border-width: 0 1rem 1rem 0;
+  border-color: transparent;
+  border-right-color: var(--color-orange);
+  filter: brightness(0.9);
+}
+
+.cards .ribbon a {
+  display: block;
+  margin: 0;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cards .ribbon a:hover {
+  color: currentColor;
+  animation: category-shake 1s;
+}
+
+@keyframes category-shake {
+  from,
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translate3d(-10px, 0, 0);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translate3d(10px, 0, 0);
+  }
+}
+
+.cards .inner {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cards ul.posts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-content: baseline;
+  min-height: 5rem;
+  overflow: hidden;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cards ul.posts li {
+  width: 45%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.cards ul.posts a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cards ul.posts a:hover {
+  text-decoration: underline;
+}
+
+.cards .meta.footer {
+  font-size: 0.875rem;
+  color: var(--grey-5);
+  display: flex;
+  gap: 0.5rem;
+  position: absolute;
+  bottom: 0.5rem;
+  max-width: calc(100% - 7rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cards .meta.footer i {
+  margin-right: 0.0625rem;
+}
+
+.cards .meta.footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cards .meta.footer a:hover {
+  color: var(--primary-color);
+}
+
+.cards .btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform-style: preserve-3d;
+  transform: translateZ(2rem);
+  backface-visibility: hidden;
+  padding: 0.3rem 1rem;
+  border-radius: 1rem 0;
+  color: var(--grey-0);
+  background-image: linear-gradient(to right, var(--color-pink) 0, var(--color-orange) 100%);
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.cards .btn::before {
+  position: absolute;
+  display: block;
+  content: "";
+  height: calc(100% - 1rem);
+  width: calc(100% - 1rem);
+  transform-style: preserve-3d;
+  transform: translateZ(-2rem);
+  backface-visibility: hidden;
+  border-radius: 5rem;
+  left: 0.5rem;
+  top: 0.8rem;
+  box-shadow: 0 0 0.6rem 0.6rem var(--color-pink-a3);
+  background-color: var(--color-pink-a3);
+  transition: transform 0.3s ease;
+}
+
+.cards .btn:hover {
+  transform: translateZ(2.5rem);
+}
+
+.cards .btn:hover::before {
+  transform: translateZ(-2.5rem);
+}
+
+@media (max-width: 768px) {
+  .cards .item {
+    width: calc(100% - 1rem) !important;
+    min-width: calc(100% - 1rem) !important;
+    margin: 1rem 0.5rem !important;
+  }
+
+  .cards .ribbon {
+    left: -2rem;
+  }
+
+  .cards .info {
+    padding: 1rem 1rem 4rem;
+  }
+}

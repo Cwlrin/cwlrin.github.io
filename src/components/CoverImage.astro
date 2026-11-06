@@ -1,0 +1,142 @@
+---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+
+interface Props {
+  src: ImageMetadata | string;
+  alt: string;
+  index: number;
+  isListItem?: boolean;
+}
+
+const { src, alt, index, isListItem = false } = Astro.props as Props;
+
+// 动画延迟(仅多图轮播)
+const animationDelay = isListItem ? `${index * 6}s` : "0s";
+const isPrimaryCarouselImage = !isListItem || index === 0;
+
+// Astro 的 <Image /> 需要 ImageMetadata；字符串（public 路径/远程 URL）用 <img> 兜底
+const isStringSrc = typeof src === "string";
+const imgSrc = isStringSrc ? (src as string) : undefined;
+const assetSrc = !isStringSrc ? (src as ImageMetadata) : undefined;
+---
+
+{
+  isListItem ? (
+    <li
+      class="cover-item"
+      style={`animation-delay: ${animationDelay};`}
+      onmouseenter="this.classList.add('stop-animation')"
+      onmouseleave="this.classList.remove('stop-animation')"
+      ontouchstart="this.classList.add('stop-animation')"
+      ontouchend="this.classList.remove('stop-animation')"
+    >
+      {imgSrc ? (
+        <img
+          src={imgSrc}
+          alt={alt}
+          class="cover-image"
+          loading={isPrimaryCarouselImage ? "eager" : "lazy"}
+          decoding="async"
+          fetchpriority={isPrimaryCarouselImage ? "high" : "auto"}
+        />
+      ) : (
+        <Image
+          src={assetSrc!}
+          alt={alt}
+          layout="constrained"
+          format="avif"
+          priority={isPrimaryCarouselImage}
+          quality={65}
+          decoding={isPrimaryCarouselImage ? "sync" : "async"}
+          class="cover-image"
+        />
+      )}
+    </li>
+  ) : imgSrc ? (
+    <img
+      src={imgSrc}
+      alt={alt}
+      class="single-image"
+      loading="eager"
+      decoding="sync"
+      fetchpriority="high"
+    />
+  ) : (
+    <Image
+      src={assetSrc!}
+      alt={alt}
+      layout="constrained"
+      format="avif"
+      class="single-image"
+      priority={true}
+      decoding="sync"
+    />
+  )
+}
+
+<style>
+  .cover-item {
+    opacity: 0;
+    height: 70vh;
+    width: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+    z-index: var(--z-base);
+    overflow: hidden;
+    animation: imageAnimation 36s linear infinite 0s;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+  }
+
+  .cover-item.stop-animation {
+    animation-play-state: paused;
+  }
+
+  .cover-image {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .single-image {
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+    object-fit: cover;
+  }
+
+  /* 动画应用到容器上，图片本身用 object-cover 填充 */
+  .cover-item :global(img) {
+    transform-origin: center;
+  }
+
+  @keyframes imageAnimation {
+    0% {
+      opacity: 0;
+      animation-timing-function: ease-in;
+    }
+    2% {
+      opacity: 1;
+    }
+    8% {
+      opacity: 1;
+      transform: scale(1.05);
+      animation-timing-function: ease-out;
+    }
+    17% {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+    25% {
+      opacity: 0;
+      transform: scale(1.1);
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+</style>

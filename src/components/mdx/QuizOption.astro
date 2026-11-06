@@ -1,0 +1,11 @@
+---
+interface Props {
+  correct?: boolean;
+}
+
+const { correct = false }: Props = Astro.props;
+---
+
+<li class="quiz-option" data-correct={correct ? "true" : undefined}>
+  <slot />
+</li>

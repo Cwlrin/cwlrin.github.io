@@ -1,0 +1,39 @@
+---
+interface Props {
+  /**
+   * 注音文本（会渲染到 <rt>）
+   */
+  rt: string;
+  /**
+   * 基文本（不传时使用默认插槽）
+   */
+  base?: string;
+  /**
+   * 是否输出 <rp> 括号回退，默认开启
+   */
+  fallback?: boolean;
+  /**
+   * 左回退括号
+   */
+  leftParen?: string;
+  /**
+   * 右回退括号
+   */
+  rightParen?: string;
+}
+
+const {
+  rt,
+  base,
+  fallback = true,
+  leftParen = "(",
+  rightParen = ")",
+}: Props = Astro.props;
+---
+
+<ruby class="ruby-annotation">
+  {base ? base : <slot />}
+  {fallback && <rp>{leftParen}</rp>}
+  <rt>{rt}</rt>
+  {fallback && <rp>{rightParen}</rp>}
+</ruby>

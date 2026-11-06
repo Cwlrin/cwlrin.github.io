@@ -1,0 +1,971 @@
+---
+title: "C++ 模板"
+date: 2020-12-04T14:18:55+08:00
+categories: ["C 与 C++", "C++ 基础"]
+tags: ["C++"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VYNEdsa0FwUVR4Rm1GYkZ6cFo1LU5BQkpTa3BDeVdkSXVRdFcySGV0Nlh6T2c_ZT1Qc0YyaGw.png"
+---
+
+C++ 作为一种静态类型、编译型语言，需要在编译时确定所有类型。为了在保持类型安全的同时提供灵活性，C++ 引入了模板机制，使得我们能够编写泛型代码。
+
+模板是一种将数据类型作为参数传递给函数或类的通用机制。通过使用模板，我们可以编写与类型无关的代码，这些代码在编译时会针对特定的数据类型进行实例化。
+
+## 为什么要定义模板
+
+在静态类型语言中，变量的类型在编译时必须已知，这有助于编译器进行类型检查和优化。然而，这也意味着我们需要为每种类型编写特定的函数或类，这增加了代码的冗余和维护的复杂性。
+
+与静态类型语言相对的是动态类型语言，如 Python 和 JavaScript，它们在运行时确定变量的类型。这种灵活性使得编写通用代码更加容易，但可能会牺牲一些性能，并增加了运行时错误的风险。
+
+模板的优势：
+
+1. **类型安全**：模板保持了 C++ 的类型安全特性，同时提供了处理多种类型的灵活性。
+2. **代码复用**：通过使用模板，我们可以编写通用的函数和类，避免为每种类型编写重复的代码。
+3. **编译时实例化**：模板在编译时针对具体类型进行实例化，这有助于编译器进行优化。
+
+示例代码：
+
+```cpp
+int add(int x, int y) {
+  return x + y;
+}
+
+double add(double x, double y) {
+  return x + y;
+}
+
+long add(long x, long y) {
+  return x + y;
+}
+
+string add(string x, string y) {
+  return x + y;
+}
+```
+
+```cpp
+// 函数模板
+template <class T>
+  T add(T x, T y) {
+  return x + y;
+}
+
+int main() {
+  cout << add(1, 2) << endl;          // 整数相加
+  cout << add(1.2, 3.4) << endl;      // 浮点数相加
+  cout << add(string("Hello, "), "World!") << endl; // 字符串相加
+  return 0;
+}
+```
+
+在这个例子中，`add` 函数模板可以接受任何类型的参数，并返回它们的和。编译器在编译时会为每种调用生成具体的函数实例。
+
+## 模版的定义
+
+模板是一种支持泛型编程的机制，允许开发者编写与类型无关的代码。通过模板，**可以实现类型参数化，也就是把类型定义为参数**，从而实现了真正的代码可重用性。
+
+模板的分类：
+
+1. **函数模板**：用于定义可处理多种数据类型的函数。
+2. **类模板**：用于定义可处理多种数据类型的类。
+
+模板参数：
+
+- **类型参数**：用类型名称（如 `T`）表示，可以是任何自定义或内置类型。
+- **非类型参数**：可以是整数、指针、引用、对象等，用于在编译时确定常量值。
+
+模板的定义形式：
+
+```cpp
+template <template_parameter_list>
+declaration
+```
+
+- **`template_parameter_list`**：定义模板参数的列表，可以包含类型参数和非类型参数。
+- **`declaration`**：可以是函数或类的声明或定义。
+
+模板的实例化：当使用模板时，编译器会根据提供的参数类型生成具体的代码。这个过程称为模板的实例化。
+
+```cpp
+// 希望将类型参数化
+// 使用 class 关键字或 typename 关键字都可以
+template<class T>
+T add(T x, T y) {
+  return x + y;
+}
+
+template<class T>
+T add(T x, T y) {
+  return x + y;
+}
+
+// 以下函数并非显式定义出的，而是由函数模板生成的
+// 编译阶段
+// 编译器根据使用函数模板时传入的参数
+// 由函数模板实例化出了一个模板函数
+int add(int x, int y) {
+  return x + y;
+}
+
+double add(double x, double y) {
+  return x + y;
+}
+
+void test0() {
+  int i1 = 1, i2 = 2;
+  short s1 = 2, s2 = 4;
+  double d1 = 3.7, d2 = 4.8;
+  // 隐式实例化
+  // 模板参数根据传入的参数进行推导
+  cout << add(i1, i2) << endl;
+  cout << add(s1, s2) << endl;
+  cout << add(d1, d2) << endl;
+
+  // 显式实例化
+  // 指定模板参数应该确定为什么内容
+  cout << add<int>(d1, d2) << endl;
+}
+```
+
+## 函数模版
+
+模板的实例化是模板使用的核心机制。这个过程涉及从函数模板或类模板到具体实现的转变，以适应特定的数据类型。
+
+函数模板 --> 生成相应的模板函数 --> 编译 --> 链接 --> 可执行文件
+
+**实例化** 是指从通用的模板创建具体类型的过程。这个过程发生在编译时，编译器根据提供的参数类型生成相应的代码。
+
+**隐式实例化：**
+
+在调用模板函数或创建模板类的对象时，如果没有明确指定模板参数，**编译器会根据函数参数的类型或对象使用的类型自动推导出模板参数**，这个过程称为隐式实例化。
+
+```cpp
+template <class T>
+T add(T t1, T t2) {
+  return t1 + t2;
+}
+
+void test0() {
+  short s1 = 1, s2 = 2;
+  int i1 = 3, i2 = 4;
+  long l1 = 5, l2 = 6;
+  double d1 = 1.1, d2 = 2.2;
+
+  std::cout << "add(s1,s2): " << add(s1, s2) << std::endl;
+  std::cout << "add(i1,i2): " << add(i1, i2) << std::endl;
+  std::cout << "add(l1,l2): " << add(l1, l2) << std::endl;
+  std::cout << "add(d1,d2): " << add(d1, d2) << std::endl;
+}
+```
+
+在这个例子中，`add` 函数模板被隐式实例化为 `short`, `int`, `long` 和 `double` 类型。
+
+**显式实例化：**
+
+显式实例化是指定模板参数的过程，这可以通过在模板函数后面直接指定类型参数来完成。显式实例化通常用于强制编译器生成特定类型的模板实例，或者用于链接时的模板实现。
+
+```cpp
+template <class T>
+T add(T t1, T t2) {
+  return t1 + t2;
+}
+
+void test0() {
+  int i1 = 3, i2 = 4;
+  std::cout << "add(i1,i2): " << add<int>(i1, i2) << std::endl;  // 显式实例化
+}
+```
+
+在这个例子中，我们显式地指定了 `add` 函数模板的参数类型为 `int`。
+
+模板实例化的时机：
+
+- **隐式实例化**：在调用模板函数或创建模板类的对象时自动发生。
+- **显式实例化**：在代码中明确指定模板参数时发生。
+
+### 函数模板与函数模板重载
+
+#### 函数模板重载
+
+模板可以被重载，就像普通函数一样。这意味着你可以有多个同名的模板，只要它们的模板参数列表不同即可。这种能力允许你为不同类型的参数或不同数量的参数创建特定的模板。
+
+函数模板定义了一个操作，该操作可以在多种类型上执行，而无需为每种类型编写单独的函数。
+
+```cpp
+template <class T>
+T add(T t1, T t2) {
+  return t1 + t2;
+}
+```
+
+这个模板要求两个参数具有相同的类型。
+
+如果需要对不同类型的参数执行不同的操作，或者需要处理两个不同类型的参数，你可以重载模板。
+
+```cpp
+template <class T>
+T add(T t1, T t2) {
+  return t1 + t2;
+}
+
+template <class T1, class T2>
+auto add(T1 t1, T2 t2) -> decltype(t1 + t2) {
+  return t1 + t2;
+}
+```
+
+这里，第二个模板处理两个不同类型的参数。`decltype(t1 + t2)` 用于确定返回类型。
+
+**显式实例化**：当你需要对特定类型进行实例化时，可以使用显式实例化。
+
+```cpp
+template <class T>
+T add(T t1, T t2) {
+  return t1 + t2;
+}
+
+int main() {
+  short s1 = 1;
+  int i2 = 4;
+  cout << "add(s1,i2): " << add<int>(s1, i2) << endl;  // ok，显式实例化
+  return 0;
+}
+```
+
+在这个例子中，我们显式地实例化了模板，指定了 `int` 类型，即使 `s1` 是 `short` 类型，它也会被转换为 `int`。
+
+**隐式实例化**：当调用模板函数时，编译器会自动推导出模板参数类型，这个过程称为隐式实例化。
+
+```cpp
+template <class T> // 模板一
+T add(T t1, T t2) {
+  return t1 + t2;
+}
+
+int main() {
+  short s1 = 1;
+  int i2 = 4;
+  cout << "add(s1,i2): " << add(s1, i2) << endl;  // ERROR，隐式实例化
+  return 0;
+}
+```
+
+在这个例子中，编译器推导出 `T` 为 `int` 类型，因为 `s1` 被提升为 `int`。
+
+模板重载的调用：当存在多个模板定义时，编译器会根据参数类型选择最合适的模板进行实例化。
+
+```cpp
+template <class T>
+T add(T t1, T t2) {
+  return t1 + t2;
+}
+
+template <class T1, class T2>
+auto add(T1 t1, T2 t2) -> decltype(t1 + t2) {
+  return t1 + t2;
+}
+
+int main() {
+  double x = 9.1;
+  int y = 10;
+  std::cout << add<int, int>(x, y) << std::endl;  // 显式实例化模板二（1）
+  std::cout << add<int>(x, y) << std::endl;     // 隐式实例化模板一（2）
+  std::cout << add<int>(y, x) << std::endl;     // 隐式实例化模板二（3）
+  return 0;
+}
+```
+
+在这个例子中，`add<int, int>(x, y)` 明确指定了模板参数 `T1` 和 `T2` 为 `int`，这将调用第二个模板。而 `add<int>(x, y)` 由于只指定了一个类型参数，并且 `x` 需要从 `double` 转换为 `int`，所以会调用第一个模板。
+
+如果仍然采用显式实例化
+
+- 可以传入两个类型参数，那么 **一定会调用模板二生成的模板函数**。传入的两个类型参数会作为 T1、T2 的实例化参数。
+
+  因为只有模板二才支持在模板参数列表中传入两个参数，模板一的模板参数列表中只有一个参数。
+
+- 也可以传入一个类型参数，那么这个参数会作为模板参数列表中的第一个类型参数进行实例化。
+
+  第 (2) 次调用时，指定了返回类型和第一个参数类型为 `int`，那么 x 会经历一次类型转换变成 `int` 型，而 `y` 本身就是 `int`，可以匹配模板一；
+
+  第 (3) 次调用时，同样指定了返回类型和第一个参数类型为 `int`，y 本身就是 `int`，`x` 是 `double` 类型，匹配模板二，可以不需要进行任何类型转换，所以优先匹配模板二。
+
+建议：
+
+1. **谨慎使用多个通用模板**：在一个源文件中定义多个通用模板可能会导致复杂的模板匹配问题。尽量避免这种情况，或者尽可能使用隐式实例化。
+2. **使用隐式实例化**：尽可能让编译器从函数调用中推导出模板参数，这通常会导致更少的类型转换和更清晰的代码。
+3. **明确模板参数**：如果你需要显式实例化模板，确保模板参数的选择是明确的，并且考虑到可能的类型转换。
+
+**重载的基本规则：**
+
+**相同的名称**：所有重载的模板必须有相同的函数名称。
+
+**不同的模板参数**：模板参数的数量或顺序（或类型约束）需要不同，以便编译器可以区分它们。
+
+**参数顺序不同的重载**：当模板参数的顺序不同时，可以构成重载。但这种方式很少使用，因为它可能导致调用时的混淆，尤其是在隐式实例化时。
+
+```cpp
+template <class T1, class T2>
+T1 add(T1 t1, T2 t2) {
+  std::cout << "模板一" << std::endl;
+  return t1 + t2;
+}
+
+template <class T1, class T2>
+T1 add(T2 t2, T1 t1) {
+  std::cout << "模板二" << std::endl;
+  return t1 + t2;
+}
+
+int main() {
+  int a = 10;
+  double b = 1.2;
+  std::cout << add(a, b) << std::endl; // 错误：调用歧义
+  std::cout << add<int>(a, b) << std::endl; // 模板一
+  std::cout << add<double>(a, b) << std::endl; // 模板二
+  return 0;
+}
+```
+
+在这个例子中，两个模板的参数顺序不同，可能导致调用时的歧义。编译器需要明确的指导来决定使用哪个模板。
+
+**参数数量不同的重载**：当模板参数的数量不同时，可以更清晰地构成重载。这种方式更常见，因为它提供了明确的函数重载决策路径。
+
+```cpp
+template <class T1, class T2>
+T1 add(T1 t1, T2 t2) {
+  return t1 + t2;
+}
+
+template <class T1, class T2, class T3>
+T1 add(T1 t1, T2 t2, T3 t3) {
+  return t1 + t2 + t3;
+}
+
+int main() {
+  int a = 10;
+  double b = 1.2;
+  int c = 3;
+  std::cout << add(a, b) << std::endl; // 调用第一个模板
+  std::cout << add(a, b, c) << std::endl; // 调用第二个模板
+  return 0;
+}
+```
+
+在这个例子中，根据参数的数量，编译器可以明确地决定使用哪个模板。
+
+#### 函数模板与普通函数重载
+
+函数模板与普通函数可以共存，形成重载，这时编译器需要根据调用的上下文来决定使用哪个函数。
+
+当一个普通函数和一个函数模板同时存在时，如果参数类型完全匹配一个普通函数，编译器通常会优先选择这个普通函数。这是因为：
+
+1. **明确性**：普通函数的类型完全匹配，没有歧义。
+2. **效率**：普通函数不需要模板实例化的过程。
+
+```cpp
+#include <iostream>
+
+// 函数模板
+template <class T1, class T2>
+auto add(T1 t1, T2 t2) -> decltype(t1 + t2) {
+  std::cout << "add(T1, T2)" << std::endl;
+  return t1 + t2;
+}
+
+// 普通函数重载
+short add(short s1, short s2) {
+  std::cout << "add(short,short)" << std::endl;
+  return s1 + s2;
+}
+int main() {
+  short s1 = 1, s2 = 2;
+  std::cout << add(s1, s2) << std::endl;  // 调用普通函数
+}
+```
+
+在这个例子中，`add(short, short)` 被调用时，编译器优先匹配并调用了普通函数 `add(short, short)`。
+
+如果不存在完全匹配的普通函数，编译器将根据提供的参数类型推导出模板参数并实例化相应的模板函数。
+
+```cpp
+void test2() {
+  short s1 = 1, s2 = 2;
+  int i1 = 3, i2 = 4;
+  std::cout << add(s1, i2) << std::endl;  // 调用模板函数
+}
+```
+
+在这个例子中，`add(s1, i2)` 由于参数类型不匹配任何普通函数，将触发模板实例化。
+
+显式实例化可以强制编译器使用模板函数，即使存在匹配的普通函数。
+
+```cpp
+template <>
+short add(short s1, short s2) {
+  std::cout << "template add(short,short)" << std::endl;
+  return s1 + s2;
+}
+
+void test3() {
+  short s1 = 1, s2 = 2;
+  std::cout << add(s1, s2) << std::endl;  // 调用显式实例化的模板函数
+}
+```
+
+### 头文件与实现文件形式
+
+C++ 标准库的头文件通常没有 `.h` 后缀，这是因为它们主要包含模板定义。模板定义需要在编译时可见，以便编译器可以生成相应的实例。因此，这些头文件通常被包含在每个使用它们的源文件中。
+
+在单个源文件中，函数模板的声明和定义可以分离，甚至可以将定义放在调用之后。
+
+```cpp
+// 函数模板的声明
+template <class T>
+T add(T t1, T t2);
+
+void test1() { 
+  int i1 = 1, i2 = 2;
+  std::cout << add(i1, i2) << std::endl;
+}
+
+// 函数模板的实现
+template <class T>
+T add(T t1, T t2) {
+  return t1 + t2;
+}
+```
+
+在这个例子中，即使模板定义在调用之后，编译器仍然可以正确实例化 `add` 函数。
+
+如果将模板的声明和定义分离到不同的文件中，需要确保在使用模板之前包含定义。
+
+```cpp
+// add.h
+template <class T>
+T add(T t1, T t2);
+
+// add.cc
+#include "add.h"
+template <class T>
+T add(T t1, T t2) {
+  return t1 + t2;
+}
+
+// testAdd.cc
+#include "add.h"
+void test0() {
+  int i1 = 1, i2 = 2;
+  std::cout << add(i1, i2) << std::endl;
+}
+```
+
+在这个例子中，如果只编译 `add.cc`，可能不会生成 `add` 函数的实例，因为模板实例化是由使用驱动的。但是，如果编译 `testAdd.cc`，将会实例化 `add` 函数。
+
+为了确保模板正确实例化，可以在实现文件中显式调用模板，或者在头文件中包含实现。
+
+```cpp
+// add.cc
+template <class T>
+T add(T t1, T t2) {
+  return t1 + t2;
+}
+
+// 显式调用以确保实例化
+void test1() { 
+  std::cout << add(1, 2) << std::endl;
+}
+```
+
+或者在头文件中包含实现：
+
+```cpp
+// add.h
+template <class T>
+T add(T t1, T t2);
+
+#include "add.cc"
+```
+
+模板的使用需要确保模板的完整定义在调用点可见。这通常意味着在头文件中包含模板的实现，或者在实现文件中显式调用模板。这种机制确保了模板可以在编译时正确实例化。
+
+C++的标准库都是由模板开发的，所以经过标准委员会的商讨，将这些头文件取消了后缀名，与 C 的头文件形成了区分；这些实现文件的后缀名设为了 `tcc`。
+
+### 模板特化
+
+在 C++中，模板特化是为特定类型提供定制化实现的一种方式。当通用模板不能满足需求或需要为特定类型提供优化时，可以使用特化模板。
+
+模板特化的形式：
+
+1. **模板特化声明**：使用空的尖括号 `<>` 来指示这是一个特化版本。
+2. **函数名**：与原模板相同。
+3. **参数列表**：与原模板相同，但在尖括号中指定特化的具体类型。
+
+```cpp
+// 通用模板声明
+template <class T>
+T add(T t1, T t2) {
+  return t1 + t2;
+}
+
+// 特化模板声明
+template <>
+const char* add<const char*>(const char* p1, const char* p2) {
+  std::cout << "特化模板被调用" << std::endl;
+  // 为两个 C 风格字符串拼接分配空间
+  char* ptmp = new char[strlen(p1) + strlen(p2) + 1];
+  strcpy(ptmp, p1);
+  strcat(ptmp, p2);
+  return ptmp;
+}
+
+void test0() {
+  const char* p = add("hello", ", world");
+  std::cout << p << std::endl;  // 输出: hello, world
+  delete[] p;  // 释放分配的内存
+}
+```
+
+在这个例子中，我们定义了一个处理 `const char*` 类型参数的特化模板，以正确处理两个 C 风格字符串的拼接。
+
+注意事项：
+
+1. **基础模板**：在使用模板特化之前，必须先定义基础的通用模板。
+2. **函数名和参数列表**：特化模板的函数名和参数列表应与基础模板相同，只在模板参数部分进行特化。
+3. **内存管理**：特化模板中可能涉及动态内存分配，需要确保适当的内存释放，以避免内存泄漏。
+
+### 模板参数类型
+
+模板参数可以是类型参数或非类型参数，也可以为它们提供默认值。这提供了额外的灵活性来处理不同的使用情况。
+
+类型参数和非类型参数：
+
+1. **类型参数**：用于指定函数或类模板的期望类型。
+2. **非类型参数**：通常是整数或枚举类型，用于指定额外的常量值。
+
+非类型参数可以指定默认值，这样在使用模板时可以省略该参数。
+
+```cpp
+template <class T, int kBase = 10>
+T multiply(T x, T y) {
+  return x * y * kBase;
+}
+
+int main() {
+  int i1 = 3, i2 = 4;
+  std::cout << multiply(i1, i2) << std::endl; // 使用默认值 10
+  std::cout << multiply<int, 5>(i1, i2) << std::endl; // 指定 kBase 为 5
+  return 0;
+}
+```
+
+在这个例子中，如果用户没有指定 `kBase` 参数，将使用默认值 `10`。
+
+类型参数的默认值通常用于当模板参数无法被推导时提供一个回退选项。
+
+```cpp
+template <class T = int, int kBase = 10>
+T multiply(T x, T y) {
+  return x * y * kBase;
+}
+
+int main() {
+  double d1 = 1.2, d2 = 1.2;
+  cout << multiply<int>(d1,d2) << endl;    //ok
+  cout << multiply(d1, d2) << endl; // 推导出 T 为 double
+  return 0;
+}
+```
+
+在这个例子中，即使为 `T` 提供了默认值 `int`，如果可以根据参数推导出 `T` 的类型为 `double`，将使用推导出的类型。
+
+模板参数的优先级：
+
+1. **指定的类型**：在模板实例化时明确指定的类型。
+2. **推导出的类型**：通过函数参数推导出的类型。
+3. **类型的默认参数**：当既没有指定也没有推导出时使用默认值。
+
+在 C++模板编程中，类型参数的默认值通常在以下情况下被使用：
+
+**既没有指定，又推导不出来的类型**：当模板使用时没有足够的信息来推导出类型参数，且用户没有显式指定类型参数时，类型参数的默认值将被使用。
+
+```cpp
+template <class T1, class T2 = double, int kBase = 10>
+T1 multiply(T2 t1, T2 t2) {
+  return t1 * t2 * kBase;
+}
+
+cout << multiply(1.2,1.2) << endl;         //error
+cout << multiply<double>(1.2,1.2) << endl; //ok
+```
+
+在这个例子中，`T1` 是一个类型参数，它没有默认值，而 `T2` 有默认值 `double`，`kBase` 也有默认值 `10`。
+
+- 当我们调用 `multiply(1.2, 1.2)` 时，编译器无法从参数 `1.2` 推导出 `T1` 的类型，因此会报错。
+- 通过显式指定 `T1` 为 `double`，我们可以正确地实例化模板：`multiply<double>(1.2, 1.2)`。
+
+如果我们为 `T1` 也提供一个默认值，例如 `double`，那么在没有足够的信息来推导 `T1` 的类型时，编译器将使用默认值。
+
+```cpp
+template <class T1 = double, class T2 = double, int kBase = 10>
+T1 multiply(T2 t1, T2 t2) {
+  return t1 * t2 * kBase;
+}
+
+int main() {
+  cout << multiply(1.2, 1.2) << endl; // 使用默认类型参数 T1 和 T2
+  return 0;
+}
+```
+
+在这个例子中，由于我们为 `T1` 和 `T2` 都提供了默认值，即使没有显式指定类型参数，模板也可以被隐式实例化。
+
+### 成员函数模板
+
+成员函数模板是类模板中的一种特殊模板，它允许类的成员函数对不同的数据类型进行操作。这些模板在编译时会根据传入的参数类型进行实例化。
+
+在类中定义成员函数模板时，可以在类内部定义，也可以在类外部定义。类内部定义时，模板参数列表写在函数参数列表之前。
+
+```cpp
+class Point {
+ public:
+  Point(double x, double y) : _x(x), _y(y) {}
+
+  // 成员函数模板
+  template <class T>
+    T convert() {
+    return static_cast<T>(_x);
+  }
+
+ private:
+  double _x;
+  double _y;
+};
+
+int main() {
+  Point pt(1.1, 2.2);
+  std::cout << pt.convert<int>() << std::endl;   // 显式实例化
+  std::cout << pt.convert<double>() << std::endl; // 隐式实例化
+  std::cout << pt.convert() << std::endl;  // error
+}
+```
+
+在这个例子中，`convert` 是一个成员函数模板，它将成员变量 `_x` 转换为指定的类型。
+
+成员函数模板也可以有默认参数，这样在调用时可以省略指定的参数。
+
+```cpp
+template <class T = int>
+T convert() {
+  return static_cast<T>(_x);
+}
+
+// 在类外部定义模板
+template <class T>
+T Point::add(T t1) {
+  return _x + _y + t1;
+}
+```
+
+成员函数模板的特点：
+
+1. **隐式实例化**：调用成员函数模板时，编译器会根据传入的参数类型隐式实例化模板。
+2. **默认参数**：可以为模板参数提供默认值，从而允许省略参数。
+3. **访问成员变量**：模板成员函数可以访问类的非静态成员变量。
+
+静态成员函数模板不能访问类的非静态成员变量，因为它们不依赖于类的具体实例。
+
+```cpp
+class Point {
+ public:
+  Point(double x, double y) : _x(x), _y(y) {}
+
+  // 静态成员函数模板
+  template <class T>
+  static T addStatic(T t1, T t2) {
+    return t1 + t2;
+  }
+
+ private:
+  double _x;
+  double _y;
+};
+
+int main() {
+  cout << Point::addStatic(1.5, 3.8) << endl;
+  return 0;
+}
+```
+
+如果需要在类外部实现成员函数模板，需要确保模板声明在类定义中可见。
+
+```cpp
+// Point 类定义
+class Point {
+ public:
+  Point(double x, double y) : _x(x), _y(y) {}
+
+  template <class T>
+    T add(T t1);
+
+ private:
+  double _x;
+  double _y;
+};
+
+// 在类外部定义模板
+template <class T>
+T Point::add(T t1) {
+  return _x + _y + t1;
+}
+
+int main() {
+  Point pt(1.5, 3.8);
+  std::cout << pt.add(8.8) << std::endl;
+  return 0;
+}
+```
+
+成员函数模板提供了一种灵活的方式来处理不同类型的数据，同时保持类的封装性和复用性。通过使用默认参数和隐式实例化，可以简化模板的使用并提高代码的可读性。然而，需要注意的是，成员函数模板不能被声明为 `virtual`，因为模板的实例化是在编译时进行的，而虚函数的机制是在运行时确定的。
+
+### 使用模板的规则
+
+#### 谨慎定义多个通用模板
+
+在一个模块中定义多个具有相同功能的通用模板可能会导致以下问题：
+
+- **歧义**：多个模板可能适用于同一个调用，使得编译器难以选择最合适的模板。
+- **复杂性**：增加了代码的复杂性，使得其他开发者难以理解和维护。
+
+**建议**：如果确实需要多个模板，确保它们服务于不同的目的，并且模板的选择尽可能基于参数类型自动进行。
+
+#### 优先使用隐式模板实例化
+
+隐式实例化允许编译器根据函数调用的参数类型自动推导出模板参数，这有助于减少代码的复杂性并提高可读性。
+
+**示例**：
+
+```cpp
+template <typename T>
+T add(T a, T b) {
+  return a + b;
+}
+
+int main() {
+  int result = add(1, 2);  // 编译器推导出 T 为 int
+  return 0;
+}
+```
+
+在这个例子中，编译器自动推导出模板参数 `T` 为 `int`。
+
+#### 无法使用隐式调用的场景只指定必须要指定的类型
+
+在某些情况下，编译器可能无法从参数中推导出模板参数，这时需要显式指定模板参数。仅在必要时指定那些无法推导出的参数。
+
+**示例**：
+
+```cpp
+template <typename T1, typename T2 = double>
+T1 add(T1 a, T2 b) {
+  return a + b;
+}
+
+int main() {
+  double result1 = add(1.0, 2.0);  // 编译器推导出 T1 为 double, T2 为 double
+  int result2 = add(1, 2);  // 编译器推导出 T1 为 int, T2 为 double
+  return 0;
+}
+```
+
+在这个例子中，当调用 `add(1, 2)` 时，编译器推导出 `T1` 为 `int`，但无法推导出 `T2`，因此使用默认参数 `double`。
+
+## 类模板
+
+一个类模板允许用户为类定义个一种模式，使得类中的某些数据成员、默认成员函数的参数，某些成员函数的返回值，能够取任意类型(包括内置类型和自定义类型)。
+
+如果一个类中的数据成员的数据类型不能确定，或者是某个成员函数的参数或返回值的类型不能确定，就需要将此类声明为模板，它的存在不是代表一个具体的、实际的类，而是代表一类类。
+
+类模板的定义使用 `template` 关键字，后跟一个或多个模板参数，然后是类的定义。
+
+```cpp
+template <class T, ...>
+class ClassName {
+    // 类成员定义
+};
+```
+
+- `class T`：类型参数，可以是任何类型。
+- `...`：表示还可以有其他类型或非类型参数。
+
+类模板广泛应用于标准模板库（STL），例如 `std::vector`、`std::set` 和 `std::map` 等。
+
+
+
+在 C++中，类模板的实现可以位于类定义内部，也可以在类定义外部。以下是使用类模板实现一个 Stack 类的例子，该类可以存放任意类型的数据。
+
+### 类模板的定义
+
+```cpp
+template<class T, int kCapacity = 10>
+class Stack {
+ public:
+  Stack() : _top(-1), _data(new T[kCapacity]()) {
+    std::cout << "Stack()" << std::endl;
+  }
+  ~Stack() {
+    if (_data) {
+      delete[] _data;
+      _data = nullptr;
+    }
+    std::cout << "~Stack()" << std::endl;
+  }
+  bool empty() const;
+  bool full() const;
+  void push(const T &);
+  void pop();
+  T top();
+
+ private:
+  int _top;
+  T *_data;
+};
+```
+
+### 成员函数的外部实现
+
+当类模板的成员函数在类定义之外实现时，需要注意以下几点：
+
+1. **模板参数列表**：在实现时需要带上完整的模板参数列表，包括模板参数的类型和名称。
+2. **作用域限定**：使用类名和模板实参列表进行作用域限定。
+3. **默认参数**：如果在模板定义中已经指定了默认参数，则在实现时不需要重复指定。
+
+**示例代码**：
+
+```cpp
+// 成员函数的外部实现
+template <class T, int kCapacity>
+bool Stack<T, kCapacity>::empty() const {
+    return _top == -1;
+}
+
+template <class T, int kCapacity>
+bool Stack<T, kCapacity>::full() const {
+    return _top == kCapacity - 1;
+}
+
+template <class T, int kCapacity>
+void Stack<T, kCapacity>::push(const T &item) {
+    if (full()) {
+        std::cerr << "Stack overflow" << std::endl;
+        return;
+    }
+    _data[++_top] = item;
+}
+
+template <class T, int kCapacity>
+void Stack<T, kCapacity>::pop() {
+    if (empty()) {
+        std::cerr << "Stack underflow" << std::endl;
+        return;
+    }
+    _top--;
+}
+
+template <class T, int kCapacity>
+T Stack<T, kCapacity>::top() {
+    if (empty()) {
+        std::cerr << "Stack is empty" << std::endl;
+        return T(); // Return default-constructed T
+    }
+    return _data[_top];
+}
+```
+
+定义完类模板及其成员函数后，可以创建存放各种类型元素的 Stack 对象。
+
+```cpp
+int main() {
+    Stack<int> intStack;
+    intStack.push(1);
+    intStack.push(2);
+
+    std::cout << "Top of int stack: " << intStack.top() << std::endl;
+
+    Stack<std::string> stringStack;
+    stringStack.push("Hello");
+    stringStack.push("World");
+
+    std::cout << "Top of string stack: " << stringStack.top() << std::endl;
+
+    return 0;
+}
+```
+
+## 可变参数模版
+
+可变参数模板是 C++11 引入的一项强大功能，它允许函数或类模板接受不确定数量的模板参数。这使得编写可以接受任意数量参数的泛型代码成为可能。
+
+可变参数模板的基本语法：
+
+```cpp
+template <class... Args>
+void function(Args... args);
+```
+
+- `class... Args`：表示类型参数包，可以接受任意数量的类型参数。
+- `Args... args`：表示函数参数包，可以接受与类型参数包中类型相对应的任意数量的函数参数。
+
+```cpp
+#include <iostream>
+
+// 递归出口
+void print() {
+  std::cout << std::endl;
+}
+
+// 可变参数模板实现
+template <class T, class... Args>
+void print(T x, Args... args) {
+  std::cout << x << " ";
+  print(args...); // 解包参数包
+}
+
+int main() {
+  print(1, "hello", 3.6, true, 100); // 输出：1 hello 3.6 1 100
+  return 0;
+}
+```
+
+在这个例子中，`print` 函数模板可以接受任意数量和类型的参数，通过递归调用自身来逐个打印参数。
+
+如果没有准备递归的出口，那么在可变参数模板中解包解到 `print` 时，不知道该调用什么，因为这个模板至少需要一个参数。
+
+只剩下一个 `int` 型参数的时候，也不会使用函数模板，而是通过普通函数结束了递归。
+
+递归的出口可以使用普通函数或者普通的函数模板，但是规范操作是使用普通函数。
+
+1. 尽量避免函数模板之间的重载；
+2. 普通函数的优先级一定高于函数模板，更不容易出错。
+
+如果想要获取并打印所有参数的类型，可以使用 `typeid` 操作符。
+
+```cpp
+// 递归出口
+void printType() {
+    std::cout << std::endl;
+}
+
+// 可变参数模板实现
+template <class T, class... Args>
+void printType(T x, Args... args) {
+    std::cout << typeid(x).name() << " ";
+    printType(args...); // 解包参数包
+}
+
+int main() {
+    printType(1, "hello", 3.6, true, 100); // 输出：i PKc d b i 
+    return 0;
+}
+```
+
+在这个例子中，`printType` 函数模板逐个打印参数的类型名称。
+

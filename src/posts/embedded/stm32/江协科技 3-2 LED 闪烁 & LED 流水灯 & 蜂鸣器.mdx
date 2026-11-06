@@ -1,0 +1,178 @@
+---
+title: "江协科技 STM32 3-2 LED 闪烁 & LED 流水灯 & 蜂鸣器"
+date: 2025-04-15T09:22:35+08:00
+categories: ["嵌入式开发", "STM32"]
+tags: ["嵌入式"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VZeHRwOVFCQmdsT21hUERkZG9xQ2l3QjVKNUNfN3dXT05KbHRSS2JRYzJuSXc_ZT1CeWZJRE4.jpg"
+---
+
+## LED 闪烁
+
+面包板接线图如下：
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWNzVkN2VqV01oQ3NoMVBRdmRXNW9rQk5VaWRtaFNlMFdyUkdFR1hfRmxmenc_ZT1TTWd4a2c.jpg)
+
+```c
+#include "Delay.h"
+#include "stm32f10x.h"  // Device header
+
+int main(void) {
+  /* 开启时钟 */
+  RCC_APB2PeriphClockCmd(
+      RCC_APB2Periph_GPIOA,
+      ENABLE);  // 开启 GPIOA 的时钟
+                // 使用各个外设前必须开启时钟，否则对外设的操作无效
+
+  /*GPIO 初始化 */
+  GPIO_InitTypeDef GPIO_InitStructure;  // 定义结构体变量
+
+  GPIO_InitStructure.GPIO_Mode =
+      GPIO_Mode_Out_PP;                      // GPIO 模式，赋值为推挽输出模式
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;  // GPIO 引脚，赋值为第 0 号引脚
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;  // GPIO 速度，赋值为 50MHz
+
+  GPIO_Init(
+      GPIOA,
+      &GPIO_InitStructure);  // 将赋值后的构体变量传递给 GPIO_Init 函数
+                             // 函数内部会自动根据结构体的参数配置相应寄存器
+                             // 实现 GPIOA 的初始化
+
+  /* 主循环，循环体内的代码会一直循环执行 */
+  while (1) {
+    /* 设置 PA0 引脚的高低电平，实现 LED 闪烁，下面展示 3 种方法 */
+
+    /* 方法 1：GPIO_ResetBits 设置低电平，GPIO_SetBits 设置高电平 */
+    GPIO_ResetBits(GPIOA, GPIO_Pin_0);  // 将 PA0 引脚设置为低电平
+    Delay_ms(500);                      // 延时 500ms
+    GPIO_SetBits(GPIOA, GPIO_Pin_0);    // 将 PA0 引脚设置为高电平
+    Delay_ms(500);                      // 延时 500ms
+
+    /* 方法 2：GPIO_WriteBit 设置低 / 高电平，由 Bit_RESET/Bit_SET 指定 */
+    GPIO_WriteBit(GPIOA, GPIO_Pin_0, Bit_RESET);  // 将 PA0 引脚设置为低电平
+    Delay_ms(500);                                // 延时 500ms
+    GPIO_WriteBit(GPIOA, GPIO_Pin_0, Bit_SET);    // 将 PA0 引脚设置为高电平
+    Delay_ms(500);                                // 延时 500ms
+
+    /* 方法 3：GPIO_WriteBit 设置低 / 高电平，由数据 0/1 指定，数据需要强转为 BitAction 类型 */
+    GPIO_WriteBit(GPIOA, GPIO_Pin_0, (BitAction)0);  // 将 PA0 引脚设置为低电平
+    Delay_ms(500);                                   // 延时 500ms
+    GPIO_WriteBit(GPIOA, GPIO_Pin_0, (BitAction)1);  // 将 PA0 引脚设置为高电平
+    Delay_ms(500);                                   // 延时 500ms
+  }
+}
+
+```
+
+## LED 流水灯
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXYThGdnVtWVRGTnM3NTl1bHBuTzRnQks4bVo0OUt0cUI0ekJRdlk2MmR4dVE_ZT13c2dZOUI.jpg)
+
+```c
+#include "Delay.h"
+#include "stm32f10x.h"  // Device header
+
+int main(void) {
+  /*开启时钟*/
+  RCC_APB2PeriphClockCmd(
+      RCC_APB2Periph_GPIOA,
+      ENABLE);  // 开启GPIOA的时钟
+                // 使用各个外设前必须开启时钟，否则对外设的操作无效
+
+  /*GPIO初始化*/
+  GPIO_InitTypeDef GPIO_InitStructure;  // 定义结构体变量
+
+  GPIO_InitStructure.GPIO_Mode =
+      GPIO_Mode_Out_PP;  // GPIO模式，赋值为推挽输出模式
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All;  // GPIO引脚，赋值为所有引脚
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;  // GPIO速度，赋值为50MHz
+
+  GPIO_Init(
+      GPIOA,
+      &GPIO_InitStructure);  // 将赋值后的构体变量传递给GPIO_Init函数
+                             // 函数内部会自动根据结构体的参数配置相应寄存器
+                             // 实现GPIOA的初始化
+
+  /*主循环，循环体内的代码会一直循环执行*/
+  while (1) {
+    /*使用GPIO_Write，同时设置GPIOA所有引脚的高低电平，实现LED流水灯*/
+    GPIO_Write(
+        GPIOA,
+        ~0x0001);  // 0000 0000 0000
+                   // 0001，PA0引脚为低电平，其他引脚均为高电平，注意数据有按位取反
+    Delay_ms(100);  // 延时100ms
+    GPIO_Write(
+        GPIOA,
+        ~0x0002);  // 0000 0000 0000 0010，PA1引脚为低电平，其他引脚均为高电平
+    Delay_ms(100);  // 延时100ms
+    GPIO_Write(
+        GPIOA,
+        ~0x0004);  // 0000 0000 0000 0100，PA2引脚为低电平，其他引脚均为高电平
+    Delay_ms(100);  // 延时100ms
+    GPIO_Write(
+        GPIOA,
+        ~0x0008);  // 0000 0000 0000 1000，PA3引脚为低电平，其他引脚均为高电平
+    Delay_ms(100);  // 延时100ms
+    GPIO_Write(
+        GPIOA,
+        ~0x0010);  // 0000 0000 0001 0000，PA4引脚为低电平，其他引脚均为高电平
+    Delay_ms(100);  // 延时100ms
+    GPIO_Write(
+        GPIOA,
+        ~0x0020);  // 0000 0000 0010 0000，PA5引脚为低电平，其他引脚均为高电平
+    Delay_ms(100);  // 延时100ms
+    GPIO_Write(
+        GPIOA,
+        ~0x0040);  // 0000 0000 0100 0000，PA6引脚为低电平，其他引脚均为高电平
+    Delay_ms(100);  // 延时100ms
+    GPIO_Write(
+        GPIOA,
+        ~0x0080);  // 0000 0000 1000 0000，PA7引脚为低电平，其他引脚均为高电平
+    Delay_ms(100);  // 延时100ms
+  }
+}
+
+```
+
+## 蜂鸣器
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VkWm1MeUtLX2VOTmphTVBobm5rYkVrQjVIcEp3OFliejJHX2pCdVRFMFlNRmc_ZT1jbFI4NHo.jpg)
+
+```c
+#include "Delay.h"
+#include "stm32f10x.h"  // Device header
+
+int main(void) {
+  /* 开启时钟 */
+  RCC_APB2PeriphClockCmd(
+      RCC_APB2Periph_GPIOB,
+      ENABLE);  // 开启 GPIOB 的时钟
+                // 使用各个外设前必须开启时钟，否则对外设的操作无效
+
+  /*GPIO 初始化 */
+  GPIO_InitTypeDef GPIO_InitStructure;  // 定义结构体变量
+
+  GPIO_InitStructure.GPIO_Mode =
+      GPIO_Mode_Out_PP;  // GPIO 模式，赋值为推挽输出模式
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;  // GPIO 引脚，赋值为第 12 号引脚
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;  // GPIO 速度，赋值为 50MHz
+
+  GPIO_Init(
+      GPIOB,
+      &GPIO_InitStructure);  // 将赋值后的构体变量传递给 GPIO_Init 函数
+                             // 函数内部会自动根据结构体的参数配置相应寄存器
+                             // 实现 GPIOB 的初始化
+
+  /* 主循环，循环体内的代码会一直循环执行 */
+  while (1) {
+    GPIO_ResetBits(GPIOB, GPIO_Pin_12);  // 将 PB12 引脚设置为低电平，蜂鸣器鸣叫
+    Delay_ms(100);                       // 延时 100ms
+    GPIO_SetBits(GPIOB, GPIO_Pin_12);  // 将 PB12 引脚设置为高电平，蜂鸣器停止
+    Delay_ms(100);                     // 延时 100ms
+    GPIO_ResetBits(GPIOB, GPIO_Pin_12);  // 将 PB12 引脚设置为低电平，蜂鸣器鸣叫
+    Delay_ms(100);                       // 延时 100ms
+    GPIO_SetBits(GPIOB, GPIO_Pin_12);  // 将 PB12 引脚设置为高电平，蜂鸣器停止
+    Delay_ms(700);                     // 延时 700ms
+  }
+}
+```
+

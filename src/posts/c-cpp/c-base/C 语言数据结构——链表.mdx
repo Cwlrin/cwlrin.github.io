@@ -1,0 +1,450 @@
+---
+title: "C 语言数据结构——链表"
+date: 2020-03-03T15:50:59+08:00
+categories: ["C 与 C++", "C 语言基础"]
+tags: ["C", "数据结构"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VYQkJ1bnZUN2NsQ3BVUVA3MWVlUVFFQmpHUTJPc1d6Q1hnRkRCZWZWM0ZQMWc_ZT1FVGF5OW8.jpg"
+---
+
+## 单链表的基本概念
+
+1. **结点（Node）**：结点是单链表中用于存储数据的基本单元。每个结点通常包含两个部分：数据域和指针域。数据域用于存储数据，而指针域则用于存储指向下一个结点的指针。
+2. **头结点（Head Node）**：
+   - 头结点是一种特殊的结点，也称为虚拟结点或哨兵结点。它通常不存储数据，或者可以存储链表的元数据，如链表长度。
+   - 在带有头结点的链表中，头结点是链表的第一个结点，它的存在可以简化链表操作的逻辑。
+3. **尾结点（Tail Node）**：尾结点是链表中的最后一个结点。它仍然包含数据域，但指针域指向 `NULL`，表示链表的结束。
+4. **头指针（Head Pointer）**：
+   - 头指针是指向单链表第一个结点的指针。它是链表操作的起点，对于单链表来说至关重要。
+   - 如果链表的头指针是 `NULL`，则表示链表为空。如果链表带有头结点，头指针指向头结点；否则，它指向第一个带有数据的结点。
+5. **尾指针（Tail Pointer）**：尾指针是指向单链表最后一个结点（尾结点）的指针。虽然尾指针不是必需的，但它的存在可以使得链表尾部的操作更加方便和高效。
+6. **构建单链表的方法**：
+   - **头插法（Head Insertion）**：在链表的头部插入一个结点，使得新结点成为新的头结点。这需要更新头指针。
+   - **尾插法（Tail Insertion）**：在链表的尾部插入一个结点，使得新结点成为新的尾结点。这需要更新尾指针（如果存在）。
+
+常见的链表主要可以分为以下几种类型：
+
+![202311152050220.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VRN21waElhSll4RXVCanJyV2ZIejBrQmhvMkhkVHAyYVVBdGJBQ2VaeWJodmc_ZT1jaWdoZDc.jpg)
+
+## 单链表的基本/核心操作
+
+1. **创建单链表**：创建单链表通常从创建头结点开始，然后根据需要添加数据结点。
+2. **销毁单链表**：销毁单链表需要释放链表中所有结点的内存。这通常通过遍历链表并逐个释放结点来完成。
+3. **插入新结点**：插入操作可以在链表的头部或尾部进行：
+   1. **头插法**：在链表头部插入新结点，新结点成为链表的第一个结点。
+   2. **尾插法**：在链表尾部插入新结点，新结点成为链表的最后一个结点。
+4. **根据索引插入结点**：在链表的指定位置插入新结点，需要先遍历链表找到插入点，然后调整指针。
+5. **删除结点**：删除操作可以基于元素的值或索引：
+   1. **根据元素值删除**：遍历链表，找到具有特定值的结点，并从链表中移除。
+   2. **根据索引删除**：遍历链表，找到特定索引的结点，并从链表中移除。
+6. **查询结点**：查询操作可以基于数据域的值或索引：
+   1. **根据值查询**：遍历链表，查找具有特定值的第一个结点。
+   2. **根据索引查询**：遍历链表，查找特定索引的结点。
+7. **遍历单链表**：遍历单链表是最基本的操作之一，通常用于访问链表中的每个结点，进行打印或其他处理。
+
+![202311161556943.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaZEZnUGlWMFh0QmdYTU9adWxDY3lzQlJMQVhvcmdNY1AyZmVPd0JEY0R2a2c_ZT1zN2htRVc.png)
+
+## 单链表的创建和销毁
+
+### 创建单链表
+
+```c
+LinkedList *create_linked_list() {
+	return calloc(1, sizeof(LinkedList));
+}
+```
+
+### 销毁单链表
+
+**释放链表结点**：从链表的头部开始，逐个结点释放内存。在释放当前结点之前，需要先保存下一个结点的地址。
+
+**释放链表结构**：在所有结点都被释放之后，释放整个链表结构的内存。
+
+**遍历链表的标准做法**：
+
+遍历单链表是许多链表操作的基础，以下是一般的步骤：
+
+1. **初始化当前结点**：创建一个指针 `current`，通常指向链表的头结点 `list->head`。
+2. **使用 while 循环**：使用 `while` 循环来遍历链表，条件通常是 `(current != NULL)`。
+3. **处理逻辑**：在循环体内部，执行需要的操作，例如打印结点数据或销毁结点。
+4. **移动到下一个结点**：在循环的每次迭代结束时，更新 `current` 指针以指向下一个结点，通常使用 `current = current->next;`。
+5. **循环结束条件**：循环继续进行，直到 `current` 为 `NULL`，表示已经到达链表的末尾。
+
+```c
+void destroy_linked_list(LinkedList *list) {
+	Node *curr = list->head;
+	while (curr != NULL) {
+		Node *next = curr->next; // 保存下一个结点
+		free(curr);              // 释放当前结点
+		curr = next;             // 移动到下一个结点
+	}
+	// 链表的所有结点都已释放，现在可以释放链表结构本身
+	free(list);
+}
+```
+
+### 打印链表
+
+1. **初始化当前结点**：使用一个指针 `curr` 初始化为链表的头结点 `list->head`。
+2. **遍历链表**：使用 `while` 循环遍历链表，直到 `curr` 为 `NULL`。
+3. **打印当前结点数据**：在循环内部，打印当前结点 `curr` 的数据域 `curr->data`。
+4. **添加箭头指示**：如果当前结点不是链表的最后一个结点（即 `curr->next` 不为 `NULL`），则打印一个箭头 `->` 作为分隔。
+5. **移动到下一个结点**：在循环的每次迭代结束时，将 `curr` 更新为下一个结点 `curr->next`。
+6. **完成打印**：在所有结点都被打印后，打印一个换行符 `\n`。
+
+```c
+void print_list(LinkedList *list) {
+	Node *curr = list->head;
+	while (curr != NULL) {
+		printf("%d ->", curr->data);
+		curr = curr->next;
+	}
+	printf("NULL\n");
+}
+```
+
+## 插入节点
+
+### 头插法插入结点
+
+![202401072127493.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VYUkFwRF8xRGxWRHZ0UC1pUlh1ODRjQklDQnBCd0RYT0l5RGpERmtRZ05aZnc_ZT04WTJhU28.png)
+
+![202401072135870.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VkUlNBU2tzU0VwQXVocHhaMjAwUnJvQmplLTZmVDJvbV9CSVdmcllzOHZYaVE_ZT1OZFBEeUM.png)
+
+1. **创建新结点**：分配内存给新结点。
+2. **初始化新结点**：
+   - 给新结点的数据域赋值。
+   - 将新结点的指针域指向原本的第一个结点。
+3. **更新链表结构信息**：
+   - 头指针指向新结点，使其成为链表的第一个结点。
+   - 如果尾结点指针为 `NULL`（意味着以前的链表是空的），则更新尾结点指针指向新结点。
+   - 链表长度增加 1。
+
+```c
+bool add_before_head(LinkedList *list, DataType new_data) {
+	Node *new_node = malloc(sizeof(Node));
+
+	if (new_node == NULL) {
+		printf("错误：malloc 在 add_before_head 中失败。\n");
+		return false;
+	}
+	new_node->data = new_data;
+	new_node->next = list->head; // 新结点指向原本的第一个结点
+
+	list->head = new_node; // 新结点成为第一个结点
+	if (list->tail == NULL) {
+		list->tail = new_node; // 如果链表为空，更新尾结点指针
+	}
+	list->size++;
+	return true;
+}
+```
+
+### 尾插法插入结点
+
+1. **创建新结点**：分配内存给新结点。
+2. **初始化新结点**：
+   - 给新结点的数据域赋值。
+   - 将新结点的指针域指向 `NULL`，因为新结点要成为新的尾结点。
+3. **更新链表结构信息**：
+   - 如果以前的链表为空（尾结点指针为 `NULL`），则头指针也应该指向新结点。
+   - 如果以前的链表非空，则头指针不用更新。只需要将以前的尾结点指针指向的新结点，指向新创建的结点（即更新前一个尾结点的 `next` 指针）。需要注意的是，这步需要保证单链表非空才能够执行否则链表没有结点，只有 `NULL`，将导致空指针操作的问题。
+   - 将链表的尾结点指针指向新结点。
+   - 链表长度增加 1。
+
+```c
+bool add_behind_tail(LinkedList *list, DataType new_data) {
+	// 分配新结点, 并初始化数据域和指针域
+	Node *new_node = malloc(sizeof(Node));
+	if (new_node == NULL) {
+		printf("错误：malloc 在 add_behind_tail 中失败");
+		return false;
+	}
+
+	new_node->data = new_data;
+	new_node->next = NULL;
+
+	if (list->tail == NULL) {
+		// 链表为空
+		list->head = new_node;
+		list->tail = new_node; // 旧尾结点指向新结点
+	} else {
+		// 链表非空，将新结点链接到当前尾结点
+		list->tail->next = new_node;
+	}
+	list->tail = new_node; // 更新尾结点指针
+	list->size++;
+	return true;
+}
+```
+
+### 根据索引插入结点
+
+1. **参数校验**：确保提供的索引 `idx` 在合法范围内，即 `[0, 链表长度]`。
+2. **边界值处理**：
+   - 如果索引为 `0`，则执行头插法。
+   - 如果索引等于链表长度，则执行尾插法。
+3. **中间插入结点**：
+   - 创建一个新结点，并将其数据部分设置为要插入的数据。
+   - 使用一个 `current` 结点指针遍历链表，找到目标索引的前一个结点。
+   - 将新结点的指针指向 `current` 结点的下一个结点。
+   - 将 `current` 结点的指针指向新结点。
+   - 更新链表长度。
+
+```c
+bool add_by_idx(LinkedList *list, int idx, DataType new_data) {
+	if (idx < 0 || idx > list->size) {
+		printf("错误：非法的传参 idx：%d！\n", idx);
+		return false;
+	}
+
+	if (idx == 0) {
+		return add_before_head(list, new_data);
+	}
+
+	if (idx == list->size) {
+		return add_behind_tail(list, new_data);
+	}
+
+	Node *new_node = malloc(sizeof(Node));
+	if (new_node == NULL) {
+		printf("错误：malloc 在 add_by_idx 中失败！\n");
+		return false;
+	}
+
+	new_node->data = new_data;
+	Node *prev = list->head;
+	for (int i = 0; i < idx - 1; ++i) {
+		prev = prev->next;
+	} // for 循环结束时, prev 指针指向 idx - 1 位置的结点
+	new_node->next = prev->next;
+	prev->next = new_node;
+	list->size++;
+
+	return true;
+}
+
+```
+
+## 查找与删除结点
+
+### 根据索引查找结点
+
+1. **参数校验**：确保提供的索引 `idx` 在合法范围内，即 `[0, 链表长度 - 1]`。
+2. **遍历链表**：使用一个指针 `current` 从链表的头结点开始遍历链表。
+3. **查找目标索引的结点**：在遍历过程中，通过索引计数来查找目标索引的结点。当索引计数等于提供的索引 `idx` 时，停止遍历。
+4. **返回结点**：如果找到了目标索引的结点，则返回该结点的指针。如果没有找到（索引超出范围），则返回 `NULL`。
+
+```c
+Node *search_by_data(LinkedList *list, DataType data) {
+	Node *curr = list->head;
+
+	while (curr != NULL) {
+		if (data == curr->data) {
+			return curr;
+		}
+		curr = curr->next;
+	}
+	return NULL;
+}
+
+```
+
+### 根据索引删除结点
+
+1. **参数校验**：确保链表不为空，并且提供的索引 `idx` 在合法范围内，即 `[0, 链表长度 - 1]`。
+2. **删除第一个结点**：如果索引为 `0`，则删除头结点。更新头指针指向下一个结点，并处理尾指针。
+3. **删除非第一个结点**：如果索引不为 `0`，则需要遍历链表找到待删除结点的前一个结点。
+4. **更新指针**：将前一个结点的 `next` 指针指向待删除结点的下一个结点，从而绕过待删除结点。
+5. **更新尾指针**：如果删除的是尾结点，需要更新尾指针指向新的最后一个结点。
+6. **释放内存**：释放待删除结点的内存。
+7. **更新链表长度**。
+
+```c
+bool delete_by_idx(LinkedList *list, int idx) {
+	if (idx < 0 || idx > list->size) {
+		printf("错误：非法的传参 idx：%d！\n", idx);
+		return false;
+	}
+
+	Node *curr = list->head;
+	Node *prev = NULL;
+
+	if (idx == 0) {
+		list->head = curr->next;
+		if (list->size == 1) {
+			list->tail = NULL;
+		}
+		free(curr);
+		list->size--;
+		return true;
+	}
+
+	curr = curr->next;
+	for (int i = 0; i < idx - 1; ++i) {
+		prev = curr;
+		curr = curr->next;
+	}
+	prev->next = curr->next;
+	if (idx == list->size - 1) {
+		list->tail = NULL;
+	}
+	free(curr);
+	list->size--;
+	return true;
+}
+```
+
+### 根据数据删除一个结点
+
+![202311201732619.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VlczlfVHBqVUQ5S2lQbEpYck9yTUMwQlhfOWV2R0x5SnNQVUhnUmRBNTZERUE_ZT1BdmNROVc.png)
+
+![202311202132276.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VTYXFfVGhMeU1STnJDbUUtLWFLQXZNQkdJeEJjUnF3M0dWa2daTTZuV0lFQnc_ZT1nSmVUUEI.png)
+
+1. **处理头结点情况**：如果头结点包含要删除的数据，更新头指针指向下一个结点，并释放原头结点的内存。
+2. **处理非头结点情况**：使用两个指针 `prev` 和 `curr` 遍历链表，`prev` 指向当前结点的前一个结点，`curr` 指向当前结点。
+3. **查找并删除结点**：在遍历过程中，找到包含要删除数据的结点，更新 `prev` 结点的 `next` 指针指向 `curr` 结点的下一个结点。
+4. **更新尾指针**：如果删除的是尾结点，更新尾指针指向 `prev` 结点。
+5. **释放内存**：释放被删除结点的内存。
+6. **更新链表长度**。
+
+```c
+bool delete_by_data(LinkedList *list, DataType data) {
+	Node *curr = list->head;
+	Node *prev = NULL;
+
+	// 如果要删除的结点是第一个结点
+	if (curr->data == data) {
+		list->head = curr->next;
+		if (list->head == NULL) {
+			list->tail = NULL;
+		}
+		free(curr);
+	} else {
+		// 从第二个结点开始遍历查找待删除目标结点
+		while (curr != NULL && curr->data != data) {
+			prev = curr;
+			curr = curr->next;
+		}
+
+		// 如果找到了目标结点
+		if (curr != NULL) {
+			prev->next = curr->next;
+			if (prev->next == NULL) {
+				list->tail = prev;
+			}
+			free(curr);
+		} else {
+			// 未找到目标结点
+			return false;
+		}
+	}
+	list->size--;
+	return true;
+}
+```
+
+相关题目：[203. 移除链表元素](https://leetcode.cn/problems/remove-linked-list-elements/)
+
+## 单链表总结
+
+1. **头部操作的时间复杂度**：由于头部操作通常只涉及更新头指针，因此大多数头部操作（如头插、删除头部结点、访问头部结点）具有 O(1) 的时间复杂度。
+2. **尾部操作的时间复杂度**：尾指针的存在使得在链表尾部新增结点（尾插）的操作也具有 O(1) 的时间复杂度。
+3. **结点操作的限制**：单链表只能在一个确定的结点后面执行操作，如新增、删除、访问，因为单链表的每个结点只有一个指向后继结点的指针。
+4. **前驱结点的操作**：任何在结点前面的操作都需要先遍历链表找到前驱结点，然后在结点的后面执行操作，此时时间复杂度为 O(n)。
+5. **双向链表的优势**：双向链表在每个结点上增加了一个指向前驱结点的指针，这使得在任意结点附近（前后）都可以直接进行 O(1) 时间复杂度的操作。
+
+**结论**：
+
+- 单链表在头部和尾部操作具有时间复杂度的优势，但在中间结点的操作受到限制。
+- 双向链表提供了更高的灵活性和效率，特别是在需要频繁访问和修改链表中间结点的场景中，因此它是更普遍的选择。
+
+## 快慢指针
+
+快慢指针法的基本原理：
+
+1. **初始化指针**：同时初始化两个指针 `slow` 和 `fast`，它们都指向链表的头部。
+2. **遍历链表**：在链表中进行遍历，每次遍历时，将 `fast` 指针向前移动两步，而 `slow` 指针只向前移动一步。
+3. **结束条件**：当 `fast` 指针到达链表末尾或其下一个节点为 `NULL` 时，遍历结束。
+4. **中间节点**：在遍历结束时，`slow` 指针将指向链表的中间节点。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWZDdVcGV3Y2dkS3F2dXlPRlRBdXh3QmdncWJwNmNXdi1vYlRuTTRVdE01ZUE_ZT1KWE9KTXQ.png)
+
+相关题目：[141. 环形链表](https://leetcode.cn/problems/linked-list-cycle/)
+
+```c
+bool hasCycle(struct ListNode *head) {
+    struct ListNode *fast = head;
+    struct ListNode *slow = head;
+    while (fast && fast->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+        if(slow == fast) {
+            return true;
+        }
+    }
+    return false;
+}
+```
+
+## 单链表的反转
+
+### 循环解法
+
+1. **初始化指针**：
+   - 需要三个指针：`curr`、`prev` 和 `next`。
+   - `curr` 用于遍历链表，初始时指向链表的第一个结点。
+   - `prev` 用于指向 `curr` 的前驱结点，初始时指向 `NULL`。
+   - `next` 用于临时存储 `curr` 的后继结点。
+2. **遍历链表**：
+   - 从链表的头结点开始，使用 `curr` 指针遍历链表。
+   - 当 `curr` 指向 `NULL` 时，遍历结束，反转完成。
+3. **反转指针**：
+   - 在遍历的过程中，首先使用 `next` 指针存储 `curr` 的后继结点（`curr->next`）。
+   - 然后，将 `curr` 结点的 `next` 指针指向 `prev`，完成当前结点的反转。
+4. **更新指针**：在每次遍历后，更新 `prev` 为 `curr`，然后将 `curr` 移动到 `next` 指向的位置。
+5. **循环结束**：当 `curr` 指向 `NULL` 时，`prev` 将指向原本的尾结点，即反转后链表的第一个结点。
+
+```c
+struct ListNode* reverseList(struct ListNode* head) {
+    struct ListNode* curr = head;
+    struct ListNode* prev = NULL;
+    while(curr) {
+        struct ListNode* succ = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = succ;
+    }
+    return prev;
+}
+```
+
+### 递归解法
+
+1. **递归体**：递归体是递归函数中自我调用的部分，它负责将问题分解为更小的子问题。
+2. **分解思路**：对于一个有 n 个结点的单链表，我们可以将其分解为：反转第一个结点和剩余的 n-1 个结点的单链表。
+3. **递归出口**：当链表为空（`head == NULL`）或只有一个结点（`head->next == NULL`）时，递归结束。
+4. **递归逻辑**：
+   - 在递归中，首先处理第一个结点的反转，即将其 `next` 指针指向之前已经反转的部分。
+   - 然后，递归调用处理剩余链表的反转。
+   - 首先，递归调用反转函数，以处理链表剩余的 n-1 个结点。这一步是递归的主体，它将问题分解为更小的子问题。
+   - 在递归调用返回后，处理反转后的 n-1 个结点中的尾结点，使其指向原本的第一个结点（head）。这一步是递归过程中的关键操作，它将反转后的子链表与原链表连接起来。
+   - 最后，更新 head 指针指向递归调用返回的新头指针。这一步是递归出口的一部分，它确保了整个链表的反转。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VjMGlTaUgxYlRCUGhjeHczQmZPa01jQnJ6SjdKa2RxRGk3ei1oZVJvaXJaN1E_ZT12UjFFS1o.png)
+
+![msedge_pACh186f6Y.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWaVlOalBHX3NwRnZnRFJfaVdjOS1BQmFVRmYtY0FtLVV2SURTaGVsaGxRTGc_ZT11SUxqeDA.png)
+
+```c
+struct ListNode* reverse(struct ListNode* pre, struct ListNode* cur) {
+    if(!cur)
+        return pre;
+    struct ListNode* temp = cur->next;
+    cur->next = pre;
+    return reverse(cur, temp);
+}
+
+struct ListNode* reverseList(struct ListNode* head){
+    return reverse(NULL, head);
+}
+```
+

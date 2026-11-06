@@ -1,0 +1,773 @@
+---
+title: "C++ 资源管理"
+date: 2020-12-15T12:32:41+08:00
+categories: ["C 与 C++", "C++ 基础"]
+tags: ["C++"]
+cover: "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWZDhMWlJhTEExTnRDaUcwNXR3Q1V3Qlk3U2lfMnlxWGFVWkk5TnBrQ3pwbkE_ZT1XRWJPa3g.jpg"
+---
+
+## RAII 技术
+
+RAII（Resource Acquisition Is Initialization）是 C++ 中一种重要的资源管理技术，由 C++之父 Bjarne Stroustrup 提出。它利用对象的生命周期来管理资源，确保资源在对象生命周期结束时自动释放。RAII 通过构造函数获取资源，并在析构函数中释放资源，从而避免了资源泄漏。
+
+RAII 的核心思想
+
+1. **资源获取即初始化**：在对象构造时获取资源。
+2. **自动资源释放**：在对象析构时自动释放资源。
+
+这种模式确保了即使在发生异常或多个退出路径的情况下，资源也能被正确释放。
+
+```cpp
+#include <iostream>
+#include <fstream>
+
+class SafeFile {
+ public:
+  // 构造函数中初始化资源（打开文件）
+  SafeFile(const std::string& filename) {
+    _file.open(filename, std::ios::out | std::ios::app);
+    std::cout << "SafeFile::SafeFile() " << std::endl;
+  }
+
+  // 提供方法访问资源（写入文件）
+  void write(const std::string& msg) {
+    if (_file.is_open()) {
+      _file << msg << std::endl;
+    }
+  }
+
+  // 利用析构函数释放资源（关闭文件）
+  ~SafeFile() {
+    std::cout << "~SafeFile()" << std::endl;
+    if (_file.is_open()) {
+      _file.close();
+      std::cout << "File closed" << std::endl;
+    }
+  }
+
+ private:
+  std::ofstream _file;
+};
+
+int main() {
+  std::string msg = "Hello, world!";
+  SafeFile sf("example.txt");
+  sf.write(msg);
+  return 0;
+}
+```
+
+在这个例子中，`SafeFile` 类在构造函数中打开文件，在析构函数中关闭文件。即使在写入文件时发生异常，对象的生命周期结束时，析构函数也会被调用，文件资源会被正确释放。
+
+RAII 的优势
+
+1. **减少资源泄漏**：通过自动释放资源，减少了资源泄漏的风险。
+2. **简化代码**：不需要在代码中显式释放资源，简化了代码逻辑。
+3. **提高代码的可读性和可维护性**：资源管理与对象生命周期紧密相关，提高了代码的清晰度。
+
+### RAII 类的常见特征
+
+RAII 技术，具备以下基本特征：
+
+1. **在构造函数中获取资源**：RAII 对象在构造时立即获取所需的资源。
+2. **在析构函数中释放资源**：RAII 对象在生命周期结束时自动释放资源。
+3. **不允许复制或赋值**：为了防止资源的不当复制和释放，RAII 类通常不支持复制和赋值操作。
+4. **提供访问资源的方法**：RAII 类提供接口供外部访问或操作资源。
+
+对象语义与值语义
+
+- **值语义**：允许对象之间可以相互复制和赋值，适用于那些不涉及资源管理的简单数据类型。
+- **对象语义**：不允许对象之间进行复制和赋值，适用于管理资源的对象。
+
+禁用复制和赋值的方法
+
+1. **将拷贝构造函数和赋值运算符设置为私有**
+   
+2. **使用 `delete` 关键字**
+   
+3. **继承的方式**：基类删除拷贝构造函数和赋值运算符，派生类继承基类。
+
+### RAII 类模板的模拟
+
+```cpp
+template<class T>
+class RAII {
+ public:
+  // 在构造函数中初始化资源（托管资源）
+  RAII(T *data) : _data(data) {
+    std::cout << "RAII(T*)" << std::endl;
+  }
+
+  // 在析构函数中释放资源
+  ~RAII() {
+    std::cout << "~RAII()" << std::endl;
+    if (_data) {
+      delete _data;
+      _data = nullptr;
+    }
+  }
+
+  // 提供若干访问资源的方法
+  T *operator->() {
+    return _data;
+  }
+
+  T &operator*() {
+    return *_data;
+  }
+
+  T *get() const {
+    return _data;
+  }
+
+  void set(T *data) {
+    if (_data) {
+      delete _data;
+      _data = nullptr;
+    }
+    _data = data;
+  }
+
+  // 不允许复制或赋值
+  RAII(const RAII &rhs) = delete;
+  RAII &operator=(const RAII &rhs) = delete;
+
+ private:
+  T *_data;
+};
+```
+
+如下，`pt` 不是一个指针，而是一个对象，但是它的使用已经和指针完全一致了。这个对象可以托管堆上的 `Point` 对象，而且不用考虑 `delete`。
+
+```cpp
+class Point {
+  public:
+  Point(int x, int y) : _x(x), _y(y) {}
+  void print() const {
+    std::cout << "Point(" << _x << ", " << _y << ")" << std::endl;
+  }
+
+  private:
+  int _x, _y;
+};
+
+int main() {
+  Point * pt = new Point(1, 2);
+  // 智能指针的雏形
+  RAII<Point> raii(pt);
+  raii->print();   // 使用 -> 访问成员函数
+  (*raii).print(); // 使用 * 访问成员函数
+}
+```
+
+在这个例子中，`RAII<Point>` 对象 `raii` 托管了 `Point` 对象的指针 `pt`。`raii` 的生命周期结束时，会自动调用析构函数，释放 `Point` 对象。
+
+RAII 技术的本质是利用对象的生命周期来管理资源。由于对象在离开作用域时会自动调用析构函数，因此可以确保资源的正确释放。
+
+##  智能指针
+
+c++11 提供了以下几种智能指针，位于头文件&lt; memory>，它们都是类模板。
+
+```cpp
+std::auto_ptr      // c++11
+std::unique_ptr    // c++11
+std::shared_ptr    // c++11
+std::weak_ptr      // c++11
+```
+
+### `auto_ptr`
+
+`auto_ptr` 是 C++ 标准库中曾经的一种智能指针，它用来自动管理动态分配的内存。然而，由于它的设计存在一些问题，特别是在复制行为上，可能会导致原指针失去对资源的控制，因此它在 C++17 被弃用。
+
+`auto_ptr` 在构造时接受一个动态分配的资源，并在析构时自动释放该资源。
+
+```cpp
+#include <iostream>
+#include <memory>
+
+int main() {
+  int * pInt = new int(10);
+  auto_ptr<int> ap(pInt);
+  cout << "*pInt: " << *pInt << endl;
+  cout << "*ap: " << *ap << endl;
+}
+```
+
+在这个例子中，`ap` 接管了 `pInt` 指向的资源。当 `ap` 的生命周期结束时，它会自动释放资源。
+
+`auto_ptr` 可以被复制，但复制后原 `auto_ptr` 会失去对资源的控制。
+
+**示例代码**：
+
+```cpp
+int main() {
+  int * pInt = new int(10);
+  auto_ptr<int> ap(pInt);
+  auto_ptr<int> ap2(ap);
+  cout << "*ap2: " << *ap2 << std::endl; // 正常
+  cout << "*ap: " << *ap << std::endl;   // 可能导致段错误
+}
+```
+
+在这个例子中，`ap2` 复制了 `ap`，之后 `ap` 被置为空，因此再访问 `ap` 可能会导致段错误。
+
+通过阅读源码的实现，`ap` 的指针被置为了空指针。
+
+`auto_ptr` 的内部实现：`auto_ptr` 的复制构造函数通过 `release` 方法实现，该方法将资源的控制权交给新对象，并将原对象置为空。
+
+也就是说，`auto_ptr<int> ap2(ap);` 这一步表面上执行了拷贝操作，但是底层已经将右操作数 ap 所托管的堆空间的控制权交给了新对象 `ap2`，并且将 `ap` 底层的指针数据成员置空。该拷贝操作存在隐患，所以 `auto_ptr` 被弃用了。
+
+```cpp
+template<class _Tp>
+class auto_ptr {
+ public:
+  //拷贝构造
+  auto_ptr(auto_ptr &__a)
+  __STL_NOTHROW
+  //ap2的_M_ptr 被赋值为 ap调用release函数的返回值
+      : _M_ptr(__a.release())
+      {}
+
+  //ap调用release函数
+  _Tp *release()
+  __STL_NOTHROW {
+    //用局部的指针__tmp接管ap的指针所指向的资源
+    _Tp *__tmp = _M_ptr;
+    _M_ptr = nullptr; //将ap底层的指针设为空指针
+    return __tmp;//返回的就是原本ap管理的资源的地址
+  }
+
+ private:
+  _Tp *_M_ptr;
+};
+```
+
+### `unique_ptr` 
+
+`std::unique_ptr` 是 C++11 引入的一种智能指针，用于管理动态分配的资源。它提供了独占所有权模型，确保同一时间只能有一个智能指针管理特定资源。
+
+`unique_ptr` 的特点：
+
+1. **不允许复制或赋值**：`unique_ptr` 不能被复制或赋值，这避免了资源的多次释放。
+2. **独享所有权**：`unique_ptr` 独占管理其指向的资源，确保资源在不再需要时被正确释放。
+3. **可以移动**：`unique_ptr` 支持移动语义，可以将其所有权从一个对象转移到另一个对象。
+
+```cpp
+int main() {
+  unique_ptr<int> up(new int(10));
+  cout << "*up: " << *up << endl;
+  cout << "up.get(): " << up.get() << endl;
+
+  // 独享所有权的智能指针，对托管的空间独立拥有
+  // 拷贝构造已经被删除
+  // std::unique_ptr<int> up2 = up; // 复制操作 error
+
+  // 赋值运算符函数也被删除
+  unique_ptr<int> up3(new int(20));
+  // up3 = up; // 赋值操作 error
+  return 0;
+}
+```
+
+`unique_ptr` 可以作为容器的元素，利用移动语义直接传递右值属性的 `unique_ptr`。
+
+**示例代码**：
+
+```cpp
+vector<std::unique_ptr<Point>> vec;
+unique_ptr<Point> up4(new Point(10, 20));
+// 将 up4 这个对象作为参数传给了 push_back 函数，会调用移动构造
+// vec.push_back(up4);  // error，不能拷贝
+vec.push_back(move(up4));  // ok
+vec.push_back(unique_ptr<Point>(new Point(1, 3))); // ok
+```
+
+在这个例子中，`up4` 通过 `std::move` 将其所有权移交给 `vec`，之后 `up4` 就不再拥有管理权。
+
+根据我们对 `vector` 的了解，`vector` 的元素一定在堆上，而 `up4` 是在栈上的智能指针对象，这里是发生了复制吗？
+
+并不是复制，`unique_ptr` 的拷贝构造是被删除的。这里实际上要理解为移交管理权，`up4` 不再拥有 (10,20) 这个 `Point` 对象的管理权。
+
+``` cpp
+// up4->print(); // error，up4 已经没有管理权了
+vec[0]->print(); // ok
+```
+
+### `shared_ptr` 
+
+`std::shared_ptr` 是 C++ 标准库中的另一种智能指针，它允许多个 `shared_ptr` 实例共享同一个资源，通过引用计数来管理资源的生命周期。
+
+`shared_ptr` 的特征：
+
+1. **共享所有权**：多个 `shared_ptr` 实例可以共享同一个资源。
+2. **引用计数**：`shared_ptr` 内部维护一个引用计数来记录有多少个 `shared_ptr` 实例共享同一个资源。
+3. **可以复制或赋值**：复制或赋值 `shared_ptr` 会增加引用计数，而不是复制资源。（区别于 `unique_ptr` 只能传右值）
+4. **作为容器的元素**：可以存储在容器中，可以传递左值或右值。
+5. **移动语义**：支持移动构造函数和移动赋值函数。
+
+```cpp
+shared_ptr<int> sp(new int(10));
+cout << "sp.use_count(): " << sp.use_count() << endl;
+
+cout << endl;
+cout << "执行复制操作" << endl;
+shared_ptr<int> sp2 = sp;
+cout << "sp.use_count(): " << sp.use_count() << endl;
+cout << "sp2.use_count(): " << sp2.use_count() << endl;
+
+cout << endl;
+cout << "再创建一个对象sp3" << endl;
+shared_ptr<int> sp3(new int(30));
+cout << "sp.use_count(): " << sp.use_count() << endl;
+cout << "sp2.use_count(): " << sp2.use_count() << endl;
+cout << "sp3.use_count(): " << sp3.use_count() << endl;
+
+cout << endl;
+cout << "执行赋值操作" << endl;
+sp3 = sp;
+cout << "sp.use_count(): " << sp.use_count() << endl;
+cout << "sp2.use_count(): " << sp2.use_count() << endl;
+cout << "sp3.use_count(): " << sp3.use_count() << endl;
+cout << endl;
+cout << "作为容器元素" << endl;
+vector<std::shared_ptr<int>> vec;
+vec.push_back(sp); // sp 已经超出作用域，但 vec 中的元素仍然有效
+vec.push_back(std::move(sp2)); // sp2 被移动，vec 拥有 sp2 原来的资源
+```
+
+```
+sp.use_count(): 1
+
+执行复制操作
+sp.use_count(): 2
+sp2.use_count(): 2
+
+再创建一个对象sp3
+sp.use_count(): 2
+sp2.use_count(): 2
+sp3.use_count(): 1
+
+执行赋值操作
+sp.use_count(): 3
+sp2.use_count(): 3
+sp3.use_count(): 3
+
+作为容器元素
+```
+
+### `shared_ptr` 的循环引用问题
+
+我们建立一个 `Parent` 和 `Child` 类的一个结构
+
+```cpp
+class Child;
+class Parent {
+public:
+    shared_ptr<Child> _spChild;
+};
+
+class Child {
+public:
+    shared_ptr<Parent> _spParent;
+};
+```
+
+由于 `shared_ptr` 的实现使用了引用计数，那么如果进行如下的创建
+
+```cpp
+shared_ptr<Parent> parentPtr(new Parent());
+shared_ptr<Child> childPtr(new Child());
+// 获取到的引用计数都是 1
+cout << "parentPtr.use_count():" << parentPtr.use_count() << endl;
+cout << "childPtr.use_count():" << childPtr.use_count() << endl;
+```
+
+![undefined202403222027179.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VXYkJYc0FWYVFCTXJINHkxTy1zN0VrQko0azVSaWxvWnB1djRBSXNhS1V5T2c_ZT1PWnlRQmg.png)
+
+```cpp
+parentPtr->_spChild = childPtr;
+childPtr->spParent = parentPtr;
+//获取到的引用计数都是 2
+cout << "parentPtr.use_count():" << parentPtr.use_count() << endl;
+cout << "childPtr.use_count():" << childPtr.use_count() << endl;
+```
+
+实际上形成了这样的结构：
+
+![image-20240508115748981.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VaREU2VDlQcTlwRXBsQXB1LU1kWGJFQjlzcnM0ZGpwOFZ6eG5ka2FLaUVzZXc_ZT1OVWNxeVI.png)
+
+程序结束时，发现 `Parent` 和 `child` 的析构函数都没有被调用
+
+因为 `childPtr` 和 `parentPtr` 会先后销毁，但是堆上的 `Parent` 对象和 `Child` 对象的引用计数都变成了 1，而不会减到 0，所以没有回收。
+
+![image-20240508115701939.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VjNjBsSXpSOWdaSnI4d3A0ZzRiX0FzQlU4TWNLNFlENU15MEJnUlhIaWVlcXc_ZT1jaGtOUzY.png)
+
+解决思路：
+
+希望某一个指针指向一片空间，能够指向，但是不会使引用计数加 1，那么堆上的 `Parent` 对象和 `Child` 对象必然有一个的引用计数是 1，栈对象再销毁的时候，就可以使引用计数减为 0。
+
+`shared_ptr` 无法实现这一效果，所以引入了 `weak_ptr`。
+
+`weak_ptr` 是一个弱引用的智能指针，不会增加引用计数。
+
+`shared_ptr` 是一个强引用的智能指针。
+
+强引用，指向一定会增加引用计数，只要有一个引用存在，对象就不能释放；
+
+弱引用并不增加对象的引用计数，但是它知道所托管的对象是否还存活。
+
+循环引用的解法，将 `Parent` 类或 `Child` 类中的任意一个 `shared_ptr` 换成 `weak_ptr` 类型的智能指针
+
+比如：将 `Parent` 类中的 `shared_ptr` 类型指针换成 `weak_ptr`。
+
+![image-20240508115831351.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0Vmem54RGlJMF9OSmd4WmNkOE8xVkZFQmdDYlVNUHJBWUhuNmJUeGxqVTN1SEE_ZT1IaGgyRjE.png)
+
+栈上的 `childPtr` 对象先销毁，会使堆上的 `Child` 对象的引用计数减 1，因为这个 `Child` 对象的引用计数本来就是 1，所以减为了 0，回收这个 `Child` 对象，造成堆上的 `Parent` 对象的引用计数也减 1。
+
+![image-20240508120233748.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0Vadm05ZmhYeGtoUGxqZnVabGZrNXEwQnZNRkIwMG9mam5Uay16THBzOUV0bUE_ZT1HcXBYb3Y.png)
+
+再当 `parentPtr` 销毁时，会再让堆上的 `Parent` 对象的引用计数减 1，所以也能够回收。
+
+![image-20240508120320252.png](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVbTk3d2FQMkw1UHFUUzVMaGxzTTFrQnItMmlDT3g1RFUzZk9UOEcwWENkQlE_ZT1JY2NOWlE.png)
+
+### `weak_ptr` 的使用
+
+`std::weak_ptr` 是 C++ 标准库中的智能指针，用于解决 `shared_ptr` 的循环引用问题。`weak_ptr` 是一种弱引用智能指针，它不会增加引用计数，因此不会阻止其指向的对象被释放。
+
+`weak_ptr` 的特点：
+
+1. **弱引用**：不会增加引用计数。
+2. **观察引用**：可以观察一个对象是否仍然存活，但不拥有对象。
+3. **提升**：可以通过 `lock()` 方法提升为 `std::shared_ptr`，如果对象仍然存活。
+
+初始化 `weak_ptr`：
+
+```cpp
+shared_ptr<int> sp(new int(10));
+weak_ptr<int> wp; // 无参的方式创建 weak_ptr
+wp = sp; // 利用 shared_ptr 创建 weak_ptr
+```
+
+判断关联的空间是否还在：
+
+1. **使用 `use_count` 函数**：如果 `use_count` 的返回值大于 0，表明关联的空间还在。
+
+2. **将 `weak_ptr` 提升为 `shared_ptr`**：
+
+   这种赋值操作可以让 wp 也能够托管这片空间，但是它作为一个 weak_ptr 仍不能够去管理，甚至连访问都不允许（weak_ptr 不支持直接解引用）
+
+   想要真正地去进行管理需要使用 lock 函数将 weak_ptr 提升为 shared_ptr
+
+   如果托管的资源没有被销毁，就可以成功提升为 shared_ptr，否则就会返回一个空的 shared_ptr（空指针）
+
+```cpp
+shared_ptr<int> sp(new int(10));
+weak_ptr<int> wp; // 无参的方式创建 weak_ptr
+wp = sp; // 赋值
+shared_ptr<int> sp2 = wp.lock(); // 提升为 shared_ptr
+if (sp2) {
+  cout << "提升成功" << endl;
+  cout << *sp2 << endl;
+} else {
+  cout << "提升失败，托管的空间已经被销毁" << endl;
+}
+```
+
+3. **使用 `expired` 函数**：
+
+```cpp
+bool flag = wp.expired();
+if (flag) {
+    std::cout << "托管的空间已经被销毁" << std::endl;
+} else {
+    std::cout << "托管的空间还在" << std::endl;
+}
+```
+
+`expired` 函数返回 true 等价于 `use_count() == 0`。
+
+```cpp
+#include <iostream>
+#include <memory>
+
+void test_weak_ptr() {
+  shared_ptr<int> sp(new int(10));
+  weak_ptr<int> wp(sp);
+
+  // 判断关联空间是否还在
+  cout << "use_count: " << wp.use_count() << endl;
+
+  // 提升为 shared_ptr
+  shared_ptr<int> sp2 = wp.lock();
+  if (sp2) {
+    cout << "提升成功" << endl;
+    cout << *sp2 << endl;
+  } else {
+    cout << "提升失败，托管的空间已经被销毁" << endl;
+  }
+
+  // 使用 expired 函数
+  bool flag = wp.expired();
+  if (flag) {
+    cout << "托管的空间已经被销毁" << endl;
+  } else {
+    cout << "托管的空间还在" << endl;
+  }
+}
+
+int main() {
+  test_weak_ptr();
+  return 0;
+}
+```
+
+## 删除器
+
+### `unique_ptr` 对应的删除器
+
+默认情况下，`unique_ptr` 使用 `default_delete` 作为删除器，它通过 `delete` 或 `delete[]` 来释放资源。然而，对于一些特殊资源，如文件句柄或网络套接字，需要特殊的释放机制，因此需要自定义删除器。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VWMDlMZlVyM3oxQ3FkbVd0LWdUa2M0QlVpeDBWOFVfVlozVVVkN0lFUzlwQ3c_ZT1IUkJrTFI.png)
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVMDFfLVlVRENKRG5QMlBMZWF3ZGJRQnlHWmVHdi0xQWJINFl1S2ZvNVZIOGc_ZT0wQzdmS3I.png)
+
+考虑一个场景，我们希望使用 `unique_ptr` 来管理一个由 `fopen` 打开的文件句柄。直接使用 `unique_ptr` 会遇到问题，因为默认删除器不知道如何正确关闭文件句柄。
+
+```cpp
+void test0() {
+  string msg = "hello,world\n";
+  FILE* fp = fopen("res1.txt", "a+");
+  fwrite(msg.c_str(), 1, msg.size(), fp);
+  fclose(fp);
+}
+```
+
+```cpp
+void test1() {
+  string msg = "hello,world\n";
+  unique_ptr<FILE> up(fopen("res2.txt", "a+"));
+  fwrite(msg.c_str(), 1, msg.size(), up.get());
+  // fclose(up.get()); // 这行会导致 double free 错误
+}
+```
+
+在上面的代码中，`test1` 函数尝试使用 `unique_ptr` 来管理文件句柄，但如果调用 `fclose(up.get())`，随后 `up` 的析构函数也会尝试释放文件句柄，导致 double free 错误。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSZFlhOElucmVWQ21ud2U1U2NLa040QnFXMzlYUUl4OWJtaE5nVVlHXzlMakE_ZT1qM0NaSjY.png)
+
+解决这个问题可以为 `unique_ptr` 提供一个自定义删除器。
+
+```cpp
+struct FILECloser {
+  void operator()(FILE* fp) {
+    if (fp) {
+      fclose(fp);
+      std::cout << "fclose(" << fp << ")" << std::endl;
+    }
+  }
+};
+
+void test1() {
+  string msg = "hello,world\n";
+  unique_ptr<FILE, FILECloser> up(fopen("res2.txt", "a+"), FILECloser());
+  fwrite(msg.c_str(), 1, msg.size(), up.get());
+  // 不需要手动 fclose，up 的析构函数会自动调用
+}
+```
+
+在这个修改后的版本中定义了一个 `FILECloser` 结构体，并在 `std::unique_ptr` 的构造函数中提供了这个自定义删除器。这样，当 `up` 的生命周期结束时，`FILECloser` 将被调用来正确关闭文件句柄。
+
+或者这样使用，与 `default_delete` 保持一致。
+
+```cpp
+template <class T> 
+struct FILECloser 
+{
+  void operator()(FILE * fp){ 
+    if(fp){ 
+      fclose(fp); 
+      cout << "fclose(fp)" << endl; 
+    } 
+  }
+}; 
+
+void test3(){
+  string msg("hello,world\n");
+  FILECloser fc;
+  shared_ptr<FILE> sp(fopen("res2.txt", "a+"), fc);
+  fwrite(msg.c_str(), 1, msg.size(), sp.get());
+}
+```
+
+### `shared_ptr` 的删除器
+
+与 `unique_ptr` 类似，`shared_ptr` 也可以使用自定义删除器来管理非默认的资源释放方式。`shared_ptr` 是一种智能指针，用于共享所有权的资源管理，它通过引用计数来跟踪资源的生命周期。
+
+`unique_ptr` 与 `shared_ptr` 删除器的区别
+
+1. **`unique_ptr` 的删除器作为模板参数**：`unique_ptr` 要求删除器作为模板参数传递，这使得删除器成为智能指针类型的一部分。
+
+   ![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVX1JLMnlFZVRsR2dYdFZnNDloVUtJQnBycmhlcFctWkFvTDN6MllxY2xpZEE_ZT1sY1phUzA.png)
+
+2. **`shared_ptr` 的删除器作为构造函数参数**：`shared_ptr` 允许在构造函数中传递删除器，提供了更大的灵活性，允许不同的 `shared_ptr` 实例使用不同的删除器。
+
+   ![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VSejNuRU1USG1sTGtCbzhBa3B4RzRzQmdNZkoyVjJKVWFwTmM5RkVZb1h6RHc_ZT1XSzRvMmY.png)
+
+```cpp
+#include <iostream>
+#include <memory>
+#include <cstdio>
+using namespace std;
+
+struct FILECloser {
+  void operator()(FILE* fp) {
+    if (fp) {
+      cout << "fclose(" << fp << ")" << endl;
+      fclose(fp);
+    }
+  }
+};
+
+void test_unique_ptr() {
+  string msg = "hello, world\n";
+  // 使用自定义删除器的 unique_ptr
+  unique_ptr<FILE, FILECloser> up(fopen("res2.txt", "a+"), FILECloser());
+  fwrite(msg.c_str(), 1, msg.size(), up.get());
+}
+
+void test_shared_ptr() {
+  string msg = "hello, world\n";
+  FILECloser fc;
+  // 使用自定义删除器的 shared_ptr
+  shared_ptr<FILE> sp(fopen("res3.txt", "a+"), fc);
+  fwrite(msg.c_str(), 1, msg.size(), sp.get());
+}
+
+int main() {
+  test_unique_ptr();
+  test_shared_ptr();
+  return 0;
+}
+```
+
+这个例子定义了一个 `FILECloser` 结构体，它重载了 `operator()` 函数来关闭文件。然后使用 `unique_ptr` 和 `shared_ptr` 来管理文件资源，并在构造时传入自定义的删除器。
+
+## 智能指针的误用
+
+智能指针误用的主要原因是将同一个原生裸指针交给了不同的智能指针进行托管，导致尝试对同一个对象销毁两次。
+
+### `unique_ptr` 的误用
+
+`unique_ptr` 要求独占所有权，因此不能将同一个裸指针传递给多个 `unique_ptr` 实例。
+
+```cpp
+void test0() {
+  Point * pt = new Point(1, 2);
+  unique_ptr<Point> up(pt);
+  unique_ptr<Point> up2(pt); // 错误：重复托管
+}
+
+void test1() {
+  unique_ptr<Point> up(new Point(1, 2));
+  unique_ptr<Point> up2(new Point(1, 2));
+  up.reset(up2.get()); // 错误：重复托管
+}
+```
+
+### `shared_ptr` 的误用
+
+使用不同的智能指针托管同一片堆空间, 只能通过 `shared_ptr` 开放的接口——拷贝构造、赋值运算符函数
+
+如果是用裸指针的形式将一片资源交给不同的智能指针对象管理，即使是 `shared_ptr` 也是不行的。
+
+之前进行的 `shared_ptr` 的复制、赋值的参数都是 `shared_ptr` 的对象，不能直接多次把同一个裸指针传给它的构造。
+
+```cpp
+void test2() {
+  Point * pt = new Point(10, 20);
+  std::shared_ptr<Point> sp(pt);
+  std::shared_ptr<Point> sp2(pt); // 错误：重复托管
+}
+
+void test3() {
+  std::shared_ptr<Point> sp(new Point(1, 2));
+  std::shared_ptr<Point> sp2(new Point(1, 2));
+  sp.reset(sp2.get()); // 错误：重复托管
+}
+```
+
+### 不明显误用
+
+当通过成员函数返回当前对象的指针（`this`），并让外部代码创建一个新的智能指针来管理这个指针时，可能出现多个智能指针管理同一资源的问题。
+
+```cpp
+class Point {
+ public:
+  int _ix, _iy;
+
+  Point(int x, int y) : _ix(x), _iy(y) {}
+
+  Point* addPoint(Point* pt) {
+    _ix += pt->_ix;
+    _iy += pt->_iy;
+    return this;
+  }
+};
+
+int main() {
+  shared_ptr<Point> sp(new Point(1, 2));
+  shared_ptr<Point> sp2(new Point(3, 4));
+
+  shared_ptr<Point> sp3(sp->addPoint(sp2.get()));
+  sp3->print();
+  return;
+}
+```
+
+在这个例子中，`sp3` 实际上是通过 `sp` 的裸指针创建的，这意味着 `sp` 和 `sp3` 都试图管理同一个 `Point` 对象。当 `sp` 和 `sp3` 被销毁时，都尝试释放同一个资源，导致 double free 错误。
+
+为了避免这种情况，可以使用 `enable_shared_from_this` 来安全地获取当前对象的 `shared_ptr`。
+
+`enable_shared_from_this` 是 C++ 标准库中的一个模板类，它提供了一种机制，允许一个对象从它的成员函数中安全地获取对自身的 `shared_ptr`。这个类通常用于管理对象的生命周期，特别是在对象的所有权可能在多个 `shared_ptr` 实例之间转移时。
+
+![](https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVUXdIWmR3eXg5SnZCUlVFYmxqeEFZQjQwZ3A3OHlQTE9KVEF3dGllR2dQbFE_ZT1YZkhVOVE.png)
+
+在 `Point` 的 `addPoint` 函数中需要使用 `shared_from_this` 函数返回的 `shared_ptr` 作为返回值，要想在 `Point` 类中调用 `enable_shared_from_this` 的成员函数，最佳方案可以让 `Point` 类继承 `enable_shared_from_this` 类。
+
+这样修改 `addPoint` 函数后，问题解决。
+
+```cpp
+#include <iostream>
+#include <memory>
+using namespace std;
+
+class Point : public enable_shared_from_this<Point> {
+ public:
+  int _ix, _iy;
+
+  Point(int x, int y) : _ix(x), _iy(y) {}
+
+  // 不存在任何的非法的使用同一个裸指针创建多个 shared_ptr 的情况
+  shared_ptr<Point> addPoint(const Point &pt) {
+    _ix += pt._ix;
+    _iy += pt._iy;
+    return shared_from_this();
+  }
+
+  void print() const {
+    cout << "Point(" << _ix << ", " << _iy << ")" << endl;
+  }
+};
+
+int main() {
+  auto sp = make_shared<Point>(1, 2);
+  auto sp2 = make_shared<Point>(3, 4);
+
+  auto sp3 = sp->addPoint(*sp2);
+  sp3->print();
+  return 0;
+}
+```
+
+在这个例子中，`Point` 类继承自 `enable_shared_from_this`，使得我们可以在成员函数中使用 `shared_from_this` 来获取当前对象的 `shared_ptr`。这样，`addPoint` 函数返回的 `shared_ptr` 与 `sp` 共享所有权，而不是创建一个新的智能指针实例。
+
