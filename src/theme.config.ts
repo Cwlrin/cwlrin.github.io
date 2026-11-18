@@ -208,6 +208,13 @@ export default defineConfig({
           "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL2kvYy9iZGU1MWU2MjVlZjhmY2M1L0VVWVRUZzhSZjFkRHBNekd2ZnloQVRzQmV5ZkpNc1dLMmI5NlVrNU5KUC1KVWc_ZT1reHgxWkQ.jpg",
         color: "#f5c87b",
       },
+      {
+        url: "https://www.levy.asia",
+        title: "levy",
+        desc: "技术博客与生活碎片",
+        author: "levy",
+        avatar: "https://www.levy.asia/_nuxt/avatar.BZlFA9uF.jpg",
+      },
     ],
   },
 
